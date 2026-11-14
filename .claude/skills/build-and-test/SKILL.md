@@ -100,6 +100,9 @@ commit anything from it.
   certificates. `SSL_CERT_FILE` replaces the system trust store for emberd.
 - `EMBER_TEST_AUDIO_JITTER_MS=<ms>` makes the audio_pipe mesh tests deliver audio in bursts (a loaded
   machine); the handheld_vox and acoustic cases must pass with it.
+- `EMBER_TEST_SDR_RATE_X=<x>` (0 = as fast as possible) and `EMBER_TEST_SDR_JITTER_MS=<ms>` make the
+  fake rtl_tcp server in the mesh tests deliver I/Q slowly, instantly or in bursts; the rtl_tcp case
+  must pass with each.
 - A suite reported **skip** did not run. Never report it as passed; say what was skipped and why.
 - Do not edit generated copies (`apps/android/app/build/…`, `build/`, `dist/`); edit the source
   (`ui/`, `core/`, …) and rebuild.

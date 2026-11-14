@@ -26,6 +26,7 @@
 #include <atomic>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <functional>
 #include <mutex>
@@ -505,19 +506,29 @@ struct PtyCable {
 };
 
 // Minimal rtl_tcp server: sends the 12-byte header, swallows tuner commands and streams the given
-// u8 I/Q buffer at `rate_x` times real time (then unmodulated noise), like a dongle.
+// u8 I/Q buffer at `rate_x` times real time (then unmodulated noise), like a dongle. Pacing is in
+// sample time against a deadline: a stretched sleep makes the next send bigger (a burst), never
+// the stream slower. `iq_done` is set once the whole buffer is on the wire, so tests wait for
+// that instead of guessing how long a loaded machine needs.
+// Test knobs: EMBER_TEST_SDR_RATE_X (default 2; 0 = the buffer as fast as the socket takes it) and
+// EMBER_TEST_SDR_JITTER_MS (random stalls up to that long, then the backlog in one burst: what a
+// busy USB host or a remote rtl_tcp over Wi-Fi delivers).
 struct FakeRtlTcp {
   int lfd = -1;
   uint16_t port = 0;
   std::string iq;
   uint32_t sample_rate = 240000;
   double rate_x = 2.0;
+  int jitter_ms = 0;
   std::atomic<bool> stop{false};
   std::atomic<size_t> sent{0};
+  std::atomic<bool> iq_done{false};
   std::atomic<size_t> commands{0};
   std::thread th;
 
   explicit FakeRtlTcp(std::string iq_bytes) : iq(std::move(iq_bytes)) {
+    if (const char* e = std::getenv("EMBER_TEST_SDR_RATE_X")) rate_x = std::atof(e);
+    if (const char* e = std::getenv("EMBER_TEST_SDR_JITTER_MS")) jitter_ms = std::atoi(e);
     lfd = ::socket(AF_INET, SOCK_STREAM, 0);
     int one = 1;
     setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one);
@@ -549,10 +560,13 @@ struct FakeRtlTcp {
 #endif
     const uint8_t hdr[12] = {'R', 'T', 'L', '0', 0, 0, 0, 5, 0, 0, 0, 29};
     ::send(c, hdr, sizeof hdr, 0);
-    size_t chunk = size_t(double(sample_rate) * 0.02) * 2;  // 20 ms of I/Q
-    size_t off = 0;
+    const double bytes_per_ms = double(sample_rate) * 2.0 / 1000.0;  // u8 I + u8 Q per sample
+    const size_t kMaxBurst = 1 << 20;
     uint32_t rng = 12345;
-    std::string noise(chunk, '\0');
+    std::string noise;
+    size_t off = 0;           // bytes of `iq` sent
+    size_t noise_sent = 0;    // bytes of noise sent after it
+    uint64_t t0 = ember_host::steady_ms(), t_noise = 0;
     while (!stop) {
       // Drain commands.
       pollfd p{c, POLLIN, 0};
@@ -565,19 +579,28 @@ struct FakeRtlTcp {
         }
         commands += size_t(r) / 5;
       }
-      const char* data;
-      size_t n;
+      // Everything due by now in sample time: the buffer at rate_x (all of it at once with 0),
+      // then noise at real time.
+      uint64_t now = ember_host::steady_ms();
+      size_t n = 0;
+      const char* data = nullptr;
       if (off < iq.size()) {
-        n = std::min(chunk, iq.size() - off);
+        size_t due = rate_x <= 0 ? iq.size() : size_t(double(now - t0) * bytes_per_ms * rate_x);
+        if (due > iq.size()) due = iq.size();
+        n = due > off ? std::min(due - off, kMaxBurst) & ~size_t(1) : 0;
         data = iq.data() + off;
         off += n;
+        if (off >= iq.size()) t_noise = now;
       } else {
+        size_t due = size_t(double(now - t_noise) * bytes_per_ms);
+        n = due > noise_sent ? std::min(due - noise_sent, kMaxBurst) & ~size_t(1) : 0;
+        noise.resize(n);
         for (auto& ch : noise) {
           rng = rng * 1103515245u + 12345u;
           ch = char(127 + int((rng >> 16) % 5) - 2);
         }
         data = noise.data();
-        n = noise.size();
+        noise_sent += n;
       }
       size_t w = 0;
       while (w < n && !stop) {
@@ -589,7 +612,13 @@ struct FakeRtlTcp {
         w += size_t(r);
       }
       sent += n;
-      std::this_thread::sleep_for(std::chrono::microseconds(int64_t(20000 / rate_x)));
+      if (off >= iq.size()) iq_done = true;
+      int pause = 10;
+      if (jitter_ms > 0) {
+        rng = rng * 1103515245u + 12345u;
+        pause = 1 + int((rng >> 8) % uint32_t(jitter_ms));
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(pause));
     }
     ::close(c);
   }

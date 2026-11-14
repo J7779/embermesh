@@ -413,14 +413,27 @@ TEST_SUITE("mesh") {
     // The driver tuned the dongle itself. The link is "up" once connected; the fake dongle counts
     // the tuning commands as it reads them, a moment later.
     CHECK(wait_until([&] { return sdr.commands.load() >= 2; }, 10000));
-    CHECK_MESSAGE(wait_until([&] { return a.link_by_name("sdr").get("stats").get("rx_frames").as_int() > 0; }, 40000),
+    // Not paced by wall time: wait until the whole recording is on the wire, then give the daemon a
+    // bounded time to demodulate what it has (a loaded machine delivers late and in bursts).
+    MESSAGE("I/Q: " << sdr.iq.size() / 480000.0 << " s at " << sdr.rate_x << "x, jitter " << sdr.jitter_ms << " ms");
+    uint64_t iq_done_at = 0;
+    auto after_iq = [&](const std::function<bool()>& pred, uint64_t grace_ms) {
+      return wait_until([&] {
+        if (pred()) return true;
+        if (!sdr.iq_done.load()) return false;
+        if (!iq_done_at) iq_done_at = ember_host::steady_ms();
+        return ember_host::steady_ms() > iq_done_at + grace_ms;
+      }, 150000) && pred();
+    };
+    CHECK_MESSAGE(after_iq([&] { return a.link_by_name("sdr").get("stats").get("rx_frames").as_int() > 0; }, 15000),
                   "no frame decoded: " << a.link_by_name("sdr").dump());
-    CHECK_MESSAGE(wait_until([&] { return a.has_message("ch:public", t); }, 20000),
+    CHECK_MESSAGE(after_iq([&] { return a.has_message("ch:public", t); }, 15000),
                   "message not shown as received traffic; peers " << a.rpc("mesh.peers").dump() << " stats "
                                                                   << a.link_by_name("sdr").get("stats").dump() << " msgs "
                                                                   << a.rpc("messages.list", J(R"({"conv":"ch:public"})")).dump().substr(0, 600));
     Json m = a.find_message("ch:public", t);
     CHECK(m.get("from").as_string() == bid);
+    MESSAGE("rtl_tcp link stats: " << a.link_by_name("sdr").get("stats").dump());
   }
 
   TEST_CASE("daemon survives garbage on every endpoint") {
