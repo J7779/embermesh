@@ -271,6 +271,7 @@ class RelayLink final : public LinkBase, public RelayControl {
     subscribed_.clear();
     awaiting_.clear();
     pending_sub_.clear();
+    refused_.clear();  // a new MQTT session asks again (the backoff below survives it)
     ping_sent_ = 0;
   }
 
@@ -327,7 +328,7 @@ class RelayLink final : public LinkBase, public RelayControl {
         if (it == awaiting_.end() || bt == batches_.end()) { protocol_error("unexpected SUBACK"); return; }
         if (bt->second.size() != p.codes.size()) { protocol_error("SUBACK of the wrong length"); return; }
         for (size_t i = 0; i < p.codes.size(); ++i)
-          if (p.codes[i] == 0x80) { refused_.insert(bt->second[i]); subscribed_.erase(bt->second[i]); }
+          if (p.codes[i] == 0x80) refuse(bt->second[i]);
         awaiting_.erase(it);
         batches_.erase(bt);
         break;
@@ -358,6 +359,16 @@ class RelayLink final : public LinkBase, public RelayControl {
     *ok = true;
     return static_cast<uint32_t>(f[off]) << 24 | static_cast<uint32_t>(f[off + 1]) << 16 |
            static_cast<uint32_t>(f[off + 2]) << 8 | f[off + 3];
+  }
+
+  // SUBACK 0x80: the broker refused one topic. Never permanent — a single (possibly hostile or
+  // transient) refusal must not cut a contact off for good: retried after 1, 2, 4 … 60 minutes,
+  // and on every new connection.
+  void refuse(const std::string& topic) {
+    subscribed_.erase(topic);
+    uint64_t& backoff = refuse_backoff_[topic];
+    backoff = backoff ? std::min(backoff * 2, kBreakerMaxMs) : 60000;
+    refused_[topic] = now() + backoff;
   }
 
   void breaker_hit(TopicState& ts, const std::string& topic, uint64_t t) {
@@ -463,6 +474,8 @@ class RelayLink final : public LinkBase, public RelayControl {
     next_pause_check_ = t + 15000;
     for (auto it = paused_.begin(); it != paused_.end();)
       it = t >= it->second ? paused_.erase(it) : std::next(it);
+    for (auto it = refused_.begin(); it != refused_.end();)
+      it = t >= it->second ? refused_.erase(it) : std::next(it);
     std::map<std::string, TopicRef> want;
     if (wall_ms_ >= kMinSaneUnixMs) {
       uint32_t E = rly::epoch_of(wall_ms_);
@@ -481,6 +494,11 @@ class RelayLink final : public LinkBase, public RelayControl {
     }
     for (const auto& kv : topic_map_)
       if (!want.count(kv.first) && subscribed_.erase(kv.first) && phase_ == Phase::Up) pending_unsub_.push_back(kv.first);
+    // Per-topic state of topics no longer wanted (old epochs, removed sessions) goes, so these maps
+    // stay bounded by the live topic set; a paused topic keeps its entry until its pause ends.
+    for (auto* m : {&refused_, &refuse_backoff_, &breaker_backoff_})
+      for (auto it = m->begin(); it != m->end();)
+        it = (!want.count(it->first) && !paused_.count(it->first)) ? m->erase(it) : std::next(it);
     topic_map_ = std::move(want);
     if (phase_ != Phase::Up) return;
     for (const auto& kv : topic_map_)
@@ -530,7 +548,8 @@ class RelayLink final : public LinkBase, public RelayControl {
   uint64_t window_key_ = ~0ull, next_pause_check_ = 0;
   std::vector<std::unique_ptr<RelayChild>> children_;
   std::map<std::string, TopicRef> topic_map_;
-  std::set<std::string> subscribed_, refused_;
+  std::set<std::string> subscribed_;
+  std::map<std::string, uint64_t> refused_, refuse_backoff_;  // topic -> retry time / current backoff
   std::map<std::string, uint64_t> paused_, breaker_backoff_;
   std::vector<std::string> pending_sub_, pending_unsub_;
   std::map<uint16_t, uint64_t> awaiting_;

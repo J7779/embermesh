@@ -375,7 +375,9 @@ namespace {
 // Hostile broker streams: valid sealed publishes, forged/mutated ones, protocol packets in the wrong
 // order, at arbitrary splits, with session and clock changes in between. The driver must never
 // crash, never deliver a frame it did not authenticate, and recover after the broker behaves again.
-void relay_fuzz(uint64_t seed, int iters) {
+// `byte_first` replays the stream GCC and MSVC produced when the insert mutation drew its two
+// values as unsequenced call arguments (kept as a regression case, see below).
+void relay_fuzz(uint64_t seed, int iters, bool byte_first = false) {
   Prng R(seed * 7919 + 3);
   Rig r;
   r.pair_session(1);
@@ -393,8 +395,26 @@ void relay_fuzz(uint64_t seed, int iters) {
   for (int i = 0; i < iters; ++i) {
     Bytes b = corpus[R.below(static_cast<uint32_t>(corpus.size()))];
     switch (R.below(5)) {
-      case 0: if (!b.empty()) b[R.below(static_cast<uint32_t>(b.size()))] ^= static_cast<uint8_t>(1u << R.below(8)); break;
-      case 1: b.insert(b.begin() + R.below(static_cast<uint32_t>(b.size() + 1)), R.byte()); break;
+      case 0:
+        if (!b.empty()) {
+          uint32_t pos = R.below(static_cast<uint32_t>(b.size()));
+          b[pos] ^= static_cast<uint8_t>(1u << R.below(8));
+        }
+        break;
+      case 1: {
+        // Two draws, explicitly sequenced: as arguments of one call their order would be
+        // unspecified (Clang left to right, GCC and MSVC right to left) and the stream would differ.
+        uint32_t pos, byte;
+        if (byte_first) {
+          byte = R.byte();
+          pos = R.below(static_cast<uint32_t>(b.size() + 1));
+        } else {
+          pos = R.below(static_cast<uint32_t>(b.size() + 1));
+          byte = R.byte();
+        }
+        b.insert(b.begin() + pos, static_cast<uint8_t>(byte));
+        break;
+      }
       case 2: if (b.size() > 1) b.resize(1 + R.below(static_cast<uint32_t>(b.size() - 1))); break;
       case 3: { Bytes x = R.bytes(R.below(300)); b.insert(b.end(), x.begin(), x.end()); break; }
       default: break;  // unchanged
@@ -437,7 +457,8 @@ void relay_fuzz(uint64_t seed, int iters) {
   REQUIRE(r.status().get_string("mqtt_state") == "up");
   size_t before = r.host.frames.size();
   r.inject(1, 20406, kNoon + 5000, mesh_frame(kPeerHop, 0x77), static_cast<uint8_t>(0xC0 + seed % 32));
-  CHECK(r.host.frames.size() == before + 1);
+  CHECK(r.status().get_int("topics") >= 1);
+  CHECK_MESSAGE(r.host.frames.size() == before + 1, "seed " << seed << " status " << r.link->status_json());
 }
 
 }  // namespace
@@ -445,11 +466,56 @@ void relay_fuzz(uint64_t seed, int iters) {
 TEST_SUITE("link") {
 
 TEST_CASE("relay fuzz: hostile broker streams (fast)") {
-  for (uint64_t s = 1; s <= 4; ++s) relay_fuzz(s, 400);
+  for (uint64_t s = 1; s <= 8; ++s) relay_fuzz(s, 400);
+}
+
+TEST_CASE("relay regression: one SUBACK 0x80 used to cut the contact off for good (fuzz seed 3, GCC/MSVC stream)") {
+  // The hostile stream answered a live SUBSCRIBE with a refusal; the topic stayed refused across
+  // 154 reconnects and the next authentic frame was never delivered.
+  relay_fuzz(3, 400, true);
+}
+
+TEST_CASE("relay: a refused topic is retried after 1, 2, 4 … minutes and on every new connection") {
+  Rig r;
+  r.pair_session();
+  r.connack();
+  std::string t = rly::topic(root_of(1), 20406, kHost);
+  auto refuse_all = [&] {
+    int n = 0;
+    for (const mqtt::Packet& p : r.drain())
+      if (p.type == mqtt::Type::Subscribe) {
+        r.deliver(mqtt::suback(p.packet_id, std::vector<uint8_t>(p.filters.size(), 0x80)));
+        ++n;
+      }
+    return n;
+  };
+  REQUIRE(refuse_all() == 1);
+  CHECK(r.status().get_int("topics_refused") == 1);
+  r.step(30000);
+  CHECK(refuse_all() == 0);  // not before a minute
+  r.step(31000);
+  REQUIRE(refuse_all() == 1);  // retried after 1 min, refused again
+  r.step(61000);
+  CHECK(refuse_all() == 0);  // the second wait is 2 min
+  r.step(60000);
+  CHECK(refuse_all() == 1);
+  // a new connection asks at once
+  r.link->on_io_state(false);
+  r.link->on_io_state(true);
+  r.step(100);
+  r.connack();
+  r.ack_subscriptions();
+  CHECK(r.status().get_int("topics_refused") == 0);
+  CHECK(r.status().get_int("topics") == 1);
+  r.inject(1, 20406, kNoon, mesh_frame(kPeerHop), 5);
+  CHECK(r.host.frames.size() == 1);
 }
 
 TEST_CASE("relay long: hostile broker streams, many seeds" * doctest::skip()) {
-  for (uint64_t s = 100; s < 140; ++s) relay_fuzz(s, 5000);
+  for (uint64_t s = 100; s < 140; ++s) {
+    relay_fuzz(s, 5000);
+    relay_fuzz(s, 5000, true);
+  }
 }
 
 }  // TEST_SUITE

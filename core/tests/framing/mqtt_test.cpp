@@ -52,8 +52,20 @@ void fuzz(uint64_t seed, int iters) {
     int n = 1 + static_cast<int>(r.below(4));
     for (int k = 0; k < n; ++k) {
       switch (r.below(6)) {
-        case 0: if (!b.empty()) b[r.below(static_cast<uint32_t>(b.size()))] ^= static_cast<uint8_t>(1u << r.below(8)); break;
-        case 1: b.insert(b.begin() + r.below(static_cast<uint32_t>(b.size() + 1)), static_cast<uint8_t>(r.next())); break;
+        // Every draw in its own statement: as call arguments their order is unspecified and the
+        // stream would differ between compilers (Clang vs GCC/MSVC).
+        case 0:
+          if (!b.empty()) {
+            uint32_t pos = r.below(static_cast<uint32_t>(b.size()));
+            b[pos] ^= static_cast<uint8_t>(1u << r.below(8));
+          }
+          break;
+        case 1: {
+          uint32_t pos = r.below(static_cast<uint32_t>(b.size() + 1));
+          uint8_t v = static_cast<uint8_t>(r.next());
+          b.insert(b.begin() + pos, v);
+          break;
+        }
         case 2: if (!b.empty()) b.erase(b.begin() + r.below(static_cast<uint32_t>(b.size()))); break;
         case 3: if (!b.empty()) b.resize(r.below(static_cast<uint32_t>(b.size()))); break;
         case 4: { const Bytes& o = corpus[r.below(static_cast<uint32_t>(corpus.size()))]; b.insert(b.end(), o.begin(), o.end()); break; }

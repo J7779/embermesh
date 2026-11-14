@@ -409,7 +409,9 @@ Remaining length ≤ 4 bytes and minimal; packets > 4400 bytes refused before bu
 WebSocket message and ≤ 64 KiB unparsed in total; PUBLISH topics exactly 32 lowercase hex and
 currently subscribed, else counted and dropped; from the server only CONNACK (once, after CONNECT),
 SUBACK/UNSUBACK for outstanding ids, PINGRESP, PUBLISH QoS 0 without RETAIN/DUP — anything else
-closes the session; a SUBACK 0x80 marks that topic refused; CONNACK within 20 s, SUBACK within 30 s,
+closes the session; a SUBACK 0x80 marks that topic refused, never for good: it is asked for again
+after 1, 2, 4 … 60 minutes and on every new connection (one hostile or transient refusal must not
+cut a contact off); CONNACK within 20 s, SUBACK within 30 s,
 PINGRESP within the keepalive, or the session closes. Fuzz targets: client decoder and the
 broker-side parser.
 

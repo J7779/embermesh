@@ -856,7 +856,8 @@ A relay topic paused by the circuit breaker does not remove a link; it shows in 
   relayed channel is its own session link** inside the core (ids ≥ 0x40000000, not in `links.list`;
   they may appear as `link_id` in `peer.seen` and `mesh.stats.per_link`, where the UI shows "internet
   relay"). `status`: `mqtt_state` (`consent_required` / `disconnected` / `waiting_for_time` /
-  `connecting` / `up`), `sessions`, `session_link_ids`, `topics`, `topics_paused`, `topics_refused`,
+  `connecting` / `up`), `sessions`, `session_link_ids`, `topics`, `topics_paused`, `topics_refused`
+  (refused by the broker; retried after 1, 2, 4 … 60 min and on every new connection),
   `rx_messages`, `tx_messages`, `rx_bad_seal`, `rx_replay`, `rx_wrong_hop`, `rx_own_echo`,
   `rx_out_of_epoch`, `rx_dropped_rate`, `rx_unknown_topic`, `rx_bad_publish`, `breaker_trips`,
   `reconnects`.
