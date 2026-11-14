@@ -164,6 +164,26 @@ test('WebRTC: manual offer/answer pairing between two pages, messages over the d
   const A = await nodePage(browser, `${srv.url}index.html?nohub=1&profile=rtca`);
   const B = await nodePage(browser, `${srv.url}index.html?nohub=1&profile=rtcb`);
   cleanups.push(() => A.close(), () => B.close());
+  // Capability probe (docs/CI.md): manual pairing carries only the host candidates gathered before
+  // the code is shown — no trickle, no STUN. Can two peer connections in this browser connect that
+  // way at all? (On some VMs the host candidates are mDNS names nobody resolves: ICE never starts.)
+  const probe = await A.evaluate(`(async () => {
+    const x = new RTCPeerConnection(), y = new RTCPeerConnection();
+    const dc = x.createDataChannel('probe');
+    const gather = (pc) => new Promise((r) => { if (pc.iceGatheringState === 'complete') return r(); pc.addEventListener('icegatheringstatechange', () => pc.iceGatheringState === 'complete' && r()); setTimeout(r, 8000); });
+    await x.setLocalDescription(await x.createOffer()); await gather(x);
+    await y.setRemoteDescription(x.localDescription); await y.setLocalDescription(await y.createAnswer()); await gather(y);
+    await x.setRemoteDescription(y.localDescription);
+    const ok = await new Promise((r) => { dc.onopen = () => r(true); setTimeout(() => r(false), 15000); });
+    const out = { ok, ice: x.iceConnectionState, candidates: (x.localDescription.sdp.match(/a=candidate:\\S+ \\d \\S+ \\d+ \\S+/g) || []).map((c) => c.split(' ').pop().replace(/^[0-9a-f-]{36}\\.local$/, '<mdns>')) };
+    x.close(); y.close();
+    return out;
+  })()`, 60000);
+  t.diagnostic(`WebRTC capability probe: ${JSON.stringify(probe)}`);
+  if (!probe.ok) {
+    t.skip(`probe: two peer connections in this browser cannot connect with host candidates only (ICE ${probe.ice}, candidates ${JSON.stringify(probe.candidates)})`);
+    return;
+  }
   const { a, b } = await introduce(A, B, 'Ann', 'Ben');
 
   const { pairing_id, offer } = await A.call('host.webrtc.create_offer', { name: 'Ben' });

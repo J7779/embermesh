@@ -61,12 +61,19 @@ smoke-tested with `--version`/`--help` and uploaded.
     `reduce`); anything paced by the clock sends what is due by the clock, not one item per timer
     tick; recorded media are timed on their own timeline (the `.y4m` light by frame index), live
     sources by their frames' timestamps, and Morse speeds are matched to the frame rate actually
-    delivered (at least 3 frames per dot, `ui/tests/capture_hook.mjs`).
-  - Exactly one browser test may **skip** on a capability probe (it is reported as skipped, never as
-    passed, also under `EMBER_REQUIRE_BROWSER=1`): `apps/web/test/e2e_morse.test.mjs` "the UI Morse
-    reader … with the real camera path: fake camera .y4m", when Chrome's fake camera delivers fewer
-    than 24 of the file's 30 frames per second (measured for 2 s), because the recorded light then no
-    longer plays in real time. The live-light variant of the same UI path runs everywhere.
+    delivered (4 frames per dot, `ui/tests/capture_hook.mjs`).
+  - Two browser tests may **skip** on a capability probe (reported as skipped, never as passed, also
+    under `EMBER_REQUIRE_BROWSER=1`); each probe tests the capability itself, not the platform:
+    - `apps/web/test/e2e_morse.test.mjs` "the UI Morse reader … with the real camera path: fake
+      camera .y4m" skips when Chrome's fake camera delivers fewer than 24 of the file's 30 frames per
+      second (measured for 2 s): the recorded light then no longer plays in real time. The live-light
+      variant of the same UI path runs everywhere.
+    - `apps/web/test/e2e_mesh.test.mjs` "WebRTC: manual offer/answer pairing between two pages"
+      skips when two peer connections in the same browser cannot connect with host candidates only
+      (no trickle, no STUN — exactly what a pairing code carries) within 15 s. Seen on hosted macOS
+      VMs: the only host candidate is an mDNS name and ICE never leaves "new". The pairing code,
+      SDP rebuild and links are still covered by the unit tests (`router.test.mjs`,
+      `webrtc_blob.test.mjs`) everywhere.
   - Reproducing a slow host locally (macOS): run Chrome at background QoS with a wrapper,
     `CHROME=<script that execs taskpolicy -b "<Chrome binary>" "$@">`; `EMBER_E2E_CPU_THROTTLE=<n>`
     applies DevTools CPU throttling to every test page; `EMBER_E2E_CHROME_FLAGS="--force-prefers-reduced-motion"`

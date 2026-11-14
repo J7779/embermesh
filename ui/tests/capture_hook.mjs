@@ -42,9 +42,9 @@ export const CAPTURE_HOOK = (text, wpm) => `(async () => {
   return true;
 })()`;
 /**
- * Keying speed a camera can follow: at least 3 frames per dot (the decoder's documented need: 3–25
- * WPM for light, limited by the frame rate). A busy machine paints the test light at a few frames per
- * second; a real camera at 30 fps reads 12 WPM.
+ * Keying speed a camera can follow: 4 frames per dot (the core decoder needs about 2–3; the margin
+ * covers frames a busy machine paints late). A busy machine paints the test light at a few frames
+ * per second; a real camera at 30 fps reads 12 WPM.
  */
-export const cameraWpm = fps => Math.max(3, Math.min(12, Math.floor(1200 / (3.2 * 1000 / Math.max(1, fps)))));
+export const cameraWpm = fps => Math.max(3, Math.min(12, Math.floor(1200 / (4 * 1000 / Math.max(1, fps)))));
 
