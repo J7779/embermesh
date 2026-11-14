@@ -19,6 +19,7 @@ export class MockMorseRx {
     this.lastFeed = Date.now();
   }
   reset() {
+    this.tracker = this.tracker ? new LightTracker() : null; // §12: reset also clears the tracker and the pin
     this.transcript = ''; this.chars = 0; this.pending = ''; this.on = false; this.level = 0;
     this.hi = 0; this.lo = 1; this.lastT = null; this.edgeT = null; this.marks = 0; this.good = 0;
     this.snr = null; this.audioT = 0; this.carry = new Float32Array(0); this.noise = 1e-6; this.peak = 1e-6;
@@ -141,7 +142,7 @@ export class MockMorseRx {
     }
     this.lastFeed = Date.now();
   }
-  target() { return this.tracker ? this.tracker.view() : null; }
+  target() { return this.tracker ? this.tracker.view(this.unit) : null; }
   pin(x, y) { (this.tracker || (this.tracker = new LightTracker())).pin(x, y); }
   status() {
     if (this.lastT !== null) this._idle(this.lastT);
@@ -151,7 +152,7 @@ export class MockMorseRx {
       quality: this.marks ? Math.round((this.good / this.marks) * 100) / 100 : 0, pending: this.pending,
     };
     if (this.source === 'audio') { s.tone_hz = Math.round(this.toneHz) || null; s.snr_db = this.snr; }
-    if (this.tracker) s.target = this.tracker.view();
+    if (this.tracker) s.target = this.tracker.view(this.unit);
     return s;
   }
   takeNew() { const t = this.newText; this.newText = ''; return t; }
@@ -180,7 +181,22 @@ function detectTone(buf, rate) {
 export class LightTracker {
   constructor() { this.w = 0; this.h = 0; this.cells = null; this.state = 'searching'; this.cur = -1; this.lastEdge = 0; this.pinned = null; this.hist = []; this.replay = null; this.t = 0; }
   _reset(w, h) { this.w = w; this.h = h; this.cells = Array.from({ length: w * h }, () => ({ lo: 255, hi: 0, on: false, edges: [] })); this.cur = -1; this.state = 'searching'; }
-  pin(x, y) { this.pinned = x == null ? null : { x, y }; if (this.pinned) this.cur = -1; }
+  /** A tap pins the light nearest to (x, y) within ~4 cells; with none there yet the pin waits. auto releases it and keeps reading. */
+  pin(x, y) {
+    if (x == null) { this.pinned = null; return; }
+    this.pinned = { x, y };
+    const near = this._nearest(x, y);
+    this.cur = near;
+    if (near < 0) this.state = 'searching';
+  }
+  _nearest(x, y) {
+    let best = -1, bd = Infinity;
+    for (const [i] of this.candidates || []) {
+      const dx = ((i % this.w) + 0.5) - x * this.w, dy = (Math.floor(i / this.w) + 0.5) - y * this.h, d = Math.hypot(dx, dy);
+      if (d <= 4 && d < bd) { bd = d; best = i; }
+    }
+    return best;
+  }
   /** One frame → the tracked brightness 0..1, or null while searching. */
   push(t, w, h, max) {
     if (w !== this.w || h !== this.h || !this.cells) this._reset(w, h);
@@ -208,8 +224,8 @@ export class LightTracker {
     this.candidates = cand.filter(([i, s]) => !cand.some(([j, s2]) => j !== i && (s2 > s || (s2 === s && j < i)) && Math.abs((j % w) - (i % w)) <= 3 && Math.abs(Math.floor(j / w) - Math.floor(i / w)) <= 3));
     let best = -1;
     if (this.pinned) {
-      let bd = Infinity;
-      for (const [i] of this.candidates) { const dx = ((i % w) + 0.5) / w - this.pinned.x, dy = (Math.floor(i / w) + 0.5) / h - this.pinned.y, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } }
+      best = this._nearest(this.pinned.x, this.pinned.y); // nothing near the tap yet: keep waiting
+      if (best < 0 && this.cur < 0) return null;
     } else {
       let bs = 0;
       for (const [i, s] of this.candidates) {
@@ -244,7 +260,11 @@ export class LightTracker {
     sg.hi = Math.max(v, sg.hi - (sg.hi - v) * decay);
     sg.lo = Math.min(v, sg.lo + (v - sg.lo) * decay);
     if (sg.hi - sg.lo >= 40) { const on = v > sg.lo + (sg.hi - sg.lo) * (sg.on ? 0.4 : 0.6); if (on !== sg.on) { sg.on = on; this.lastEdge = t; } }
-    this.state = t - this.lastEdge > 2200 ? 'lost' : 'locked';
+    // lost after max(2 s, 7.5 dots) without the light; searching again after about 10 s
+    const quiet = t - this.lastEdge;
+    const lostAfter = Math.max(2000, 7.5 * (this.dotMs || 100));
+    if (quiet > 10000) { this.state = 'searching'; this.cur = -1; return null; }
+    this.state = quiet > lostAfter ? 'lost' : 'locked';
     return v / 255;
   }
   _value(i, max) {
@@ -256,9 +276,11 @@ export class LightTracker {
     }
     return v / 255;
   }
-  view() {
+  view(dotMs) {
+    if (Number.isFinite(dotMs)) this.dotMs = dotMs;
     const n = (this.candidates || []).length;
-    if (this.state === 'searching' || this.cur < 0) return { state: 'searching', confidence: 0, candidates: n };
+    const pinned = !!this.pinned;
+    if (this.state === 'searching' || this.cur < 0) return { state: 'searching', confidence: 0, candidates: n, pinned };
     let edges = 0, span = 0;
     for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
       const x = (this.cur % this.w) + dx, y = Math.floor(this.cur / this.w) + dy;
@@ -269,7 +291,7 @@ export class LightTracker {
     const c = { hi: span, lo: 0 };
     return {
       state: this.state, x: ((this.cur % this.w) + 0.5) / this.w, y: (Math.floor(this.cur / this.w) + 0.5) / this.h,
-      size: Math.max(2 / this.w, 0.04), confidence: Math.round(Math.min(1, edges / 14) * Math.min(1, (c.hi - c.lo) / 160) * 100) / 100, candidates: n,
+      size: Math.max(2 / this.w, 0.04), confidence: Math.round(Math.min(1, edges / 14) * Math.min(1, (c.hi - c.lo) / 160) * 100) / 100, candidates: n, pinned,
     };
   }
 }

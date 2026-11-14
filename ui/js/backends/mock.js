@@ -497,9 +497,10 @@ export default class MockBackend {
     if (!after) return;
     const now = Date.now();
     const moved = before && after.x !== undefined && (Math.abs((before.x || 0) - after.x) > 0.01 || Math.abs((before.y || 0) - after.y) > 0.01);
-    if ((before && before.state) !== after.state || (moved && now - (this._lastTargetEv || 0) >= 200)) {
+    const more = before && before.candidates !== after.candidates;
+    if ((before && before.state) !== after.state || (before && before.pinned) !== after.pinned || ((moved || more) && now - (this._lastTargetEv || 0) >= 200)) {
       this._lastTargetEv = now;
-      this._emit('morse.target', { session, state: after.state, ...(after.x !== undefined ? { x: after.x, y: after.y, size: after.size } : {}), confidence: after.confidence });
+      this._emit('morse.target', { session, state: after.state, ...(after.x !== undefined ? { x: after.x, y: after.y, size: after.size } : {}), confidence: after.confidence, candidates: after.candidates, pinned: after.pinned });
     }
   }
   _morse(session) {
@@ -1056,12 +1057,23 @@ const METHODS = {
   'morse.rx.feed'(p) {
     const r = this._morse(p.session);
     if (r.source === 'light' && Array.isArray(p.frames) && !this.morseFrames) throw rpcError('bad_params', 'levels must be an array'); // an old core
+    if (r.source === 'light' && p.frames !== undefined && p.levels !== undefined) throw rpcError('bad_params', 'one call carries frames or levels, not both');
     if (r.source === 'light' && Array.isArray(p.frames) && this.morseFrames) {
-      if (p.frames.length > 8) throw rpcError('too_large', 'at most 8 frames per feed');
+      // §12 limits: every frame is checked before any is used
+      if (!p.frames.length) throw rpcError('bad_params', 'frames must not be empty');
+      if (p.frames.length > 64) throw rpcError('too_large', 'at most 64 frames per feed');
+      for (const f of p.frames) {
+        if (!f || !Number.isInteger(f.w) || !Number.isInteger(f.h) || f.w < 1 || f.h < 1) throw rpcError('bad_params', 'w and h must be integers ≥ 1');
+        if (f.w * f.h > 4096) throw rpcError('too_large', 'w·h at most 4096');
+        if (!Number.isFinite(f.t_ms) || Math.abs(f.t_ms) > 1e15) throw rpcError('bad_params', 't_ms must be a number');
+        if (typeof f.max_b64 !== 'string' || b64Len(f.max_b64) !== f.w * f.h) throw rpcError('bad_params', 'max_b64 must hold w·h bytes');
+        if (f.mean_b64 !== undefined && (typeof f.mean_b64 !== 'string' || b64Len(f.mean_b64) !== f.w * f.h)) throw rpcError('bad_params', 'mean_b64 must hold w·h bytes');
+      }
       const before = r.target();
       r.feedFrames(p);
       this._morseTarget(p.session, before, r.target());
     } else if (r.source === 'light') {
+      if (r.tracker) throw rpcError('bad_params', 'this session was fed frames: start another session for levels');
       if (!Array.isArray(p.levels)) throw rpcError('bad_params', 'levels must be an array');
       if (p.levels.length > 4096) throw rpcError('too_large', 'at most 4096 samples per feed');
       r.feedLight(p);
@@ -1078,9 +1090,12 @@ const METHODS = {
   'morse.rx.target'(p) {
     const r = this._morse(p.session);
     if (r.source !== 'light') throw rpcError('bad_params', 'only light sessions have a target');
+    if (p.auto !== undefined && (p.x !== undefined || p.y !== undefined)) throw rpcError('bad_params', 'x, y or auto, not both');
+    const before = r.target();
     if (p.auto === true) r.pin(null);
     else if (Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1) r.pin(p.x, p.y);
     else throw rpcError('bad_params', 'x and y (0..1) or auto:true');
+    this._morseTarget(p.session, before, r.target());
     return r.status();
   },
   async 'host.capture.start'(p) {
@@ -1581,3 +1596,9 @@ function snippet(plain, terms) {
 }
 
 export { METHODS as _MOCK_METHODS };
+
+/** Decoded length of a base64 string (standard alphabet) or -1. */
+function b64Len(b) {
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(b) || b.length % 4) return -1;
+  return b.length / 4 * 3 - (b.endsWith('==') ? 2 : b.endsWith('=') ? 1 : 0);
+}

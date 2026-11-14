@@ -35,6 +35,8 @@ export function cameraStateText(st, running) {
   if (!t) return st && st.chars ? 'Reading the light' : 'Looking for a blinking light…';
   if (t.state === 'locked') return 'Reading the light';
   if (t.state === 'lost') return 'Lost the light — keep the camera on it';
+  // a tap with no light there yet: the pin waits (§12), so say so rather than "looking"
+  if (t.pinned) return 'Waiting for a light where you tapped… Tap Automatic to search everywhere.';
   return 'Looking for a blinking light…';
 }
 
@@ -90,7 +92,7 @@ function readPanel(app, box, source) {
 
   let session = null, running = false, reader = null, native = null, poll = 0, lastChars = 0, text = '';
   let feeding = Promise.resolve();
-  let last = null, mode = 'grid', checkedFrames = false, pinned = false, locked = false, nativeZoom = [];
+  let last = null, mode = 'grid', checkedFrames = false, locked = false, nativeZoom = [];
   // §12: a core with the light tracker says so; without it, the old watched-region feed and no ring
   const coreFrames = () => { const f = (app.store.get('info') || {}).features; return Array.isArray(f) && f.includes('morse_frames'); };
   // a native preview is drawn above the page: the host draws the ring there (§12), not the page
@@ -125,7 +127,7 @@ function readPanel(app, box, source) {
     }
     view.classList.toggle('has-target', !!g);
     tapHint.hidden = !(running && t && t.candidates > 1);
-    autoBtn.hidden = !(running && pinned);
+    autoBtn.hidden = !(running && t && t.pinned); // the core says whether a tap pinned it (§12)
     tools.hidden = zoomBar.hidden && autoBtn.hidden;
     // exposure locked once the light is locked (§12), released otherwise
     const isLocked = !!(t && t.state === 'locked');
@@ -137,18 +139,30 @@ function readPanel(app, box, source) {
     const s = session;
     feeding = feeding.then(async () => {
       if (s !== session) return;
+      if (params.frames && mode !== 'grid') return; // queued before the fallback: never mix frames and levels
       try {
         const st = await app.api.call('morse.rx.feed', { session: s, ...params });
         // a core without §12 frames ignores them (no target): read with the old watched-region path
-        if (params.frames && !checkedFrames) { checkedFrames = true; if (!st || !st.target) fallback(); }
+        if (params.frames && !checkedFrames) { checkedFrames = true; if (!st || !st.target) { await fallback(); return; } }
         render(st);
       } catch (e) {
         if (e.code === 'not_found') { session = null; setMsg('Reading stopped after a long pause. Press Start reading to go on.', 'warn'); stopAll(); }
-        else if (params.frames && (e.code === 'bad_params' || e.code === 'unsupported' || e.code === 'not_implemented')) fallback();
+        else if (params.frames && (e.code === 'bad_params' || e.code === 'unsupported' || e.code === 'not_implemented')) await fallback();
       }
     });
   };
-  function fallback() { if (mode === 'grid' && reader) { mode = 'levels'; reader.setMode('levels'); } }
+  // a session fed with frames refuses levels (§12), so the fallback starts a fresh session for them
+  async function fallback() {
+    if (mode !== 'grid' || !reader) return;
+    mode = 'levels';
+    reader.setMode('levels');
+    await endSession();
+    const r = await app.api.try('morse.rx.start', { source: 'light' }, null, true);
+    if (!running) { if (r) await app.api.try('morse.rx.stop', { session: r.session }, null, true); return; }
+    if (!r) { setMsg('Could not start reading. Press Start reading to try again.', 'bad'); stopAll(); return; }
+    session = r.session; last = null; lastChars = 0;
+    render();
+  }
 
   async function start() {
     setMsg('');
@@ -157,7 +171,7 @@ function readPanel(app, box, source) {
       setMsg(e.code === 'not_implemented' ? 'Reading Morse needs a newer version of EmberMesh. Update the app.' : 'Could not start reading: ' + errorText(e), 'bad');
       return;
     }
-    session = r.session; lastChars = 0; text = ''; transcript.textContent = ''; last = null; checkedFrames = false; pinned = false; locked = false; mode = coreFrames() ? 'grid' : 'levels';
+    session = r.session; lastChars = 0; text = ''; transcript.textContent = ''; last = null; checkedFrames = false; locked = false; mode = coreFrames() ? 'grid' : 'levels';
     delete transcript.dataset.live;
     const why = unavailableReason(isCam ? 'camera' : 'mic');
     const nativeKind = isCam ? 'capture_camera_luma' : 'capture_mic_pcm';
@@ -264,9 +278,9 @@ function readPanel(app, box, source) {
       if (!session || !last || !last.target || !(last.target.candidates > 1) || e.target === autoBtn || zoomBar.contains(e.target)) return;
       const r = view.getBoundingClientRect();
       const st = await app.api.try('morse.rx.target', { session, x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }, null, true);
-      if (st) { pinned = true; render(st); }
+      if (st) render(st);
     });
-    autoBtn.addEventListener('click', async () => { const st = await app.api.try('morse.rx.target', { session, auto: true }, null, true); pinned = false; if (st) render(st); });
+    autoBtn.addEventListener('click', async () => { const st = await app.api.try('morse.rx.target', { session, auto: true }, null, true); if (st) render(st); });
   }
 
   const actions = h('div', { class: 'row reader-actions' },

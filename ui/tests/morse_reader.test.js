@@ -189,6 +189,28 @@ test('mock tracker: searching → locked → lost → locked again on a drifting
   const v = tr.view();
   assert.ok(v.x > 0 && v.x < 1 && v.y > 0 && v.y < 1);
   assert.equal(v.candidates <= 1, true, 'the steady lamp is not a candidate');
+  assert.equal(v.pinned, false);
+});
+
+test('mock tracker: lost after max(2 s, 7.5 dots), searching again after about 10 s', () => {
+  const sim = new NativeCameraSim({ feed() {}, after() {}, text: 'CQ', wpm: 10 });
+  sim.t0 = 0;
+  const tr = new LightTracker();
+  let t = 0, lockedAt = -1;
+  for (; t < 4000 && lockedAt < 0; t += 33) { tr.push(t, 48, 36, sim.frame(t)); if (tr.view(120).state === 'locked') lockedAt = t; }
+  assert.ok(lockedAt >= 0);
+  // the light goes dark: a flat frame
+  const dark = new Uint8Array(48 * 36).fill(10);
+  const seen = {};
+  for (let q = t; q < t + 14000; q += 100) { tr.push(q, 48, 36, dark); const s = tr.view(400).state; if (!(s in seen)) seen[s] = q - t; }
+  assert.ok(seen.lost >= 2900 && seen.lost <= 3200, 'lost after 7.5 × 400 ms: ' + seen.lost);
+  assert.ok(seen.searching >= 9800 && seen.searching <= 10400, 'searching again after ~10 s: ' + seen.searching);
+});
+
+test('state text: a waiting pin, locked, lost, searching', () => {
+  assert.equal(cameraStateText({ target: { state: 'searching', pinned: true } }, true), 'Waiting for a light where you tapped… Tap Automatic to search everywhere.');
+  assert.equal(cameraStateText({ target: { state: 'searching', pinned: false } }, true), 'Looking for a blinking light…');
+  assert.equal(cameraStateText({ target: { state: 'locked', pinned: true } }, true), 'Reading the light');
 });
 
 test('mock morse.rx: frames feed, target, pinning, old core rejects frames', async () => {
@@ -206,11 +228,33 @@ test('mock morse.rx: frames feed, target, pinning, old core rejects frames', asy
   assert.ok(st.target && ['locked', 'lost'].includes(st.target.state));
   assert.match(st.transcript, /CQ/);
   assert.ok(events.includes('locked'));
-  const pinned = await b.call('morse.rx.target', { session, x: 0.9, y: 0.9 });
-  assert.ok(pinned.target);
-  await b.call('morse.rx.target', { session, auto: true });
+  assert.equal(st.target.pinned, false);
+  // a tap where no light blinks: the pin waits, the state stays searching
+  const tapped = await b.call('morse.rx.target', { session, x: 0.02, y: 0.98 });
+  assert.equal(tapped.target.pinned, true);
+  assert.equal(tapped.target.state, 'searching');
+  assert.equal(cameraStateText(tapped, true), 'Waiting for a light where you tapped… Tap Automatic to search everywhere.');
+  const pe = [];
+  b.on('morse.target', d => pe.push(d));
+  const auto = await b.call('morse.rx.target', { session, auto: true });
+  assert.equal(auto.target.pinned, false);
+  assert.ok(pe.length && pe.at(-1).pinned === false && Number.isInteger(pe.at(-1).candidates), 'the event carries candidates and pinned');
   await assert.rejects(b.call('morse.rx.target', { session, x: 2, y: 0 }), { code: 'bad_params' });
-  await assert.rejects(b.call('morse.rx.feed', { session, frames: new Array(9).fill({ t_ms: 1, w: 1, h: 1, max_b64: 'AA==' }) }), { code: 'too_large' });
+  await assert.rejects(b.call('morse.rx.target', { session, x: 0.5, y: 0.5, auto: true }), { code: 'bad_params' });
+  // feed limits: 1–64 frames, each one checked before any is used
+  const one = { t_ms: 1, w: 1, h: 1, max_b64: 'AA==' };
+  await b.call('morse.rx.feed', { session, frames: new Array(64).fill(one) });
+  await assert.rejects(b.call('morse.rx.feed', { session, frames: new Array(65).fill(one) }), { code: 'too_large' });
+  await assert.rejects(b.call('morse.rx.feed', { session, frames: [] }), { code: 'bad_params' });
+  await assert.rejects(b.call('morse.rx.feed', { session, frames: [one, { t_ms: 2, w: 2, h: 1, max_b64: 'AA==' }] }), { code: 'bad_params' });
+  await assert.rejects(b.call('morse.rx.feed', { session, frames: [{ t_ms: 1, w: 100, h: 41, max_b64: '' }] }), { code: 'too_large' });
+  // a session fed with frames refuses levels, and one call never carries both
+  await assert.rejects(b.call('morse.rx.feed', { session, times_ms: [1], levels: [0.5] }), { code: 'bad_params' });
+  await b.call('morse.rx.reset', { session });
+  await assert.rejects(b.call('morse.rx.feed', { session, times_ms: [1], levels: [0.5] }), { code: 'bad_params' });
+  const s3 = (await b.call('morse.rx.start', { source: 'light' })).session;
+  await assert.rejects(b.call('morse.rx.feed', { session: s3, frames: [one], times_ms: [1], levels: [0.5] }), { code: 'bad_params' });
+  await b.call('morse.rx.feed', { session: s3, times_ms: [1], levels: [0.5] });
   b.close();
   const old = new MockBackend({ persist: false, speed: 0.01, autoplay: false, latency: 0, params: new URLSearchParams('morseframes=0') });
   const s2 = (await old.call('morse.rx.start', { source: 'light' })).session;
