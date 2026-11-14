@@ -114,7 +114,13 @@ captures/
 *.code-workspace
 
 # --- AI assistant / agent local state ------------------------------------------------------------
-.claude/
+# Everything under .claude/ (settings, local overrides, session data) stays private, at any depth.
+# The two exceptions, at the repository root only: the project skills (.claude/skills/, published
+# playbooks, see AGENTS.md) and the shared settings file (.claude/settings.json, deny rules that keep
+# secrets unread). The publishing gate allows exactly these two.
+**/.claude/*
+!/.claude/skills/
+!/.claude/settings.json
 CLAUDE.local.md
 .aider*
 

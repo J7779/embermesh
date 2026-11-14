@@ -319,6 +319,8 @@ The **operator manual** is inside every app (Guides → "How to use EmberMesh") 
 (wire format, security) · platform READMEs: [desktop](apps/desktop/README.md) ·
 [web](apps/web/README.md) · [Android](apps/android/README.md) · [iOS](apps/ios/README.md) ·
 [shared UI](ui/README.md) · [guide packer](tools/guidepack/README.md).
+Working rules and step-by-step playbooks for contributors and automated coding tools:
+[AGENTS.md](AGENTS.md).
 
 ## Building and testing
 

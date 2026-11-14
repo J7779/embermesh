@@ -41,8 +41,13 @@
 #   name-word   with --strict-names only: the user / first name as a bare word (noisy)
 #
 # Allow-lists: tools/publishable-allow.txt (format described at its top) and
-# tools/publishable-landmarks.txt. Binary files are also searched (strings, and the uncompressed
-# contents of .jar/.zip/.aar archives) for the machine, path, e-mail and credential rules.
+# tools/publishable-landmarks.txt. Narrow kinds exist for agent instructions (AGENTS.md, the
+# project skills under .claude/skills/, the shared .claude/settings.json): `filename dir <prefix>`
+# and `filename file <path>` publish one directory or file whose parent the filename rule otherwise
+# refuses (everything else under .claude/ stays refused), and `residue term <literal>` accepts a
+# tool-convention name such as CLAUDE.md as a literal only.
+# Binary files are also searched (strings, and the uncompressed contents of .jar/.zip/.aar
+# archives) for the machine, path, e-mail and credential rules.
 # Exit status: 0 clean (warnings allowed), 1 findings, 2 usage or environment error.
 set -u
 export LC_ALL=C
@@ -67,7 +72,7 @@ while [[ $# -gt 0 ]]; do
     --max-size) shift; MAX_SIZE="${1:?--max-size needs a number}" ;;
     --quiet|-q) QUIET=1 ;;
     --self-test) SELF_TEST=1 ;;
-    -h|--help) sed -n '2,46p' "$SCRIPT" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,51p' "$SCRIPT" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
   esac
   shift
@@ -114,6 +119,14 @@ Big Ben is at 51.5007, -0.1246. password=changeme token=<admin token>
 CONTROL
   # Owner-approved public identity: the git display name in a copyright statement of an approved file.
   printf 'MIT License\n\nCopyright (c) 2026 %s\n\n\302\251 2024-2026 %s. All rights granted below.\n' "$sname" "$sname" > "$t/LICENSE"
+  # Published agent instructions: a project skill under the allow-listed directory .claude/skills/,
+  # the shared project settings file and the root import file. The tool-convention names are allow-listed as literal terms only.
+  local tool; tool="cla""ude"
+  mkdir -p "$t/.$tool/skills/demo"
+  printf -- '---\nname: demo\ndescription: Demo playbook. Use when testing the publishing gate.\n---\n\nPlaybooks live in .%s/skills/<name>/SKILL.md; %s.md imports AGENTS.md.\n' "$tool" "$(printf '%s' "$tool" | tr 'a-z' 'A-Z')" > "$t/.$tool/skills/demo/SKILL.md"
+  printf '@AGENTS.md\n' > "$t/$(printf '%s' "$tool" | tr 'a-z' 'A-Z').md"
+  printf '{\n  "$schema": "https://json.schemastore.org/%s-code-settings.json",\n  "permissions": { "deny": ["Read(.env)", "Read(~/.ssh/**)"] }\n}\n' "$tool" > "$t/.$tool/settings.json"
+  local controls=(control.md LICENSE ".$tool/skills/demo/SKILL.md" ".$tool/settings.json" "$(printf '%s' "$tool" | tr 'a-z' 'A-Z').md")
   echo "### pass 1 ($mode): clean tree must pass"
   if ! (cd "$t" && bash tools/check-publishable.sh --root "$t" "$mode"); then
     echo "${R}self-test FAILED: the clean control tree was rejected${N}"; exit 1
@@ -165,9 +178,20 @@ CONTROL
   printf 'sdk.dir=x\n' > "$t/local.properties"; plants+=("local.properties filename")
   printf 'x\n' > "$t/.idea/workspace.xml";   plants+=(".idea/workspace.xml filename")
   printf 'x\n' > "$t/run.log";               plants+=("run.log filename")
-  (cd "$t" && git add -f .DS_Store apps/x/release.jks apps/x/release.p12 apps/x/keystore.properties id_ed25519 local.properties .idea/workspace.xml run.log) || exit 2
+  # The published skills directory is narrow: tool settings beside it, the same directory name
+  # elsewhere, and forbidden files inside it are still refused; content rules still apply inside it.
+  mkdir -p "$t/apps/x/.$tool/skills/y" "$t/.$tool/projects"
+  printf '{}\n' > "$t/.$tool/settings.local.json";          plants+=(".$tool/settings.local.json filename")
+  printf '{}\n' > "$t/.$tool/projects/x.jsonl";             plants+=(".$tool/projects/x.jsonl filename")
+  printf '{}\n' > "$t/apps/x/.$tool/settings.json";         plants+=("apps/x/.$tool/settings.json filename")
+  printf 'x\n' > "$t/apps/x/.$tool/skills/y/SKILL.md";      plants+=("apps/x/.$tool/skills/y/SKILL.md filename")
+  printf 'x' > "$t/.$tool/skills/demo/release.jks";         plants+=(".$tool/skills/demo/release.jks filename")
+  printf 'See .%s/skills/demo/ - drafted by %s for jane.doe@%s.net\n' "$tool" "Cla""ude" 'realmail' > "$t/.$tool/skills/demo/notes.md"
+  plants+=(".$tool/skills/demo/notes.md residue" ".$tool/skills/demo/notes.md email")
+  (cd "$t" && git add -f .DS_Store apps/x/release.jks apps/x/release.p12 apps/x/keystore.properties id_ed25519 local.properties .idea/workspace.xml run.log \
+     ".$tool/settings.local.json" ".$tool/projects/x.jsonl" "apps/x/.$tool/settings.json" "apps/x/.$tool/skills/y/SKILL.md" ".$tool/skills/demo/release.jks") || exit 2
 
-  # expect <hits.tsv> <plant...>: every plant must be reported; control.md and LICENSE must not be.
+  # expect <hits.tsv> <plant...>: every plant must be reported; the control files must not be.
   expect() {
     local hits="$1" p f r; shift
     for p in "$@"; do
@@ -178,7 +202,7 @@ CONTROL
         echo "  ${R}MISSED${N}  $r  <- $f"; fails=$((fails + 1))
       fi
     done
-    for f in control.md LICENSE; do
+    for f in "${controls[@]}"; do
       if awk -F'\t' -v f="$f" '$3 == f { found = 1 } END { exit !found }' "$hits"; then
         echo "  ${R}false positive in $f:${N}"; awk -F'\t' -v f="$f" '$3 == f' "$hits"; fails=$((fails + 1))
       fi
@@ -350,13 +374,14 @@ function check(m,   lm, n, o, i, sep, v, local, dom, nums, s, k, lat, lon, comp)
   return desc " " m
 }
 BEGIN {
-  FS = "\n"; np = 0; nm = 0; nl = 0; ni = 0; nidp = 0; nnm = 0; fullname = ""
+  FS = "\n"; np = 0; nm = 0; nt = 0; nl = 0; ni = 0; nidp = 0; nnm = 0; fullname = ""
   while ((getline ln < allow) > 0) {
     sub(/[ \t]+#.*$/, "", ln); if (ln ~ /^[ \t]*(#|$)/) continue
     n = split(ln, a, /[ \t]+/)
     if (n >= 3 && a[1] == "identity" && a[2] == "path") { if (rule == "machine") IDP[++nidp] = glob2re(a[3]); continue }
     if (n < 3 || (a[1] != rule && a[1] != "*")) continue
     if (a[2] == "path") P[++np] = glob2re(a[3]); else if (a[2] == "match") M[++nm] = tolower(a[3])
+    else if (a[2] == "term" && a[1] == rule) T[++nt] = a[3]
   }
   if (land != "") while ((getline ln < land) > 0) {
     sub(/#.*$/, "", ln); n = split(ln, a, /[ \t]+/); k = 0
@@ -400,6 +425,17 @@ function approved_identity(f, line, m,   k, ok, t, n, ln, ll, rest) {
   for (k = 1; k <= ni; k++) if (!is_name(IV[k]) && has_word(ll, IV[k])) return 0
   return 1
 }
+# 1 if every occurrence of the matched word on that line lies inside one of the literal `term`
+# entries of the allow-list (case-sensitive; e.g. a file or directory name a tool convention
+# requires). The same word anywhere else on the line still fails.
+function only_terms(f, line, m,   n, ln, k, p) {
+  n = 0; ln = ""
+  while ((getline ln < f) > 0) if (++n == line + 0) break
+  close(f)
+  if (n != line + 0) return 0
+  for (k = 1; k <= nt; k++) while ((p = index(ln, T[k])) > 0) ln = substr(ln, 1, p - 1) " " substr(ln, p + length(T[k]))
+  return !has_word(tolower(ln), tolower(m))
+}
 {
   i = index($0, ":"); f = substr($0, 1, i - 1); r = substr($0, i + 1)
   j = index(r, ":"); line = substr(r, 1, j - 1); m = substr(r, j + 1)
@@ -413,6 +449,7 @@ function approved_identity(f, line, m,   k, ok, t, n, ln, ll, rest) {
   for (k = 1; k <= np; k++) if (shown ~ P[k]) next
   if (m != "") { lmm = tolower(m); for (k = 1; k <= nm; k++) if (lmm ~ M[k]) next }
   if (rule == "machine" && shown == f && approved_identity(f, line, m)) next
+  if (nt > 0 && shown == f && line + 0 > 0 && m != "" && only_terms(f, line, m)) next
   d = check(m); if (d == "") next
   key = rule SUBSEP shown SUBSEP line SUBSEP d; if (key in seen) next; seen[key] = 1
   print level "\t" rule "\t" shown "\t" line "\t" d
@@ -692,7 +729,31 @@ sed 's/^\([A-Z]*\)\tsvg-meta\t/\1\timage-meta\t/' "$HITS" > "$HITS.tmp" && mv "$
 # 3. file-level rules
 # =============================================================================================
 FILTER_MODE=path
-grep -E -i '(^|/)(\.DS_Store|\._[^/]*|Thumbs\.db|ehthumbs\.db|desktop\.ini|\.directory|Icon[^[:print:]])$|(^|/)(\.idea|\.vscode|\.vs|\.fleet|\.cursor|\.claude|\.kotlin|\.gradle|\.cxx|\.externalNativeBuild|captures|xcuserdata|DerivedData|node_modules|__pycache__|\.venv|venv|\.pytest_cache|\.mypy_cache|\.cache|\.toolchains|CMakeFiles|\.history|build|dist|out|\.Trash[^/]*|[^/]*\.xcresult|[^/]*\.xcarchive|[^/]*\.dSYM)/|\.(p12|pfx|jks|keystore|pem|key|p8|mobileprovision|provisionprofile|cer|crt|der|csr|kdbx|ovpn|ppk|gpg|log|trace|crash|ips|dmp|hprof|xcuserstate|xccheckout|xcscmblueprint|swp|swo|orig|rej|bak|tmp|apk|aab|ipa|o|obj|a|lib|so|dylib|dll|exe|wasm|class|dex|pyc|pyo|iml|sqlite|sqlite3|db|pack|lnk|sublime-workspace|code-workspace)$|(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)(\.pub)?$|(^|/)\.env(\.[^/]*)?$|(^|/)(\.netrc|\.npmrc|\.pypirc|\.htpasswd|local\.properties|keystore\.properties|signing\.properties|google-services\.json|GoogleService-Info\.plist|ExportOptions\.plist|compile_commands\.json|CMakeCache\.txt|CMakeUserPresets\.json|\.bash_history|\.zsh_history|\.python_history|\.node_repl_history|\.lesshst|\.viminfo|admin_token|emberd\.json|CLAUDE\.local\.md)$|~$|(^|/)#[^/]*#$|(^|/)\.#' "$WORK/all.txt" \
+# Published directories and files (`filename dir <prefix>` / `filename file <path>` in the
+# allow-list, e.g. the project skills under .claude/skills/ and the shared .claude/settings.json):
+# the directory-name part of the filename rule does not apply to that exact prefix or path at the
+# top of the repository. Every other filename pattern (keys, keystores, logs, OS and
+# editor files, build directories) still applies to the files inside it, and the same directory
+# name anywhere else is still refused. The prefix is masked with a neutral name for this one grep
+# and the matching lines are mapped back to the real paths.
+awk -v allow="$ALLOW" '
+  BEGIN {
+    while ((getline ln < allow) > 0) {
+      sub(/[ \t]+#.*$/, "", ln); if (ln ~ /^[ \t]*(#|$)/) continue
+      n = split(ln, a, /[ \t]+/)
+      if (n >= 3 && a[1] == "filename" && a[2] == "dir") { d = a[3]; sub(/\/+$/, "", d); if (d != "") D[++nd] = d "/" }
+      if (n >= 3 && a[1] == "filename" && a[2] == "file") F[a[3]] = 1
+    }
+  }
+  {
+    m = $0
+    if (m in F) { sub(/^.*\//, "", m); m = "published-dir/" m }
+    else for (k = 1; k <= nd; k++) if (index(m, D[k]) == 1) { m = "published-dir/" substr(m, length(D[k]) + 1); break }
+    print m
+  }
+' "$WORK/all.txt" > "$WORK/all-masked.txt"
+grep -n -E -i '(^|/)(\.DS_Store|\._[^/]*|Thumbs\.db|ehthumbs\.db|desktop\.ini|\.directory|Icon[^[:print:]])$|(^|/)(\.idea|\.vscode|\.vs|\.fleet|\.cursor|\.claude|\.kotlin|\.gradle|\.cxx|\.externalNativeBuild|captures|xcuserdata|DerivedData|node_modules|__pycache__|\.venv|venv|\.pytest_cache|\.mypy_cache|\.cache|\.toolchains|CMakeFiles|\.history|build|dist|out|\.Trash[^/]*|[^/]*\.xcresult|[^/]*\.xcarchive|[^/]*\.dSYM)/|\.(p12|pfx|jks|keystore|pem|key|p8|mobileprovision|provisionprofile|cer|crt|der|csr|kdbx|ovpn|ppk|gpg|log|trace|crash|ips|dmp|hprof|xcuserstate|xccheckout|xcscmblueprint|swp|swo|orig|rej|bak|tmp|apk|aab|ipa|o|obj|a|lib|so|dylib|dll|exe|wasm|class|dex|pyc|pyo|iml|sqlite|sqlite3|db|pack|lnk|sublime-workspace|code-workspace)$|(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)(\.pub)?$|(^|/)\.env(\.[^/]*)?$|(^|/)(\.netrc|\.npmrc|\.pypirc|\.htpasswd|local\.properties|keystore\.properties|signing\.properties|google-services\.json|GoogleService-Info\.plist|ExportOptions\.plist|compile_commands\.json|CMakeCache\.txt|CMakeUserPresets\.json|\.bash_history|\.zsh_history|\.python_history|\.node_repl_history|\.lesshst|\.viminfo|admin_token|emberd\.json|CLAUDE\.local\.md)$|~$|(^|/)#[^/]*#$|(^|/)\.#' "$WORK/all-masked.txt" \
+  | cut -d: -f1 | awk 'NR == FNR { hit[$1] = 1; next } FNR in hit' - "$WORK/all.txt" \
   | grep -v -E '(^|/)\.env\.example$' | filter filename FAIL '' 'file must not be published:'
 filter binary FAIL '' 'binary file not approved in tools/publishable-allow.txt:' < "$WORK/binary.txt"
 xargs -0 wc -c -- < "$WORK/all.z" 2>/dev/null | awk -v max="$MAX_SIZE" '$2 != "total" && $1 > max { sub(/^ *[0-9]+ /, ""); print }' \

@@ -56,7 +56,7 @@ feature is an RPC method documented in [`RPC_API.md`](RPC_API.md). Schema-driven
 ## 2. Repository layout
 
 ```
-CMakeLists.txt, build.sh                top-level build (./build.sh core|test|desktop|web|android|ios|all)
+CMakeLists.txt, build.sh                top-level build (./build.sh doctor|core|guides|desktop|web|android|ios|all|test|privacy|clean)
 core/include/ember/   ember.h link.h bytes.h crc.h      cross-module contracts (change additively)
 core/src/<module>/    module sources + headers, included as "<module>/<header>.h"
 core/tests/<module>/  doctest unit tests, TEST_SUITE("<module>")

@@ -1,6 +1,6 @@
 # Continuous integration and releases
 
-Every push to `main` and every pull request runs the workflows below on GitHub Actions. They call
+Every push to `main` runs the workflows below on GitHub Actions; pull requests run the build, test and check workflows (not Release or Pages — see the table). They call
 the same entry points a developer uses (`./build.sh`, and `build.ps1` on Windows), so a red job can
 be reproduced locally with the command shown for it. No workflow needs a secret; the only optional
 ones are the Android release key (see "Release signing").
@@ -127,7 +127,8 @@ is the search-quality check.
   (Monocypher, doctest, miniaudio, ZXing); a `_sources.md` per guide category; `source`, `license`
   and `attribution` on every guide, with no NC/ND/all-rights-reserved licence.
 - `tools/ci/check-required-files.sh`: the files the repository depends on exist and are not
-  git-ignored (`git check-ignore`): `build.sh`, `build.ps1`, `LICENSE`, the gate and its allow-lists,
+  git-ignored (`git check-ignore`): `build.sh`, `build.ps1`, `LICENSE`, `AGENTS.md`, `CLAUDE.md`,
+  `.claude/settings.json` and the playbooks `.claude/skills/*/SKILL.md`, the gate and its allow-lists,
   every workflow and composite action, the CI helpers, the Gradle wrapper jar and properties, the
   Xcode project and scheme, the encrypted-store test fixture, and `models/` once it exists.
 - `tools/ci/check-pins.sh`: the Emscripten version in `.github/actions/setup-emsdk` equals

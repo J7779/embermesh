@@ -373,7 +373,8 @@ before, with an empty profile).
 | `host.qr.scan` | — | `{text}` — camera QR scanner (`unsupported` if no camera/decoder) |
 | `host.file.save` | `{name, mime, data_b64}` | `{}` — save/share a file (bundles, backups) |
 | `host.file.pick` | `{accept?}` | `{name, mime, data_b64}` |
-| `host.signal.flash` | `{pattern_ms:[on,off,on,…]}` | `{}` — flashlight/screen Morse |
+| `host.signal.flash` | `{pattern_ms:[on,off,on,…], mode?}` | `{used, stopped, timing?}` — flashlight/screen Morse (section 10) |
+| `host.signal.stop` | — | `{}` — stop a running flash or tone (section 10) |
 | `host.signal.tone` | `{pattern_ms:[…], freq_hz?=700}` | `{}` — audible Morse |
 | `host.notify` | `{title, body}` | `{}` |
 | `host.keep_awake` | `{enabled}` | `{}` |
@@ -667,3 +668,68 @@ Event `host.app.offline {stored_bytes, total_bytes, offline_ready, update?}` rep
 same controls appear in Settings → "This device" through `host.info.actions` ("Download everything
 for offline use", "Check for updates", "Restart to update"), with the current state in each
 action's `description`.
+
+## 10. Morse sending by light (additive)
+
+The Morse screen lets the user type text and flash it — with the device's flashlight (torch) when
+it has one, with the screen otherwise — for another device to read with its camera (section 6,
+`morse.rx.*` with `source:"light"`). Timing comes from the UI (`ui/js/lib/morse.js`:
+`toMorse()` → `morsePattern(code, wpm)` → `pattern_ms`), so every platform flashes the same
+pattern.
+
+| Method | Params | Result |
+|---|---|---|
+| `host.signal.flash` | `{pattern_ms:[on,off,on,…], mode?="auto"}` | `{used:"torch"\|"screen", stopped:bool, timing?:{…}}` |
+| `host.signal.stop` | — | `{}` |
+
+`mode`:
+
+- `"auto"` (default; what older UIs send by omitting it): the torch if the device has one that the
+  host can switch, otherwise a full-screen flash.
+- `"torch"`: the torch only; error `unsupported` when there is none, `permission_denied` when the
+  platform needs a permission for it and the user refused.
+- `"screen"`: the screen only.
+
+`host.signal.flash` resolves when the pattern has finished or was stopped (`stopped:true`), never
+before. A second `host.signal.flash` or `host.signal.tone` while one is running stops the running
+one first. `host.signal.stop` stops a running flash or tone at once and is a no-op otherwise.
+Limits every host enforces: at most 4,096 entries, each 10 ms – 60,000 ms, total at most 10 minutes
+(`bad_params` otherwise). `timing` is optional and platform-specific (for example the largest
+deviation from the requested edges, in ms) — the UI may show it, tests may assert on it.
+
+`host.info` gains `signal: {torch: "yes" | "no" | "ask", screen: true}`. `"ask"` means the host
+cannot know before the user grants a permission (a browser exposes the torch only through the
+camera). `features` keeps `"flash"` (the host can flash something) and gains `"torch"` when
+`signal.torch` is `"yes"` or `"ask"`.
+
+Rules for hosts — these are requirements, not suggestions:
+
+- **The light always goes off.** The torch is switched off and the screen restored when the pattern
+  ends, on `host.signal.stop`, on any error, when the app goes to the background or the screen
+  locks, and when the page is hidden or closed.
+- **Least privilege, at the moment of use.** Nothing is requested at start-up for this feature. A
+  host that needs the camera permission to reach the torch (browsers) asks only when the user
+  starts a torch flash, opens the camera stream only for the duration of the flash, never reads,
+  records, stores or transmits frames from it, and stops the track as soon as the flash ends. Hosts
+  that can switch the torch without the camera (Android `setTorchMode`, iOS torch) must not request
+  the camera for sending.
+- **Nothing leaves the device and nothing is kept.** The typed text is not sent to the mesh, not
+  logged and not stored by the host; the UI keeps it only in the page (no history).
+- **Timing.** Edges are scheduled against a monotonic clock from the start of the pattern (no
+  accumulated drift): a late edge shortens the next interval instead of delaying everything.
+
+Rules for the UI:
+
+- It says plainly that light is not private: anyone who can see it can read it, and it is not
+  encrypted.
+- Full-screen flashing can trigger seizures in people with photosensitive epilepsy. Screen flashes
+  are limited to at most three flashes per second (a dot of at least 170 ms, about 7 words per
+  minute), are never started automatically, and show a warning before the first one; with reduced
+  motion or Simple mode the warning must be confirmed each time. The torch is a small source and
+  may be faster, up to the fastest speed the camera reader decodes reliably.
+- The default speed is one the camera reader of another device decodes reliably at 30 frames per
+  second; the screen shows the progress, the time remaining and a Stop button that works at once.
+
+Old hosts that ignore `mode` and return `{}` remain valid: the UI treats a missing `used` as
+unknown and a missing `host.signal.stop` (`unsupported` / `not_implemented`) as "cannot stop the
+torch early" and says so.

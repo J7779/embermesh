@@ -14,6 +14,10 @@ The most useful contributions right now:
 
 Open an issue for bugs and ideas. Report security problems privately: see [SECURITY.md](SECURITY.md).
 
+Working rules, commands and step-by-step playbooks for people and automated coding tools are in
+[AGENTS.md](AGENTS.md) (playbooks in `.claude/skills/`, plain Markdown); update it and the
+playbooks in the same change whenever a procedure, command, contract or secret name changes.
+
 ## Building
 
 Everything goes through one script; it finds the toolchains, skips what is missing and never

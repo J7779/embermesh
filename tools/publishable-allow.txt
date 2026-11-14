@@ -7,6 +7,16 @@
 #          match  <ERE>   a finding whose matched text matches this extended regex is accepted
 #                         (case-insensitive; anchor it with ^...$ to accept one exact value;
 #                         no {n} intervals: they are evaluated by awk, which may not support them)
+#          term   <literal>  (content rules) a finding is accepted when every occurrence of the
+#                         matched word on that line lies inside this literal, compared
+#                         case-sensitively; the same word anywhere else on the line still fails.
+#                         For names a tool convention imposes, never for prose
+#          file   <path>     (filename rule only) this exact file, at the repository root, may be
+#                         published although its parent directory is refused; same rules as dir
+#          dir    <prefix>   (filename rule only) this one directory, at the repository root, may be
+#                         published although its name is refused elsewhere; every other filename
+#                         pattern (keys, keystores, logs, OS/editor/build residue) still applies to
+#                         the files inside it, and all content rules apply as everywhere else
 # The value ends at the first space; everything after " #" is the comment. Adding a legitimate
 # third-party e-mail address is one line:   email match ^someone@project\.org$   # vendored X author
 # Never list the machine identifiers here (user, host, e-mail, tokens): those are discovered at
@@ -85,6 +95,17 @@ credential match (ice-pwd|ice_pwd)                          # WebRTC ICE passwor
 residue path guides/content/*                               # ordinary words there (job titles, first names)
 residue path tools/check-publishable.sh                     # the checker's own word list
 residue path .gitignore                                     # ignores editor/assistant state directories
+
+# --- Agent instructions (AGENTS.md and the project skills; see AGENTS.md "Playbooks") -------------------
+# Only the skills directory and the shared, privacy-protecting project settings file are published;
+# local settings, session and project data, memory and everything else under the same parent stay
+# git-ignored (.gitignore) and refused by the filename rule.
+filename dir .claude/skills                                 # project skills (SKILL.md playbooks), published on purpose
+filename file .claude/settings.json                         # shared project settings: deny rules for secret-bearing paths only
+residue term .claude/                                       # the directory name the skills convention requires
+residue term https://json.schemastore.org/claude-code-settings.json # the settings file's published JSON schema
+residue term CLAUDE.md                                      # root file name a tool convention requires (imports AGENTS.md)
+residue term CLAUDE.local.md                                # named only to say it must never be committed
 
 # --- Approved binary files (each one reviewed for metadata; see CONTRIBUTING.md "The publishing gate") --
 binary path apps/android/gradle/wrapper/gradle-wrapper.jar  # Gradle wrapper, upstream, entries dated 1980 (reproducible)
