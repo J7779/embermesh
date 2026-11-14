@@ -96,6 +96,22 @@ final class NearbyPolicyTests: XCTestCase {
     XCTAssertTrue(q.shouldAccept(ip: "fe80::1%en0", now: 3), "link-local")
   }
 
+  /// A host with no usable local-network interface (e.g. a CI VM): no IPv4 or ULA address counts as
+  /// on-link, only IPv6 link-local could be dialed; nothing crashes and inbound rules are unchanged.
+  func testNoLocalNetworkInterface() {
+    let none: [([UInt8], [UInt8])] = []
+    XCTAssertFalse(LocalNet.isOnLink("192.168.1.20", nets: none))
+    XCTAssertFalse(LocalNet.isOnLink("10.0.0.2", nets: none))
+    XCTAssertFalse(LocalNet.isOnLink("fd00::5", nets: none))
+    XCTAssertTrue(LocalNet.isOnLink("fe80::2%en0", nets: none), "link-local needs no subnet")
+    XCTAssertEqual(LocalNet.dialOrder(["192.168.1.20", "10.0.0.2", "fd00::5"], nets: none), [], "nothing to dial")
+    XCTAssertEqual(LocalNet.dialOrder(["192.168.1.20", "fe80::2%en0"], nets: none), ["fe80::2%en0"])
+    let p = NearbyPolicy(myToken: "00000000")
+    XCTAssertTrue(p.shouldAccept(ip: "192.168.1.20", now: 0), "accepting does not depend on the interface list")
+    // The real interface list of this host never crashes and contains only up, non-loopback entries.
+    for (a, m) in LocalNet.interfaceNets() { XCTAssertEqual(a.count, m.count); XCTAssertTrue(a.count == 4 || a.count == 16) }
+  }
+
   func testOnLinkDialOrder() {
     let nets: [([UInt8], [UInt8])] = [([192, 168, 1, 10], [255, 255, 255, 0])]
     let order = LocalNet.dialOrder(["192.168.1.20", "8.8.8.8", "fe80::2%en0", "192.168.2.5", "fd00::5", "192.168.1.21", "192.168.1.22", "192.168.1.23", "192.168.1.24"], nets: nets)

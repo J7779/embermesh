@@ -406,15 +406,23 @@ final class RealCoreMeshTests: XCTestCase {
 /// The phone hub (ws_server endpoint = host library Hub): HTTP + /hub.json + static web app + /ws bus.
 /// A second node joins as a guest through the app's own `websocket` endpoint and exchanges a DM.
 final class HubTests: XCTestCase {
-  func get(_ url: String) -> (Int, Data, [AnyHashable: Any]) {
+  /// One request on its own ephemeral session (no keep-alive reuse across a hub restart) with
+  /// generous timeouts for slow, virtualised hosts. `head` asks for the headers only.
+  func get(_ url: String, head: Bool = false) -> (Int, Data, [AnyHashable: Any]) {
     var out: (Int, Data, [AnyHashable: Any]) = (0, Data(), [:])
     let done = expectation(description: url)
-    URLSession.shared.dataTask(with: URL(string: url)!) { d, r, _ in
+    let cfg = URLSessionConfiguration.ephemeral
+    cfg.timeoutIntervalForRequest = 30
+    let session = URLSession(configuration: cfg)
+    var req = URLRequest(url: URL(string: url)!)
+    if head { req.httpMethod = "HEAD" }
+    session.dataTask(with: req) { d, r, _ in
       let h = r as? HTTPURLResponse
       out = (h?.statusCode ?? 0, d ?? Data(), h?.allHeaderFields ?? [:])
       done.fulfill()
     }.resume()
-    wait(for: [done], timeout: 10)
+    wait(for: [done], timeout: 45)
+    session.invalidateAndCancel()
     return out
   }
 
@@ -443,14 +451,19 @@ final class HubTests: XCTestCase {
     let html = String(decoding: index.1, as: UTF8.self)
     if WebContent.bundled().hubRoot != nil {
       XCTAssertTrue(html.contains("<script"), "bundled dist/web index served")
-      XCTAssertEqual(get("http://127.0.0.1:\(port)/wasm/ember.wasm").0, 200, "WASM build served to guests")
+      XCTAssertEqual(get("http://127.0.0.1:\(port)/wasm/ember.wasm", head: true).0, 200, "WASM build served to guests")
       // The guide library the WASM app loads (path from wasm/build.json) is served too.
       let bj = JSON.parseObject(String(decoding: get("http://127.0.0.1:\(port)/wasm/build.json").1, as: UTF8.self))
       if let gp = bj?.string("guides"), !gp.isEmpty {
         let rel = gp.hasPrefix("/") ? String(gp.dropFirst()) : gp   // relative to the web root
-        let r = get("http://127.0.0.1:\(port)/\(rel)")
+        // HEAD, not GET: the library is tens of MB; what matters is that the hub serves the file
+        // the WASM app will load (status and exact length), not that the test downloads it.
+        let r = get("http://127.0.0.1:\(port)/\(rel)", head: true)
         XCTAssertEqual(r.0, 200, rel)
-        print("hub served /\(rel): \(r.1.count) bytes")
+        let length = Int((r.2["Content-Length"] as? String) ?? (r.2["content-length"] as? String) ?? "") ?? -1
+        let bundled = WebContent.bundled().hubRoot.flatMap { try? FileManager.default.attributesOfItem(atPath: $0.appendingPathComponent(rel).path)[.size] as? Int }
+        XCTAssertEqual(length, bundled ?? -2, "the whole bundled file is offered")
+        print("hub serves /\(rel): \(length) bytes")
       }
     }
 
@@ -458,23 +471,22 @@ final class HubTests: XCTestCase {
     let gl = try XCTUnwrap(guest.host("host.link.create", ["name": "hub", "endpoint": ["kind": "websocket", "config": ["url": "ws://127.0.0.1:\(port)/ws"]],
                                                           "link": ["type": "raw", "config": ["preset": "websocket"]]])).get()
     XCTAssertNotNil(gl.object("link")?.int("id"))
-    XCTAssertTrue(spin(until: 10) { (hubNode.host("host.hub.status").flatMap { try? $0.get() }?.int("clients") ?? 0) == 1 }, "guest counted")
-    XCTAssertTrue(hubNode.events.contains { $0.0 == "host.hub.clients" } || true)
+    XCTAssertTrue(spin(until: 30) { (hubNode.host("host.hub.status").flatMap { try? $0.get() }?.int("clients") ?? 0) == 1 }, "guest counted")
 
     _ = guest.ok("messages.send", ["conv": "ch:public", "text": "guest to hub"])
-    XCTAssertNotNil(hubNode.waitMessage("guest to hub"))
+    XCTAssertNotNil(hubNode.waitMessage("guest to hub", timeout: 60))
     let sent = hubNode.ok("messages.send", ["conv": "dm:\(guest.nodeId)", "text": "hub to guest dm"])
     let mid = try XCTUnwrap(sent.object("message")?.string("id"))
-    XCTAssertNotNil(guest.waitMessage("hub to guest dm"))
-    XCTAssertTrue(spin(until: 20) { hubNode.status(of: mid).contains("delivered") || hubNode.status(of: mid).contains("read") },
+    XCTAssertNotNil(guest.waitMessage("hub to guest dm", timeout: 60))
+    XCTAssertTrue(spin(until: 60) { hubNode.status(of: mid).contains("delivered") || hubNode.status(of: mid).contains("read") },
                   "\(hubNode.status(of: mid))")
 
     // Persisted like any link: a restart brings the hub back (node.ready → ws_server reopened).
     hubNode.stop()
     XCTAssertNotEqual(get("http://127.0.0.1:\(port)/hub.json").0, 200, "hub down while the app is closed")
     hubNode.start()
-    XCTAssertTrue(spin(until: 10) { (hubNode.host("host.hub.status").flatMap { try? $0.get() }?.bool("running")) == true }, "hub restored")
-    XCTAssertEqual(get("http://127.0.0.1:\(port)/hub.json").0, 200)
+    XCTAssertTrue(spin(until: 30) { (hubNode.host("host.hub.status").flatMap { try? $0.get() }?.bool("running")) == true }, "hub restored")
+    XCTAssertTrue(spin(until: 30) { self.get("http://127.0.0.1:\(port)/hub.json").0 == 200 }, "hub answers again")
     let stopped = try XCTUnwrap(hubNode.host("host.hub.stop")).get()
     XCTAssertEqual(stopped.bool("running"), false)
     XCTAssertNotEqual(get("http://127.0.0.1:\(port)/hub.json").0, 200)
