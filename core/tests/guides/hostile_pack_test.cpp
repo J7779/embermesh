@@ -1,6 +1,7 @@
 // Security review H6 regressions: checksum-valid but hostile guides.pack files must not make
 // load/get/search expensive. Packs are built with the real builder, then doctored (bodies
 // appended, doc records re-pointed, checksums repaired) the way an attacker would.
+#include <algorithm>
 #include <chrono>
 #include <cstring>
 #include <string>

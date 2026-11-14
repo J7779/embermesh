@@ -69,6 +69,9 @@ endif()
 
 if(EMBER_BUILD_TESTS)
   add_executable(ember_tests ${_test_root}/main.cpp ${_test_sources})
+  # doctest prints values through std::ostream: let it include the real standard headers instead of
+  # forward-declaring them (MSVC's <string_view> needs the complete type).
+  target_compile_definitions(ember_tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
   target_link_libraries(ember_tests PRIVATE ember_core)
   target_include_directories(ember_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/include ${_test_root})
   target_compile_definitions(ember_tests PRIVATE

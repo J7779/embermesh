@@ -10,6 +10,7 @@
 // output stay bounded, and no single operation takes long.
 //
 // Fast version in the default suite; the long one: ./ember_tests -ts=link -tc="fuzz long*" --no-skip
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <memory>

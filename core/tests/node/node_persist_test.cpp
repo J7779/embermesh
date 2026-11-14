@@ -1,5 +1,6 @@
 // Node: persistence across restarts, encryption at rest, lock / unlock / re-key, duress and panic
 // wipes, corrupted stores, bounded history, and storage / wire size measurements.
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iterator>

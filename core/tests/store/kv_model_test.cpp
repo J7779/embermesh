@@ -1,5 +1,6 @@
 // KvStore: ordered scans with binary keys and a seeded randomized model test against std::map.
 #include "store_test_util.h"
+#include <algorithm>
 
 using namespace store_test;
 

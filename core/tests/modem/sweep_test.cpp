@@ -2,6 +2,7 @@
 // Skipped by default; run with:
 //   ./ember_tests -ts=modem -tc="sweep*" --no-skip
 // Results are recorded in core/src/modem/PERFORMANCE.md.
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <string>

@@ -17,6 +17,9 @@ install(TARGETS emberd RUNTIME DESTINATION bin)
 
 if(EMBER_HOST_TESTS)
   add_executable(emberd_tests tests/console_test.cpp ${CMAKE_SOURCE_DIR}/host/tests/main.cpp)
+  # doctest prints values through std::ostream: let it include the real standard headers instead of
+  # forward-declaring them (MSVC's <string_view> needs the complete type).
+  target_compile_definitions(emberd_tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
   target_link_libraries(emberd_tests PRIVATE emberd_console)
   target_include_directories(emberd_tests PRIVATE ${CMAKE_SOURCE_DIR}/core/third_party/include)
   add_test(NAME emberd_tests COMMAND emberd_tests)
@@ -25,6 +28,9 @@ endif()
 # End-to-end mesh tests: real emberd processes over real sockets, ptys, FIFOs (POSIX only).
 if(EMBER_HOST_TESTS AND NOT WIN32)
   add_executable(emberd_mesh_tests tests/mesh_test.cpp ${CMAKE_SOURCE_DIR}/host/tests/main.cpp)
+  # doctest prints values through std::ostream: let it include the real standard headers instead of
+  # forward-declaring them (MSVC's <string_view> needs the complete type).
+  target_compile_definitions(emberd_mesh_tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
   target_link_libraries(emberd_mesh_tests PRIVATE emberd_console ember_host)
   if(NOT APPLE)
     target_link_libraries(emberd_mesh_tests PRIVATE util)

@@ -1,5 +1,6 @@
 // DTN store and bounded recent-sets.
 #include "mesh/impl.h"
+#include <algorithm>
 
 namespace ember::mesh {
 

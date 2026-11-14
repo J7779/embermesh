@@ -1,5 +1,6 @@
 // Node: regressions for the security review findings handled in the node layer (H4 durable replay
 // memory, M3 conversation-table pressure, M4 unverified look-alikes, L7 outbox, L2 channels).
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <memory>

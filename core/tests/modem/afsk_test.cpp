@@ -1,4 +1,5 @@
 // AFSK 1200 / 300 HDLC modems: on-air waveform checks, loopback at every rate, impairments.
+#include <algorithm>
 #include <cmath>
 #include <string>
 #include <vector>

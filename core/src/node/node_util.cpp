@@ -1,5 +1,6 @@
 #include "node/node_util.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 

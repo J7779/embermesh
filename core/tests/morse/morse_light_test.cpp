@@ -2,6 +2,7 @@
 // text, over frame rates, speeds and impairments. Asserts character error rates and real-time
 // (incremental) output; the long sweep prints the usable range table.
 //   ./ember_tests -ts=morse -tc="light long*" --no-skip
+#include <algorithm>
 #include <cstdio>
 #include <string>
 

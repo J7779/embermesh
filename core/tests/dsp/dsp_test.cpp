@@ -1,5 +1,6 @@
 // Tests for core/src/dsp: oscillators, FFT, FIR/IIR design, detectors, AGC, level/SNR, resampler,
 // channel simulator and NBFM demodulator.
+#include <algorithm>
 #include <cmath>
 #include <vector>
 

@@ -2,6 +2,7 @@
 // and inside words, at 5/13/20/30 WPM with standard timing as the apps send it
 // (ember::morse::timing), through BOTH the light and the audio source. Digits once vanished on the
 // audio path ("QX0ABC" -> "QXABC"); an undecodable group must appear as U+25A1, never be dropped.
+#include <algorithm>
 #include <string>
 #include <vector>
 

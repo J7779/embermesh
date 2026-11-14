@@ -1,5 +1,6 @@
 #include "modem/rtty.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 

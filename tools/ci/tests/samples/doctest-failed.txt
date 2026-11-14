@@ -1,0 +1,5 @@
+core/tests/mesh/flood_test.cpp:88: ERROR: CHECK( a == b ) is NOT correct!
+===============================================================================
+[doctest] test cases: 412 | 410 passed | 2 failed | 3 skipped
+[doctest] assertions: 90210 | 90207 passed | 3 failed |
+[doctest] Status: FAILURE!

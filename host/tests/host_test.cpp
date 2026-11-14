@@ -4,6 +4,7 @@
 #include "host/host.h"
 #include "host/stream.h"
 #include "test_util.h"
+#include <algorithm>
 
 using namespace ember_host;
 using test::Json;

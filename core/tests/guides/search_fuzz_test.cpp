@@ -6,6 +6,7 @@
 //   long (run by hand):     ./ember_tests -ts=guides -tc="pack mutation soak*" --no-skip
 //     The long version also fuzzes the real corpus pack if one exists at
 //     $EMBER_GUIDES_PACK or <repo>/build/guides.pack.
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>

@@ -1,5 +1,6 @@
 // lora_at driver: scripted Reyax RYLR998/RYLR896 AT-command emulator, exact command strings, flash-
 // friendly init, send/receive of every size, interop text, errors, timeouts, reboot, fuzz, relay.
+#include <algorithm>
 #include <functional>
 #include <map>
 

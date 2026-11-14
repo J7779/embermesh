@@ -1,5 +1,6 @@
 // C API (ember.h): NULL / garbage-argument safety, envelopes, outbox semantics, guides loading,
 // thread safety of the per-node lock.
+#include <algorithm>
 #include <atomic>
 #include <cstring>
 #include <thread>

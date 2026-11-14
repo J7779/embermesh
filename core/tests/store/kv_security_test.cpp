@@ -4,6 +4,7 @@
 //   * snapshot chunks are bound to their ordinal (swap / reorder / drop are detected);
 //   * scrubbing never follows symlinks or hard links out of the store directory;
 //   * compaction / aborted re-key do not leave old cleartext in removed files.
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstring>

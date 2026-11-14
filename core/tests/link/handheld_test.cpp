@@ -3,6 +3,7 @@
 // must deliver frames reliably through its matching model; the default (non-preset) settings are
 // shown to fail where the preset succeeds. Measured rates are printed (MESSAGE) and summarised in
 // core/src/link/README.md "Handheld radios".
+#include <algorithm>
 #include <set>
 #include <string>
 #include <vector>

@@ -91,6 +91,9 @@ if(EMBER_HOST_TESTS)
     list(FILTER _host_tests EXCLUDE REGEX ".*/serial_test\\.cpp$")
   endif()
   add_executable(ember_host_tests ${_host_tests})
+  # doctest prints values through std::ostream: let it include the real standard headers instead of
+  # forward-declaring them (MSVC's <string_view> needs the complete type).
+  target_compile_definitions(ember_host_tests PRIVATE DOCTEST_CONFIG_USE_STD_HEADERS)
   target_link_libraries(ember_host_tests PRIVATE ember_host)
   target_include_directories(ember_host_tests PRIVATE ${CMAKE_SOURCE_DIR}/core/third_party/include)
   target_compile_definitions(ember_host_tests PRIVATE EMBER_HOST_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests")

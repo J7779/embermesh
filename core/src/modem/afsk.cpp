@@ -1,5 +1,6 @@
 #include "modem/afsk.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 

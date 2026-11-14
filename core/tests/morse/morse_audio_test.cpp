@@ -1,6 +1,7 @@
 // Audio Morse receive quality: encode -> hand keying -> tone + channel (AWGN at an SNR in a
 // 2500 Hz bandwidth, tone drift, QSB fading, clicks) -> AudioDecoder (shared CwReceiver) -> text.
 //   ./ember_tests -ts=morse -tc="audio long*" --no-skip   prints the SNR at 10 % CER per speed.
+#include <algorithm>
 #include <cstdio>
 #include <string>
 

@@ -35,27 +35,27 @@ def run(script, *args, env=None, cwd=None):
 
 class ReportParsers(unittest.TestCase):
     def test_doctest(self):
-        self.assertEqual(counts("doctest", "doctest.log"), (557, 557, 0, 28))
-        self.assertEqual(counts("doctest", "doctest-failed.log"), (412, 410, 2, 3))
-        self.assertEqual(counts("doctest", "doctest.log", "doctest-failed.log"), (969, 967, 2, 31))
+        self.assertEqual(counts("doctest", "doctest.txt"), (557, 557, 0, 28))
+        self.assertEqual(counts("doctest", "doctest-failed.txt"), (412, 410, 2, 3))
+        self.assertEqual(counts("doctest", "doctest.txt", "doctest-failed.txt"), (969, 967, 2, 31))
 
     def test_ctest_console_both_formats(self):
-        self.assertEqual(counts("ctest", "ctest4.log"), (23, 23, 0, 0))   # CTest 4: no "failed" clause
-        self.assertEqual(counts("ctest", "ctest3.log"), (23, 22, 1, 0))
+        self.assertEqual(counts("ctest", "ctest4.txt"), (23, 23, 0, 0))   # CTest 4: no "failed" clause
+        self.assertEqual(counts("ctest", "ctest3.txt"), (23, 22, 1, 0))
 
     def test_ctest_junit(self):
         self.assertEqual(counts("ctest", "ctest.xml"), (3, 1, 1, 1))
 
     def test_node_spec_and_tap(self):
-        self.assertEqual(counts("node", "node-spec.log"), (88, 88, 0, 0))
-        self.assertEqual(counts("node", "node-tap.log"), (3, 1, 1, 1))
+        self.assertEqual(counts("node", "node-spec.txt"), (88, 88, 0, 0))
+        self.assertEqual(counts("node", "node-tap.txt"), (3, 1, 1, 1))
 
     def test_gradle_junit_directory(self):
         self.assertEqual(counts("junit", "gradle"), (10, 7, 2, 1))
 
     def test_xcresult_json_and_log(self):
         self.assertEqual(counts("xcresult", "xcresult-summary.json"), (87, 81, 1, 5))
-        self.assertEqual(counts("xcresult", "xcodebuild.log"), (87, 81, 1, 5))
+        self.assertEqual(counts("xcresult", "xcodebuild.txt"), (87, 81, 1, 5))
 
     def test_missing_input_is_reported_not_fatal(self):
         r = run("report.py", "tests", "doctest", "suite", os.path.join(SAMPLES, "nope.log"))
@@ -63,7 +63,7 @@ class ReportParsers(unittest.TestCase):
         self.assertIn("no results found", r.stdout)
 
     def test_row_marks_failures(self):
-        r = run("report.py", "tests", "ctest", "native", os.path.join(SAMPLES, "ctest3.log"))
+        r = run("report.py", "tests", "ctest", "native", os.path.join(SAMPLES, "ctest3.txt"))
         self.assertIn("| native ❌ | 23 | 22 | 1 | 0 |", r.stdout)
 
     def test_xcresult_failures(self):

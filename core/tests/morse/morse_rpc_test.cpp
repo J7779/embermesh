@@ -1,5 +1,6 @@
 // morse.rx.* over the C API (docs/RPC_API.md §6): result shapes, the morse.text event, session
 // limits and expiry, and hostile parameters.
+#include <algorithm>
 #include <string>
 #include <vector>
 

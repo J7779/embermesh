@@ -9,6 +9,7 @@
 //   * every value returned by get()/scan() is one that was written for that key at some point;
 //   * a store that opened read-write still accepts a write and reopens with it.
 // Fast version runs in the default suite; the long soak:  ./ember_tests -ts=store -tc="fuzz soak*" --no-skip
+#include <algorithm>
 #include <set>
 
 #include "store/kv_format.h"

@@ -47,7 +47,9 @@ jobs:
       - name: Reproducible pack (second build must be byte-identical)
         if: ${{ !cancelled() }}
         run: |
-          build/host/tools/guidepack build guides/content -o build/guides-again.pack > /dev/null
+          # Same inputs as the guides_pack target (tools/CMakeLists.txt): content + the search model.
+          build/host/tools/guidepack build guides/content -o build/guides-again.pack \
+            --model models/potion-base-4M/potion-base-4M-q4.emodel > /dev/null
           cmp build/guides.pack build/guides-again.pack
           sha256sum build/guides.pack | tee build/ci-logs/guides-pack.sha256
 

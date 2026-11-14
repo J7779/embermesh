@@ -1,4 +1,5 @@
 // Fast DPSK modems, the modem factory / option parsing, and the common Modem interface contract.
+#include <algorithm>
 #include <cmath>
 #include <string>
 #include <vector>

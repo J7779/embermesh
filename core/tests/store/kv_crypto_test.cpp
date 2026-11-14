@@ -1,4 +1,5 @@
 // KvStore: encryption at rest, key checks, re-keying, tamper detection, nonce uniqueness, probe, wipe.
+#include <algorithm>
 #include <set>
 
 #include "store/kv_format.h"

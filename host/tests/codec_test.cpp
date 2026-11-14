@@ -1,6 +1,7 @@
 #include "doctest.h"
 #include "host/json.h"
 #include "host/util.h"
+#include <algorithm>
 
 using namespace ember_host;
 

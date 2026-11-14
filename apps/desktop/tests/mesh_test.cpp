@@ -4,6 +4,9 @@
 #include "daemon_harness.h"
 #include "doctest.h"
 #include "remote_rpc.h"
+#include <algorithm>
+#include <chrono>
+#include <thread>
 
 using namespace mesh;
 
@@ -531,7 +534,10 @@ TEST_SUITE("mesh") {
     long rss_max = 0;
     bool evicted = false;
     uint64_t start = ember_host::steady_ms();
-    while (ember_host::steady_ms() - start < 45000 && !evicted) {
+    // How long this takes depends on how much the kernel buffers for a peer that never reads (the hub
+    // only starts its 15 s "queue full" clock once the socket buffers and its own queue are full):
+    // a few seconds on macOS, most of a minute on Linux hosts with large auto-tuned buffers.
+    while (ember_host::steady_ms() - start < 120000 && !evicted) {
       Json p = Json::object();
       p.set("conv", "ch:public");
       p.set("name", "blob.bin");
@@ -942,6 +948,7 @@ TEST_SUITE("mesh") {
     size_t off = 0;
     double t_ms = 0;
     uint64_t start = ember_host::steady_ms();
+    const auto pace_start = std::chrono::steady_clock::now();
     int n = 0;
     while (ember_host::steady_ms() - start < 10000) {
       // audio: 33 ms of 8 kHz PCM as base64 (~720 bytes) per call
@@ -972,7 +979,10 @@ TEST_SUITE("mesh") {
       ws.call("morse.rx.feed", l);
       light_ms.push_back(double(ember_host::steady_ms() - t0));
       ++n;
-      std::this_thread::sleep_for(std::chrono::milliseconds(30));
+      // Paced by deadline (one audio + one light feed every 33 ms), not by a fixed sleep: loaded or
+      // virtualised hosts stretch short sleeps to several times their length, and this test measures
+      // the daemon, not the sleeping accuracy of the machine running it.
+      std::this_thread::sleep_until(pace_start + std::chrono::milliseconds(33) * n);
     }
     stop = true;
     other.join();
