@@ -38,9 +38,9 @@
 
 	<!-- Permission prompts: written for a non-technical person. -->
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>EmberMesh uses Bluetooth to pass messages straight to nearby phones and to connect to radio equipment. This works with no internet and no phone signal.</string>
+	<string>EmberMesh uses Bluetooth only for links you add yourself: a direct link to a nearby phone running EmberMesh, or radio equipment such as a Bluetooth TNC. This works with no internet and no phone signal.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>EmberMesh uses Bluetooth to pass messages straight to nearby phones and to connect to radio equipment. This works with no internet and no phone signal.</string>
+	<string>EmberMesh uses Bluetooth only for links you add yourself: a direct link to a nearby phone running EmberMesh, or radio equipment such as a Bluetooth TNC. This works with no internet and no phone signal.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>EmberMesh listens to send and receive messages as sound (a cable to a radio, or the phone held near one) and to read Morse code tones. It listens only while a sound link or the Morse reader is on, and nothing is recorded or saved.</string>
 	<key>NSCameraUsageDescription</key>
@@ -48,7 +48,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>EmberMesh uses your location only when you choose to share it, for example in an SOS or a check-in, so people can find you. It works from GPS without internet.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>EmberMesh looks for other EmberMesh phones and computers on the same Wi-Fi or hotspot so you can chat without the internet.</string>
+	<string>EmberMesh finds other EmberMesh devices on the same Wi-Fi or hotspot and connects to them, so you can exchange messages without the internet. Other devices on the network can see that this phone runs EmberMesh.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_embermesh._tcp</string>

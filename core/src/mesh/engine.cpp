@@ -607,7 +607,8 @@ bool MeshEngine::Impl::admit(uint8_t trust, uint32_t link_id, uint32_t hop_src, 
   if (it == links.end()) return trust != kTrustUnknown;
   LinkSlot& L = it->second;
   bool fast = fast_link(L.caps);
-  if (trust == kTrustKnown) return L.known_b.take(host_now, fast ? 600 : 120, fast ? 1200 : 240);
+  if (trust == kTrustKnown)
+    return L.known_b.take(host_now, fast ? 600 : 120, fast ? 1200 : 240) && g_known.take(host_now, 2400, 4800);
   auto nit = L.nbrs.find(hop_src);
   if (nit != L.nbrs.end() && !nit->second.unknown_b.take(host_now, fast ? 30 : 10, fast ? 30 : 10)) return false;
   if (!L.unknown_b.take(host_now, fast ? 60 : 20, fast ? 60 : 20)) return false;
@@ -914,6 +915,22 @@ bool MeshEngine::attach_link(uint32_t link_id, Link* link) {
 }
 
 void MeshEngine::detach_link(uint32_t link_id) { d_->links.erase(link_id); }
+
+std::vector<NodeId> MeshEngine::proven_neighbours(uint32_t link_id) const {
+  std::vector<NodeId> out;
+  auto it = d_->links.find(link_id);
+  if (it == d_->links.end()) return out;
+  for (const auto& kv : it->second.nbrs)
+    if (kv.second.proven) out.push_back(kv.second.proven_node);
+  return out;
+}
+
+void MeshEngine::set_link_scope(uint32_t link_id, const LinkScope& scope) {
+  auto it = d_->links.find(link_id);
+  if (it == d_->links.end()) return;
+  it->second.scope = scope;
+  it->second.digest_gen = UINT64_MAX;  // digests cover only in-scope packets: recompute
+}
 
 void MeshEngine::on_frame(uint32_t link_id, ByteView frame, const RxMeta& meta) { d_->on_frame(link_id, frame, meta); }
 

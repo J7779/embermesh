@@ -4,6 +4,7 @@ import { h, clear, debounce, append } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { toast, toastError, sheet, confirmDialog, showQr, copyText, empty, errorText, qrSvg, setFill, bar } from '../lib/ui.js';
 import { playClass } from '../lib/motion.js';
+import { autoKind, linkRemovedText, topicsPausedText } from '../lib/connectivity.js';
 import { renderForm } from '../lib/form.js';
 import { loadHardware, methodFor, needsCard, platformOf } from './hardware.js';
 import { timeAgo, formatBytes, formatDuration, formatBitrate, formatFreq, trimNum } from '../lib/format.js';
@@ -47,10 +48,11 @@ export default async function render(app, params, root) {
   const hubEl = h('div');
   const rtcEl = h('div');
   const planEl = h('div');
+  const removedEl = h('div', { class: 'stack', role: 'status' });
   append(page,
     h('div', { class: 'page-head' }, h('h1', null, 'Links & radios'),
       h('a', { class: 'btn primary', href: '#/links/add' }, icon('plus'), 'Add connection')),
-    legalEl, listEl,
+    legalEl, removedEl, listEl,
     h('h2', { class: 'section-title', 'data-secondary': '' }, 'Share this device'), h('div', { 'data-secondary': '' }, hubEl, rtcEl),
     h('h2', { class: 'section-title', 'data-secondary': '' }, 'Net plan (where to tune)'), h('div', { 'data-secondary': '' }, planEl));
 
@@ -83,6 +85,14 @@ export default async function render(app, params, root) {
   const reload = debounce(load, 400);
   app.on('link.state', d => { if (d && d.link && cards.has(d.link.id) && !d.link.removed && cards.get(d.link.id).sameShape(d.link)) cards.get(d.link.id).update(d.link); else reload(); });
   app.on('host.endpoint.state', reload);
+  // the core closed an automatic link by itself: say why (RPC_API §11 link.removed)
+  app.on('link.removed', d => {
+    if (!d) return;
+    const l = (app.store.get('links') || []).find(x => x.id === Number(d.id));
+    removedEl.appendChild(h('p', { class: 'notice info small' }, linkRemovedText(d.reason, l && l.name)));
+    while (removedEl.childElementCount > 3) removedEl.firstElementChild.remove();
+    reload();
+  });
   app.on('link.activity', d => { const c = d && cards.get(d.link_id); if (c) c.activity(d); });
   app.on('link.ptt', d => { const c = d && cards.get(d.link_id); if (c) c.ptt(!!d.on); });
 
@@ -299,6 +309,8 @@ function linkCard(app, l, types, per, reload) {
       h('div', { class: 'meta' }, h('strong', { class: x.state === 'up' ? 'ok-text' : x.state === 'error' ? 'bad-text' : 'warn-text' }, STATE_LABEL[x.state] || x.state), act));
     clear(errEl);
     if (x.error) errEl.appendChild(h('div', { class: 'notice bad small' }, String(x.error)));
+    const paused = x.auto === 'relay' ? topicsPausedText(x.status) : '';
+    if (paused) errEl.appendChild(h('div', { class: 'notice info small' }, paused));
     // blocked: the core will not transmit on this link (RPC_API §6 Link.blocked)
     clear(blockedEl);
     if (linkBlocked(x) === 'no_callsign') {
@@ -313,6 +325,7 @@ function linkCard(app, l, types, per, reload) {
     clear(settingsEl);
     for (const [k, v, changed] of effectiveSettings(t, x)) append(settingsEl, h('dt', null, k), h('dd', null, v, changed ? h('span', { class: 'tag accent', title: 'You changed this setting' }, 'changed') : null));
     append(clear(tagsEl),
+      autoKind(x) ? h('span', { class: 'tag', title: 'Created and closed automatically; switch it in Settings → Connections' }, autoKind(x).label) : null,
       caps.bitrate_bps ? h('span', { class: 'tag' }, formatBitrate(caps.bitrate_bps)) : null,
       caps.mtu ? h('span', { class: 'tag' }, 'MTU ' + caps.mtu + ' B') : h('span', { class: 'tag', title: 'Carries plain text only, no mesh frames' }, 'text only'),
       caps.half_duplex ? h('span', { class: 'tag' }, 'half duplex') : null,
@@ -343,9 +356,10 @@ function linkCard(app, l, types, per, reload) {
     h('details', null, h('summary', null, 'Settings in use'), settingsEl),
     h('div', { class: 'row' },
       h('button', { class: 'btn small', onclick: async () => { try { await app.api.call('host.link.reconnect', { id: cur.id }); toast('Reconnecting…'); reload(); } catch (e) { toastError(e, 'Reconnect failed'); } } }, icon('retry', { size: 18 }), 'Reconnect'),
-      h('button', { class: 'btn small', onclick: () => configure(app, cur, t, types, reload) }, icon('gear', { size: 18 }), 'Settings'),
-      !NOT_INTEROP.has(l.type) ? h('button', { class: 'btn small', onclick: () => interop(app, cur) }, icon('send', { size: 18 }), 'Plain-text message') : null,
-      h('button', {
+      autoKind(l) ? null : h('button', { class: 'btn small', onclick: () => configure(app, cur, t, types, reload) }, icon('gear', { size: 18 }), 'Settings'),
+      !NOT_INTEROP.has(l.type) && !autoKind(l) ? h('button', { class: 'btn small', onclick: () => interop(app, cur) }, icon('send', { size: 18 }), 'Plain-text message') : null,
+      // automatic links (nearby, relay) are switched in Settings → Connections, not removed by hand
+      autoKind(l) ? h('a', { class: 'btn small', href: '#/settings/connections' }, icon('gear', { size: 18 }), 'Change in Connections') : h('button', {
         class: 'btn small danger', onclick: async () => {
           if (!await confirmDialog('Remove ' + (cur.name || cur.type) + '?', 'Closes the connection and forgets its settings.', { ok: 'Remove', danger: true })) return;
           try { await removeLink(app, cur.id); } catch (e) { toastError(e); return; }
@@ -614,7 +628,8 @@ async function addWizard(app, root, preKind) {
   const hostInfo = app.store.get('host') || {};
   const kinds = (hostInfo.endpoint_kinds || []).filter(k => k && k.kind);
   const tr = await app.api.try('links.types', {}, { types: [] }, true);
-  const types = tr.types || [];
+  // relay links are created automatically (Settings → Connections), never by hand (RPC_API §11)
+  const types = (tr.types || []).filter(t => t.type !== 'relay');
   const head = title => h('div', { class: 'page-head' }, h('a', { class: 'btn ghost icon-only', href: '#/links', 'aria-label': 'Back to links' }, icon('back')), h('h1', null, title));
   let hwList = null;
   try { hwList = await loadHardware(app, { platform: platformOf(app) }); } catch { hwList = null; }

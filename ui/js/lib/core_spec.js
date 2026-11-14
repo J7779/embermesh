@@ -55,7 +55,7 @@ export function validateSettings(patch) {
 export function meshFields() {
   const S = SETTINGS_SPEC;
   return [
-    { key: 'relay_enabled', label: 'Relay messages for others', type: 'bool', default: S.relay_enabled.default, help: 'Keeps the mesh working. Turn off only to save battery in an emergency.' },
+    { key: 'relay_enabled', label: 'Pass on messages for others', type: 'bool', default: S.relay_enabled.default, help: 'Keeps the mesh working. Turn off only to save battery in an emergency.' },
     { key: 'store_forward_days', label: 'Carry undelivered messages for', type: 'number', unit: 'days', min: S.store_forward_days.min, max: S.store_forward_days.max, step: 1, default: S.store_forward_days.default, help: 'Store-and-forward: your device carries messages for people out of range and hands them over when it meets them (' + S.store_forward_days.min + '–' + S.store_forward_days.max + ' days).' },
     { key: 'beacon_interval_s', label: 'Announce this node every', type: 'number', unit: 's', min: 0, max: S.beacon_interval_s.max, step: 60, default: S.beacon_interval_s.default, help: 'Longer saves airtime and battery; shorter helps others find you. ' + S.beacon_interval_s.min + '–' + S.beacon_interval_s.max + ' s, or 0 to never announce automatically.' },
     { key: 'read_receipts', label: 'Send read receipts', type: 'bool', default: S.read_receipts.default, help: 'Tell the sender of a direct message when you have read it.' },

@@ -126,6 +126,8 @@ int ember_hub_start(ember_hub* h, const char* options_json, char* err, size_t er
   int64_t mg = o.get("max_guests").as_int(int64_t(opt.max_guests));
   if (mg > 0) opt.max_guests = size_t(mg);
   opt.captive_portal = o.get("captive_portal").as_bool(false);
+  opt.mqtt = o.get("mqtt").as_bool(false);  // embedders opt in
+  opt.mqtt_port = uint16_t(o.get("mqtt_port").as_int(8438));
   opt.version = o.get("version").as_string(EMBER_HOST_VERSION);
   {
     std::lock_guard<std::mutex> lk(h->probe_mu);

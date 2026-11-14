@@ -31,6 +31,7 @@ third_party=(
   "Monocypher|core/third_party/monocypher/LICENCE.md|BSD|CC0"
   "doctest|core/third_party/include/doctest.h|MIT"
   "miniaudio|host/third_party/miniaudio/LICENSE|public domain|MIT"
+  "Mbed TLS|host/third_party/mbedtls/LICENSE|Apache License"
   "ZXing core|apps/android/app/libs/ZXING-LICENSE.txt|Apache License"
 )
 declare -a tp_rows=()

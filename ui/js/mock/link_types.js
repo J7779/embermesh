@@ -24,3 +24,21 @@ for (const t of CORE_LINK_TYPES) {
     { value: 'custom', label: 'Custom (set the values below)' },
   ], help: 'Fills the modem, lead-in/tail, level and channel-check settings for this kind of setup; values you set yourself win.', required: false, advanced: false });
 }
+
+// RPC_API §11: link type `relay` (MQTT 3.1.1 over a websocket endpoint). Created only as an
+// automatic link (auto:"relay") after the user turned the internet relay on. Added here until the
+// snapshot is regenerated from a core that has it.
+if (!CORE_LINK_TYPES.some(t => t.type === 'relay')) {
+  CORE_LINK_TYPES.push({ type: 'relay', title: 'Internet relay', description: 'Reaches contacts over the internet through an MQTT relay over TLS WebSocket. Every message is end-to-end sealed; the relay sees IP addresses, timing and sizes. Created automatically when the internet relay is on.', endpoint_kinds: ['websocket'], config: [
+    { key: 'url', label: 'Relay', type: 'text', default: '', help: 'The relay this link connects to (informational).', required: false, advanced: false },
+    { key: 'keepalive_s', label: 'Keep-alive', type: 'number', unit: 's', default: 240, min: 60, max: 1200, step: 1, help: 'How often an idle connection is checked.', required: false, advanced: true },
+    { key: 'username', label: 'User name', type: 'text', default: '', help: 'Only for a private relay that needs it.', required: false, advanced: true },
+  ] });
+}
+
+// RPC_API §11 rev 2: nearby links use `stream` with preset "nearby" (the 8-byte hello).
+for (const t of CORE_LINK_TYPES) {
+  if (t.type !== 'stream') continue;
+  const f = t.config.find(c => c.key === 'preset');
+  if (f && Array.isArray(f.options) && !f.options.some(o => o.value === 'nearby')) f.options.push({ value: 'nearby', label: 'Nearby device (automatic)' });
+}

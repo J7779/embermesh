@@ -57,6 +57,8 @@ class HostRouter(
         f.add("link_configure")   // host.link.configure (endpoint settings editable after creation)
         capture?.let { f.addAll(it.features()) } // capture_camera_luma / capture_mic_pcm
         if (app.hub != null && org.embermesh.app.hub.HubNative.available) f.add("hub")
+        f.add("nearby")  // NSD advertise/browse + automatic TCP links (RPC_API §11, CONNECTIVITY §3)
+        f.add("relay")   // websocket with TLS (validated) and Sec-WebSocket-Protocol (CONNECTIVITY §4.11)
         return f.toList()
     }
 
@@ -209,6 +211,7 @@ class HostRouter(
         .put("backend", "native")
         .put("endpoint_kinds", registry.describe(ctx))
         .put("features", JSONArray(features()))
+        .put("websocket_tls", true)
         .put("actions", actions())
         .put("signal", try { services.signalInfo() } catch (_: Throwable) { JSONObject().put("torch", "no").put("screen", true) })
         .apply { app.accessibility()?.let { put("accessibility", it) } }

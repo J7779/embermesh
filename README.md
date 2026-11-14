@@ -4,8 +4,9 @@
 <img src="docs/assets/banner.svg" alt="EmberMesh — off-grid mesh chat and an offline survival library" width="100%">
 
 **Off-grid chat and an offline survival library, for when the network is gone.**<br>
-No internet, no accounts, no servers: every phone, computer or browser is a node that stores,
-carries and forwards messages over whatever link it has.
+No internet needed, no accounts, no servers of its own: every phone, computer or browser is a node
+that stores, carries and forwards messages over whatever link it has. An optional internet relay,
+off until you turn it on, reaches contacts far away while a connection exists.
 
 <!--
   Status badges use repository-relative URLs (../../actions/..., ../../releases/...), which GitHub
@@ -42,7 +43,7 @@ reach another camp kilometres away. Messages that cannot be delivered yet are ke
 by anyone walking between the groups, or on a USB stick, or as a series of QR codes.
 
 Beside the chat sits a library of **5,301 offline guides** — first aid, water, food, shelter,
-radio, repair, power and more — plus a 32-chapter operator manual, searchable by keywords and by meaning, with 60 field calculators
+radio, repair, power and more — plus a 33-chapter operator manual, searchable by keywords and by meaning, with 60 field calculators
 and a Morse reader that decodes a flashing light through the camera or a tone through the
 microphone. The same C++17 core runs on Android, iOS, Linux, macOS, Windows and in any modern
 browser as WebAssembly, so every device behaves the same way. In a browser it installs as an
@@ -129,7 +130,7 @@ runs from a USB stick — see [Getting the app onto other people's devices](guid
 | 📻 **Radios** | Sound-card soft modems through any radio's audio, KISS TNCs with APRS messaging, Meshtastic, RNode, AT-command LoRa modules, transparent serial radios, receive-only SDR |
 | 📶 **Device to device** | Bluetooth LE phone-to-phone, Wi-Fi multicast, Apple peer-to-peer, WebRTC paired by QR code, TCP, serial cable, USB-stick and QR-code bundles |
 | 🏕️ **Hub** | A computer or phone serves the app on its own hotspot at `http://<ip>:8437/`; browsers that open it join the mesh. Add a radio and the whole hotspot reaches distant groups |
-| 📚 **Library** | 5,301 guides in 19 categories plus a 32-chapter operator manual, keyword and meaning-based search, every guide with its source and licence |
+| 📚 **Library** | 5,301 guides in 19 categories plus a 33-chapter operator manual, keyword and meaning-based search, every guide with its source and licence |
 | 🧭 **Easy to use** | Simple mode (bigger text and buttons, fewer choices, plain words) and accessibility settings: text size, high contrast, motion, reading spacing, vibration, keyboard shortcuts, screen-reader labels. A short 3D launch animation that can be shortened or turned off and follows the system's reduced-motion setting |
 | 🧮 **Tools** | 60 calculators, including 19 antenna designers with build diagrams, link budget, radio horizon, coax loss, solar and battery sizing, grid conversion, water disinfection; band plans for 36 radio services |
 | 🔐 **Your data** | Storage encrypted with a passphrase, duress passphrase, panic wipe, identity backup, contact verification by 8 words read over the radio or by QR card |
@@ -276,7 +277,7 @@ is in [What you need](guides/content/embermesh/what-you-need.md).
 
 ## The guide library
 
-5,301 guides in 19 categories plus the 32-chapter operator manual — about 81 MB of Markdown, packed
+5,301 guides in 19 categories plus the 33-chapter operator manual — about 81 MB of Markdown, packed
 into one 58.2 MB `guides.pack` with a prebuilt keyword index, the search model and passage vectors. Every guide records its source, licence and attribution, and the app shows
 them at the bottom of each guide.
 
@@ -286,7 +287,7 @@ them at the bottom of each guide.
 | Agriculture | 629 | Electronics | 157 | Security | 81 |
 | Repair | 560 | Community | 139 | Fire | 78 |
 | Survival | 503 | Water | 107 | Signaling | 58 |
-| Food | 467 | Hygiene | 139 | EmberMesh manual | 32 |
+| Food | 467 | Hygiene | 139 | EmberMesh manual | 33 |
 | Hazards | 459 | Power | 138 | Reference | 29 |
 | Radio | 281 | Shelter | 233 | | |
 
@@ -305,14 +306,14 @@ The **operator manual** is inside every app (Guides → "How to use EmberMesh") 
 
 | Getting started | Connecting things | Radio | In the field |
 |---|---|---|---|
-| [1 Quick start](guides/content/embermesh/quick-start.md) | [11 What you need](guides/content/embermesh/what-you-need.md) | [15 Radio gateway](guides/content/embermesh/radio-gateway.md) | [24 Sneakernet](guides/content/embermesh/sneakernet.md) |
-| [2 How it works](guides/content/embermesh/how-it-works.md) | [12 Phone to phone](guides/content/embermesh/phone-to-phone.md) | [16 Handhelds + sound-card modem](guides/content/embermesh/handheld-audio-modem.md) | [25 Emergency use](guides/content/embermesh/emergency-use.md) |
-| [3 Android app](guides/content/embermesh/app-android.md) | [13 Spreading the app](guides/content/embermesh/spreading-the-app.md) | [17 Baofeng UV-5R](guides/content/embermesh/baofeng-uv5r.md) | [26 Morse by light and sound](guides/content/embermesh/morse-reading.md) |
-| [4 iPhone and iPad](guides/content/embermesh/app-ios.md) | [14 Setting up a hub](guides/content/embermesh/hub-setup.md) | [18 KISS TNCs and packet](guides/content/embermesh/kiss-tnc-packet.md) | [27 Security](guides/content/embermesh/security.md) |
-| [5 Web app](guides/content/embermesh/app-web.md) | | [19 LoRa](guides/content/embermesh/lora.md) | [28 Power and field operation](guides/content/embermesh/power-and-field.md) |
-| [6 Computer hub (emberd)](guides/content/embermesh/app-desktop.md) | | [20 SDR listening](guides/content/embermesh/sdr-listening.md) | [29 Troubleshooting and limits](guides/content/embermesh/troubleshooting.md) |
-| [7 Tour of every screen](guides/content/embermesh/screens-tour.md) | | [21 Antennas you can build](guides/content/embermesh/antennas.md) | [30 Glossary and quick reference](guides/content/embermesh/quick-reference.md) |
-| [8 Simple mode and accessibility](guides/content/embermesh/accessibility.md) · [9 Finding guides](guides/content/embermesh/library-search.md) · [10 Settings reference](guides/content/embermesh/settings-reference.md) | | [22 Relays and repeaters](guides/content/embermesh/relays-and-repeaters.md) · [23 Running a net](guides/content/embermesh/running-a-net.md) | [31 Building from source](guides/content/embermesh/building-from-source.md) · [32 Licences and credits](guides/content/embermesh/licences.md) |
+| [1 Quick start](guides/content/embermesh/quick-start.md) | [11 What you need](guides/content/embermesh/what-you-need.md) | [16 Radio gateway](guides/content/embermesh/radio-gateway.md) | [25 Sneakernet](guides/content/embermesh/sneakernet.md) |
+| [2 How it works](guides/content/embermesh/how-it-works.md) | [12 Phone to phone](guides/content/embermesh/phone-to-phone.md) | [17 Handhelds + sound-card modem](guides/content/embermesh/handheld-audio-modem.md) | [26 Emergency use](guides/content/embermesh/emergency-use.md) |
+| [3 Android app](guides/content/embermesh/app-android.md) | [13 Connections: nearby and internet relay](guides/content/embermesh/connections.md) | [18 Baofeng UV-5R](guides/content/embermesh/baofeng-uv5r.md) | [27 Morse by light and sound](guides/content/embermesh/morse-reading.md) |
+| [4 iPhone and iPad](guides/content/embermesh/app-ios.md) | [14 Spreading the app](guides/content/embermesh/spreading-the-app.md) | [19 KISS TNCs and packet](guides/content/embermesh/kiss-tnc-packet.md) | [28 Security](guides/content/embermesh/security.md) |
+| [5 Web app](guides/content/embermesh/app-web.md) | [15 Setting up a hub](guides/content/embermesh/hub-setup.md) | [20 LoRa](guides/content/embermesh/lora.md) | [29 Power and field operation](guides/content/embermesh/power-and-field.md) |
+| [6 Computer hub (emberd)](guides/content/embermesh/app-desktop.md) | | [21 SDR listening](guides/content/embermesh/sdr-listening.md) | [30 Troubleshooting and limits](guides/content/embermesh/troubleshooting.md) |
+| [7 Tour of every screen](guides/content/embermesh/screens-tour.md) | | [22 Antennas you can build](guides/content/embermesh/antennas.md) | [31 Glossary and quick reference](guides/content/embermesh/quick-reference.md) |
+| [8 Simple mode and accessibility](guides/content/embermesh/accessibility.md) · [9 Finding guides](guides/content/embermesh/library-search.md) · [10 Settings reference](guides/content/embermesh/settings-reference.md) | | [23 Relays and repeaters](guides/content/embermesh/relays-and-repeaters.md) · [24 Running a net](guides/content/embermesh/running-a-net.md) | [32 Building from source](guides/content/embermesh/building-from-source.md) · [33 Licences and credits](guides/content/embermesh/licences.md) |
 
 **For developers:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (design and layout) ·
 [docs/RPC_API.md](docs/RPC_API.md) (app ↔ core contract) · [docs/PROTOCOL.md](docs/PROTOCOL.md)

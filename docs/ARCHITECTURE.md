@@ -1,7 +1,8 @@
 # EmberMesh — Architecture
 
 EmberMesh is an off-grid, serverless, device-to-device chat and survival-reference system for when
-the infrastructure is gone. No internet, no accounts, no servers: every device is a full mesh node
+the infrastructure is gone. No internet needed, no accounts, no servers of its own (an optional,
+consented internet relay is described in docs/CONNECTIVITY.md): every device is a full mesh node
 that stores, carries and forwards messages over whatever medium is available — handheld radios,
 LoRa, packet TNCs, sound-card modems, Bluetooth, Wi-Fi, a USB stick, or a QR code.
 

@@ -1,6 +1,6 @@
 ---
 id: embermesh/radio-gateway
-title: "EmberMesh 15: Radio Gateway - Connecting a Hub or Phone to a Radio"
+title: "EmberMesh 16: Radio Gateway - Connecting a Hub or Phone to a Radio"
 category: embermesh
 tags: [embermesh, gateway, radio, tnc, kiss, lora, meshtastic, rnode, sound card, sdr, amateur, licence-free, bridge]
 summary: "How a hub or phone with a radio links the local crowd to distant groups, how to choose between the sound-card modem, KISS TNCs, LoRa devices, serial radio modules and SDR receive, and which devices support which."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 15
+order: 16
 ---
 
 # Radio Gateway: Connecting a Hub or Phone to a Radio

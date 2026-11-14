@@ -216,6 +216,7 @@ TEST_CASE("endpoint kinds per driver match what the platforms provide") {
       {"rnode", {"serial", "ble", "bt_spp", "tcp"}},
       {"lora_at", {"serial", "ble", "bt_spp", "tcp"}},
       {"rtl_tcp", {"rtl_tcp", "tcp"}},
+      {"relay", {"websocket"}},
   };
   Json types;
   REQUIRE(Json::parse(link_types_json(), types));
@@ -231,7 +232,7 @@ TEST_CASE("endpoint kinds per driver match what the platforms provide") {
     // No byte-stream driver may claim a datagram kind and vice versa.
     for (const std::string& k : got) {
       if (name == "raw") CHECK(streams.count(k) == 0);
-      if (name != "raw" && name != "audio") CHECK(datagrams.count(k) == 0);
+      if (name != "raw" && name != "audio" && name != "relay") CHECK(datagrams.count(k) == 0);  // relay: MQTT over WebSocket
     }
     ++n;
   }

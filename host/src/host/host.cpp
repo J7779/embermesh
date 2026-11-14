@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <future>
+#include <map>
 #include <set>
 
 #include "host/util.h"
+#include "host/ws.h"
 
 #if !defined(_WIN32)
 #include <spawn.h>
@@ -13,6 +15,15 @@ extern char** environ;
 #endif
 
 namespace ember_host {
+
+constexpr uint64_t kRelayStableMs = 120000;  // RPC_API §11: relay backoff resets after 2 min up
+
+uint32_t relay_backoff_step(uint32_t* backoff_ms, uint16_t rnd) {
+  // RPC_API §11: 2 s ... 5 min, +-20 % so many nodes behind one outage do not return in step.
+  uint32_t base = std::min<uint32_t>(std::max<uint32_t>(*backoff_ms, 2000), 300000);
+  *backoff_ms = std::min<uint32_t>(base * 2, 300000);
+  return uint32_t(double(base) * (0.8 + 0.4 * (double(rnd) / 65535.0)));
+}
 
 Json rpc_ok(Json result) {
   Json e = Json::object();
@@ -60,6 +71,8 @@ HostConfig HostConfig::from_json(const Json& j) {
   c.local_no_token = cfg_bool(j, "local_no_token", c.local_no_token);
   c.captive_portal = cfg_bool(j, "captive_portal", c.captive_portal);
   c.max_tick_interval_ms = uint32_t(cfg_int(j, "max_tick_interval_ms", c.max_tick_interval_ms));
+  c.nearby = cfg_bool(j, "nearby", c.nearby);
+  c.nearby_service = cfg_str(j, "nearby_service", c.nearby_service);
   for (const auto& l : j.get("links").elements())
     if (l.is_object()) c.startup_links.push(l);
   const Json& h = j.get("hub");
@@ -73,6 +86,8 @@ HostConfig HostConfig::from_json(const Json& j) {
     c.hub_port = uint16_t(cfg_int(h, "port", c.hub_port));
     c.hub_bind = cfg_str(h, "bind", c.hub_bind);
     c.hub_max_guests = size_t(cfg_int(h, "max_guests", int64_t(c.hub_max_guests)));
+    c.hub_mqtt = cfg_bool(h, "mqtt", c.hub_mqtt);
+    c.hub_mqtt_port = uint16_t(cfg_int(h, "mqtt_port", c.hub_mqtt_port));
     if (h.get("token").is_string()) c.admin_token = h.get("token").as_string();
     c.local_no_token = cfg_bool(h, "local_no_token", c.local_no_token);
     c.captive_portal = cfg_bool(h, "captive_portal", c.captive_portal);
@@ -153,6 +168,9 @@ void Host::start() {
     std::string err;
     if (!hub_server_start(cfg_.hub_port, cfg_.hub_bind, &err)) EH_LOGE("hub: %s", err.c_str());
   }
+#ifdef EMBER_HOST_HAVE_MDNS
+  if (cfg_.nearby && !nearby_) nearby_.reset(new Nearby(loop_, *this, *this, cfg_.nearby_service));
+#endif
   // Also run on every node.ready (the first one is usually still in the outbox: sync is idempotent).
   sync_links();
 }
@@ -174,6 +192,7 @@ void Host::shutdown() {
   }
   if (shut_down_) return;
   shut_down_ = true;
+  nearby_.reset();  // goodbye on mDNS, closes the listener; its links go with links_ below
   hub_.stop();
   if (capture_) {
     if (capture_->timer) loop_.cancel(capture_->timer);
@@ -291,6 +310,17 @@ void Host::handle_event(const char* json, size_t len) {
     uint32_t id = uint32_t(d.get("link_id").as_int(0));
     auto it = links_.find(id);
     if (it != links_.end() && it->second.ep) it->second.ep->set_ptt(d.get("on").as_bool(false));
+  } else if (name == "connectivity.changed") {
+    if (started_) {
+      refresh_nearby(&ev.get("data"));
+      refresh_relays(&ev.get("data"));
+    }
+  } else if (name == "link.removed") {
+    // The core removed a link by itself (duplicate nearby link, relay consent withdrawn).
+    uint32_t id = uint32_t(ev.get("data").get("id").as_int(0));
+    bool ours = nearby_ && nearby_->owns(id);
+    close_link_rec(id);
+    if (ours) nearby_->link_gone(id);
   } else if (name == "node.ready") {
     // RPC_API.md: hosts re-run their startup step on every node.ready (after create, unlock,
     // duress unlock and wipe).
@@ -485,7 +515,11 @@ Json Host::m_info(CallOrigin origin) {
   if (!cfg_.data_dir.empty()) feats.push("file");
   feats.push("notify");
   feats.push("capture_mic_pcm");  // the daemon's own sound input (or a PCM pipe) can feed morse.rx
+  if (nearby_) feats.push("nearby");
+  if (ws_tls_available()) feats.push("relay");  // RPC_API §11: only with TLS in the websocket endpoint
   r.set("features", feats);
+  r.set("websocket_tls", ws_tls_available());
+  if (nearby_) r.set("nearby", nearby_->status());
   // Morse reading: the camera is always captured by the page itself (getUserMedia in the operator's
   // browser); the microphone either by the page (the operator's device) or natively here.
   Json cap = Json::object();
@@ -786,12 +820,173 @@ void Host::sync_links() {
         continue;
       }
       if (!cfg_.restore_links) continue;
+      // Auto links (nearby / relay) belong to the component that created them; never reopen them here.
+      if (l.get("auto").is_string() || ep.get("auto").is_string()) continue;
       open_core_link(l);  // kinds this host cannot provide are left alone (state down)
     }
     if (hub_.running() && !hub_link_) ensure_hub_link();
     ensure_startup_links();
   }
   syncing_ = false;
+  refresh_nearby();
+  refresh_relays();
+}
+
+void Host::refresh_relays(const Json* connectivity) {
+  if (shut_down_ || relays_refreshing_) return;
+  relays_refreshing_ = true;
+  Json c;
+  if (connectivity && connectivity->is_object()) {
+    c = *connectivity;
+  } else {
+    Json env = core_call("connectivity.get", Json::object());
+    c = env.get("ok").as_bool(false) ? env.get("result") : Json::object();
+  }
+  // Only while `ready` and `internet.active`, and never without TLS (a host without TLS creates no
+  // relay links). ready:false (lock, wipe, duress) closes them all.
+  bool on = ws_tls_available() && c.get("ready").as_bool(false) && c.get("internet").get("active").as_bool(false);
+  std::map<std::string, bool> want;  // url -> allow_plaintext
+  if (on)
+    for (const auto& rl : c.get("internet").get("relays").elements()) {
+      std::string url = rl.get("url").as_string();
+      if (!url.empty() && rl.get("enabled").as_bool(false)) want[url] = rl.get("allow_plaintext").as_bool(false);
+    }
+  std::vector<uint32_t> drop;
+  std::set<std::string> have;
+  for (const auto& kv : links_)
+    if (kv.second.auto_relay) {
+      if (want.count(kv.second.auto_key))
+        have.insert(kv.second.auto_key);
+      else
+        drop.push_back(kv.first);
+    }
+  for (uint32_t id : drop) relay_remove(id);
+  for (const auto& w : want)
+    if (!have.count(w.first)) relay_install(w.first, w.second);
+  relays_refreshing_ = false;
+}
+
+void Host::relay_install(const std::string& url, bool allow_plaintext) {
+  const EndpointKind* k = registry_.find("websocket");
+  if (!k || !k->create) return;
+  Json ecfg = Json::object();
+  ecfg.set("url", url);
+  Json protos = Json::array();
+  protos.push("mqtt");
+  ecfg.set("protocols", protos);
+  if (allow_plaintext) ecfg.set("allow_plaintext", true);
+  std::string err;
+  std::unique_ptr<Endpoint> ep = k->create(loop_, *this, cfg_with_defaults(k->config, ecfg), &err);
+  if (!ep) {
+    EH_LOGW("relay: not connecting (%s)", err.c_str());
+    return;
+  }
+  Json endpoint = Json::object();
+  endpoint.set("kind", "websocket");
+  endpoint.set("config", ecfg);
+  endpoint.set("auto", "relay");  // marker for hosts reading links.list (sync_links skips these)
+  Json lcfg = Json::object();
+  lcfg.set("url", url);
+  Json add = Json::object();
+  add.set("type", "relay");
+  add.set("config", lcfg);
+  add.set("endpoint", endpoint);
+  add.set("persist", false);
+  add.set("auto", "relay");
+  add.set("auto_key", url);
+  Json env = core_call("links.add", add);
+  uint32_t id = uint32_t(env.get("result").get("link").get("id").as_int(0));
+  if (!env.get("ok").as_bool(false) || !id) {
+    EH_LOGW("relay: the core refused the link (%s)", env.get("error").get("message").as_string().c_str());
+    return;
+  }
+  Json lspec = Json::object();
+  lspec.set("type", "relay");
+  lspec.set("config", lcfg);
+  LinkRec& r = install_link(id, env.get("result").get("link").get("name").as_string("Internet relay"), endpoint, lspec,
+                            std::string(), false, std::move(ep));
+  r.auto_relay = true;
+  r.auto_key = url;
+}
+
+void Host::relay_remove(uint32_t id) {
+  close_link_rec(id);
+  Json rp = Json::object();
+  rp.set("id", id);
+  core_call("links.remove", rp);  // may already be gone (the core removes relay links itself)
+}
+
+void Host::refresh_nearby(const Json* connectivity) {
+  if (!nearby_ || shut_down_) return;
+  Json c;
+  if (connectivity && connectivity->is_object()) {
+    c = *connectivity;
+  } else {
+    Json env = core_call("connectivity.get", Json::object());
+    // Anything but a valid answer (locked, a core without connectivity.*) means: start nothing.
+    c = env.get("ok").as_bool(false) ? env.get("result") : Json::object();
+  }
+  // RPC_API §11: only while `ready` (setup done, unlocked) and `nearby.active`; stop on ready:false.
+  bool on = c.get("ready").as_bool(false) && c.get("nearby").get("active").as_bool(false);
+  std::string token = c.get("nearby").get("token").as_string();
+  if (token.size() != 8) on = false;
+  nearby_->set_enabled(on, on ? token : std::string());
+}
+
+uint32_t Host::nearby_install(std::unique_ptr<Endpoint> ep, const Json& p) {
+  if (shut_down_) return 0;
+  Json endpoint = p.get("endpoint");
+  endpoint.set("auto", "nearby");  // marker for hosts reading links.list (sync_links skips these)
+  Json cfg = Json::object();
+  cfg.set("preset", "nearby");     // the core sends and checks the 8-byte hello (CONNECTIVITY §3.3)
+  Json add = Json::object();
+  add.set("type", "stream");       // the core names it "Nearby device" / "Nearby: <name>"
+  add.set("config", cfg);
+  add.set("endpoint", endpoint);
+  add.set("persist", false);
+  add.set("auto", "nearby");
+  add.set("auto_role", p.get("auto_role"));
+  add.set("auto_key", p.get("auto_key"));
+  Json env = core_call("links.add", add);
+  if (!env.get("ok").as_bool(false)) {
+    EH_LOGD("nearby: core refused the link (%s)", env.get("error").get("message").as_string().c_str());
+    return 0;
+  }
+  uint32_t id = uint32_t(env.get("result").get("link").get("id").as_int(0));
+  if (!id) return 0;
+  Json lspec = Json::object();
+  lspec.set("type", "stream");
+  lspec.set("config", cfg);
+  LinkRec& r = install_link(id, env.get("result").get("link").get("name").as_string("Nearby device"), endpoint, lspec,
+                            std::string(), false, std::move(ep));
+  r.auto_nearby = true;
+  return id;
+}
+
+std::string Host::nearby_network_changed() {
+  Json env = core_call("connectivity.network_changed", Json::object());
+  return env.get("result").get("token").as_string();
+}
+
+void Host::nearby_remove(uint32_t id) {
+  auto remove_now = [this, id] {
+    bool known = links_.count(id) != 0;
+    close_link_rec(id);
+    if (known || !shut_down_) {
+      Json rp = Json::object();
+      rp.set("id", id);
+      core_call("links.remove", rp);
+    }
+  };
+  if (shut_down_) {
+    remove_now();
+    return;
+  }
+  // Deferred: this is often called from inside the endpoint's own callbacks.
+  auto alive = alive_;
+  loop_.timer(0, [alive, remove_now] {
+    if (*alive) remove_now();
+  });
 }
 
 void Host::ensure_startup_links() {
@@ -878,7 +1073,13 @@ void Host::schedule_reconnect(uint32_t id) {
   if (it == links_.end() || it->second.retry_timer || shut_down_) return;
   LinkRec& r = it->second;
   uint32_t delay = r.backoff_ms;
-  r.backoff_ms = std::min<uint32_t>(r.backoff_ms * 2, 30000);
+  if (r.ep && r.ep->relay_backoff()) {
+    uint16_t rnd = 0;
+    random_bytes(&rnd, sizeof rnd);
+    delay = relay_backoff_step(&r.backoff_ms, rnd);
+  } else {
+    r.backoff_ms = std::min<uint32_t>(r.backoff_ms * 2, 30000);
+  }
   EH_LOGD("link %u: reconnecting in %u ms", id, delay);
   r.retry_timer = loop_.timer(delay, [this, id] {
     auto it2 = links_.find(id);
@@ -940,8 +1141,20 @@ void Host::ep_state(Endpoint& ep, bool connected, const std::string& error) {
       loop_.cancel(r.retry_timer);
       r.retry_timer = 0;
     }
-    r.backoff_ms = 1000;
+    if (ep.relay_backoff())
+      r.up_since_ms = steady_ms();  // the backoff resets only after 2 min connected (below)
+    else
+      r.backoff_ms = 1000;
+  } else if (r.auto_nearby) {
+    // A nearby connection that ended (or a dial that failed) is not reconnected: the link goes and
+    // rediscovery makes a new one.
+    if (nearby_) nearby_->link_gone(r.id);
+    nearby_remove(r.id);
   } else if (ep.auto_reconnect()) {
+    if (ep.relay_backoff() && r.up_since_ms) {
+      if (steady_ms() - r.up_since_ms >= kRelayStableMs) r.backoff_ms = 2000;
+      r.up_since_ms = 0;
+    }
     schedule_reconnect(r.id);
   }
 }
@@ -1027,6 +1240,8 @@ bool Host::hub_server_start(uint16_t port, const std::string& bind, std::string*
   o.local_no_token = cfg_.local_no_token;
   o.captive_portal = cfg_.captive_portal;
   o.max_guests = cfg_.hub_max_guests;
+  o.mqtt = cfg_.hub_mqtt;
+  o.mqtt_port = cfg_.hub_mqtt_port;
   o.version = cfg_.app_version;
   if (!hub_.start(o, err)) return false;
   hub_wanted_ = true;
@@ -1065,6 +1280,7 @@ Json Host::m_hub_status() {
   if (hub_.running()) r.set("port", hub_.port());
   r.set("link_id", hub_link_);
   r.set("remote_sessions", double(hub_.rpc_count()));
+  if (hub_.mqtt_port()) r.set("relay_broker_port", hub_.mqtt_port());
   r.set("stats", hub_.stats());
   return rpc_ok(r);
 }

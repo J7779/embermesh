@@ -2,7 +2,7 @@
 // work before the core's decoder lands. Simple but honest: adaptive threshold, adaptive dot
 // length, Goertzel tone detection for audio. Not a reference implementation.
 import { MORSE } from '../lib/morse.js';
-import { b64ToPcm } from '../lib/capture.js';
+import { b64ToPcm, b64ToBytes } from '../lib/capture.js';
 
 const DECODE = Object.fromEntries(Object.entries(MORSE).map(([k, v]) => [v, k]));
 DECODE['...---...'] = '<SOS>';
@@ -122,6 +122,27 @@ export class MockMorseRx {
     this.snr = this.peak > 0 && this.noise > 0 ? Math.round(10 * Math.log10(this.peak / Math.max(this.noise, 1e-9)) * 10) / 10 : null;
     this.lastFeed = Date.now();
   }
+  /**
+   * §12 frames: whole-frame max-luma grids. A small tracker finds the cell that keys on and off
+   * with strong contrast, follows it (neighbouring cells), and feeds that cell's brightness to the
+   * decoder above. States: searching → locked → lost (> 2 s without a keyed edge).
+   */
+  feedFrames(p) {
+    const tr = this.tracker || (this.tracker = new LightTracker());
+    for (const f of p.frames) {
+      const t = Number(f.t_ms), w = Number(f.w), h = Number(f.h);
+      const max = b64ToBytes(f.max_b64);
+      if (!(w > 0 && h > 0 && w * h <= 4096 && max.length === w * h && Number.isFinite(t))) continue;
+      const v = tr.push(t, w, h, max);
+      if (v !== null) {
+        if (tr.replay) { for (const [rt, rv] of tr.replay) this._sample(rt, rv); tr.replay = null; }
+        this._sample(t, v);
+      }
+    }
+    this.lastFeed = Date.now();
+  }
+  target() { return this.tracker ? this.tracker.view() : null; }
+  pin(x, y) { (this.tracker || (this.tracker = new LightTracker())).pin(x, y); }
   status() {
     if (this.lastT !== null) this._idle(this.lastT);
     const s = {
@@ -130,6 +151,7 @@ export class MockMorseRx {
       quality: this.marks ? Math.round((this.good / this.marks) * 100) / 100 : 0, pending: this.pending,
     };
     if (this.source === 'audio') { s.tone_hz = Math.round(this.toneHz) || null; s.snr_db = this.snr; }
+    if (this.tracker) s.target = this.tracker.view();
     return s;
   }
   takeNew() { const t = this.newText; this.newText = ''; return t; }
@@ -148,4 +170,106 @@ function detectTone(buf, rate) {
   let best = 0, bestE = 0;
   for (let f = 300; f <= 1500; f += 20) { const e = goertzel(buf, off, n, f, rate); if (e > bestE) { bestE = e; best = f; } }
   return bestE > 0.01 ? best : 0;
+}
+
+/**
+ * Mock of the core's light tracker (RPC_API §12) over max-luma grids. Per cell: a slowly
+ * forgetting min/max, the edges (threshold crossings with strong contrast) of the last 4 s.
+ * The best cell keys most; a lock follows it to neighbours as the light drifts.
+ */
+export class LightTracker {
+  constructor() { this.w = 0; this.h = 0; this.cells = null; this.state = 'searching'; this.cur = -1; this.lastEdge = 0; this.pinned = null; this.hist = []; this.replay = null; this.t = 0; }
+  _reset(w, h) { this.w = w; this.h = h; this.cells = Array.from({ length: w * h }, () => ({ lo: 255, hi: 0, on: false, edges: [] })); this.cur = -1; this.state = 'searching'; }
+  pin(x, y) { this.pinned = x == null ? null : { x, y }; if (this.pinned) this.cur = -1; }
+  /** One frame → the tracked brightness 0..1, or null while searching. */
+  push(t, w, h, max) {
+    if (w !== this.w || h !== this.h || !this.cells) this._reset(w, h);
+    this.t = t;
+    const dt = this.prevT ? Math.max(0, t - this.prevT) : 33;
+    this.prevT = t;
+    const decay = Math.min(1, dt / 3000);
+    for (let i = 0; i < max.length; i++) {
+      const c = this.cells[i], v = max[i];
+      c.hi = Math.max(v, c.hi - (c.hi - v) * decay);
+      c.lo = Math.min(v, c.lo + (v - c.lo) * decay);
+      const span = c.hi - c.lo;
+      if (span < 40) continue;
+      const on = v > c.lo + span * (c.on ? 0.4 : 0.6);
+      if (on !== c.on) { c.on = on; c.edges.push(t); if (c.edges.length > 64) c.edges.shift(); }
+    }
+    // keep the last 3 s of frames so the first characters are not lost when the lock comes
+    this.hist.push([t, max]);
+    while (this.hist.length && t - this.hist[0][0] > 3000) this.hist.shift();
+    const score = i => { const c = this.cells[i]; return c.edges.filter(e => t - e < 4000).length * Math.min(1, (c.hi - c.lo) / 128); };
+    const cand = [];
+    for (let i = 0; i < this.cells.length; i++) { const s = score(i); if (s >= 3) cand.push([i, s]); }
+    // candidates: local maxima only (a light spilling into neighbours is one light)
+    // one light spills into neighbouring cells: keep local maxima within 3 cells (ties: lowest index)
+    this.candidates = cand.filter(([i, s]) => !cand.some(([j, s2]) => j !== i && (s2 > s || (s2 === s && j < i)) && Math.abs((j % w) - (i % w)) <= 3 && Math.abs(Math.floor(j / w) - Math.floor(i / w)) <= 3));
+    let best = -1;
+    if (this.pinned) {
+      let bd = Infinity;
+      for (const [i] of this.candidates) { const dx = ((i % w) + 0.5) / w - this.pinned.x, dy = (Math.floor(i / w) + 0.5) / h - this.pinned.y, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } }
+    } else {
+      let bs = 0;
+      for (const [i, s] of this.candidates) {
+        // prefer staying on (or next to) the current light
+        const near = this.cur >= 0 && Math.abs((i % w) - (this.cur % w)) <= 2 && Math.abs(Math.floor(i / w) - Math.floor(this.cur / w)) <= 2;
+        const sc = s * (near ? 1.5 : 1);
+        if (sc > bs) { bs = sc; best = i; }
+      }
+    }
+    if (this.cur < 0 && best >= 0 && score(best) >= 4) {
+      this.state = 'locked';
+      this.cur = best;
+      this.sig = { lo: 255, hi: 0, on: false };
+      this.replay = this.hist.slice(0, -1).map(([ht, hm]) => [ht, this._value(best, hm)]);
+      this.lastEdge = t;
+    } else if (this.cur >= 0 && best >= 0 && this.pinned) this.cur = best;
+    if (this.cur < 0) return null;
+    // follow the light as the camera drifts: the brightest cell near the current one, when it is lit
+    const cx = this.cur % w, cy = Math.floor(this.cur / w);
+    let bi = this.cur, bv = max[this.cur];
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+      const x = cx + dx, y = cy + dy;
+      if (x < 0 || y < 0 || x >= w || y >= h) continue;
+      const i = y * w + x;
+      if (max[i] > bv) { bv = max[i]; bi = i; }
+    }
+    if (bi !== this.cur && bv > this.cells[bi].lo + 60) this.cur = bi;
+    // a light that keyed somewhere else for a while (the old one is gone): move there
+    if (this.state === 'lost' && best >= 0 && !this.pinned) this.cur = best;
+    const v = this._value(this.cur, max) * 255;
+    const sg = this.sig;
+    sg.hi = Math.max(v, sg.hi - (sg.hi - v) * decay);
+    sg.lo = Math.min(v, sg.lo + (v - sg.lo) * decay);
+    if (sg.hi - sg.lo >= 40) { const on = v > sg.lo + (sg.hi - sg.lo) * (sg.on ? 0.4 : 0.6); if (on !== sg.on) { sg.on = on; this.lastEdge = t; } }
+    this.state = t - this.lastEdge > 2200 ? 'lost' : 'locked';
+    return v / 255;
+  }
+  _value(i, max) {
+    const w = this.w, x = i % w, y = Math.floor(i / w);
+    let v = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const xx = x + dx, yy = y + dy;
+      if (xx >= 0 && yy >= 0 && xx < w && yy < this.h) v = Math.max(v, max[yy * w + xx]);
+    }
+    return v / 255;
+  }
+  view() {
+    const n = (this.candidates || []).length;
+    if (this.state === 'searching' || this.cur < 0) return { state: 'searching', confidence: 0, candidates: n };
+    let edges = 0, span = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const x = (this.cur % this.w) + dx, y = Math.floor(this.cur / this.w) + dy;
+      if (x < 0 || y < 0 || x >= this.w || y >= this.h) continue;
+      const c = this.cells[y * this.w + x];
+      edges = Math.max(edges, c.edges.filter(e => this.t - e < 4000).length); span = Math.max(span, c.hi - c.lo);
+    }
+    const c = { hi: span, lo: 0 };
+    return {
+      state: this.state, x: ((this.cur % this.w) + 0.5) / this.w, y: (Math.floor(this.cur / this.w) + 0.5) / this.h,
+      size: Math.max(2 / this.w, 0.04), confidence: Math.round(Math.min(1, edges / 14) * Math.min(1, (c.hi - c.lo) / 160) * 100) / 100, candidates: n,
+    };
+  }
 }

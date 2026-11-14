@@ -44,6 +44,11 @@ per-driver UI code is needed beyond optional help text.
   settings not checked on a real device are marked `verified:false`.
 - Permissions (camera, microphone, Bluetooth, location, USB) are requested only when the user starts
   the feature, explained in the platform README's permissions section, and released when it stops.
+- **Automatic links** (Nearby, internet relay, docs/CONNECTIVITY.md): created by hosts only while
+  `connectivity.get` reports `ready` and the feature `active`, with `auto`/`auto_key`, never
+  persisted; anything reaching beyond the local network is off until consent, sealed end to end,
+  and attached to the engine as one scoped child link per contact (`LinkScope`), never as a shared
+  broadcast medium.
 
 ## 4. Tests
 

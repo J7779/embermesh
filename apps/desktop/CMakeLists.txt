@@ -60,11 +60,13 @@ if(EMBER_HOST_TESTS AND NOT WIN32)
       "native morse capture from a PCM pipe and the console"
       "rpc carries 30 feeds per second without blocking other calls"
       "big guide pack mmap with ranges ETag and many downloads"
-      "a fresh identity is anonymous by default")
+      "a fresh identity is anonymous by default"
+      "nearby devices find each other by mDNS with no links configured"
+      "internet relay over wss through a TLS proxy to the built-in broker")
     string(REGEX REPLACE "[^A-Za-z0-9]+" "_" _id "${_case}")
     add_test(NAME emberd_mesh.${_id} COMMAND emberd_mesh_tests "--test-case=${_case}")
     set_tests_properties(emberd_mesh.${_id} PROPERTIES TIMEOUT 180 LABELS mesh)
-    if(_case MATCHES "acoustic")
+    if(_case MATCHES "acoustic|handheld_vox")
       set_tests_properties(emberd_mesh.${_id} PROPERTIES TIMEOUT 600)  # robust modem: ~15 s per frame
     endif()
   endforeach()

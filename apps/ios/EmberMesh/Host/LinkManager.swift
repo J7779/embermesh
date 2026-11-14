@@ -101,6 +101,11 @@ final class LinkManager: EndpointDelegate {
     }
     let epCfg = spec.applyDefaults(ep.object("config") ?? [:])
     if let e = spec.validate(epCfg) { completion(.failure(e)); return }
+    // Relay links: TLS only (RPC_API §11); plain ws:// only with an explicit per-relay allow_plaintext.
+    if type == "relay" {
+      guard kind == "websocket" else { completion(.failure(.badParams("relay links run on a websocket endpoint"))); return }
+      if let e = RelaySocketPolicy.check(url: URL(string: EndpointConfig(epCfg).string("url")), config: epCfg) { completion(.failure(e)); return }
+    }
     let endpoint: Endpoint
     do { endpoint = try factory(kind, epCfg) } catch {
       completion(.failure((error as? RPCError) ?? .badParams(error.localizedDescription))); return
@@ -112,6 +117,7 @@ final class LinkManager: EndpointDelegate {
     guard let core else { completion(.failure(.busy("node is not running"))); return }
     var add: JSONObject = ["type": type, "name": name, "config": linkCfg, "endpoint": desc.json]
     if let persist = p.bool("persist") { add["persist"] = persist }
+    LinkManager.copyAuto(p, into: &add)
     core.call("links.add", add) { [weak self] r in
       guard let self else { return }
       switch r {
@@ -122,6 +128,7 @@ final class LinkManager: EndpointDelegate {
         }
         let lid = UInt32(id)
         self.descriptors[lid] = desc
+        if p.string("auto")?.isEmpty == false { self.autoLinks.insert(lid) }
         self.unbindAndClose(lid, report: false)
         if desc.autostart {
           self.bind(endpoint, id: lid)
@@ -132,6 +139,55 @@ final class LinkManager: EndpointDelegate {
     }
   }
 
+  /// `auto` / `auto_role` / `auto_key` (RPC_API §11) are passed through; auto links are never persisted.
+  static func copyAuto(_ p: JSONObject, into add: inout JSONObject) {
+    guard let auto = p.string("auto"), !auto.isEmpty else { return }
+    add["auto"] = auto
+    if let r = p.string("auto_role"), !r.isEmpty { add["auto_role"] = r }
+    if let k = p.string("auto_key"), !k.isEmpty { add["auto_key"] = String(k.prefix(64)) }
+    add["persist"] = false
+  }
+
+  /// A link around an endpoint that already exists (an accepted or dialed nearby connection):
+  /// links.add with the auto fields, then bind and open. On failure the caller closes the endpoint.
+  func createAuto(endpoint: Endpoint, descriptor: EndpointDescriptor, params p: JSONObject, completion: @escaping RPCCompletion) {
+    guard let core else { completion(.failure(.busy("node is not running"))); return }
+    let link = p.object("link") ?? [:]
+    var add: JSONObject = ["type": link.string("type") ?? "stream", "name": p.string("name") ?? "Nearby device",
+                           "config": link.object("config") ?? [:], "endpoint": descriptor.json, "persist": false]
+    LinkManager.copyAuto(p, into: &add)
+    core.call("links.add", add) { [weak self] r in
+      guard let self else { return }
+      switch r {
+      case .failure(let e): completion(.failure(e))
+      case .success(let res):
+        guard let l = res.object("link"), let id = l.int("id"), id > 0, id <= Int(UInt32.max) else {
+          completion(.failure(.internalError("links.add returned no link id"))); return
+        }
+        let lid = UInt32(id)
+        self.descriptors[lid] = descriptor
+        self.autoLinks.insert(lid)
+        self.bind(endpoint, id: lid)
+        endpoint.open()
+        completion(.success(["link": l]))
+      }
+    }
+  }
+
+  /// link.removed from the core (duplicate nearby link, relay links after consent was withdrawn):
+  /// the link is already gone in the core, just close the endpoint.
+  func coreRemoved(_ id: UInt32) {
+    unbindAndClose(id, report: false)
+    descriptors[id] = nil
+    backoff[id] = nil
+    autoLinks.remove(id)
+  }
+
+  /// Links created with `auto` (never persisted, owned by ConnectivityController).
+  private(set) var autoLinks: Set<UInt32> = []
+  /// Called (main queue) when a bound endpoint reports down.
+  var onEndpointDown: ((UInt32, Endpoint) -> Void)?
+
   // MARK: host.link.remove
 
   func remove(_ p: JSONObject, completion: @escaping RPCCompletion) {
@@ -140,6 +196,7 @@ final class LinkManager: EndpointDelegate {
     unbindAndClose(id, report: false)
     descriptors[id] = nil
     backoff[id] = nil
+    autoLinks.remove(id)
     guard let core else { completion(.failure(.busy("node is not running"))); return }
     core.call("links.remove", ["id": Int(id)]) { r in
       switch r {
@@ -220,6 +277,8 @@ final class LinkManager: EndpointDelegate {
         guard let raw = l.int("id"), raw > 0, raw <= Int(UInt32.max) else { continue }
         let id = UInt32(raw)
         seen.insert(id)
+        // Auto links (nearby, relay) are never persisted and are owned by ConnectivityController.
+        if l.string("auto")?.isEmpty == false { continue }
         guard let d = EndpointDescriptor(json: l.object("endpoint")) else { continue }  // added without endpoint (links.add by hand)
         let previous = self.descriptors[id]
         self.descriptors[id] = d
@@ -295,9 +354,19 @@ final class LinkManager: EndpointDelegate {
       var ev: JSONObject = ["link_id": Int(id), "connected": connected, "kind": e.kind]
       if let error { ev["error"] = error }
       self.onEvent?("host.endpoint.state", ev)
-      if connected { self.backoff[id] = 0 } else if e.wantsAutoReconnect { self.scheduleReconnect(id, endpoint: e) }
+      if connected {
+        self.connectedSince[id] = Date()
+        if e.reconnectPolicy.resetAfterSeconds == 0 { self.backoff[id] = 0 }
+      } else {
+        // Relay policy: the backoff resets only after the link stayed up long enough (2 min).
+        if let since = self.connectedSince.removeValue(forKey: id),
+           Date().timeIntervalSince(since) >= e.reconnectPolicy.resetAfterSeconds { self.backoff[id] = 0 }
+        if e.wantsAutoReconnect { self.scheduleReconnect(id, endpoint: e) }
+        self.onEndpointDown?(id, e)
+      }
     }
   }
+  private var connectedSince: [UInt32: Date] = [:]
 
   func endpointStatusChanged(_ e: Endpoint) {
     let id = e.linkId
@@ -313,8 +382,8 @@ final class LinkManager: EndpointDelegate {
   private func scheduleReconnect(_ id: UInt32, endpoint e: Endpoint) {
     guard !pendingReconnect.contains(id), let d = descriptors[id] else { return }
     let n = backoff[id, default: 0]
-    backoff[id] = min(n + 1, 6)
-    let delay = min(60.0, pow(2.0, Double(n)) * 2)  // 2, 4, 8 … 60 s
+    backoff[id] = min(n + 1, 12)
+    let delay = e.reconnectPolicy.delay(attempt: n)  // 2, 4, 8 … cap (60 s; relays 300 s ±20 %)
     pendingReconnect.insert(id)
     DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
       guard let self else { return }

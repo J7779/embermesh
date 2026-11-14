@@ -12,7 +12,7 @@ const std::vector<const LinkTypeInfo*>& all_types() {
   // Immutable after first use (function-local static of constant data, no mutable global state).
   static const std::vector<const LinkTypeInfo*> types = {
       &raw_type(),   &stream_type(), &kiss_type(),    &audio_type(),
-      &meshtastic_type(), &rnode_type(), &lora_at_type(), &rtl_tcp_type(),
+      &meshtastic_type(), &rnode_type(), &lora_at_type(), &rtl_tcp_type(), &relay_type(),
   };
   return types;
 }

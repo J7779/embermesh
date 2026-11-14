@@ -166,7 +166,8 @@ TEST_CASE("rf.hardware manual chapters are operator-manual chapters (pinned list
   const std::set<std::string> chapters = {
       "embermesh/handheld-audio-modem", "embermesh/hub-setup", "embermesh/kiss-tnc-packet", "embermesh/lora",
       "embermesh/morse-reading",        "embermesh/phone-to-phone", "embermesh/radio-gateway",
-      "embermesh/sdr-listening",        "embermesh/sneakernet",     "embermesh/what-you-need"};
+      "embermesh/sdr-listening",        "embermesh/sneakernet",     "embermesh/what-you-need",
+      "embermesh/connections"};
   for (const auto& m : rf::hardware_methods("", "")) {
     CAPTURE(m.id);
     CHECK(chapters.count(m.manual_chapter) == 1);

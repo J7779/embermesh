@@ -67,6 +67,12 @@ object EmberRuntime : OutboxSink, AppControls {
         private set
     @Volatile var a11y: org.embermesh.app.host.AccessibilityHints? = null
         private set
+    /** Nearby devices + internet relay (RPC_API §11), following connectivity.get / connectivity.changed. */
+    @Volatile var connectivity: org.embermesh.app.connectivity.ConnectivityController? = null
+        private set
+    @Volatile var nearby: org.embermesh.app.connectivity.NearbyManager? = null
+        private set
+    private var netCallback: android.net.ConnectivityManager.NetworkCallback? = null
 
     override fun accessibility(): JSONObject? = a11y?.snapshot()
 
@@ -90,6 +96,7 @@ object EmberRuntime : OutboxSink, AppControls {
     val eventListeners = CopyOnWriteArrayList<(String) -> Unit>()
 
     @Volatile var uiVisible = false
+        set(v) { field = v; foregroundChanged() }
     @Volatile var guidesStatus = "none"
         private set
     @Volatile private var keepAwakeRequested = false
@@ -142,6 +149,7 @@ object EmberRuntime : OutboxSink, AppControls {
         capture = org.embermesh.app.capture.CaptureManager(hostContext, r) { org.embermesh.app.util.Perms.ensure(hostContext, it) }
         (services as? org.embermesh.app.services.AndroidDeviceServices)?.cameraInUseByApp = { capture?.cameraActive() == true }
         router = HostRouter(hostContext, r, registry, links, services, this, capture)
+        connectivity = createConnectivity(r)
         r.start()
         started = true
         a11y = org.embermesh.app.host.AccessibilityHints(appContext) { s -> emitHostEvent("host.accessibility", s) }
@@ -151,6 +159,9 @@ object EmberRuntime : OutboxSink, AppControls {
             hostContext.scheduler.scheduleWithFixedDelay({ mixEntropy() }, 15, 15, java.util.concurrent.TimeUnit.MINUTES)
         } catch (_: Exception) { null }
         registerHotplug()
+        registerNetworkCallback()
+        registerBackgroundCameraRelease()
+        foregroundChanged()
         // Endpoints are (re)opened from the core's links.list on node.ready (see onCoreEvent).
         Log.i(TAG, "node started (core ${EmberNode.version()}, guides=$guidesStatus)")
         return true
@@ -178,6 +189,11 @@ object EmberRuntime : OutboxSink, AppControls {
         if (!started) return
         started = false
         entropyTask?.cancel(false)
+        try { connectivity?.shutdown() } catch (t: Throwable) { Log.w(TAG, "connectivity", t) }
+        netCallback?.let { cb -> try { (appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager).unregisterNetworkCallback(cb) } catch (_: Throwable) {} }
+        netCallback = null
+        lifecycle?.let { cb -> (appContext as? android.app.Application)?.unregisterActivityLifecycleCallbacks(cb) }
+        lifecycle = null
         a11y?.let { h -> try { hostContext.main.post { h.stop() } } catch (_: Throwable) {} }
         try { links.closeAll() } catch (t: Throwable) { Log.w(TAG, "closeAll", t) }
         try { phoneHub?.stop() } catch (_: Throwable) {}
@@ -209,7 +225,90 @@ object EmberRuntime : OutboxSink, AppControls {
 
     /** Builds a dispatcher for one WebView. */
     fun newDispatcher(evalJs: (String) -> Unit): BridgeDispatcher =
-        BridgeDispatcher(core, { m, p -> router.handle(m, p) }, hostContext.io, evalJs)
+        BridgeDispatcher(consentAwareCore(core), { m, p -> router.handle(m, p) }, hostContext.io, evalJs)
+
+    /**
+     * The page's core calls, with one host step: when the user turns "Nearby devices" on
+     * (`connectivity.set {nearby:true}` from first-run setup or Settings) the OS permissions it needs
+     * are requested first, at that moment and never at launch (CONNECTIVITY §3.7). A refusal does not
+     * block the setting: Wi-Fi discovery works without them below Android 17.
+     */
+    private fun consentAwareCore(c: CoreApi): CoreApi = object : CoreApi by c {
+        override fun call(method: String, paramsJson: String): String {
+            if (method == "connectivity.set" && nearbyTurnedOn(paramsJson)) requestNearbyPermissions()
+            return c.call(method, paramsJson)
+        }
+    }
+
+    /**
+     * `connectivity.set` that switches Nearby on: `nearby:true`, or the first-run / upgrade
+     * `setup_done:true` that leaves it on (core default) — CONNECTIVITY §3.9.
+     */
+    internal fun nearbyTurnedOn(paramsJson: String): Boolean {
+        if (!paramsJson.contains("nearby") && !paramsJson.contains("setup_done")) return false
+        val p = try { JSONObject(paramsJson) } catch (_: Exception) { return false }
+        return p.optBoolean("nearby", false) || (p.optBoolean("setup_done", false) && p.optBoolean("nearby", true))
+    }
+
+    /**
+     * Local network (Android 17+); blocking, best effort. Bluetooth is not asked: Android has no
+     * automatic BLE nearby links yet (the multi-peer `ble_peer` endpoint cannot carry the per-link
+     * hello, and Android cannot advertise the `EM<token>` local name without renaming the phone).
+     */
+    fun nearbyPermissions(): List<String> = org.embermesh.app.util.Perms.localNetwork()
+
+    private fun requestNearbyPermissions() {
+        try { org.embermesh.app.util.Perms.ensure(hostContext, nearbyPermissions()) } catch (e: HostError) { Log.i(TAG, "nearby permissions: ${e.message}") }
+    }
+
+    /** The UI came to the front / went away, or the foreground service started / stopped. */
+    fun foregroundChanged() {
+        if (!started) return
+        connectivity?.setForeground(uiVisible || org.embermesh.app.service.MeshService.running)
+    }
+
+    private fun createConnectivity(r: NodeRunner): org.embermesh.app.connectivity.ConnectivityController {
+        val parts = org.embermesh.app.connectivity.ConnectivityWiring.create(hostContext, r, links,
+            org.embermesh.app.endpoint.net.NsdNearbyPlatform(hostContext) { Log.i(TAG, it) }) { Log.i(TAG, it) }
+        nearby = parts.nearby
+        return parts.controller
+    }
+
+    private var lifecycle: android.app.Application.ActivityLifecycleCallbacks? = null
+
+    /**
+     * RPC_API §12 privacy: the camera is released the moment an activity of the app stops (background,
+     * screen off or locked); the page hears `host.capture.state {running:false}`.
+     */
+    private fun registerBackgroundCameraRelease() {
+        val app = appContext as? android.app.Application ?: return
+        val cb = object : android.app.Application.ActivityLifecycleCallbacks {
+            override fun onActivityStopped(a: android.app.Activity) {
+                val c = capture ?: return
+                if (c.cameraActive()) try { hostContext.io.execute { c.stopCamera("the app went to the background") } } catch (_: Exception) {}
+            }
+            override fun onActivityCreated(a: android.app.Activity, b: android.os.Bundle?) {}
+            override fun onActivityStarted(a: android.app.Activity) {}
+            override fun onActivityResumed(a: android.app.Activity) {}
+            override fun onActivityPaused(a: android.app.Activity) {}
+            override fun onActivitySaveInstanceState(a: android.app.Activity, b: android.os.Bundle) {}
+            override fun onActivityDestroyed(a: android.app.Activity) {}
+        }
+        app.registerActivityLifecycleCallbacks(cb)
+        lifecycle = cb
+    }
+
+    private fun registerNetworkCallback() {
+        val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        val cb = object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: android.net.Network) { connectivity?.networkChanged() }
+            override fun onLost(network: android.net.Network) { connectivity?.networkChanged() }
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= 24) cm.registerDefaultNetworkCallback(cb) else return
+            netCallback = cb
+        } catch (t: Throwable) { Log.w(TAG, "network callback", t) }
+    }
 
     // --- OutboxSink (node thread) ------------------------------------------------------------------
 
@@ -220,7 +319,8 @@ object EmberRuntime : OutboxSink, AppControls {
             onNodeReady()
             return
         }
-        if (json.contains("\"link.ptt\"") || json.contains("\"message.new\"") || json.contains("\"sos.received\"")) {
+        if (json.contains("\"link.ptt\"") || json.contains("\"message.new\"") || json.contains("\"sos.received\"") ||
+            json.contains("\"connectivity.changed\"") || json.contains("\"link.removed\"")) {
             val o = try { JSONObject(json) } catch (_: Exception) { return }
             val data = o.optJSONObject("data") ?: JSONObject()
             when (o.optString("event")) {
@@ -229,6 +329,8 @@ object EmberRuntime : OutboxSink, AppControls {
                     if (!m.bool("outgoing", false) && !uiVisible && prefs.notifyMessages) Notifier.message(appContext, m)
                 }
                 "sos.received" -> Notifier.sos(appContext, data)
+                "connectivity.changed" -> connectivity?.onChanged(data)
+                "link.removed" -> links.onRemoved(data.optInt("id")) // duplicate, hello_failed, nearby_off, locked…
             }
         }
     }
@@ -247,6 +349,7 @@ object EmberRuntime : OutboxSink, AppControls {
                 mixEntropy()
                 try { registry.setCoreLinkTypes(core.rpc("links.types")) } catch (t: Throwable) { Log.w(TAG, "links.types: $t") }
                 try { links.sync() } catch (t: Throwable) { Log.w(TAG, "link sync failed", t) }
+                connectivity?.refresh()
                 updatePowerLocks()
             }
         } catch (_: Exception) { /* shutting down */ }
@@ -347,9 +450,14 @@ object EmberRuntime : OutboxSink, AppControls {
     fun updatePowerLocks() {
         if (!started) return
         val kinds = try { links.activeKinds() } catch (_: Throwable) { emptySet() }
+        // Automatic links (nearby TCP, internet relay) idle cheaply (CONNECTIVITY §3.6, §4.9): they
+        // never hold the CPU awake by themselves; nearby links keep the Wi-Fi lock, relay links not.
+        val act = try { links.activeLinks().filter { !it.closedByUser } } catch (_: Throwable) { emptyList() }
+        val cpuLinkKinds = act.filter { it.def.auto == null }.map { it.def.endpointKind }.toSet()
+        val wifiLinkKinds = act.filter { it.def.auto != "relay" }.map { it.def.endpointKind }.toSet()
         val needCpu = keepAwakeRequested || prefs.keepCpuAwake == "always" ||
-            (prefs.keepCpuAwake == "auto" && kinds.any { it in cpuKinds })
-        val needWifi = kinds.any { it in wifiKinds }
+            (prefs.keepCpuAwake == "auto" && cpuLinkKinds.any { it in cpuKinds })
+        val needWifi = wifiLinkKinds.any { it in wifiKinds }
         runner?.maxIntervalMs = if ("audio" in kinds) 20 else 0
         try {
             if (needCpu && cpuLock?.isHeld != true) {

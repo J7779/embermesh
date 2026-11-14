@@ -305,4 +305,74 @@ TEST_CASE("stream: duty cycle budget holds frames back") {
   CHECK(st.get_int("tx_frames") < 60);
 }
 
+TEST_CASE("stream M5: a nearby link speaks only after the EmberMesh hello") {
+  const Bytes hello = {0x45, 0x4D, 0x4E, 0x42, 0x01, 0x00, 0x00, 0x00};
+  std::string err;
+  SUBCASE("the hello goes first; frames wait for the other side's hello") {
+    Clock clk;
+    FakeHost h(&clk);
+    auto l = create_link("stream", R"({"preset":"nearby"})", h, &err);
+    REQUIRE(l);
+    l->on_io_state(true);
+    REQUIRE(h.writes.size() == 1);
+    CHECK(h.writes[0] == hello);
+    REQUIRE(l->send(ByteView(Bytes{1, 2, 3}), 0));
+    l->tick(clk.t);
+    CHECK(h.writes.size() == 1);  // nothing before the peer proved it speaks EmberMesh
+    // the peer's hello split across two reads, followed directly by a framed packet
+    FakeHost peer_h(&clk);
+    auto peer = create_link("stream", R"({"preset":"cable"})", peer_h, &err);
+    peer->on_io_state(true);
+    REQUIRE(peer->send(ByteView(Bytes{9, 8, 7}), 0));
+    Bytes rest(hello.begin() + 3, hello.end());
+    rest.insert(rest.end(), peer_h.writes[0].begin(), peer_h.writes[0].end());
+    l->on_io_bytes(ByteView(hello).sub(0, 3));
+    l->on_io_bytes(ByteView(rest));
+    REQUIRE(h.frames.size() == 1);
+    CHECK(h.frames[0].data == (Bytes{9, 8, 7}));
+    l->tick(clk.t);
+    CHECK(h.writes.size() == 2);  // the queued frame now goes out
+    CHECK(parse_json(l->status_json()).get_string("hello") == "ok");
+    clk.t += 5000;
+    l->tick(clk.t);
+    CHECK(l->state() == LinkState::Up);
+  }
+  SUBCASE("no hello within 2 s fails the link") {
+    Clock clk;
+    FakeHost h(&clk);
+    auto l = create_link("stream", R"({"preset":"nearby"})", h, &err);
+    REQUIRE(l);
+    l->on_io_state(true);
+    clk.t += 1900;
+    l->tick(clk.t);
+    CHECK(l->state() == LinkState::Up);
+    clk.t += 200;
+    l->tick(clk.t);
+    CHECK(l->state() == LinkState::Error);
+    CHECK(parse_json(l->status_json()).get_string("hello") == "failed");
+  }
+  SUBCASE("anything else (a web server, a printer) fails at the first wrong byte") {
+    Clock clk;
+    FakeHost h(&clk);
+    auto l = create_link("stream", R"({"preset":"nearby"})", h, &err);
+    REQUIRE(l);
+    l->on_io_state(true);
+    REQUIRE(l->send(ByteView(Bytes{1}), 0));
+    std::string get = "GET / HTTP/1.1\r\n";
+    l->on_io_bytes(ByteView(reinterpret_cast<const uint8_t*>(get.data()), get.size()));
+    CHECK(l->state() == LinkState::Error);
+    l->on_io_bytes(ByteView(hello));  // too late: stays failed, nothing delivered or sent
+    l->tick(clk.t + 10);
+    CHECK(h.frames.empty());
+    CHECK(h.writes.size() == 1);
+  }
+  SUBCASE("other presets send no hello") {
+    Clock clk;
+    FakeHost h(&clk);
+    auto l = create_link("stream", R"({"preset":"cable"})", h, &err);
+    l->on_io_state(true);
+    CHECK(h.writes.empty());
+  }
+}
+
 }  // TEST_SUITE

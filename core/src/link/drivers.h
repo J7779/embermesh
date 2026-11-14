@@ -14,6 +14,7 @@ const LinkTypeInfo& meshtastic_type();
 const LinkTypeInfo& rnode_type();
 const LinkTypeInfo& lora_at_type();
 const LinkTypeInfo& rtl_tcp_type();
+const LinkTypeInfo& relay_type();
 
 // All registered types in catalogue order.
 const std::vector<const LinkTypeInfo*>& all_types();

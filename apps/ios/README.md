@@ -211,8 +211,8 @@ backups (identity keys never leave the phone — use the identity export for bac
 | `multipeer` | implemented | service `embermesh`; auto-invite with a token tie-break; one reliable message per core write; ≤ 7 peers. |
 | `audio` | implemented | AVAudioEngine, `.playAndRecord` + `.measurement` (no AGC/echo cancel), voice processing off, input/output route choice, real hardware rates reported to the core, interruption / route-change / media-reset recovery. |
 | `tcp`, `rtl_tcp` | implemented | Network.framework, host:port or Bonjour service name, reconnect with backoff. |
-| `tcp_server` | implemented | NWListener, Bonjour `_embermesh._tcp` (TXT `ember=1`), `includePeerToPeer`, ≤16 clients — the entitlement-free LAN path. Scanning `tcp` finds these. |
-| `websocket` | implemented | URLSessionWebSocketTask to `ws://hub:8437/ws`, binary frames, pings, reconnect. |
+| `tcp_server` | implemented | Manual listener: NWListener, Bonjour `_embermesh._tcp` (TXT `ember=1 link=stream v=1`, no `t`, so automatic Nearby ignores it), `includePeerToPeer`, ≤16 clients, all on one link. Automatic Nearby uses its own listener with one link per connection (see "Nearby devices"). |
+| `websocket` | implemented | URLSessionWebSocketTask to `ws://hub:8437/ws` or `wss://…`, binary frames, pings, reconnect; `protocols` (Sec-WebSocket-Protocol), system TLS validation; carries `relay` links. |
 | `udp` | implemented, gated | NWConnectionGroup multicast `239.83.77.69:47474`. Works in the Simulator; on devices it needs Apple's **multicast entitlement** — `host.info` reports it unavailable unless the provisioning profile contains it. |
 | `ble` | implemented (P1) | GATT central to one device. Supported services (exactly): **Nordic UART** `6e400001-b5a3-f393-e0a9-e50e24dcca9e` (we write RX `6e400002-…`, device notifies TX `6e400003-…`; KISS TNCs, serial bridges, RNode/REYAX behind a bridge); **BLE KISS API** `00000001-ba2a-46c9-ae49-01b0961f68bb` (Mobilinkd TNC3/TNC4: we write `00000002-…`, TNC notifies `00000003-…`; KISS byte stream, profile `kiss_ble`); **Meshtastic** `6ba1b218-15a8-461f-9fa8-5dcae273eafd` (ToRadio `f75c76d2-…` write, FromNum `ed9da18c-…` notify, FromRadio `2c55e69e-…` read until empty); **custom** service/write/notify UUIDs (byte stream). Meshtastic is adapted here: each FromRadio protobuf is delivered to the core as `0x94 0xC3 len_hi len_lo <protobuf>` and outgoing stream frames are unwrapped to one protobuf per ToRadio write, so the core's `meshtastic` link keeps its default `framing:"stream"` — do **not** set `framing:"ble"` with the iOS endpoint. |
 | `loopback` | implemented | echoes bytes; for testing. |
@@ -309,6 +309,92 @@ on the air, so they interoperate. Only `stream` is offered for `ble_peer` (never
   - Cold-start screenshots: no white frame. The screenshots are ~400 ms apart, so a single frame
     could be missed; the colours of every native layer are asserted in tests.
 
+## Nearby devices and the internet relay (RPC_API §11 revision 2, CONNECTIVITY.md)
+
+`Host/ConnectivityController.swift` follows the core: `connectivity.get` on every `node.ready`
+and on return to the foreground, `connectivity.changed`, `link.removed`. It creates and removes
+the automatic links.
+
+- **Gating** (the core's, not the host's): nothing listens, advertises, browses, dials, accepts or
+  connects a relay unless `ready` (setup applied and unlocked) and the feature's `active` are true.
+  The UI applies setup with `connectivity.set {setup_done:true}`, so that is when the iOS Local
+  Network prompt appears. `ready:false` (lock, wipe, duress), Nearby off and the
+  background stop discovery and close every automatic endpoint.
+- **Nearby (Wi-Fi):** `Endpoints/NearbyNetwork.swift`.
+  - **Listener:** TCP on 47475 or any free port. Cellular, loopback and peer-to-peer are
+    prohibited (local network only).
+  - **Advertisement:** `_embermesh._tcp`, instance `EmberMesh-<token>`, TXT exactly
+    `ember=1 v=1 link=stream t=<token>`.
+  - **Browsing:** an `NWBrowser`. Only `ember=1`, `v=1` and a valid `t` count; hostile records are
+    ignored.
+  - **Who dials:** the smaller token dials, the other side after 8 s.
+  - **Dialing:** only resolved on-link/private addresses on a local interface's subnet, at most 4
+    per instance, IPv6 link-local first then IPv4, 250 ms apart; ≤ 4 new dials per minute.
+  - **Accepting:** only private/link-local sources, ≤ 2 connections and ≤ 4 new per minute per
+    source (IPv4 address or IPv6 /64).
+  - **Links:** each connection is a `stream` link with `preset:"nearby"` (the core sends and
+    requires the 8-byte hello), `persist:false, auto:"nearby"`, and `auto_key` `"<token>@<address>"`
+    (dial) or `"@<address>"` (accept). `link.removed` (any reason, e.g. `hello_failed`, `evicted`,
+    `duplicate`) closes the socket.
+  - **Network change:** a path change (Wi-Fi interfaces) calls `connectivity.network_changed` and
+    re-advertises under the new token.
+- **No automatic Bluetooth in v1** (a decision for every platform). Automatic Nearby is same
+  Wi-Fi/LAN only, so the Nearby switch never asks for the Bluetooth permission. Bluetooth
+  (`ble_peer` to nearby phones, `ble` to TNCs/radios) is a link the user adds by hand on the Links
+  screen, and that is when iOS asks.
+- **Internet relay:**
+  - **Links:** while `internet.active` and in the foreground, one `relay` link per enabled relay of
+    the core's list (lists and notice texts only from the core; credentials attached by the core):
+    `host.link.create {endpoint:{kind:"websocket", config:{url, protocols:["mqtt"],
+    allow_plaintext?}}, link:{type:"relay", config:{url}}, persist:false, auto:"relay",
+    auto_key:url}`.
+  - **Relay sockets** (`protocols` contains `mqtt`): default URLSession server-trust evaluation
+    (system trust store and host name), with no challenge handler and no `insecure` option.
+    `ws://` is allowed only with `allow_plaintext` AND a LAN, link-local or `.local` host.
+    User-Agent is the generic `mqtt` (never the app name); messages ≤ 8 KiB.
+  - **Reconnect:** 2 s … 5 min, ±20 %, reset after 2 minutes connected.
+- **`host.info`:** `features` includes `nearby` and `relay`; `websocket_tls:true`.
+
+What another device on the same Wi-Fi can observe while Nearby is on:
+- the DNS-SD record: that this IP/MAC address runs EmberMesh, its port, and the 8-hex-digit token,
+  which changes at every node start;
+- TXT `ember=1 v=1 link=stream t=<token>`, and nothing else: no device name, user name, node id,
+  model or version;
+- once it connects to the port (anyone may): nothing until it sends the 8-byte hello, then what any
+  mesh neighbour sees, i.e. the node's beacons and announcement (node id, display name and callsign
+  as set in the profile) and the Public channel;
+- nothing over Bluetooth: Nearby does not advertise over Bluetooth (only a `ble_peer` link the user
+  added does, as `Ember` or the name given on that link).
+
+Direct messages and private channels stay end-to-end encrypted on these links as on any other.
+
+Info.plist strings:
+- `NSLocalNetworkUsageDescription`: "EmberMesh finds other EmberMesh devices on the same Wi-Fi or
+  hotspot and connects to them, so you can exchange messages without the internet. Other devices
+  on the network can see that this phone runs EmberMesh."
+- `NSBluetoothAlwaysUsageDescription` / `NSBluetoothPeripheralUsageDescription`: "EmberMesh uses
+  Bluetooth only for links you add yourself: a direct link to a nearby phone running EmberMesh, or
+  radio equipment such as a Bluetooth TNC. This works with no internet and no phone signal."
+- `NSBonjourServices`: `_embermesh._tcp`, `_embermesh._udp` (unchanged).
+
+Proven in the simulator, with the real core:
+- **Nearby:** two in-process nodes, each with its own controller and the real Network.framework
+  transport, find each other over Bonjour with the core's own tokens. They link with
+  `preset:"nearby"` (core hello) and exchange DMs both ways with a delivery receipt.
+- **Relay:** two nodes connected only through an in-test MQTT-3.1.1-over-WebSocket broker
+  (subprotocol `mqtt`, 32-hex topics only, own echo like a real broker) exchange DMs both ways with
+  a delivery receipt. The relay socket's User-Agent is checked to be generic.
+- **Unit tests:** the dial rule, on-link and per-source (/64) limits, dial order, hostile TXT,
+  `ready` / `active` gating, network change, relay socket rules, background/foreground and
+  `link.removed`.
+
+Needs real phones:
+- the Local Network prompt at setup (and no Bluetooth prompt from Nearby), and behaviour when Local
+  Network is denied (one-sided discovery);
+- two separate devices on real Wi-Fi, and client-isolated networks;
+- a public `wss://` broker over LTE/Starlink, with its certificate validation;
+- background suspension.
+
 ## Morse reader: camera and microphone (RPC_API §6)
 
 Both capture paths exist on iOS; `host.info.features` advertises `getusermedia`, `capture_mic_pcm`
@@ -320,13 +406,43 @@ and, on devices with a camera, `capture_camera_luma`.
   skipped; iOS still shows its one-time Camera / Microphone prompt (usage strings mention the Morse
   reader). `allowsInlineMediaPlayback` keeps the `<video playsinline>` preview in the page.
 - **Native sources** (`Services/CaptureService.swift`), the more robust path:
-  - `host.capture.start {kind:"camera_luma", session, rect?, roi?, camera?}`: AVCaptureSession at
-    ≤ 640×480 and up to 60 fps. Auto exposure/focus meters for 0.8 s, then exposure, focus and white
-    balance are **locked**, so auto-exposure "breathing" can't swamp a flashlight. The ROI mean is
-    taken from the Y plane of 420f frames with real frame timestamps, and batched about every
-    100 ms into `morse.rx.feed {session, times_ms, levels}`. A native preview with the ROI outlined
-    is placed over the web view at `rect` (CSS px = web-view points); `host.capture.update` moves it
-    or changes the ROI.
+  - `host.capture.start {kind:"camera_luma", session, rect?, camera?}` (RPC_API §12):
+    - **Camera settings:** rear wide camera; full-range 420 frames at ≤ 1920×1080, 60 fps when a
+      ≥ 1280×720 format allows it, else 30 fps; continuous auto-focus; exposure biased −1 EV; HDR
+      and low-light boost off; torch off. White balance is locked after 0.8 s. Exposure is locked
+      while the core's `target.state` is `locked` and back to automatic (biased down) while
+      searching or lost.
+    - **Grid per frame:** the WHOLE frame is reduced to a grid of **max** luma (and mean) per cell
+      from the full-resolution Y plane (`native/ember_ios_grid.c`, built -O3 even in Debug), so a
+      light covering one pixel decides its cell. 64 cells on the long side (64×36 for 16:9).
+      The grid is rotated/mirrored to what the user sees.
+    - **Feeding:** `morse.rx.feed {session, frames:[{t_ms, w, h, max_b64, mean_b64}]}` with `t_ms`
+      the presentation time (host clock, monotonic), ≤ 8 frames / 100 ms per call. Frames are
+      dropped, not queued, while the core is busy.
+    - **Old core:** `node.info.features` without `"morse_frames"` means no tracker, so the capture
+      sends the section-6 `levels` feed of the centre region from the start. As a second line of
+      defence, a first frames feed answered with `bad_params` / `unsupported` also switches to it.
+      With the current core the synthetic flashlight tests decode through the tracker
+      (`frames` mode).
+    - **Cost** in the simulator: 0.54 ms mean / 0.8 ms max per 1920×1080 frame (reduce + rotate +
+      base64), off the main thread on the capture queue. A 2018–2020 iPhone is probably 2–5×
+      slower, still well under a 16–33 ms frame interval; not measured on a device.
+    - **Zoom:** the start result carries `zoom_steps` (1, 2, 5 — what the camera can do);
+      `host.capture.update {zoom}` sets it. A capture that stops by itself emits
+      `host.capture.state {kind, running:false, error?}`.
+    - **Preview** (`PreviewPlacer`): drawn on top of the web view, exactly at the page's `rect`
+      (CSS px of the viewport × page zoom, in the web view's coordinates — the web view is pinned
+      to the safe area with no content inset and the page uses `viewport-fit=cover`, so the
+      viewport origin is the web view's origin), clipped to it. Non-interactive, so taps reach the
+      page (`morse.rx.target`).
+    - **Marker ring:** the page cannot draw over a native layer, so the host draws its one marker
+      on the preview from the core's `target` in every feed reply: a 2 pt #ff8a3d ring centred on
+      `x, y` (mapped through the aspect-fill crop), diameter `max(size × preview width, 28 pt)`.
+      It is shown while `locked`, dimmed (35 %) while `lost`, absent while `searching`, and moves
+      with a 0.15 s ease. No other box, text or control.
+    - **Following the page:** it follows the page's scroll offset until the page sends a fresh rect
+      with `host.capture.update`. It is removed at once on stop, background, screen lock, or when
+      the page navigates (URL change).
   - `host.capture.start {kind:"mic_pcm", session, sample_rate?=8000}`: microphone → mono Int16 at
     the session rate (boxcar decimator) → `morse.rx.feed {session, pcm_b64}` about every 100 ms. If a
     sound link is running it **shares that link's input tap** (`AudioEndpoint.addInputListener`)

@@ -1,6 +1,6 @@
 ---
 id: embermesh/licences
-title: "EmberMesh 32: Licences and Credits"
+title: "EmberMesh 33: Licences and Credits"
 category: embermesh
 tags: [embermesh, licence, license, credits, mit, cc by-sa, cc by, public domain, cc0, attribution, third party]
 summary: "What you may do with EmberMesh and its library: the app's code is MIT-licensed, the guide library is not (each guide carries its own licence), and where the app lists the third-party components."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 32
+order: 33
 ---
 
 # Licences and Credits

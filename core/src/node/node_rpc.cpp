@@ -87,11 +87,15 @@ const Node::MethodDef* Node::find_method(std::string_view name) {
       {"rf.bands", &Node::m_rf_bands, L},
       {"rf.radios", &Node::m_rf_radios, L},
       {"rf.hardware", &Node::m_rf_hardware, L},
+      {"connectivity.get", &Node::m_connectivity_get, L},
+      {"connectivity.set", &Node::m_connectivity_set, 0},
+      {"connectivity.network_changed", &Node::m_connectivity_network_changed, L},
       {"morse.rx.start", &Node::m_morse_rx_start, L},
       {"morse.rx.feed", &Node::m_morse_rx_feed, L},
       {"morse.rx.status", &Node::m_morse_rx_status, L},
       {"morse.rx.reset", &Node::m_morse_rx_reset, L},
       {"morse.rx.stop", &Node::m_morse_rx_stop, L},
+      {"morse.rx.target", &Node::m_morse_rx_target, L},
       {"tools.qr", &Node::m_tools_qr, L},
       {"bundle.export", &Node::m_bundle_export, E},
       {"bundle.import", &Node::m_bundle_import, E},
@@ -136,7 +140,7 @@ Json Node::node_info_json() {
   j.set("uptime_ms", mono_ - created_mono_);
   j.set("locked", lock_ != Lock::Open);
   j.set("features", Json::array({"dm", "channels", "sos", "checkin", "position", "bulletins", "guides", "tools",
-                                 "bundles", "files", "interop", "netplan", "kv", "security"}));
+                                 "bundles", "files", "interop", "netplan", "kv", "security", "morse_frames"}));
   j.set("storage", cfg_.storage_dir.empty() ? "memory" : "disk");
   if (!storage_error_.empty()) j.set("storage_error", storage_error_);
   return j;
@@ -236,7 +240,9 @@ RpcResult Node::m_identity_import(Params& p) {
 
 // --- settings ------------------------------------------------------------------------------------
 
-RpcResult Node::m_settings_get(Params&) { return rpc_ok(Json::object({{"settings", settings_}})); }
+RpcResult Node::m_settings_get(Params&) {
+  return rpc_ok(Json::object({{"settings", strip_connectivity_secrets(settings_)}}));
+}
 
 RpcResult Node::m_settings_set(Params& p) {
   const Json* in = nullptr;
@@ -253,6 +259,8 @@ RpcResult Node::m_settings_set(Params& p) {
       return false;
     };
     if (k.empty() || k.size() > 64) return rpc_err("bad_params", "setting names must be 1..64 bytes");
+    if (k.rfind("connectivity.", 0) == 0)
+      return rpc_err("bad_params", "settings." + k + ": use connectivity.set (consent and relay checks)");
     if (k == "region") {
       if (!v.is_string() || v.as_string().empty() || v.as_string().size() > 8) return bad("region code expected");
       std::string r = v.as_string();
@@ -514,6 +522,7 @@ RpcResult Node::m_security_unlock(Params& p) {
 RpcResult Node::m_security_lock(Params&) {
   if (!has_passphrase_) return rpc_err("bad_params", "set a storage passphrase first (security.set_passphrase)");
   db_sync();
+  connectivity_shutdown("locked");
   lock_ = Lock::Runtime;
   emit("security.locked", Json::object());
   return rpc_ok();

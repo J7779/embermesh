@@ -377,4 +377,16 @@ TEST_SUITE("host") {
     ember_host_destroy(h);
     ember_destroy(n);
   }
+  TEST_CASE("relay reconnect backoff: 2 s to 5 min with +-20 percent") {
+    uint32_t b = 1000;  // a fresh LinkRec
+    CHECK(relay_backoff_step(&b, 0) == 1600);       // 2 s - 20 %
+    CHECK(b == 4000);
+    CHECK(relay_backoff_step(&b, 65535) == 4800);   // 4 s + 20 %
+    uint32_t last = 0;
+    for (int i = 0; i < 20; ++i) last = relay_backoff_step(&b, 32768);
+    CHECK(b == 300000);
+    CHECK(last >= 299000);
+    CHECK(last <= 301000);                          // capped at 5 min (+- jitter around it)
+    CHECK(relay_backoff_step(&b, 65535) == 360000);
+  }
 }

@@ -249,6 +249,15 @@ int MeshEngine::Impl::handle_packet(ByteView raw, uint32_t link_id, const RxMeta
   PacketView pv;
   if (!parse_packet(raw, pv)) { st.rx_bad++; return -1; }
   const Header& h = pv.h;
+  // Restricted links (internet relay sessions) accept only packets inside their scope: a contact
+  // cannot push third-party traffic into us through its relay session (docs/CONNECTIVITY.md §4.7).
+  if (link_id && !from_bundle) {
+    auto sl = links.find(link_id);
+    if (sl != links.end() && sl->second.scope.restricted && !in_scope(sl->second, h)) {
+      st.dropped_scope++;
+      return -1;
+    }
+  }
   uint64_t wire = wire_id(raw);
   MsgId mid{h.origin, h.pkt_id};
   if (seen.contains(wire) || store.contains(wire)) {
@@ -334,6 +343,8 @@ int MeshEngine::Impl::handle_packet(ByteView raw, uint32_t link_id, const RxMeta
     handle_announce(pv, link_id, meta, &ok, from_bundle ? 0 : hop_src);
     if (!ok) { st.dropped_auth++; return -1; }
     trust = kTrustVerified;
+    // A verified announcement straight from its origin proves who this neighbour is (review H5).
+    if (h.hops == 0 && link_id && hop_src && hop_src == short_id(h.origin)) mark_proven(link_id, hop_src, h.origin);
   } else if (h.sec == Sec::Signed) {
     if (had_keys) {
       if (!verify_signed(pv, pit->second.info.keys.sign_pk)) { st.dropped_auth++; return -1; }
@@ -355,6 +366,7 @@ int MeshEngine::Impl::handle_packet(ByteView raw, uint32_t link_id, const RxMeta
     if (lit != links.end()) {
       auto nb = lit->second.nbrs.find(hop_src);
       if (nb != lit->second.nbrs.end()) nb->second.knows_us = true;
+      mark_proven(link_id, hop_src, h.origin);
     }
   }
 
@@ -378,6 +390,7 @@ int MeshEngine::Impl::handle_packet(ByteView raw, uint32_t link_id, const RxMeta
     set_hop_byte(txraw, ttl, static_cast<uint8_t>(h.hops + 1));
   }
   uint8_t flags = transmittable ? kStoredTransmittable : 0;
+  if (link_id && from_relay_session(link_id)) flags |= kStoredViaRelay;
   bool to_me_only = h.dst_type == DestType::Node && h.dst_node == me;
   bool keep = !(to_me_only && h.want_ack);  // acknowledged right away; the ack replaces it
   if (h.kind == Kind::Bulletin && o.authenticated) {

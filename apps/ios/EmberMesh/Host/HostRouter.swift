@@ -33,6 +33,7 @@ final class HostRouter: HostMethodHandler {
     links.didCreateEndpoint = { [weak self] e in if let h = e as? HubEndpoint { self?.configureHub(h) } }
     capture.audioEndpoint = { [weak self] in self?.links.endpoints(of: AudioEndpoint.self).first { $0.isConnected } }
     capture.previewHost = { [weak self] in self?.presenter?.webContentView }
+    capture.coreFeatures = { [weak runner] in (try? runner?.callSync("node.info").get())?["features"] as? [String] }
     capture.onEvent = { [weak self] n, d in self?.onEvent?(n, d) }
     signal.cameraBusy = { [weak self] in self?.capture.camera != nil || QRScannerViewController.active > 0 }
     accessibility.onChange = { [weak self] d in self?.onEvent?("host.accessibility", d) }
@@ -109,6 +110,7 @@ final class HostRouter: HostMethodHandler {
     f += CaptureService.features
     if signal.info.string("torch") == "yes" { f.append("torch") }
     f.append("accessibility")
+    f += ["nearby", "relay"]   // RPC_API §11: Bonjour/TCP nearby links; TLS WebSocket with subprotocols
     if haptics.supported { f.append("haptic") }
     if QRScannerViewController.hasCamera { f.append("qr_scan") }
     return f
@@ -127,7 +129,7 @@ final class HostRouter: HostMethodHandler {
       return spec.json(available: ok, reason: reason, linkTypes: linkTypes(for: spec.kind).flatMap { $0.isEmpty ? nil : $0 })
     }
     return ["platform": "ios", "app_version": HostRouter.appVersion, "backend": "native", "endpoint_kinds": kinds,
-            "features": features, "actions": HostRouter.actions, "accessibility": accessibility.state, "signal": signal.info,
+            "features": features, "actions": HostRouter.actions, "accessibility": accessibility.state, "signal": signal.info, "websocket_tls": true,
             // Sound links: iOS has no serial/GPIO lines, so PTT is VOX or keyed by hand only.
             "audio": ["ptt": ["vox", "manual"], "serial_ptt": false, "presets_supported": ["handheld_vox", "acoustic", "sound_card", "custom"],
                       "presets_unsupported": ["handheld_ptt": "iPhone cannot key a PTT line (no serial/GPIO). Use the radio's VOX (handheld_vox) or an interface with its own VOX, or press PTT yourself (acoustic)."]], "os_version": UIDevice.current.systemVersion,

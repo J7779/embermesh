@@ -1,11 +1,11 @@
 // Morse: Send (flashlight / screen / tone, ./morse_send.js) | Read by camera | Read by sound. Reading uses the core's
 // decoder (morse.rx.*, docs/RPC_API.md §6); capture is ui/js/lib/capture*.js, or the host's native
 // capture (host.capture.*) when the web view cannot use getUserMedia.
-import { h, clear, append } from '../lib/dom.js';
+import { h, clear, append, debounce } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
-import { toast, toastError, copyText, segmented, errorText, setFill } from '../lib/ui.js';
+import { toast, toastError, copyText, segmented, errorText } from '../lib/ui.js';
 import { sendPanel } from './morse_send.js';
-import { lightAdvice, pcmToB64, roiAt, clampRoi, DEFAULT_ROI } from '../lib/capture.js';
+import { pcmToB64, confidenceWord } from '../lib/capture.js';
 import { CameraReader, MicReader, unavailableReason, mediaErrorText } from '../lib/capture_media.js';
 
 const TABS = [{ value: 'send', label: 'Send' }, { value: 'camera', label: 'Read by camera' }, { value: 'sound', label: 'Read by sound' }];
@@ -17,7 +17,7 @@ export default async function render(app, params, root) {
   root.appendChild(page);
   append(page,
     h('div', { class: 'page-head' }, h('a', { class: 'btn ghost icon-only', href: '#/tools', 'aria-label': 'Back' }, icon('back')), h('h1', null, 'Morse'),
-      h('a', { class: 'btn ghost small', href: '#/help/read/embermesh/morse-reading', 'aria-label': 'Help: reading Morse' }, icon('book', { size: 16 }), '?')),
+      h('a', { class: 'btn ghost icon-only', href: '#/help/read/embermesh/morse-reading', 'aria-label': 'How to send and read Morse' }, icon('info'))),
     segmented(TABS, tab, v => app.nav('#/tools/morse?tab=' + v), 'Morse mode'));
   const body = h('div');
   page.appendChild(body);
@@ -27,58 +27,109 @@ export default async function render(app, params, root) {
 }
 
 // ---------------------------------------------------------------- reading
+
+/** The plain state line for a camera reader status (§12 target). Pure; exported for tests. */
+export function cameraStateText(st, running) {
+  if (!running) return 'Point the camera at a blinking light, then press Start reading.';
+  const t = st && st.target;
+  if (!t) return st && st.chars ? 'Reading the light' : 'Looking for a blinking light…';
+  if (t.state === 'locked') return 'Reading the light';
+  if (t.state === 'lost') return 'Lost the light — keep the camera on it';
+  return 'Looking for a blinking light…';
+}
+
+/** "12 WPM · signal good" (no percentages). Pure; exported for tests. */
+export function readerMeta(st, isCam) {
+  if (!st) return '';
+  const parts = [];
+  if (st.wpm) parts.push(Math.round(st.wpm) + ' WPM');
+  const c = isCam ? (st.target ? st.target.confidence : null) : snrConfidence(st.snr_db);
+  const w = confidenceWord(c);
+  if (w && (st.wpm || (st.target && st.target.state === 'locked'))) parts.push('signal ' + w);
+  if (!isCam && st.tone_hz) parts.push('tone ' + Math.round(st.tone_hz) + ' Hz');
+  return parts.join(' · ');
+}
+const snrConfidence = snr => (Number.isFinite(snr) ? Math.max(0, Math.min(1, (snr - 3) / 15)) : null);
+
+/**
+ * Ring geometry in the preview's own pixels from a target — the same ring a host draws on a native
+ * preview (§12): centred on x, y, diameter max(size × preview width, 28), only when locked (dimmed
+ * when lost, absent while searching). Pure; exported for tests.
+ */
+export function ringGeometry(target, viewW, viewH) {
+  if (!target || (target.state !== 'locked' && target.state !== 'lost') || !Number.isFinite(target.x) || !Number.isFinite(target.y)) return null;
+  const d = Math.max(28, (Number(target.size) || 0) * viewW);
+  return { x: target.x * viewW - d / 2, y: target.y * viewH - d / 2, d, lost: target.state === 'lost' };
+}
+
 function readPanel(app, box, source) {
   const isCam = source === 'light';
   const kindWord = isCam ? 'camera' : 'microphone';
+  const page = box.closest('.morse-page');
+  const main = document.getElementById('main');
   const msg = h('div', { class: 'morse-msg', 'aria-live': 'polite' });
   const lamp = h('span', { class: 'morse-lamp', role: 'img', 'aria-label': 'Signal off' });
-  const fill = h('i');
-  const thr = h('b', { class: 'thr', 'aria-hidden': 'true' });
-  const levelBar = h('div', { class: 'meter-bar', role: 'meter', 'aria-label': 'Signal level', 'aria-valuemin': '0', 'aria-valuemax': '100' }, fill, thr);
+  const stateLine = h('p', { class: 'reader-state-text', role: 'status' });
+  const meta = h('p', { class: 'reader-meta' });
   const pending = h('span', { class: 'morse-pending mono', 'aria-label': 'Character being received' });
-  const stats = h('div', { class: 'row small muted morse-stats' });
   const transcript = h('div', { class: 'morse-transcript', 'aria-live': 'polite', 'aria-label': 'Transcript' });
-  const startBtn = h('button', { class: 'btn primary', onclick: () => (running ? stopAll() : start()) }, icon(isCam ? 'scan' : 'sound'), 'Start reading');
-  // camera bits
-  const video = isCam ? h('video', { class: 'morse-video', muted: true, playsinline: '', autoplay: '' }) : null;
-  const roiBox = isCam ? h('div', { class: 'morse-roi', 'aria-hidden': 'true' }) : null;
-  const camWrap = isCam ? h('div', { class: 'morse-cam', title: 'Tap or drag to place the box on the light' }, video, roiBox, h('div', { class: 'morse-cam-hint' }, 'Tap the light, or drag the box onto it')) : null;
-  const autoBox = h('input', { type: 'checkbox' });
-  // keep the preview box at the video's own aspect ratio so the watched box maps 1:1 onto the frame
-  if (video) video.addEventListener('loadedmetadata', () => { if (video.videoWidth && video.videoHeight) camWrap.style.aspectRatio = video.videoWidth + ' / ' + video.videoHeight; });
-  // hosts with both native capture and getUserMedia let the user fall back to the in-page camera
-  const inPage = h('input', { type: 'checkbox' });
-  const inPageRow = isCam && app.has('capture_camera_luma') && app.has('getusermedia') ? h('label', { class: 'check' }, inPage, h('span', null, 'Use the in-page camera instead of the app’s')) : null;
-  const camSel = h('select', { 'aria-label': 'Camera' }, h('option', { value: 'environment' }, 'Back camera'), h('option', { value: 'user' }, 'Front camera'));
+  const startBtn = h('button', { class: 'btn primary block morse-start', onclick: () => (running ? stopAll() : start()) });
+  const setStartLabel = () => append(clear(startBtn), icon(running ? 'close' : isCam ? 'scan' : 'sound'), running ? 'Stop' : 'Start reading');
+  // camera bits: preview, ring drawn by the UI on the tracked light, zoom, "Automatic" after a tap
+  const video = isCam ? h('video', { class: 'morse-video', muted: true, playsinline: '', autoplay: '', 'aria-hidden': 'true' }) : null;
+  const ring = h('div', { class: 'reader-ring', hidden: true, 'aria-hidden': 'true' });
+  const idle = h('div', { class: 'reader-idle' }, icon(isCam ? 'scan' : 'sound', { size: 40 }));
+  const autoBtn = h('button', { class: 'btn small reader-auto', type: 'button', hidden: true }, 'Automatic');
+  const zoomBar = h('div', { class: 'reader-zoom', role: 'group', 'aria-label': 'Zoom', hidden: true });
+  const tapHint = h('p', { class: 'reader-hint', hidden: true }, 'Several lights blink: tap the one to read.');
+  // the picture only: with a native preview the host draws over this rectangle, so nothing the user
+  // needs goes inside it (zoom and "Automatic" sit below)
+  const view = isCam ? h('div', { class: 'reader-view', 'aria-label': 'Camera picture. Tap a light to read it.' }, video, idle, ring) : null;
+  const tools = isCam ? h('div', { class: 'reader-tools' }, zoomBar, autoBtn) : null;
+  const saveNotes = h('input', { type: 'checkbox', class: 'switch' });
 
   let session = null, running = false, reader = null, native = null, poll = 0, lastChars = 0, text = '';
   let feeding = Promise.resolve();
-  const history = [];
-  let roi = DEFAULT_ROI;
+  let last = null, mode = 'grid', checkedFrames = false, pinned = false, locked = false, nativeZoom = [];
+  // §12: a core with the light tracker says so; without it, the old watched-region feed and no ring
+  const coreFrames = () => { const f = (app.store.get('info') || {}).features; return Array.isArray(f) && f.includes('morse_frames'); };
+  // a native preview is drawn above the page: the host draws the ring there (§12), not the page
+  // (the mock host draws nothing, so the page stands in for it)
+  const pageDrawsRing = () => !native || app.backend.kind === 'mock';
   const setMsg = (t, kind) => { clear(msg); if (t) msg.appendChild(h('div', { class: 'notice ' + (kind || 'info') + ' small' }, t)); };
+  setStartLabel();
 
-  const drawRoi = r => { if (!roiBox) return; roiBox.style.left = r.x * 100 + '%'; roiBox.style.top = r.y * 100 + '%'; roiBox.style.width = r.w * 100 + '%'; roiBox.style.height = r.h * 100 + '%'; };
-  drawRoi(roi);
-
-  function show(st) {
-    if (!st) return;
-    lamp.classList.toggle('on', !!st.on);
-    lamp.setAttribute('aria-label', st.on ? 'Signal on' : 'Signal off');
-    const lv = Math.max(0, Math.min(1, Number(st.level) || 0));
-    setFill(fill, lv * 100);
-    levelBar.setAttribute('aria-valuenow', String(Math.round(lv * 100)));
-    if (Number.isFinite(st.threshold)) { thr.hidden = false; thr.style.left = 'calc(' + st.threshold * 100 + '% - 1px)'; } else thr.hidden = true;
-    pending.textContent = String(st.pending || '').replace(/\./g, '·').replace(/-/g, '–') || ' ';
-    clear(stats);
-    append(stats, h('span', null, st.wpm ? Math.round(st.wpm) + ' WPM' : 'speed: listening…'),
-      h('span', null, 'quality ' + Math.round((Number(st.quality) || 0) * 100) + ' %'),
-      !isCam ? h('span', null, 'tone ' + (st.tone_hz ? Math.round(st.tone_hz) + ' Hz' : '—')) : null,
-      !isCam ? h('span', null, 'SNR ' + (st.snr_db != null ? st.snr_db + ' dB' : '—')) : null);
-    if (typeof st.transcript === 'string' && (st.chars !== lastChars || st.transcript !== text)) {
-      lastChars = st.chars; text = st.transcript;
+  function render(st) {
+    if (st) last = st;
+    const s = last;
+    const on = !!(s && s.on);
+    lamp.classList.toggle('on', on);
+    lamp.setAttribute('aria-label', on ? 'Signal on' : 'Signal off');
+    stateLine.textContent = isCam ? cameraStateText(s, running) : !running ? 'Hold the device close to the sound, then press Start reading.' : s && (s.chars || s.wpm) ? 'Reading the sound' : 'Listening…';
+    meta.textContent = readerMeta(s, isCam);
+    pending.textContent = String((s && s.pending) || '').replace(/\./g, '·').replace(/-/g, '−');
+    if (s && typeof s.transcript === 'string' && (s.chars !== lastChars || s.transcript !== text)) {
+      lastChars = s.chars; text = s.transcript;
       transcript.textContent = text;
-      transcript.scrollTop = transcript.scrollHeight;
     }
+    if (!isCam) return;
+    // the ring: only from a §12 target (an old core has none: no ring rather than a wrong one)
+    const t = s && s.target;
+    const g = running && t && pageDrawsRing() ? ringGeometry(t, view.clientWidth, view.clientHeight) : null;
+    ring.hidden = !g;
+    if (g) {
+      ring.style.width = ring.style.height = Math.round(g.d) + 'px';
+      ring.style.transform = 'translate(' + g.x.toFixed(1) + 'px, ' + g.y.toFixed(1) + 'px)';
+      ring.classList.toggle('lost', g.lost);
+      ring.classList.toggle('lit', on);
+    }
+    view.classList.toggle('has-target', !!g);
+    tapHint.hidden = !(running && t && t.candidates > 1);
+    autoBtn.hidden = !(running && pinned);
+    tools.hidden = zoomBar.hidden && autoBtn.hidden;
+    // exposure locked once the light is locked (§12), released otherwise
+    const isLocked = !!(t && t.state === 'locked');
+    if (reader && isLocked !== locked) { locked = isLocked; reader.lockExposure(isLocked); }
   }
 
   const feed = params => {
@@ -86,79 +137,102 @@ function readPanel(app, box, source) {
     const s = session;
     feeding = feeding.then(async () => {
       if (s !== session) return;
-      try { show(await app.api.call('morse.rx.feed', { session: s, ...params })); } catch (e) { if (e.code === 'not_found') { session = null; setMsg('The reading session ended (idle too long). Press Start again.', 'bad'); stopAll(); } }
+      try {
+        const st = await app.api.call('morse.rx.feed', { session: s, ...params });
+        // a core without §12 frames ignores them (no target): read with the old watched-region path
+        if (params.frames && !checkedFrames) { checkedFrames = true; if (!st || !st.target) fallback(); }
+        render(st);
+      } catch (e) {
+        if (e.code === 'not_found') { session = null; setMsg('Reading stopped after a long pause. Press Start reading to go on.', 'warn'); stopAll(); }
+        else if (params.frames && (e.code === 'bad_params' || e.code === 'unsupported' || e.code === 'not_implemented')) fallback();
+      }
     });
   };
+  function fallback() { if (mode === 'grid' && reader) { mode = 'levels'; reader.setMode('levels'); } }
 
   async function start() {
     setMsg('');
     let r;
     try { r = await app.api.call('morse.rx.start', isCam ? { source: 'light' } : { source: 'audio', sample_rate: AUDIO_RATE }); } catch (e) {
-      setMsg(e.code === 'not_implemented' ? 'Morse reading needs a newer EmberMesh core than this one. Update the app.' : 'Could not start the decoder: ' + errorText(e), 'bad');
+      setMsg(e.code === 'not_implemented' ? 'Reading Morse needs a newer version of EmberMesh. Update the app.' : 'Could not start reading: ' + errorText(e), 'bad');
       return;
     }
-    session = r.session; lastChars = 0; text = ''; transcript.textContent = '';
+    session = r.session; lastChars = 0; text = ''; transcript.textContent = ''; last = null; checkedFrames = false; pinned = false; locked = false; mode = coreFrames() ? 'grid' : 'levels';
     delete transcript.dataset.live;
-    if (!isCam) setMsg('Starting the microphone…', 'info');
     const why = unavailableReason(isCam ? 'camera' : 'mic');
     const nativeKind = isCam ? 'capture_camera_luma' : 'capture_mic_pcm';
-    // Native capture is preferred for light: it can lock exposure, focus and white balance.
-    const preferNative = app.has(nativeKind) && (isCam ? !inPage.checked : !!why);
+    // the app's own capture when it has one (it can lock exposure and focus), else the page's
+    const preferNative = app.has(nativeKind) && (isCam || !!why);
+    // the screen stays still while the camera runs (the preview rectangle must not move)
+    if (isCam && main) { main.scrollTop = 0; main.classList.add('morse-fixed'); }
+    page && page.classList.add('reading');
+    running = true;
+    setStartLabel();
+    render();
     try {
       if (preferNative) await startNative();
-      else if (why) { setMsg(why, 'bad'); await endSession(); return; }
+      else if (why) { setMsg(why, 'bad'); await stopAll(); return; }
       else await startWeb();
     } catch (e) {
-      setMsg(e && e.name ? mediaErrorText(e, isCam ? 'camera' : 'mic') : errorText(e), 'bad');
-      await endSession();
+      setMsg(e && e.name ? mediaErrorText(e, kindWord) : errorText(e), 'bad');
+      await stopAll();
       return;
     }
-    running = true;
-    append(clear(startBtn), icon('close'), 'Stop');
     app.api.try('host.keep_awake', { enabled: true }, null, true);
     clearInterval(poll);
     poll = setInterval(async () => {
       if (!session) return;
-      if (native) { const st = await app.api.try('morse.rx.status', { session }, null, true); if (st) show(st); }
-      if (isCam && history.length > 20) {
-        const adv = lightAdvice(history.slice(-60));
-        if (adv === 'too_dark') setMsg('Too dark to see a light. Point the camera at the light, or move closer.', 'warn');
-        else if (adv === 'saturated') setMsg('The watched area is fully bright. Tap a darker spot next to the light, or place the box exactly on it.', 'warn');
-        else if (adv === 'no_blink') setMsg(autoBox.checked ? 'Nothing is blinking yet. Keep the light in view.' : 'Nothing is blinking in the box. Tap the light, or turn on “Find the blinking light”.', 'info');
-        else setMsg('');
-      }
+      if (native) { const st = await app.api.try('morse.rx.status', { session }, null, true); if (st) render(st); }
+      else render();
     }, 250);
   }
 
   async function startWeb() {
     if (isCam) {
       reader = new CameraReader({
-        video,
+        video, mode,
         onBatch: b => feed(b),
-        onFrame: f => { if (!transcript.dataset.live) transcript.dataset.live = '1'; history.push(f.level); if (history.length > 120) history.shift(); if (f.roi !== roi) { roi = f.roi; drawRoi(roi); } },
+        onFrame: () => { if (!transcript.dataset.live) { transcript.dataset.live = '1'; view.classList.add('live'); showZoom(); } },
         onError: e => console.warn('[morse camera]', e),
+        onStopped: () => { if (running) { setMsg('The camera stopped when the app went to the background. Press Start reading to go on.', 'info'); stopAll(); } },
       });
-      reader.roi = roi;
-      reader.setAuto(autoBox.checked);
-      await reader.start(camSel.value);
+      const settings = await reader.start('environment');
+      if (settings && settings.width && settings.height) { view.style.setProperty('--ar', settings.width + ' / ' + settings.height); view.style.setProperty('--arn', String(settings.width / settings.height)); }
     } else {
       reader = new MicReader({
         rate: AUDIO_RATE,
-        onLive: () => { transcript.dataset.live = '1'; setMsg('Listening…', 'info'); },
+        onLive: () => { transcript.dataset.live = '1'; render(); },
         onPcm: (() => { let buf = []; let n = 0; return pcm => { buf.push(pcm); n += pcm.length; if (n >= AUDIO_RATE / 10) { const all = new Int16Array(n); let o = 0; for (const p of buf) { all.set(p, o); o += p.length; } buf = []; n = 0; feed({ pcm_b64: pcmToB64(all) }); } }; })(),
       });
       await reader.start();
     }
   }
 
+  // zoom steps: the track's zoom capability (in-page) or host.capture.start's zoom_steps (native)
+  function showZoom() {
+    const steps = native ? nativeZoom : reader && reader.zoomSteps ? reader.zoomSteps() : [];
+    clear(zoomBar);
+    zoomBar.hidden = steps.length < 2;
+    for (const z of steps) zoomBar.appendChild(h('button', { class: 'btn small', type: 'button', 'aria-pressed': String(z === 1), 'aria-label': 'Zoom ' + z + ' times', onclick: async e => {
+      const ok = native ? !!(await app.api.try('host.capture.update', { kind: native, zoom: z }, null, true)) : await reader.setZoom(z);
+      if (ok) for (const b of zoomBar.children) b.setAttribute('aria-pressed', String(b === e.currentTarget));
+    } }, z + '×'));
+  }
+
+  const rectOf = () => { const r = view.getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) }; };
   async function startNative() {
     const kind = isCam ? 'camera_luma' : 'mic_pcm';
-    const rect = isCam ? camWrap.getBoundingClientRect() : null;
-    await app.api.call('host.capture.start', { kind, session, ...(rect ? { rect: { x: rect.left, y: rect.top, w: rect.width, h: rect.height }, roi, camera: camSel.value === 'user' ? 'front' : 'back' } : { sample_rate: AUDIO_RATE }) });
+    if (isCam) { view.classList.add('native', 'live'); if (app.backend.kind === 'mock') view.classList.add('mock-preview'); }
+    const r = await app.api.call('host.capture.start', { kind, session, ...(isCam ? { rect: rectOf(), camera: 'back' } : { sample_rate: AUDIO_RATE }) });
     native = kind;
+    nativeZoom = r && Array.isArray(r.zoom_steps) ? r.zoom_steps.filter(z => Number.isFinite(z)) : [];
+    if (isCam) showZoom();
     transcript.dataset.live = '1';
-    setMsg('Using the ' + kindWord + ' through the app (native capture).', 'info');
   }
+  // the native preview follows the rectangle on layout change and rotation (§12)
+  const onResize = debounce(() => { if (native === 'camera_luma') app.api.try('host.capture.update', { kind: native, rect: rectOf() }, null, true); render(); }, 150);
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', onResize);
 
   async function endSession() {
     const s = session; session = null;
@@ -166,70 +240,82 @@ function readPanel(app, box, source) {
   }
 
   async function stopAll() {
+    const was = running;
     running = false;
     clearInterval(poll);
     if (reader) { reader.stop(); reader = null; }
     if (native) { await app.api.try('host.capture.stop', { kind: native }, null, true); native = null; }
+    if (view) { view.classList.remove('native', 'live', 'mock-preview', 'has-target'); zoomBar.hidden = true; }
+    if (main) main.classList.remove('morse-fixed');
+    page && page.classList.remove('reading');
     delete transcript.dataset.live;
     await feeding;
     await endSession();
     app.api.try('host.keep_awake', { enabled: false }, null, true);
-    append(clear(startBtn), icon(isCam ? 'scan' : 'sound'), 'Start reading');
+    setStartLabel();
     lamp.classList.remove('on');
+    render();
+    if (was && saveNotes.checked && text.trim()) saveToNotes(app, text.trim(), true);
   }
 
-  // placing the watched region: tap = centre on the light, drag = move
+  // tap the picture to read another light (only when several blink); "Automatic" releases it
   if (isCam) {
-    let dragging = false;
-    const place = e => {
-      const r = camWrap.getBoundingClientRect();
-      roi = roiAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, roi.w, roi.h);
-      drawRoi(roi);
-      autoBox.checked = false;
-      if (reader) reader.setRoi(roi);
-      if (native) app.api.try('host.capture.update', { kind: native, roi }, null, true);
-    };
-    camWrap.addEventListener('pointerdown', e => { dragging = true; try { camWrap.setPointerCapture(e.pointerId); } catch { /* ignore */ } place(e); });
-    camWrap.addEventListener('pointermove', e => { if (dragging) place(e); });
-    camWrap.addEventListener('pointerup', () => { dragging = false; });
-    autoBox.addEventListener('change', () => { if (reader) reader.setAuto(autoBox.checked); if (!autoBox.checked && reader) reader.setRoi(clampRoi(roi)); });
-    camSel.addEventListener('change', () => { if (reader && running) reader.start(camSel.value).catch(e => setMsg(mediaErrorText(e, 'camera'), 'bad')); });
+    view.addEventListener('click', async e => {
+      if (!session || !last || !last.target || !(last.target.candidates > 1) || e.target === autoBtn || zoomBar.contains(e.target)) return;
+      const r = view.getBoundingClientRect();
+      const st = await app.api.try('morse.rx.target', { session, x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }, null, true);
+      if (st) { pinned = true; render(st); }
+    });
+    autoBtn.addEventListener('click', async () => { const st = await app.api.try('morse.rx.target', { session, auto: true }, null, true); pinned = false; if (st) render(st); });
   }
 
-  const actions = h('div', { class: 'row' },
-    h('button', { class: 'btn small', onclick: async () => { if (session) await app.api.try('morse.rx.reset', { session }, null, true); text = ''; lastChars = 0; transcript.textContent = ''; } }, icon('trash', { size: 16 }), 'Clear'),
+  const actions = h('div', { class: 'row reader-actions' },
     h('button', { class: 'btn small', onclick: () => copyText(transcript.textContent) }, icon('copy', { size: 16 }), 'Copy'),
     h('button', { class: 'btn small', onclick: () => sendAsMessage(app, transcript.textContent) }, icon('send', { size: 16 }), 'Send as message…'),
-    h('button', { class: 'btn small', onclick: async () => {
-      const t = transcript.textContent.trim();
-      if (!t) return toast('Nothing to save yet');
-      try { await app.kvSet('notes', 'morse-' + Date.now().toString(36), { title: 'Morse received ' + new Date().toLocaleString(), body: t, ts: Date.now() }); toast('Saved to notes', { kind: 'ok' }); } catch (e) { toastError(e, 'Not saved'); }
-    } }, icon('notes', { size: 16 }), 'Save to notes'));
+    h('button', { class: 'btn small', onclick: async () => { if (session) await app.api.try('morse.rx.reset', { session }, null, true); text = ''; lastChars = 0; transcript.textContent = ''; render(); } }, icon('trash', { size: 16 }), 'Clear'));
 
   append(box,
-    h('p', { class: 'muted small' }, isCam
-      ? 'Point the camera at a flashlight, a lamp or another phone’s screen flash. Hold the device still. Works from a few metres up to as far as the camera can see the light.'
-      : 'Listen to a radio speaker or a whistle/tone sender. Hold the device close to the sound; quiet surroundings help.'),
-    camWrap,
-    msg,
-    h('div', { class: 'card stack morse-status' },
-      h('div', { class: 'row nowrap' }, lamp, h('div', { class: 'grow' }, levelBar), pending),
-      stats),
-    transcript,
-    h('div', { class: 'row' }, startBtn, isCam ? h('label', { class: 'check' }, autoBox, h('span', null, 'Find the blinking light automatically')) : null, isCam ? camSel : null, inPageRow),
-    actions);
+    h('section', { class: 'card morse-reader' + (isCam ? ' camera' : ' sound'), 'aria-label': isCam ? 'Read Morse by camera' : 'Read Morse by sound' },
+      isCam ? view : h('div', { class: 'reader-ear' }, lamp),
+      tools,
+      h('div', { class: 'reader-state' }, isCam ? lamp : null, h('div', { class: 'grow' }, stateLine, meta), pending),
+      isCam ? tapHint : null,
+      msg,
+      h('div', { class: 'reader-text' }, transcript),
+      startBtn,
+      actions,
+      h('label', { class: 'check reader-save' }, saveNotes, h('span', null, 'Save to Notes when I stop'))),
+    h('p', { class: 'muted small reader-tip' }, isCam
+      ? 'Hold the phone as still as you can, or rest it on something, and keep the light in the picture. Darker surroundings make a distant light easier to read.'
+      : 'Works with a radio speaker, a whistle or a tone sender. Quiet surroundings help.'));
+  render();
 
   const onVis = () => { if (document.visibilityState === 'hidden' && running) stopAll(); };
   document.addEventListener('visibilitychange', onVis);
+  const onPageHide = () => { if (running) stopAll(); };
+  window.addEventListener('pagehide', onPageHide);
   // a native capture that stopped by itself (permission revoked, device lost, interruption)
   app.on('host.capture.state', d => {
     if (!d || d.running !== false || !native || (d.kind && d.kind !== native)) return;
     native = null;
-    setMsg('The ' + kindWord + ' stopped: ' + (d.error || 'unknown reason') + '. Press Start reading to try again.', 'bad');
+    setMsg('The ' + kindWord + ' stopped' + (d.error ? ': ' + d.error : '') + '. Press Start reading to try again.', 'bad');
     stopAll();
   });
-  app.on('morse.text', d => { if (d && d.session === session && native) app.api.try('morse.rx.status', { session }, null, true).then(show); });
-  return () => { document.removeEventListener('visibilitychange', onVis); stopAll(); };
+  app.on('morse.text', d => { if (d && d.session === session && native) app.api.try('morse.rx.status', { session }, null, true).then(render); });
+  app.on('morse.target', d => { if (d && d.session === session && last) render({ ...last, target: { ...(last.target || {}), ...d } }); });
+  return () => {
+    document.removeEventListener('visibilitychange', onVis);
+    window.removeEventListener('pagehide', onPageHide);
+    window.removeEventListener('resize', onResize);
+    window.removeEventListener('orientationchange', onResize);
+    onResize.cancel();
+    stopAll();
+  };
+}
+
+async function saveToNotes(app, t, quiet) {
+  try { await app.kvSet('notes', 'morse-' + Date.now().toString(36), { title: 'Morse received ' + new Date().toLocaleString(), body: t, ts: Date.now() }); toast('Saved to Notes', { kind: 'ok' }); }
+  catch (e) { if (!quiet) toastError(e, 'Not saved'); }
 }
 
 async function sendAsMessage(app, text) {

@@ -1,6 +1,6 @@
 ---
 id: embermesh/sdr-listening
-title: "EmberMesh 20: Listening with an SDR Dongle (rtl_tcp)"
+title: "EmberMesh 21: Listening with an SDR Dongle (rtl_tcp)"
 category: embermesh
 tags: [embermesh, sdr, rtl-sdr, rtl_tcp, receive only, monitor, aprs, scanner, dongle]
 summary: "Using a cheap RTL-SDR dongle with the rtl_tcp server as a receive-only EmberMesh link to monitor a net, APRS or keyboard modes without transmitting: setup, settings and troubleshooting."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 20
+order: 21
 ---
 
 # Listening with an SDR Dongle (rtl_tcp)

@@ -1,6 +1,6 @@
 ---
 id: embermesh/spreading-the-app
-title: "EmberMesh 13: Getting the App onto Other People's Devices Without Internet"
+title: "EmberMesh 14: Getting the App onto Other People's Devices Without Internet"
 category: embermesh
 tags: [embermesh, install, sideload, apk, android, iphone, ios, safari, single file, html, usb stick, hub, download]
 summary: "Passing the Android APK phone to phone, running the single-file HTML version from a USB stick or SD card, offering downloads from a hub, and the limits and workarounds for iPhones."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 13
+order: 14
 ---
 
 # Getting the App onto Other People's Devices Without Internet

@@ -408,3 +408,78 @@ Rules:
   conversation the user wrote in, or one with a contact, to make room for strangers; when only
   such conversations remain, a new stranger's conversation is refused.
 * Per-link frame cap 400/s, and 200/s per transmitting `hop_src`.
+
+## 12. Internet relay framing
+
+Links of type `relay` carry mesh frames over MQTT 3.1.1 (QoS 0) through a broker (design and threat
+model: [CONNECTIVITY.md §4](CONNECTIVITY.md#4-internet-relay)). The broker is untrusted, and on public
+brokers anyone may be able to watch topic names, sizes and timing: every frame is sealed, and topics
+are derived from secrets only the parties hold.
+
+**Sessions.** A relay link is one MQTT connection. Each *session* — one per contact pair, one per
+relayed private channel — is its own mesh link with its own scope (below), beacons, digests,
+fragment ids and caps.
+
+**Roots.** Pair: `R = BLAKE2b-256(key = K_pair, "ember-relay-pair-v1")`. Private channel (relayed only
+after a per-channel opt-in, only for random-key or strong-passphrase channels):
+`R = BLAKE2b-256(key = K_chan, "ember-relay-chan-v1")`. Domain-separated from every other use of the
+keys (§4).
+
+**Broker binding.** `host` = the broker's canonical `hostname:port` (lower case, IPv6 without brackets,
+default port 443 for `wss://`, 80 for `ws://`, ≤ 200 bytes); `H = u8 |host| ‖ host`.
+
+**Epochs and topics.** `e = floor(unix_ms / 86 400 000)`, Unix time from the node's mesh clock (UTC
+days). `topic(e)` = 32 lowercase hex digits of `BLAKE2b-128(key = R, "ember-relay-topic-v1" ‖ u32be e ‖ H)`.
+A node subscribes to `topic(E)`, also to `topic(E+1)` during the last 3 hours of day E and to
+`topic(E-1)` during its first 3 hours, and publishes on `topic(E)`. A node without a sane clock (before
+2024-01-01) neither subscribes nor publishes.
+
+**Message** (the MQTT PUBLISH payload): `u8 version (1) ‖ nonce[24] ‖ ct ‖ tag[16]`, where
+
+* `K_frame(e) = BLAKE2b-256(key = R, "ember-relay-aead-v1" ‖ u32be e ‖ H)`;
+* `P = u64be sent_ms ‖ u16be len ‖ frame[len] ‖ zero bytes`, `|P|` the smallest of 128, 256, 512,
+  1024, 2048, 4096 that holds `10 + len` (so `1 ≤ len ≤ 4086`; session mtu 4000);
+* `nonce = BLAKE2b-192(key = K_frame(e), "ember-relay-nonce-v1" ‖ rnd16 ‖ u64be sent_ms ‖ P)`, `rnd16`
+  = 16 fresh random bytes (hedged);
+* `AD = "ember-relay-v1" ‖ u8 1 ‖ H ‖ topic` (the 32 ASCII characters);
+* `ct ‖ tag = XChaCha20-Poly1305(K_frame(e), nonce, AD, P)`.
+
+Receivers MUST drop a message whose version is not 1, whose `|P|` is not a class or not the smallest
+class for its `len`, whose tag fails, whose `len` is 0 or exceeds `|P| - 10`, or whose padding is not
+all zero. The frame is an ordinary mesh frame (§2).
+
+**Receiver rules.** PUBLISH packets with RETAIN, DUP or QoS ≠ 0 are dropped. Try `K_frame` of the
+epoch the topic belongs to. Drop frames whose `hop_src` is our own (broker echo) before any state
+changes. On a pair topic `hop_src` MUST equal the first 4 bytes of the contact's node id. Drop
+`sent_ms` outside [start(e) − 1 day, start(e) + 2 days). Replay state per (topic, `hop_src`): drop a
+`sent_ms` more than 600 000 ms below that sender's highest; drop a nonce seen in the last 30 minutes
+(≤ 16 384 nonces per link, ≤ 64 senders per topic). At most 50 messages/s per topic and 200/s per link;
+a topic with more than 20 failures or rate drops in a minute is unsubscribed for 1, 2, 4 … 60 minutes.
+
+**Scope.** A pair session carries only packets between us and the contact, ANNOUNCE/SOS broadcasts
+originated by either, and hop-local controls; a channel session only that channel's packets and
+ANNOUNCE/WHOIS broadcasts. Digests cover only in-scope packets; out-of-scope packets received on a
+session are dropped. A pair session sends nothing while its contact was heard directly (hops 0) on
+another non-relay link within 3 minutes. Sessions beacon every 30 minutes (and at most every 2
+minutes after the store changed) and push at most 8 packets per reconciliation round. Packets
+received over a relay are never transmitted on `requires_station_id` links (stored with a flag that
+excludes them from flooding and reconciliation there). Relay links are never amateur links.
+
+**Test vectors** (`K_pair` = bytes 00 01 … 1f, `K_chan` = bytes 20 21 … 3f, `host` =
+`broker.example.org:8084`; produced by an independent implementation — hashlib BLAKE2b and an
+XChaCha20-Poly1305 checked against RFC 8439 §2.8.2 and draft-irtf-cfrg-xchacha A.3.1):
+
+| Value | Result |
+|---|---|
+| `R` (pair) | `f2ed9d1556599423401b6154e15a81c09c13353b10f68fa2656e4f980d456451` |
+| `R` (channel) | `56525207dbb953de803f3d1f7093580b532e71484e08bf53f4de058ca2834acd` |
+| `e` for unix_ms 1763078400000 | `20406` |
+| pair `topic(20406)` / `topic(20407)` | `b61f9b3d043471379e905d4aefbe672c` / `9e8c34977c9269c6d0dd31226b015feb` |
+| pair `topic(20406)` with host `broker.example.org:443` | `65132cb6b60682b977ed2036b0bf23e1` |
+| channel `topic(20406)` / `topic(20407)` | `0a9ec8333ccee061f6f92007dea7837f` / `af251244b409e280a7c9b444aaf1fa1f` |
+| pair `K_frame(20406)` | `ad93f89b41b4e5a1caf5ac9506e10b5dfc67a74a1e0c0304aa45ea3492b1f124` |
+| pair `K_frame(20407)` | `0368ee5df4a47c0fc44677b6430f45735418219c2776c02782d8a0985467654a` |
+| message: pair, e 20406, `rnd16` = a0 a1 … af, `sent_ms` 1763078400123, frame `80 01 02 03 04 55` | 169 bytes, `nonce` = `941851c18244f015e3fb407c67ac3afbe0314c04e8e8de5e`, BLAKE2b-256 of the message = `a438a9455b4cd6489058c38d0083277a946675723ca6f30d801678e52dc88d0e` (full hex in `core/tests/proto/relay_test.cpp`) |
+
+Implementation and tests: `core/src/proto/relay.*`, `core/src/link/relay_link.*`,
+`core/tests/proto/relay_test.cpp`, `core/tests/link/relay_test.cpp`.

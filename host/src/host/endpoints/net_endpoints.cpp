@@ -1,10 +1,14 @@
 // Network endpoints: tcp (client), tcp_server, udp (LAN multicast per ARCHITECTURE §6), websocket
 // (client, hub-to-hub bridging) and loopback. Byte pipes only.
+#include <cctype>
+#include <cstdio>
 #include <set>
 
 #include "host/endpoint.h"
+#include "host/net.h"
 #include "host/stream.h"
 #include "host/util.h"
+#include "host/ws.h"
 #include "host/ws_client.h"
 
 namespace ember_host {
@@ -346,10 +350,79 @@ class UdpEndpoint : public Endpoint {
 
 // ---- websocket client ----------------------------------------------------------------------------
 
+// RPC_API §11 relay sockets: a websocket endpoint whose `protocols` contains "mqtt".
+constexpr size_t kRelayMaxMessage = 8192;
+
+bool is_relay_socket(const Json& c) {
+  for (const auto& p : c.get("protocols").elements())
+    if (p.is_string() && p.as_string() == "mqtt") return true;
+  return false;
+}
+
+// A host that can only be on the local network: "*.local", a private or link-local IPv4 literal,
+// or a link-local / unique-local IPv6 literal (the same rule as the core's relay list). Host names
+// that need DNS are never "local" (DNS could point anywhere).
+bool lan_only_host(std::string h) {
+  for (auto& ch : h) ch = char(std::tolower(static_cast<unsigned char>(ch)));
+  if (!h.empty() && h.back() == '.') h.pop_back();
+  if (h.size() > 6 && h.compare(h.size() - 6, 6, ".local") == 0) return true;
+  SockAddr a;
+  if (!resolve_numeric(h, 0, &a)) return false;
+  std::string ip = a.ip();
+  if (a.is_v4()) {
+    unsigned b[4] = {0, 0, 0, 0};
+    if (std::sscanf(ip.c_str(), "%u.%u.%u.%u", &b[0], &b[1], &b[2], &b[3]) != 4) return false;
+    return b[0] == 10 || (b[0] == 172 && (b[1] & 0xF0) == 16) || (b[0] == 192 && b[1] == 168) || (b[0] == 169 && b[1] == 254);
+  }
+  for (auto& ch : ip) ch = char(std::tolower(static_cast<unsigned char>(ch)));
+  if (ip.size() >= 3 && ip[0] == 'f' && ip[1] == 'e' && (ip[2] == '8' || ip[2] == '9' || ip[2] == 'a' || ip[2] == 'b')) return true;
+  return ip.size() >= 2 && ip[0] == 'f' && (ip[1] == 'c' || ip[1] == 'd');
+}
+
+// Validates a websocket endpoint config. Relay sockets: TLS (wss://) with full certificate and
+// host name validation; ws:// only with allow_plaintext AND a local-network host; no "insecure".
+bool check_websocket_config(const Json& c, std::string* err) {
+  std::string url = cfg_str(c, "url"), h, p;
+  uint16_t port = 0;
+  bool tls = false;
+  if (!ws_parse_url_tls(url, &h, &port, &p, &tls, err)) return false;
+  bool relay = is_relay_socket(c);
+  if (relay && c.has("insecure")) {
+    *err = "relay sockets always validate the TLS certificate: \"insecure\" is not accepted";
+    return false;
+  }
+  if (tls && !ws_tls_available()) {
+    *err = "wss:// is not available: this build has no TLS";
+    return false;
+  }
+  if (!relay || tls) return true;
+  if (!cfg_bool(c, "allow_plaintext", false)) {
+    *err = "relay sockets need wss:// (or allow_plaintext with a local-network host)";
+    return false;
+  }
+  if (!lan_only_host(h)) {
+    *err = "plaintext ws:// relay sockets are only allowed to a .local, private or link-local address";
+    return false;
+  }
+  return true;
+}
+
 class WebSocketEndpoint : public Endpoint {
  public:
-  WebSocketEndpoint(Loop& l, EndpointSink& s, const Json& c) : Endpoint(l, s, c), ws_(l), alive_(std::make_shared<bool>(true)) {
+  static WsClient::Options client_options(const Json& c) {
+    WsClient::Options o;
+    for (const auto& p : c.get("protocols").elements())
+      if (p.is_string() && !p.as_string().empty()) o.protocols.push_back(p.as_string());
+    if (is_relay_socket(c)) {
+      o.send_user_agent = false;  // RPC_API §11: nothing that identifies the software
+      o.max_message = kRelayMaxMessage;
+    }
+    return o;
+  }
+  WebSocketEndpoint(Loop& l, EndpointSink& s, const Json& c)
+      : Endpoint(l, s, c), ws_(l, client_options(c)), alive_(std::make_shared<bool>(true)) {
     url_ = cfg_str(c, "url", "");
+    relay_ = is_relay_socket(c);
     ws_.on_open = [this] {
       EH_LOGI("websocket: connected to %s", url_.c_str());
       set_state(true);
@@ -366,6 +439,7 @@ class WebSocketEndpoint : public Endpoint {
   ~WebSocketEndpoint() override { *alive_ = false; }
   const char* kind() const override { return "websocket"; }
   bool datagram() const override { return true; }
+  bool relay_backoff() const override { return relay_; }
   void open() override {
     std::string err;
     if (!ws_.connect(url_, &err)) defer(loop_, alive_, [this, err] { set_state(false, err); });
@@ -382,11 +456,13 @@ class WebSocketEndpoint : public Endpoint {
     s.set("url", url_);
     s.set("tx_frames", double(tx_frames_));
     s.set("rx_frames", double(rx_frames_));
+    if (!ws_.protocol().empty()) s.set("protocol", ws_.protocol());
     return s;
   }
 
  private:
   std::string url_;
+  bool relay_ = false;
   WsClient ws_;
   uint64_t tx_frames_ = 0, rx_frames_ = 0;
   std::shared_ptr<bool> alive_;
@@ -590,13 +666,12 @@ void register_net_endpoints(EndpointRegistry& r) {
     k.kind = "websocket";
     k.title = "WebSocket (hub-to-hub)";
     k.description = "Connect to another hub's mesh bus, e.g. ws://10.42.0.1:8437/ws, over any IP network.";
-    k.config.push(Field("url", "Hub URL", "text").def("ws://10.42.0.1:8437/ws").required().help("ws:// only (no TLS)."));
-    k.link_types = {"raw"};
+    k.config.push(Field("url", "Hub URL", "text").def("ws://10.42.0.1:8437/ws").required().help(ws_tls_available() ? "ws:// or wss://." : "ws:// only (this build has no TLS)."));
+    // RPC_API §11: subprotocols to offer (relay links use ["mqtt"]); not a form field.
+    k.link_types = {"raw", "relay"};  // relay = MQTT relay link (RPC_API §11)
     k.default_link_type = "raw";
     k.create = [](Loop& l, EndpointSink& s, const Json& c, std::string* err) -> std::unique_ptr<Endpoint> {
-      std::string h, p;
-      uint16_t port;
-      if (!ws_parse_url(cfg_str(c, "url"), &h, &port, &p, err)) return nullptr;
+      if (!check_websocket_config(c, err)) return nullptr;
       return std::make_unique<WebSocketEndpoint>(l, s, c);
     };
     r.add(std::move(k));

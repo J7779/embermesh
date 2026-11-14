@@ -76,16 +76,22 @@ std::string ws_accept_key(std::string_view client_key);
 // (400, or 426 for an unsupported version; also *why).
 int ws_validate_upgrade(const HttpRequest& req, std::string* why);
 bool ws_is_upgrade_request(const HttpRequest& req);
-std::string ws_server_handshake_response(const HttpRequest& req);
+std::string ws_server_handshake_response(const HttpRequest& req, const std::string& subprotocol = std::string());
 // Client side.
 std::string ws_make_client_key();  // base64 of 16 random bytes
 std::string ws_client_handshake_request(const std::string& host_header, const std::string& path_and_query,
-                                        const std::string& key, const std::string& origin = std::string());
+                                        const std::string& key, const std::string& origin = std::string(),
+                                        const std::vector<std::string>& protocols = {}, bool user_agent = true);
 // Parses the server's response head (bytes up to and including CRLFCRLF). Returns true if it is a
 // valid 101 with matching Sec-WebSocket-Accept and no unrequested extensions.
-bool ws_check_server_response(std::string_view head, const std::string& key, std::string* why);
+bool ws_check_server_response(std::string_view head, const std::string& key, std::string* why,
+                              const std::vector<std::string>& offered = {}, std::string* chosen = nullptr);
 
-// Parses "ws://host[:port]/path?query". (wss:// is rejected: no TLS in the host layer.)
+// Parses "ws://host[:port]/path?query" (and "wss://…" when this build has TLS, EMBER_HOST_TLS).
 bool ws_parse_url(const std::string& url, std::string* host, uint16_t* port, std::string* path, std::string* err);
+// Same, reporting whether the URL is wss:// (default port 443) regardless of TLS support.
+bool ws_parse_url_tls(const std::string& url, std::string* host, uint16_t* port, std::string* path, bool* tls,
+                      std::string* err);
+bool ws_tls_available();
 
 }  // namespace ember_host

@@ -4,6 +4,7 @@ import { icon } from '../lib/icons.js';
 import { toast, toastError, sheet, confirmDialog, showQr, copyText, avatar, empty, errorText, pickFile, saveFile, promptDialog, skeletonRows, bar } from '../lib/ui.js';
 import { allows } from '../lib/motion.js';
 import { announce } from '../lib/a11y.js';
+import { loadConnectivity, capabilities } from '../lib/connectivity.js';
 import { msgTime, timeAgo, shortDate, formatBytes, formatDistance, distance, bearing, compass, estimateWireBytes, estimateAirtimeMs, formatDuration, utf8Length, displayName, formatPos, validPos } from '../lib/format.js';
 import { hopsLabel, convKind, networkTitle, validLinkId } from '../lib/core_spec.js';
 import { strongPassphrase, passphraseStrength } from '../lib/ratelimit.js';
@@ -420,6 +421,7 @@ async function renderThread(app, pane, conv) {
 }
 
 function linkName(app, id) {
+  if (Number(id) >= 0x40000000) return 'internet relay'; // a relay session link (§11 rev 2)
   const l = (app.store.get('links') || []).find(x => x.id === id);
   return l ? l.name || l.type : id != null ? 'link ' + id : '';
 }
@@ -584,6 +586,26 @@ async function convMenu(app, conv, ctx) {
     try { await app.api.call('channels.leave', { id: ctx.channel.id }); app.nav('#/chats'); } catch (e) { toastError(e); }
   }]);
   body.appendChild(h('ul', { class: 'list' }, items.map(([ic, label, fn]) => h('li', null, h('button', { class: 'item', onclick: () => { s.close(); fn(); } }, icon(ic), h('span', { class: 'grow' }, label))))));
+  // Private channels over the internet relay (§11 rev 2): only when the core allows it for this
+  // channel (random key, or a passphrase rated strong)
+  if (ctx.channel && ctx.channel.encrypted) {
+    const conn = await loadConnectivity(app).catch(() => null);
+    if (conn && capabilities(app.store.get('host'), conn).relay) body.appendChild(channelRelayRow(app, ctx.channel, conn));
+  }
+}
+
+function channelRelayRow(app, ch, conn) {
+  if (!ch.relay_allowed) {
+    return h('p', { class: 'small muted channel-relay' }, 'Not offered over the internet relay: this channel uses a typed passphrase that was not rated strong, and anyone who guessed it could read what a relay carries. Channels with a random key can use the relay.');
+  }
+  const sw = h('input', { type: 'checkbox', class: 'switch', id: 'ch-relay', checked: !!ch.relay });
+  sw.addEventListener('change', async () => {
+    try { const r = await app.api.call('channels.update', { id: ch.id, relay: sw.checked }); Object.assign(ch, r.channel || { relay: sw.checked }); }
+    catch (e) { sw.checked = !sw.checked; toastError(e, 'Not changed'); }
+  });
+  return h('div', { class: 'channel-relay' },
+    h('label', { class: 'check', for: 'ch-relay' }, sw, h('span', { class: 'grow' }, h('strong', null, 'Also over the internet relay'), h('br'),
+      h('span', { class: 'small muted' }, conn.internet && conn.internet.enabled ? 'Members far away get this channel through the relay. The relay cannot read it.' : 'Takes effect when the internet relay is on (Settings → Connections).'))));
 }
 
 // ---------------------------------------------------------------- interop compose (io:<network>)

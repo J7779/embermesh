@@ -1,5 +1,7 @@
 #include "host/ws.h"
 
+#include <algorithm>
+
 #include <cstring>
 
 #include "host/util.h"
@@ -204,11 +206,12 @@ int ws_validate_upgrade(const HttpRequest& req, std::string* why) {
   return 0;
 }
 
-std::string ws_server_handshake_response(const HttpRequest& req) {
+std::string ws_server_handshake_response(const HttpRequest& req, const std::string& subprotocol) {
   std::string key = trim(req.header_or("sec-websocket-key"));
   std::string r = "HTTP/1.1 101 Switching Protocols\r\n";
   r += "Upgrade: websocket\r\nConnection: Upgrade\r\n";
   r += "Sec-WebSocket-Accept: " + ws_accept_key(key) + "\r\n";
+  if (!subprotocol.empty()) r += "Sec-WebSocket-Protocol: " + subprotocol + "\r\n";
   r += "Server: emberd\r\n\r\n";
   return r;
 }
@@ -220,18 +223,27 @@ std::string ws_make_client_key() {
 }
 
 std::string ws_client_handshake_request(const std::string& host_header, const std::string& path_and_query,
-                                        const std::string& key, const std::string& origin) {
+                                        const std::string& key, const std::string& origin,
+                                        const std::vector<std::string>& protocols, bool user_agent) {
   std::string r = "GET " + (path_and_query.empty() ? std::string("/") : path_and_query) + " HTTP/1.1\r\n";
   r += "Host: " + host_header + "\r\n";
   r += "Upgrade: websocket\r\nConnection: Upgrade\r\n";
   r += "Sec-WebSocket-Key: " + key + "\r\n";
   r += "Sec-WebSocket-Version: 13\r\n";
   if (!origin.empty()) r += "Origin: " + origin + "\r\n";
-  r += "User-Agent: emberd\r\n\r\n";
+  if (!protocols.empty()) {
+    std::string pl;
+    for (const auto& p : protocols) pl += (pl.empty() ? "" : ", ") + p;
+    r += "Sec-WebSocket-Protocol: " + pl + "\r\n";
+  }
+  if (user_agent) r += "User-Agent: emberd\r\n";
+  r += "\r\n";
   return r;
 }
 
-bool ws_check_server_response(std::string_view head, const std::string& key, std::string* why) {
+bool ws_check_server_response(std::string_view head, const std::string& key, std::string* why,
+                              const std::vector<std::string>& offered, std::string* chosen) {
+  std::string proto;
   auto bad = [why](const std::string& m) {
     if (why) *why = m;
     return false;
@@ -253,23 +265,49 @@ bool ws_check_server_response(std::string_view head, const std::string& key, std
     if (n == "connection" && header_has_token(v, "upgrade")) connection = true;
     if (n == "sec-websocket-accept" && v == expect) accept_ok = true;
     if (n == "sec-websocket-extensions" && !v.empty()) return bad("server negotiated an extension we did not offer");
+    if (n == "sec-websocket-protocol") proto = v;
   }
   if (!upgrade || !connection) return bad("missing Upgrade/Connection headers");
   if (!accept_ok) return bad("bad Sec-WebSocket-Accept");
+  if (!proto.empty() && std::find(offered.begin(), offered.end(), proto) == offered.end())
+    return bad("server chose a subprotocol we did not offer");
+  if (!offered.empty() && proto.empty()) return bad("server did not accept subprotocol " + offered.front());
+  if (chosen) *chosen = proto;
   return true;
 }
 
 bool ws_parse_url(const std::string& url, std::string* host, uint16_t* port, std::string* path, std::string* err) {
+  bool tls = false;
+  if (!ws_parse_url_tls(url, host, port, path, &tls, err)) return false;
+  if (tls && !ws_tls_available()) {
+    if (err) *err = "wss:// (TLS) is not available in this build; use ws:// on the local network";
+    return false;
+  }
+  return true;
+}
+
+bool ws_tls_available() {
+#ifdef EMBER_HOST_HAVE_TLS
+  return true;
+#else
+  return false;
+#endif
+}
+
+bool ws_parse_url_tls(const std::string& url, std::string* host, uint16_t* port, std::string* path, bool* tls,
+                      std::string* err) {
   std::string u = trim(url);
   size_t pos;
   uint16_t def_port = 80;
+  *tls = false;
   if (starts_with(u, "ws://")) {
     pos = 5;
   } else if (starts_with(u, "http://")) {
     pos = 7;
   } else if (starts_with(u, "wss://") || starts_with(u, "https://")) {
-    if (err) *err = "wss:// (TLS) is not supported; use ws:// on the local network";
-    return false;
+    pos = starts_with(u, "wss://") ? 6 : 8;
+    def_port = 443;
+    *tls = true;
   } else {
     if (err) *err = "URL must start with ws://";
     return false;

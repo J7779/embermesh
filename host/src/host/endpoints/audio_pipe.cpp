@@ -60,6 +60,8 @@ class AudioPipeEndpoint : public Endpoint {
     rate_ = uint32_t(cfg_int(c, "sample_rate", 48000));
     int64_t b = cfg_int(c, "block_ms", 20);
     block_ms_ = uint32_t(b < 5 ? 5 : b > 200 ? 200 : b);
+    int64_t j = cfg_int(c, "block_jitter_ms", 0);
+    jitter_ms_ = uint32_t(j < 0 ? 0 : j > 2000 ? 2000 : j);
     make_fifos_ = cfg_bool(c, "create_fifos", true);
     double nd = cfg_num(c, "rx_noise_dbfs", -70);
     noise_amp_ = nd <= -120 ? 0.0 : 32768.0 * std::pow(10.0, nd / 20.0);
@@ -118,6 +120,9 @@ class AudioPipeEndpoint : public Endpoint {
       loop_.cancel(timer_);
       timer_ = 0;
     }
+    watch_input(false);
+    if (out_watch_) loop_.unwatch(out_watch_);
+    out_watch_ = 0;
     if (in_fd_ >= 0) ::close(in_fd_);
     if (out_fd_ >= 0) ::close(out_fd_);
     in_fd_ = out_fd_ = -1;
@@ -141,6 +146,7 @@ class AudioPipeEndpoint : public Endpoint {
     if (tx_dropped_) s.set("tx_dropped_samples", double(tx_dropped_));
     s.set("ptt_on", ptt_on_);
     if (vox_) s.set("vox_keyups", double(vox_keyups_));
+    if (stalls_) s.set("stalls", double(stalls_));
     double dbfs = peak_ <= 0 ? -120.0 : 20.0 * std::log10(double(peak_) / 32768.0);
     s.set("rx_level_dbfs", std::round(dbfs * 10) / 10);
     s.set("rx_max_dbfs", max_peak_ <= 0 ? -120.0 : std::round(200.0 * std::log10(double(max_peak_) / 32768.0)) / 10);
@@ -185,6 +191,7 @@ class AudioPipeEndpoint : public Endpoint {
     ::fcntl(out_fd_, F_SETPIPE_SZ, 1 << 20);  // room for ~5 s at 48 kHz
 #endif
     out_pending_.clear();
+    out_written_ = 0;  // a new reader starts at a sample boundary
   }
 
   void on_block() {
@@ -192,13 +199,25 @@ class AudioPipeEndpoint : public Endpoint {
     if (!running_) return;
     uint64_t now = steady_ms();
     uint64_t total = (now - t0_) * uint64_t(rate_) / 1000;
-    // After a stall (laptop suspended, debugger) do not burst more than one second of audio.
-    if (total > produced_ + rate_) produced_ = total - rate_;
-    if (total > consumed_ + rate_) consumed_ = total - rate_;
+    // A late timer (busy computer, stretched VM) is caught up sample-accurately: the missed samples
+    // are produced now, in one burst, exactly as a sound card's buffered callback would deliver
+    // them; the channel model and the far end count in samples, so bursts change nothing. Only a
+    // real stall (suspend, debugger) longer than kMaxCatchUpS is skipped, and counted.
+    uint64_t max_catch = uint64_t(rate_) * kMaxCatchUpS;
+    if (total > produced_ + max_catch) {
+      ++stalls_;
+      produced_ = total - max_catch;
+    }
+    if (total > consumed_ + max_catch) consumed_ = total - max_catch;
     size_t due = size_t(total - produced_);
     produce(due);
-    consume(size_t(total - consumed_));
-    if (running_) timer_ = loop_.timer(block_ms_, [this] { on_block(); });
+    if (consume(size_t(total - consumed_)) > 0) watch_input(true);
+    uint32_t next = block_ms_;
+    if (jitter_ms_) {  // testing: deliver audio in irregular bursts, like an overloaded host
+      jrng_ = jrng_ * 1664525u + 1013904223u;
+      next += (jrng_ >> 8) % (jitter_ms_ + 1);
+    }
+    if (running_) timer_ = loop_.timer(next, [this] { on_block(); });
   }
 
   void produce(size_t n) {
@@ -225,6 +244,27 @@ class AudioPipeEndpoint : public Endpoint {
       out_pending_[base + 2 * i] = uint8_t(v & 0xff);
       out_pending_[base + 2 * i + 1] = uint8_t(v >> 8);
     }
+    flush_output();
+    // What the reader could not take yet waits (a FIFO holds only 16-64 KiB); beyond
+    // kMaxCatchUpS of backlog the oldest whole samples are dropped, keeping the stream aligned.
+    size_t cap = size_t(rate_) * 2 * kMaxCatchUpS;
+    if (out_pending_.size() > cap) {
+      size_t keep_head = (out_written_ & 1) ? 1 : 0;  // the rest of a half-written sample must go out
+      size_t drop = (out_pending_.size() - cap) & ~size_t(1);
+      if (drop + keep_head > out_pending_.size()) drop = (out_pending_.size() - keep_head) & ~size_t(1);
+      tx_dropped_ += drop / 2;
+      out_pending_.erase(out_pending_.begin() + long(keep_head), out_pending_.begin() + long(keep_head + drop));
+    }
+  }
+
+  // Writes as much pending output as the FIFO takes now, and keeps writing whenever it becomes
+  // writable again (not only at the next block): otherwise a reader that is late once would make
+  // the backlog grow for ever, as the pipe can take only one buffer per block.
+  void flush_output() {
+    if (out_fd_ < 0) {
+      out_pending_.clear();
+      return;
+    }
     size_t off = 0;
     while (off < out_pending_.size()) {
       ssize_t w = write_nosig(out_fd_, out_pending_.data() + off, out_pending_.size() - off);
@@ -234,21 +274,21 @@ class AudioPipeEndpoint : public Endpoint {
       }
       if (w < 0 && errno == EINTR) continue;
       if (w < 0 && errno == EPIPE) {  // reader went away: reopen when one comes back
+        if (out_watch_) loop_.unwatch(out_watch_);
+        out_watch_ = 0;
         ::close(out_fd_);
         out_fd_ = -1;
       }
-      break;  // EAGAIN: the reader is behind; drop the rest (whole samples)
+      break;  // EAGAIN: wait for writability
     }
-    // Keep what the reader could not take yet (a FIFO holds only 16-64 KiB) for up to 1 s, so a
-    // briefly late reader gets every sample; beyond that drop the oldest whole samples.
+    out_written_ += off;
     out_pending_.erase(out_pending_.begin(), out_pending_.begin() + long(off));
-    size_t cap = size_t(rate_) * 2;
-    if (out_pending_.size() > cap) {
-      size_t drop = (out_pending_.size() - cap) & ~size_t(1);
-      if (off & 1) drop += 1;  // stay sample-aligned after a partial write
-      if (drop > out_pending_.size()) drop = out_pending_.size();
-      tx_dropped_ += drop / 2;
-      out_pending_.erase(out_pending_.begin(), out_pending_.begin() + long(drop));
+    bool want = out_fd_ >= 0 && !out_pending_.empty();
+    if (want && !out_watch_) {
+      out_watch_ = loop_.watch(out_fd_, kPollOut, [this](short) { flush_output(); });
+    } else if (!want && out_watch_) {
+      loop_.unwatch(out_watch_);
+      out_watch_ = 0;
     }
   }
 
@@ -293,10 +333,25 @@ class AudioPipeEndpoint : public Endpoint {
     }
   }
 
-  void consume(size_t due) {
+  // FIFO input is read as soon as it is readable (a watch), so the endpoint adds no latency of its
+  // own; while no writer is connected the watch is dropped (a writer-less FIFO polls as readable
+  // forever) and the block timer polls instead.
+  void watch_input(bool on) {
+    if (on == (in_watch_ != 0) || in_is_file_ || in_fd_ < 0) return;
+    if (on) {
+      in_watch_ = loop_.watch(in_fd_, kPollIn, [this](short) {
+        if (consume(0) == 0) watch_input(false);
+      });
+    } else {
+      loop_.unwatch(in_watch_);
+      in_watch_ = 0;
+    }
+  }
+
+  size_t consume(size_t due) {
     if (in_fd_ < 0) {
       consumed_ += due;
-      return;
+      return 0;
     }
     // FIFOs: read everything that is there (the writer paces). Files: at the real-time rate.
     size_t want_bytes = in_is_file_ ? due * 2 : size_t(1) << 20;
@@ -337,14 +392,18 @@ class AudioPipeEndpoint : public Endpoint {
         win_peak_ = 0;
         win_count_ = 0;
       }
-      if (!running_) return;
+      if (!running_) return got_total;
     }
     consumed_ += due;
+    return got_total;
   }
 
   std::string in_path_, out_path_;
   uint32_t rate_ = 48000, block_ms_ = 20;
   bool make_fifos_ = true;
+  static constexpr uint64_t kMaxCatchUpS = 10;
+  uint32_t jitter_ms_ = 0, jrng_ = 0x2545f491u;
+  uint64_t stalls_ = 0;
   double noise_amp_ = 0;
   double tx_gain_ = 1.0, tx_noise_amp_ = 0, lp_a_ = 1.0, hp_a_ = 0.0, lp_y_ = 0, hp_x_ = 0, hp_y_ = 0, vox_thr_ = 328;
   bool vox_ = false, vox_keyed_ = false;
@@ -357,6 +416,8 @@ class AudioPipeEndpoint : public Endpoint {
   bool running_ = false;
   bool ptt_on_ = false;
   uint64_t timer_ = 0;
+  uint64_t in_watch_ = 0, out_watch_ = 0;
+  uint64_t out_written_ = 0;  // bytes written to the output so far (sample alignment)
   uint64_t t0_ = 0, produced_ = 0, consumed_ = 0;
   uint64_t rx_samples_ = 0, tx_samples_ = 0, tx_dropped_ = 0, tx_signal_ = 0;
   int win_peak_ = 0, peak_ = 0, max_peak_ = 0;
@@ -384,6 +445,8 @@ void register_audio_pipe_endpoints(EndpointRegistry& reg) {
   k.config.push(Field("block_ms", "Block size", "number").def(20).unit("ms").min(5).max(200).advanced());
   k.config.push(Field("create_fifos", "Create missing paths as FIFOs", "bool").def(true).advanced());
   // Channel model (testing / training): what a radio path does to the transmitted audio.
+  k.config.push(Field("block_jitter_ms", "Testing: irregular delivery", "number").def(0).unit("ms").min(0).max(2000).advanced().help(
+      "Adds up to this much random delay between blocks (audio then arrives in bursts, as on an overloaded computer)"));
   k.config.push(Field("vox_attack_ms", "Simulated VOX: lost start of each transmission", "number").def(0).unit("ms").min(0).max(2000).advanced());
   k.config.push(Field("vox_hang_ms", "Simulated VOX: hang time", "number").def(0).unit("ms").min(0).max(5000).advanced());
   k.config.push(Field("vox_threshold_dbfs", "Simulated VOX: threshold", "number").def(-40).unit("dBFS").min(-90).max(0).advanced());

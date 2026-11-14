@@ -37,8 +37,11 @@ operator page. Labels in **bold** are exactly what the screen shows.
 ## First run: Welcome to EmberMesh
 
 Shown until a name is set. **Your name**, **Amateur radio callsign** (only if licensed), **Region**,
-**Continue**; then **Your identity** with your node ID and fingerprint words, **Start using
-EmberMesh**.
+**Continue**; then **Your identity** with your node ID and fingerprint words, the **Connect to
+people** card (**Nearby devices**, tagged **recommended**, on; **Reach contacts over the internet**,
+off; each with its notice), **Start using EmberMesh**. Installs from before these features show a
+one-time sheet **New: connect to people** with the same two choices and **Continue**. See
+[Connections](connections.md).
 
 ## Lock screen: EmberMesh is locked
 
@@ -57,7 +60,9 @@ Shown when a storage passphrase is set and the app is locked. Type the passphras
   last seen (direct messages), or "Encrypted channel" / "Cleartext, signed". The **⋯** button
   (Conversation options) offers **Contact details**, **Ping**, **Invite people** (channels),
   **Mute**, **Share my position**, **Export as bundle (sneakernet)**, **Clear conversation**,
-  **Leave channel**.
+  **Leave channel**. For an encrypted channel the menu also shows **Also over the internet relay**
+  (a switch, when the channel has a random key or a strong passphrase; otherwise a line saying why
+  it is not offered).
 - Each message shows the sender, its priority if not normal, a lock (encrypted) or globe
   (cleartext), **⚠ unverified sender** when the signature could not be checked, the hop count, the
   link it came in on, the time, and on your own messages a status icon (Queued, Sent, Relayed,
@@ -73,7 +78,8 @@ Shown when a storage passphrase is set and the app is locked. Type the passphras
 Four tabs:
 
 - **Contacts:** **Add contact** (**Scan contact QR**, paste a **Contact card**, or **Add by node
-  ID**) and **My card** (your QR code). Each contact shows its status, verified or not, last heard,
+  ID**; under **Far away?** the offer **Reach this contact over the internet** while the internet
+  relay is off) and **My card** (your QR code). Each contact shows its status, verified or not, last heard,
   path and distance.
 - **Nearby:** every node heard, with path, signal (RSSI/SNR) per link and distance; **Announce
   myself**; per node a ping button and **Add to contacts** (+) or **Message**.
@@ -83,7 +89,10 @@ Four tabs:
 - **Stats:** stored messages and data, relayed for others, frames sent/received, bad frames,
   duplicates dropped, expired, uptime, and per link airtime, duty cycle used and queue.
 
-**A contact's page:** **Message**, **Ping** (shows "Pong: ... round trip, N hops"), **Verify
+**A contact's page:** the **Reaching <name>** card (for example "Nearby now (same Wi-Fi).",
+"Reachable through the internet relay." or "Not reachable right now. ... Messages wait on this
+device and are sent when a connection to them exists."; it describes reachability, never delivery),
+**Message**, **Ping** (shows "Pong: ... round trip, N hops"), **Verify
 identity** (their fingerprint words; **Words match — verify** or **Verify by scanning their
 card**), the **Mesh** details (node ID, last heard, path, via, signal, position, distance),
 **Favourite**, **Rename**, **Block**, **Remove**.
@@ -148,7 +157,9 @@ Bulletins from unverified senders carry an **unverified sender** tag.
   "This link cannot transmit until you set a callsign" with a **Set callsign** button when an
   amateur link has no callsign, **Statistics**, **Settings in use** (the settings the link actually
   runs with; the ones you changed are tagged **changed**), and **Reconnect**, **Settings**,
-  **Plain-text message**, **Remove**, **Help**.
+  **Plain-text message**, **Remove**, **Help**. **Automatic links** (from Nearby devices or the
+  internet relay) are tagged **Automatic · nearby device** or **Automatic · internet relay** and
+  have **Change in Connections** instead of Settings, Plain-text message and Remove.
 - **Share this device:** the **Hub** card (**Start hub** / **Stop hub**, addresses with QR and copy
   buttons; or "not on this device") and **Pair directly (WebRTC)** (**Create invite**, **Answer an
   invite**) in browsers.
@@ -159,7 +170,8 @@ Bulletins from unverified senders carry an **unverified sender** tag.
 
 - **Band plans** (choose **Region**, filter), **Morse send & read** (the **Morse** screen: **Send** (**Send a message by light**: type, choose **Slow · 6** / **Normal · 12** /
   **Fast · 15**, **Flash with flashlight** or **Flash with screen**, **Play as sound**, **Stop**),
-  **Read by camera**, **Read by sound**; see
+  **Read by camera** (point the camera at the light, **Start reading**; the reader finds the blinking
+  light by itself and rings it), **Read by sound**; see
   [Morse by light and sound](morse-reading.md)), **Station
   profiles** (your radios' power, feedline, antenna and height, used to fill calculators).
 - Calculators by group: **Antennas**, **Radio & propagation**, **Power**, **Navigation**,
@@ -176,7 +188,9 @@ are protected by a storage passphrase.
 ## Settings
 
 At the top, **Accessibility** (Simple mode, text size, contrast, motion; see [Simple mode and
-accessibility](accessibility.md)) and an **Instructions** button. Then, in order: **Profile** (name, callsign, status), **Region & display** (region, units, theme, low-power
+accessibility](accessibility.md)) and an **Instructions** button. Then, in order: **Profile** (name, callsign, status), **Connections** (**Nearby devices**,
+**Internet relay**, the **Relays** list and **Add your own relay or hub**; see
+[Connections](connections.md)), **Region & display** (region, units, theme, low-power
 mode), **Mesh & relaying**, **Position**, **Clock**, **Identity** (node ID, fingerprint words, **Show
 my card**, **Back up identity**, **Restore identity**), **Security** (passphrase, **Lock now**,
 **Duress passphrase**, **Panic wipe**), **Sneakernet bundles** (**Export bundle**, **Import

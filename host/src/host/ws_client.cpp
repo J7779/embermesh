@@ -1,12 +1,38 @@
 #include "host/ws_client.h"
 
 #include "host/util.h"
+#ifdef EMBER_HOST_HAVE_TLS
+#include "host/tls.h"
+#endif
 
 namespace ember_host {
 
+struct WsClient::Tls {
+#ifdef EMBER_HOST_HAVE_TLS
+  explicit Tls(TlsClient::SendFn f) : c(std::move(f)) {}
+  TlsClient c;
+#endif
+};
+
 WsClient::WsClient(Loop& loop, Options opt) : loop_(loop), opt_(std::move(opt)), stream_(loop), alive_(std::make_shared<bool>(true)) {
   stream_.on_connect = [this](const std::string& e) { on_connected(e); };
-  stream_.on_data = [this](const uint8_t* d, size_t n) { on_bytes(d, n); };
+  stream_.on_data = [this](const uint8_t* d, size_t n) {
+#ifdef EMBER_HOST_HAVE_TLS
+    if (tls_) {
+      std::string plain, err;
+      bool ok = tls_->c.feed(d, n, &plain, &err);
+      auto alive = alive_;
+      if (!plain.empty()) on_bytes(reinterpret_cast<const uint8_t*>(plain.data()), plain.size());
+      if (!*alive) return;
+      if (!ok && state_ != Idle) {
+        stream_.close();
+        finish(kWsCloseAbnormal, err);
+      }
+      return;
+    }
+#endif
+    on_bytes(d, n);
+  };
   stream_.on_close = [this](const std::string& why) {
     if (state_ == Idle) return;
     finish(peer_close_code_, peer_close_reason_.empty() ? why : peer_close_reason_);
@@ -23,11 +49,17 @@ bool WsClient::connect(const std::string& url, std::string* err) {
   std::string host;
   uint16_t port = 80;
   std::string e;
-  if (!ws_parse_url(url, &host, &port, &path_, &e)) {
+  if (!ws_parse_url_tls(url, &host, &port, &path_, &use_tls_, &e)) {
     if (err) *err = e;
     return false;
   }
-  host_header_ = (host.find(':') != std::string::npos ? "[" + host + "]" : host) + (port == 80 ? "" : ":" + std::to_string(port));
+  if (use_tls_ && !ws_tls_available()) {
+    if (err) *err = "wss:// (TLS) is not available in this build";
+    return false;
+  }
+  tls_host_ = host;
+  host_header_ = (host.find(':') != std::string::npos ? "[" + host + "]" : host) +
+                 (port == (use_tls_ ? 443 : 80) ? "" : ":" + std::to_string(port));
   key_ = ws_make_client_key();
   head_buf_.clear();
   WsDecoder::Options o;
@@ -50,8 +82,40 @@ void WsClient::on_connected(const std::string& err) {
   }
   state_ = Handshake;
   last_input_ = steady_ms();
-  stream_.write(ws_client_handshake_request(host_header_, path_, key_, opt_.origin));
+  handshake_deadline_ = last_input_ + opt_.connect_timeout_ms;
+#ifdef EMBER_HOST_HAVE_TLS
+  if (use_tls_) {
+    // TLS first (certificate chain + host name verified; no way to skip it), then the upgrade,
+    // which TlsClient holds until the handshake is done.
+    tls_.reset(new Tls([this](const uint8_t* d, size_t n) { stream_.write(d, n); }));
+    std::string terr;
+    if (!tls_->c.start(tls_host_, opt_.tls_ca_file_for_tests, &terr)) {
+      stream_.close();
+      finish(kWsCloseAbnormal, terr);
+      return;
+    }
+  }
+#endif
+  send_upgrade();
   schedule_tick();
+}
+
+void WsClient::send_upgrade() {
+  raw_write(ws_client_handshake_request(host_header_, path_, key_, opt_.origin, opt_.protocols, opt_.send_user_agent));
+}
+
+void WsClient::raw_write(const std::string& bytes) {
+#ifdef EMBER_HOST_HAVE_TLS
+  if (tls_) {
+    std::string err;
+    if (!tls_->c.write(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size(), &err)) {
+      stream_.close();
+      finish(kWsCloseAbnormal, err);
+    }
+    return;
+  }
+#endif
+  stream_.write(bytes);
 }
 
 void WsClient::on_bytes(const uint8_t* d, size_t n) {
@@ -67,7 +131,7 @@ void WsClient::on_bytes(const uint8_t* d, size_t n) {
       return;
     }
     std::string why;
-    if (!ws_check_server_response(std::string_view(head_buf_).substr(0, end + 4), key_, &why)) {
+    if (!ws_check_server_response(std::string_view(head_buf_).substr(0, end + 4), key_, &why, opt_.protocols, &protocol_)) {
       stream_.close();
       finish(kWsCloseAbnormal, why);
       return;
@@ -132,7 +196,7 @@ bool WsClient::send_frame(uint8_t op, const void* data, size_t len) {
   if (!stream_.is_open()) return false;
   uint8_t mask[4];
   random_bytes(mask, 4);
-  stream_.write(ws_encode_frame(op, data, len, true, mask));
+  raw_write(ws_encode_frame(op, data, len, true, mask));
   return true;
 }
 
@@ -166,6 +230,7 @@ void WsClient::abort() {
     tick_timer_ = 0;
   }
   stream_.close();
+  tls_.reset();
 }
 
 void WsClient::finish(uint16_t code, const std::string& reason) {
@@ -194,6 +259,10 @@ void WsClient::tick() {
   uint64_t now = steady_ms();
   if (now - last_input_ > opt_.timeout_ms) {
     finish(kWsCloseAbnormal, "timeout");
+    return;
+  }
+  if (state_ == Handshake && now > handshake_deadline_) {
+    finish(kWsCloseAbnormal, use_tls_ ? "TLS/WebSocket handshake timeout" : "WebSocket handshake timeout");
     return;
   }
   if (state_ == Closing && close_deadline_ && now > close_deadline_) {

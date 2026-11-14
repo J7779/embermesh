@@ -15,9 +15,11 @@ order: 1
 
 # Quick Start: Two Devices Talking in Five Minutes
 
-EmberMesh is a messenger that needs **no internet, no phone network, no accounts and no
-servers**. Every phone, laptop or small computer running it talks directly to nearby devices and
-radios, and carries messages for other people until they can be delivered.
+EmberMesh is a messenger that needs **no internet, no phone network and no account**, and there
+is no server of ours. Every phone, laptop or small computer running it talks directly to nearby
+devices and radios, and carries messages for other people until they can be delivered. Nothing
+leaves your devices for the internet unless you turn on the optional **Internet relay**
+([Connections](connections.md)).
 
 This chapter gets two devices talking as fast as possible. Read the rest of the manual later.
 
@@ -26,7 +28,8 @@ This chapter gets two devices talking as fast as possible. Read the rest of the 
 | What you have right now | Fastest way | Read |
 |---|---|---|
 | Two phones with EmberMesh, within a few tens of metres | Bluetooth | This chapter, then [Phone to phone](phone-to-phone.md) |
-| Phones on the same Wi-Fi, or one Android phone running a hotspot | Wi-Fi (UDP) | This chapter, then [Phone to phone](phone-to-phone.md) |
+| Phones on the same Wi-Fi, or one phone running a hotspot | **Nearby devices** finds them by itself (on after setup) | [Connections](connections.md) |
+| Contacts far away, and the internet still works | The optional **Internet relay** (both apps open) | [Connections](connections.md) |
 | Two iPhones or iPads | Apple peer-to-peer | [Phone to phone](phone-to-phone.md) |
 | Only one person has the app | Copy the app to the others | [Getting the app onto other devices](spreading-the-app.md) |
 | You still have internet | Install the hosted web app; it then works offline | [Operating the web app](app-web.md) |
@@ -64,7 +67,7 @@ This chapter gets two devices talking as fast as possible. Read the rest of the 
   screen.
 
 **Simple mode** uses plain names: **Chats** is **Messages**, **SOS** is **Send for help**, **Links &
-radios** is **Connections**, **Help** / **Instructions** is **How to use**. The full list is in [Simple mode and
+radios** is **Connections** (not the same as **Settings → Connections**), **Help** / **Instructions** is **How to use**. The full list is in [Simple mode and
 accessibility](accessibility.md).
 
 ## The five-minute path
@@ -81,10 +84,17 @@ Do steps 1 to 4 on **both** devices.
 3. Leave **Amateur radio callsign** empty unless you hold an amateur licence.
 4. Choose your **Region**. It selects the legal frequencies and power limits shown in the tools.
 5. Tap **Continue**. The **Your identity** page shows your node ID and eight **fingerprint words**.
-   Leave them for now (see step 7).
+   Leave them for now (see step 7). Below them, **Connect to people** offers **Nearby devices**
+   (**recommended**, on: finds EmberMesh on the same Wi-Fi) and **Reach contacts over the internet**
+   (off). Read the short notice under each; you can change both later in **Settings →
+   Connections** ([Connections](connections.md)).
 6. Tap **Start using EmberMesh**. You arrive in **Chats**.
 
 ### Step 2. Add a connection
+
+**On the same Wi-Fi or hotspot with Nearby devices on, you may not need this step:** the other
+device appears by itself on Links & radios as **Automatic · nearby device**. Allow the
+local-network prompt if your phone asks. If nothing appears within a minute, add a link by hand:
 
 1. Open **More → Links & radios** (wide screen: **Links**).
 2. Tap **Add connection**. A list asks "How do you want to reach other devices?"

@@ -13,18 +13,20 @@ import {
 import { SETTINGS_DEFAULTS, validateSettings, networkTitle } from '../lib/core_spec.js';
 import { passphraseStrength } from '../lib/ratelimit.js';
 import { MockMorseRx } from '../mock/morse_rx.js';
+import { NativeCameraSim } from '../mock/camera_sim.js';
 import { RADIOS } from '../mock/radios.js';
 import { HARDWARE } from '../mock/hardware.js';
 import { bestPassage, related as semRelated, ask as semAsk, MODEL_INFO } from '../mock/semantic.js';
 import { GUIDES, CATEGORY_TITLES } from '../mock/guides.js';
 import { TOOLS, runTool, bandsFor } from '../mock/tools.js';
 import { encodeQR } from '../mock/qr.js';
+import { initConnectivity, loadConnectivity, saveConnectivity, syncAutoLinks, autoPeerLinks, contactReach, connectivityView, CONNECTIVITY_METHODS } from '../mock/connectivity.js';
 
 const STORE_KEY = 'embermesh.mock.v1';
 const VERSION = '0.1.0-mock';
 const MIN = 60000;
 const FEATURES = ['dm', 'channels', 'sos', 'checkin', 'position', 'bulletins', 'guides', 'tools', 'bundles', 'files', 'interop', 'netplan', 'kv', 'security'];
-const HOST_FEATURES = ['hub', 'qr_scan', 'location', 'flash', 'tone', 'file', 'notify', 'webrtc', 'keep_awake'];
+const HOST_FEATURES = ['hub', 'qr_scan', 'location', 'flash', 'tone', 'file', 'notify', 'webrtc', 'keep_awake', 'nearby', 'relay'];
 // Same defaults and ranges as the real core (docs/RPC_API.md, ui/js/lib/core_spec.js).
 const DEFAULT_SETTINGS = { ...SETTINGS_DEFAULTS, links_autostart: [] };
 const MAX_FILE = 128 * 1024;
@@ -116,6 +118,11 @@ export default class MockBackend {
     this.profile = { name: this.fresh ? '' : 'Alex', callsign: '', status: this.fresh ? '' : 'At home base' };
     this.startOnBoot = false;
     this.semanticOn = getParam(params, 'nosemantic') !== '1';
+    initConnectivity(this, getParam, params);
+    // Morse camera reader (§12): ?morseframes=0 = a core without frame support (levels only);
+    // ?nativecam=1 = a host with native camera capture (simulated moving, keyed light; &lights=2)
+    this.morseFrames = getParam(params, 'morseframes') !== '0';
+    this.nativeCam = getParam(params, 'nativecam') === '1' ? { lights: Number(getParam(params, 'lights')) || 1 } : null;
     this.nodeId = OWN_ID;
     this.settings = { ...DEFAULT_SETTINGS };
     this.kv = {};
@@ -171,6 +178,7 @@ export default class MockBackend {
           if (c) Object.assign(c, f);
         }
       }
+      if (d.conn) loadConnectivity(this, d.conn);
       if (d.wiped) this._resetWorld(true);
     } catch { /* corrupt storage: ignore */ }
   }
@@ -184,7 +192,7 @@ export default class MockBackend {
     try {
       store.setItem(STORE_KEY, JSON.stringify({
         profile: this.profile, settings: this.settings, kv: this.kv, security: this.security,
-        nodeId: this.nodeId, contactFlags, wiped: !!this.wiped,
+        nodeId: this.nodeId, contactFlags, wiped: !!this.wiped, conn: saveConnectivity(this),
       }));
     } catch { /* quota / private mode */ }
   }
@@ -247,6 +255,7 @@ export default class MockBackend {
     this._inited = true;
     // T-Beam finishes its BLE connection.
     this._after(3500, () => this._setLinkState(3, 'up'));
+    syncAutoLinks(this); // nearby links (switch on by default) and, after consent, relay links
     if (this.autoplay) this._startAutoplay();
     this._emit('node.ready', {});
   }
@@ -279,7 +288,7 @@ export default class MockBackend {
     return {
       version: VERSION, node_id: L ? '' : this.nodeId, name: L ? '' : this.profile.name, callsign: L ? '' : this.profile.callsign, status: L ? '' : this.profile.status,
       fingerprint: L ? [] : fingerprint(this.nodeId), card: L ? '' : this._card(), platform: 'web', app_version: VERSION, device_name: 'Mock device',
-      time_ms: this._now(), time_source: this.timeSource, uptime_ms: Math.round(performanceNow()), locked: L, features: FEATURES, storage: this.persist ? 'disk' : 'memory',
+      time_ms: this._now(), time_source: this.timeSource, uptime_ms: Math.round(performanceNow()), locked: L, features: this.morseFrames ? [...FEATURES, 'morse_frames'] : FEATURES, storage: this.persist ? 'disk' : 'memory',
     };
   }
 
@@ -322,8 +331,10 @@ export default class MockBackend {
   }
 
   _channelOut(ch) {
-    const { passphrase, ...rest } = ch;
-    return { ...rest, unread: this._meta(`ch:${ch.id}`).unread };
+    const { passphrase, random, ...rest } = ch;
+    // §11 rev 2: a channel may use the internet relay when its key is random or its passphrase strong
+    const relayAllowed = !!(ch.encrypted && (random || (passphrase && passphraseStrength(passphrase) === 'strong')));
+    return { ...rest, relay: !!ch.relay && relayAllowed, relay_allowed: relayAllowed, unread: this._meta(`ch:${ch.id}`).unread };
   }
 
   _validConv(conv) {
@@ -481,6 +492,16 @@ export default class MockBackend {
       level_hint: clip ? 'clipping' : peak > -1 ? 'too_loud' : lvl < -50 ? 'too_quiet' : 'ok' });
   }
 
+  /** morse.target (§12): on state changes, and at most 5 times a second while the light moves. */
+  _morseTarget(session, before, after) {
+    if (!after) return;
+    const now = Date.now();
+    const moved = before && after.x !== undefined && (Math.abs((before.x || 0) - after.x) > 0.01 || Math.abs((before.y || 0) - after.y) > 0.01);
+    if ((before && before.state) !== after.state || (moved && now - (this._lastTargetEv || 0) >= 200)) {
+      this._lastTargetEv = now;
+      this._emit('morse.target', { session, state: after.state, ...(after.x !== undefined ? { x: after.x, y: after.y, size: after.size } : {}), confidence: after.confidence });
+    }
+  }
   _morse(session) {
     const r = this.morse && this.morse.get(String(session || ''));
     if (!r) throw rpcError('not_found', 'no such Morse session');
@@ -495,13 +516,14 @@ export default class MockBackend {
 
   _peerList() {
     const now = this._now();
-    return WORLD.filter(p => this.peerSeen.has(p.node_id)).map(p => {
-      const seen = this.peerSeen.get(p.node_id);
+    const auto = autoPeerLinks(this); // neighbours on nearby links / a contact reached over a relay
+    return WORLD.filter(p => this.peerSeen.has(p.node_id) || auto.has(p.node_id)).map(p => {
+      const seen = auto.has(p.node_id) ? now : this.peerSeen.get(p.node_id);
       const c = this.contacts.get(p.node_id);
       const pos = peerPosition(p, now);
       return {
         node_id: p.node_id, name: (c && c.name) || p.name, callsign: p.callsign, direct: p.hops === 0, hops: p.hops, last_seen_ts: seen,
-        links: [{ link_id: p.link, ...(p.rssi !== undefined ? { rssi: p.rssi + Math.round(Math.random() * 4 - 2) } : {}), ...(p.snr !== undefined ? { snr: p.snr } : {}), last_rx_ts: seen }],
+        links: [{ link_id: auto.get(p.node_id) || p.link, ...(p.rssi !== undefined ? { rssi: p.rssi + Math.round(Math.random() * 4 - 2) } : {}), ...(p.snr !== undefined ? { snr: p.snr } : {}), last_rx_ts: seen }],
         ...(pos ? { position: { ...pos, ts: seen } } : {}),
       };
     });
@@ -509,6 +531,8 @@ export default class MockBackend {
 
   _wipe() {
     this.wiped = true;
+    this.conn.setup_done = false;
+    syncAutoLinks(this, 'wipe');
     this.nodeId = hex(16);
     this.profile = { name: '', callsign: '', status: '' };
     this.settings = { ...DEFAULT_SETTINGS };
@@ -580,6 +604,7 @@ function performanceNow() {
 // Each handler runs with `this` = MockBackend.
 
 const METHODS = {
+  ...CONNECTIVITY_METHODS,
   // ---- node / identity
   'node.info'() { return this._nodeInfo(); },
   'node.set_profile'(p) {
@@ -621,7 +646,8 @@ const METHODS = {
 
   // ---- contacts
   'contacts.list'() {
-    return { contacts: [...this.contacts.values()].sort((a, b) => (b.favorite - a.favorite) || a.name.localeCompare(b.name)) };
+    const peers = new Map(this._peerList().map(p => [p.node_id, p]));
+    return { contacts: [...this.contacts.values()].map(c => ({ ...c, reach: contactReach(this, c.node_id, peers.get(c.node_id)) })).sort((a, b) => (b.favorite - a.favorite) || a.name.localeCompare(b.name)) };
   },
   'contacts.add'(p) {
     let id, name = p.name || '', callsign = '';
@@ -682,7 +708,7 @@ const METHODS = {
     const id = random ? hex(8) : passphrase ? simpleHash(name.toLowerCase() + '\u0000' + passphrase) : simpleHash(name.toLowerCase());
     const clash = this.channels.get(id);
     if (clash && (clash.passphrase || '') !== passphrase) throw rpcError('busy', 'another channel uses this id with a different key');
-    const ch = clash || { id, name, encrypted: !!passphrase, is_default: false, muted: false, members_seen: 1, passphrase };
+    const ch = clash || { id, name, encrypted: !!passphrase, is_default: false, muted: false, members_seen: 1, passphrase, ...(random ? { random: true } : {}) };
     this.channels.set(ch.id, ch);
     this._meta(`ch:${ch.id}`);
     this._emit('channel.updated', { channel: this._channelOut(ch) });
@@ -694,6 +720,7 @@ const METHODS = {
     if (!ch) throw rpcError('not_found', 'No such channel');
     const q = new URLSearchParams({ v: '1', ch: ch.id, n: ch.name });
     if (ch.encrypted) q.set('k', b64utf8(ch.passphrase || ch.id));
+    if (ch.random) q.set('r', '1');
     return { invite: `ember:invite?${q.toString()}` };
   },
   'channels.join'(p) {
@@ -724,6 +751,10 @@ const METHODS = {
     const ch = this.channels.get(String(p.id || ''));
     if (!ch) throw rpcError('not_found', 'No such channel');
     if (typeof p.muted === 'boolean') { ch.muted = p.muted; this._meta(`ch:${ch.id}`).muted = p.muted; }
+    if (typeof p.relay === 'boolean') {
+      if (p.relay && !this._channelOut(ch).relay_allowed) throw rpcError('denied', 'only channels with a random key or a strong passphrase may use the internet relay');
+      ch.relay = p.relay;
+    }
     this._emit('channel.updated', { channel: this._channelOut(ch) });
     this._emitConv(`ch:${ch.id}`);
     return { channel: this._channelOut(ch) };
@@ -1024,7 +1055,13 @@ const METHODS = {
   },
   'morse.rx.feed'(p) {
     const r = this._morse(p.session);
-    if (r.source === 'light') {
+    if (r.source === 'light' && Array.isArray(p.frames) && !this.morseFrames) throw rpcError('bad_params', 'levels must be an array'); // an old core
+    if (r.source === 'light' && Array.isArray(p.frames) && this.morseFrames) {
+      if (p.frames.length > 8) throw rpcError('too_large', 'at most 8 frames per feed');
+      const before = r.target();
+      r.feedFrames(p);
+      this._morseTarget(p.session, before, r.target());
+    } else if (r.source === 'light') {
       if (!Array.isArray(p.levels)) throw rpcError('bad_params', 'levels must be an array');
       if (p.levels.length > 4096) throw rpcError('too_large', 'at most 4096 samples per feed');
       r.feedLight(p);
@@ -1038,8 +1075,30 @@ const METHODS = {
     return st;
   },
   'morse.rx.status'(p) { return this._morse(p.session).status(); },
+  'morse.rx.target'(p) {
+    const r = this._morse(p.session);
+    if (r.source !== 'light') throw rpcError('bad_params', 'only light sessions have a target');
+    if (p.auto === true) r.pin(null);
+    else if (Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1) r.pin(p.x, p.y);
+    else throw rpcError('bad_params', 'x and y (0..1) or auto:true');
+    return r.status();
+  },
+  async 'host.capture.start'(p) {
+    if (!this.nativeCam || p.kind !== 'camera_luma') throw rpcError('unsupported', 'no native capture of that kind here');
+    this._morse(p.session);
+    if (this._cam) this._cam.stop();
+    this._cam = new NativeCameraSim({ lights: this.nativeCam.lights, speed: this.speed, after: (ms, fn) => this._after(ms, fn),
+      feed: frames => { try { METHODS['morse.rx.feed'].call(this, { session: p.session, frames }); } catch { this._cam && this._cam.stop(); } } });
+    this._cam.start();
+    return { zoom_steps: [1, 2, 5] };
+  },
+  'host.capture.update'(p) {
+    if (p.zoom !== undefined && ![1, 2, 5].includes(p.zoom)) throw rpcError('bad_params', 'zoom must be one of zoom_steps');
+    return {};
+  },
+  'host.capture.stop'() { if (this._cam) { this._cam.stop(); this._cam = null; } return {}; },
   'morse.rx.reset'(p) { this._morse(p.session).reset(); return {}; },
-  'morse.rx.stop'(p) { const r = this._morse(p.session); this.morse.delete(p.session); return { transcript: r.transcript }; },
+  'morse.rx.stop'(p) { const r = this._morse(p.session); this.morse.delete(p.session); if (this._cam) { this._cam.stop(); this._cam = null; } return { transcript: r.transcript }; },
   'rf.hardware'(p) {
     let list = HARDWARE;
     if (p.method) list = list.filter(m => m.id === p.method || m.link_type === p.method);
@@ -1186,6 +1245,7 @@ const METHODS = {
   'settings.get'() { return { settings: this.settings }; },
   'settings.set'(p) {
     if (!p.settings || typeof p.settings !== 'object' || Array.isArray(p.settings)) throw rpcError('bad_params', 'settings must be an object');
+    if (Object.keys(p.settings).some(k => k.startsWith('connectivity.'))) throw rpcError('bad_params', 'connectivity.* settings are changed with connectivity.set');
     const bad = Object.entries(validateSettings(p.settings));
     if (bad.length) throw rpcError('bad_params', `settings.${bad[0][0]}: ${bad[0][1]}`); // nothing applied
     if (utf8Bytes(JSON.stringify({ ...this.settings, ...p.settings })).length > 64 * 1024) throw rpcError('too_large', 'settings exceed 64 KiB');
@@ -1256,12 +1316,16 @@ const METHODS = {
     }
     if (pass !== this.security.passphrase) throw rpcError('denied', 'wrong passphrase');
     this.locked = false;
+    syncAutoLinks(this);
+    this._emit('connectivity.changed', connectivityView(this));
     this._emit('node.ready', {});
     return { unlocked: true };
   },
   'security.lock'() {
     if (!this.security.passphrase) throw rpcError('bad_params', 'Set a passphrase first');
     this.locked = true;
+    syncAutoLinks(this, 'locked'); // ready:false — every automatic link closes
+    this._emit('connectivity.changed', connectivityView(this));
     this._emit('security.locked', {});
     return {};
   },
@@ -1284,8 +1348,9 @@ const METHODS = {
     const actions = this.unsupported.has('feature:actions') ? [] : HOST_ACTIONS.map(a => (a.id === 'start_on_boot' ? { ...a, checked: this.startOnBoot } : a));
     const features = HOST_FEATURES.filter(f => !this.unsupported.has(`feature:${f}`));
     if (this.torch !== 'no' && features.includes('flash')) features.push('torch');
+    if (this.nativeCam) features.push('capture_camera_luma');
     const signal = { torch: this.torch === 'refused' ? 'ask' : this.torch, screen: true };
-    return { platform: 'web', app_version: VERSION, backend: 'mock', endpoint_kinds: ENDPOINT_KINDS, features, actions, signal };
+    return { platform: 'web', app_version: VERSION, backend: 'mock', endpoint_kinds: ENDPOINT_KINDS, features, actions, signal, websocket_tls: true };
   },
   'host.app.share'() { return { message: 'Share sheet opened (mock)' }; },
   'host.app.start_on_boot'(p) {

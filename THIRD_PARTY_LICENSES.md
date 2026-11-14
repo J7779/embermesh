@@ -3,7 +3,8 @@
 
 EmberMesh's own code is released under the MIT License (see [LICENSE](LICENSE)). The repository
 also contains the components below, written by other people and kept under their own licences.
-Each code component is vendored **unmodified**, next to its licence file; the search model is
+Each code component is vendored **unmodified**, next to its licence file, except where its entry
+says otherwise (Mbed TLS is trimmed to the files the build uses); the search model is
 converted to a 4-bit format, as described in its entry. Nothing else is bundled: the shared UI
 uses no third-party code, fonts or images, and the Android and iOS shells use only the platforms'
 own frameworks plus ZXing core on Android.
@@ -16,6 +17,7 @@ licensing is explained in [guides/LICENSES.md](guides/LICENSES.md).
 | [Monocypher](#monocypher) | 4.0.2 | `core/third_party/monocypher/` | BSD-2-Clause **or** CC0-1.0, your choice | every app (the core's cryptography) |
 | [doctest](#doctest) | 2.4.11 | `core/third_party/include/doctest.h` | MIT (includes parts under BSL-1.0) | nothing: unit tests only |
 | [miniaudio](#miniaudio) | 0.11.21 | `host/third_party/miniaudio/` | Public domain (Unlicense) **or** MIT-0, your choice | desktop `emberd` (sound-card endpoint) |
+| [Mbed TLS](#mbed-tls) | 3.6.2 (LTS) | `host/third_party/mbedtls/` | Apache-2.0 (dual-licensed upstream as Apache-2.0 **or** GPL-2.0-or-later; used here under Apache-2.0) | desktop `emberd` (`wss://` internet relay links) |
 | [ZXing core](#zxing-core) | 3.5.3 | `apps/android/app/libs/zxing-core-3.5.3.jar` | Apache-2.0 | Android app (QR scanning) |
 | [Gradle wrapper](#gradle-wrapper) | wrapper for Gradle 9.8.2 | `apps/android/gradlew`, `gradlew.bat`, `gradle/wrapper/` | Apache-2.0 | nothing: build tool only |
 | [potion-base-4M](#potion-base-4m-semantic-search-model) (search model) | upstream commit `9b3cff412d30`, converted to 4-bit weights | `models/potion-base-4M/` | MIT | every app, inside `guides.pack` |
@@ -138,6 +140,25 @@ DEALINGS IN THE SOFTWARE.
 - **Licence:** a choice of public domain (the Unlicense) **or** MIT No Attribution (MIT-0).
   Full text: [`host/third_party/miniaudio/LICENSE`](host/third_party/miniaudio/LICENSE) (also at
   the end of `miniaudio.h`). Neither option requires attribution; it is credited here anyway.
+
+## Mbed TLS
+
+- **What:** TLS and X.509 library (the Mbed TLS project, a Linux Foundation / TrustedFirmware
+  project; contributors listed in its sources). Used by the desktop host library's TLS client
+  (`host/src/host/tls.cpp`) for `wss://` internet relay links: client only, TLS 1.2, certificate
+  chain and host name always verified against the operating system's trust store. Not compiled for
+  Android, iOS or the web (they use the platform's TLS).
+- **Version:** 3.6.2 (LTS), from the upstream release tarball (`mbedtls-3.6.2.tar.bz2`, SHA-256
+  `8b54fb9bcf4d5a7078028e0520acddefb7900b3e66fec7f7175bb5b7d85ccdca`). Upstream:
+  <https://github.com/Mbed-TLS/mbedtls>.
+- **Changes:** only the library sources this client configuration compiles and the headers they
+  include are vendored (no tests, programs, scripts, sample keys or certificates). One file is
+  modified: `library/rsa.c` has its `MBEDTLS_SELF_TEST` block (a self-test with an embedded test key
+  pair, never compiled here) removed; the file says so where the block was. The build configuration
+  is EmberMesh's own `host/src/host/tls_mbedtls_config.h`.
+- **Licence:** Apache License 2.0 (upstream offers Apache-2.0 **or** GPL-2.0-or-later; EmberMesh
+  uses it under Apache-2.0). Full text: [`host/third_party/mbedtls/LICENSE`](host/third_party/mbedtls/LICENSE).
+  Mbed TLS ships no NOTICE file.
 
 ## ZXing core
 

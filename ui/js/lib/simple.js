@@ -15,8 +15,8 @@ import { announce, haptic } from './a11y.js';
 /** Plain wording. Exact full-text matches only (so changed source strings simply stop matching). */
 export const GLOSSARY = [
   // navigation and screen titles
-  ['Chats', 'Messages'], ['SOS', 'Send for help'], ['Emergency', 'Send for help'], ['Links', 'Connections'],
-  ['Links & radios', 'Connections'], ['Bulletins', 'Notice board'], ['Instructions', 'How to use'],
+  ['Chats', 'Messages'], ['SOS', 'Send for help'], ['Emergency', 'Send for help'], ['Links', 'Radios and links'],
+  ['Links & radios', 'Radios and links'], ['Bulletins', 'Notice board'], ['Instructions', 'How to use'],
   ['Survival library', 'Guides'], ['People & mesh', 'People'], ['Tools', 'Radio tools'],
   // sections and controls
   ['Safety check-in', 'Tell people how you are'], ['SOS alerts received', 'Calls for help nearby'],

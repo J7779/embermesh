@@ -225,7 +225,8 @@ final class RealCoreLifecycleTests: XCTestCase {
     XCTAssertTrue(types("ws_server").contains("raw"))
     XCTAssertEqual(types("audio"), ["audio"])
     let coreTypes = Set(((a.ok("links.types")["types"] as? [JSONObject]) ?? []).compactMap { $0.string("type") })
-    XCTAssertEqual(coreTypes, ["raw", "stream", "kiss", "audio", "meshtastic", "rnode", "lora_at", "rtl_tcp"])
+    XCTAssertEqual(coreTypes, ["raw", "stream", "kiss", "audio", "meshtastic", "rnode", "lora_at", "rtl_tcp", "relay"])
+    XCTAssertTrue(types("websocket").contains("relay"), "relay links run on the websocket endpoint")
     for k in kinds { XCTAssertTrue(((k["link_types"] as? [String]) ?? []).allSatisfy { coreTypes.contains($0) }, "\(k)") }
     XCTAssertTrue((info["features"] as? [String] ?? []).contains("hub"))
     let actions = info["actions"] as? [JSONObject] ?? []

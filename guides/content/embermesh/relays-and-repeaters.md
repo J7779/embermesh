@@ -1,6 +1,6 @@
 ---
 id: embermesh/relays-and-repeaters
-title: "EmberMesh 22: Relays and Repeaters"
+title: "EmberMesh 23: Relays and Repeaters"
 category: embermesh
 tags: [embermesh, relay, repeater, digipeater, solar, raspberry pi, spare phone, siting, line of sight, radio horizon, fresnel, link budget, coverage, ping]
 summary: "How every EmberMesh node relays, how to build an unattended relay from a battery, solar panel, radio and a small computer or spare phone, how to site it for height and line of sight using the app's planning tools, chaining relays, and testing coverage with ping."
@@ -10,15 +10,18 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 22
+order: 23
 ---
 
 # Relays and Repeaters
 
+This chapter is about mesh relays: devices that pass messages on by radio, Wi-Fi or Bluetooth. The
+optional **internet relay** (a server on the internet) is something else: see [Connections](connections.md).
+
 ## Every node is already a relay
 
 You do not need special equipment to relay. Every EmberMesh node with **Settings → Mesh &
-relaying → Relay messages for others** switched on (the default):
+relaying → Pass on messages for others** switched on (the default):
 
 - re-sends new messages it hears, a limited number of hops;
 - **bridges** between all its links (Bluetooth to radio, Wi-Fi to LoRa ...), except that

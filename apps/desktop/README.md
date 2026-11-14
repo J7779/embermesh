@@ -92,9 +92,9 @@ then `cmake --preset windows-mingw`).
 |---|---|
 | Linux (glibc) | `libc`, `libm` and the dynamic loader only. libstdc++ and libgcc are static. glibc stays dynamic (NSS / `getaddrinfo`), so build on the oldest distribution you want to support. ALSA/PulseAudio/JACK are `dlopen`ed when a sound card is used and are optional. |
 | Linux (musl, e.g. Alpine) | add `-DCMAKE_EXE_LINKER_FLAGS=-static` for a fully static binary with no dependencies |
-| Windows (MSVC) | static CRT (`/MT`). Only DLLs that ship with Windows 10/11: `kernel32`, `ws2_32`, `iphlpapi`, `bcrypt`, `advapi32`, `shell32`. No Visual C++ redistributable. miniaudio loads WASAPI/DirectSound/WinMM at run time. |
+| Windows (MSVC) | static CRT (`/MT`). Only DLLs that ship with Windows 10/11: `kernel32`, `ws2_32`, `iphlpapi`, `bcrypt`, `advapi32`, `shell32`, `crypt32` (the system certificate store, for `wss://`). No Visual C++ redistributable. miniaudio loads WASAPI/DirectSound/WinMM at run time. |
 | Windows (MinGW) | `-static`: no `libstdc++-6.dll`, `libgcc_s_seh-1.dll` or `libwinpthread-1.dll`. The UCRT (part of Windows 10/11) is used. |
-| macOS | system `libc++` and frameworks (CoreFoundation, CoreAudio, AudioToolbox, IOKit) |
+| macOS | system `libc++` and frameworks (CoreFoundation, CoreAudio, AudioToolbox, IOKit, Security) |
 
 Pass `-DEMBER_STATIC_RUNTIME=OFF` to use the shared runtimes, for example for distribution packages.
 Sanitizer builds always use the shared runtime.
@@ -156,6 +156,10 @@ Headless box over SSH: `emberd --console`, or attach to a running service with `
 | `--print-token` | Print the admin token and exit. |
 | `--local-no-token` | Allow `/rpc` from 127.0.0.1 / ::1 without a token. |
 | `--no-udp` | Disable the LAN multicast link (default on: `239.83.77.69:47474`, interoperates with the phone apps on the same Wi-Fi). |
+| `--no-nearby` | Do not advertise/browse `_embermesh._tcp` (mDNS) or link up with nearby devices automatically (see *Nearby devices*). |
+| `--nearby-service NAME` | Use another mDNS service type (testing). |
+| `--relay-broker [PORT]` | Also run the `/mqtt` relay broker on its own port (default 8438); see *A private internet relay*. |
+| `--setup-done` | Acknowledge the Nearby/internet notices for a headless node (what first-run setup does in the app). |
 | `--link JSON` | Bring up a link for this run (repeatable). Same shape as `host.link.create` params. Not saved: the core keeps it with `persist:false`; drop the flag and it is gone. |
 | `--kiss-tcp HOST:PORT` | Shorthand: KISS over TCP (Direwolf: `127.0.0.1:8001`). |
 | `--kiss-serial PORT[:BAUD]` | Shorthand: KISS TNC on a serial port. |
@@ -358,7 +362,7 @@ raw s16le PCM file/FIFO) and feeds the session every ~33 ms; `host.info.features
 ```
 
 **Hub-to-hub bridging** over any IP network: use a `websocket` endpoint to `ws://<other-hub>:8437/ws`
-with a `raw` link. `wss://` is not supported.
+with a `raw` link, or `wss://` when the other hub sits behind a TLS reverse proxy (see *TLS*).
 
 ## Turning a machine into a Wi-Fi hotspot hub (no internet needed)
 
@@ -411,9 +415,105 @@ What anyone on the network can learn **without the admin token**:
 | HTTP | the hub's LAN address and port; header `Server: emberd` |
 | `/download/` | the names and sizes of the files offered there |
 | `/ws` (the mesh bus) | everything any mesh node broadcasts: Public-channel messages, SOS, check-ins, bulletins, and every node's announcement (name, callsign, status, public keys). Direct messages and private channels cross it end-to-end encrypted. |
+| mDNS (Nearby devices) | see below |
+| relay broker (`--relay-broker`, its own port) | that this machine relays; nothing else is readable (topics are random hex, payloads sealed). The broker sees connecting clients' addresses, like any relay. |
+
+**What a LAN observer learns from Nearby devices.** emberd answers and sends multicast DNS on
+224.0.0.251 / ff02::fb port 5353 with exactly these records, nothing else:
+
+| Record | Content |
+|---|---|
+| PTR `_embermesh._tcp.local` | `EmberMesh-<token>._embermesh._tcp.local` |
+| SRV | port of the Nearby TCP listener (47475 if free), host `EmberMesh-<token>.local` (never the computer's host name) |
+| TXT | `ember=1`, `v=1`, `link=stream`, `t=<token>` |
+| A / AAAA `EmberMesh-<token>.local` | the private (RFC 1918 / 169.254) IPv4 addresses of the local-network interfaces and their IPv6 link-local addresses; never public, global or EUI-64 addresses |
+
+`<token>` is 8 random hex digits from the core, new at every start; it is not derived from the node
+id, the computer or the user, and it changes when the network changes. So a passive observer
+learns that a device at this address runs EmberMesh, its listening port, and a token that changes
+at every start and network change. Anyone who connects (and sends the Nearby hello) then sees what
+any mesh neighbour sees: the node's id, display name, callsign, public keys and Public traffic —
+stable identifiers, which is why the app discloses Nearby before it starts. No host name, user
+name, model or version is advertised. Turn it off with `--no-nearby` or Settings → Nearby devices
+(`connectivity.nearby`).
 
 The operator page, `/rpc` and console need the admin token. To rename the hub node later, use
 `--name NEW` (applied at start), console `name NEW`, or the operator page (Settings → Profile).
+
+## Nearby devices (mDNS, automatic links)
+
+While the core reports `nearby.active` (Nearby on, first-run setup done, node unlocked;
+`--no-nearby` turns the host side off), emberd listens for Nearby TCP connections, advertises
+`_embermesh._tcp` with its own small mDNS responder (no Avahi/Bonjour library; it shares port 5353
+with the OS responder through address/port reuse), browses for other instances and links up with
+them by itself (docs/CONNECTIVITY.md §3). Nothing starts before the first-run notice has been
+acknowledged: by the operator page's setup screen, or `--setup-done` for a headless node (emberd
+prints the notice text at start while it is pending). On lock, wipe or duress everything stops.
+
+- the node with the smaller token dials; the other dials too if no connection from that peer
+  arrives within 8 s (one side may not see the other's announcements);
+- addresses are tried IPv6 link-local first, then IPv4, 250 ms apart (first to connect wins);
+- each connection is a core `stream` link with `preset:"nearby"` (the core sends and requires the
+  8-byte hello, so a browser request cannot inject frames) created with `links.add {auto:"nearby",
+  auto_role, auto_key}` (`"<token>@<address>"` dialing, `"@<address>"` accepting; not persisted); a
+  nearby link whose connection ends is removed and rediscovery makes a new one; when the core removes
+  a link (`link.removed`: duplicate, hello failed, evicted, Nearby off, locked) emberd closes it;
+- the listener is bound only to the local-network interface addresses (private IPv4, IPv6
+  link-local), never to every interface; a change of those addresses is a network change:
+  `connectivity.network_changed` gives a new token and emberd re-advertises;
+- limits: inbound only from on-link sources, at most 2 connections per source IPv4 address or IPv6
+  /64 and 4 new per minute per source; outbound only to on-link addresses from the mDNS answer, at
+  most 4 per instance and 4 new dials per minute; the core caps nearby links at 16; the mDNS parser
+  drops malformed packets (bounded names, no compression loops, ≤ 64 records per section, TXT ≤ 1300
+  bytes, valid UTF-8), ignores responses not from port 5353 and processes at most 40 packets/s per
+  sender and 500/s in total.
+
+`host.info` has feature `nearby` and a `nearby` status object (port, links, devices seen, mDNS
+counters). `--nearby-service NAME` uses another service type (tests use a private one so they
+never meet real devices).
+
+## A private internet relay (`--relay-broker`)
+
+`emberd --relay-broker [PORT]` also runs a minimal MQTT 3.1.1 broker over WebSocket (path `/mqtt`,
+subprotocol `mqtt`) on **its own listener** (default port 8438; nothing else is served there — not
+the web app, `/ws` or `/rpc`), so a machine reachable from the internet is a private relay with no
+third party (CONNECTIVITY §4.12). Off by default. Topics and subscriptions must be exactly 32
+lowercase hex characters (what relay links use): `#`, `+`, `$…` and anything else are refused
+(SUBACK 0x80), PUBLISHes elsewhere are denied, retain/will/QoS > 0 are ignored, nothing is stored.
+Limits: ≤ 200 clients, ≤ 4 per source address, ≤ 256 subscriptions and 100 messages/s per client,
+≤ 50 messages/s per topic, packets ≤ 4400 bytes (a sealed relay frame is ≤ 4137), slow subscribers
+dropped after 15 s. It never logs topics, client ids or payloads.
+
+Phones, browsers and emberd connect to relays only with `wss://`, and the broker has no TLS of its
+own, so put it behind a TLS-terminating reverse proxy that **forwards only `/mqtt`**. Example with Caddy
+(automatic certificates) on a machine reachable as `relay.example.org`:
+
+```
+relay.example.org {
+  reverse_proxy /mqtt 127.0.0.1:8438
+}
+```
+
+or nginx:
+
+```
+location = /mqtt {
+  proxy_pass http://127.0.0.1:8438;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+  proxy_set_header X-Forwarded-For $remote_addr;
+  proxy_read_timeout 600s;
+}
+```
+
+Run `emberd --bind 127.0.0.1 --relay-broker` (hub and broker reachable only through the proxy),
+forward only TCP 443 to the proxy, and add `wss://relay.example.org/mqtt` as a relay in Settings →
+Internet relay on every device. The proxy must set `X-Forwarded-For` (Caddy does by default): for
+connections from this machine the broker takes the last entry as the client address for its
+per-source limit. Never expose the hub port (8437: `/`, `/ws`, `/rpc`) to the internet. The relay sees
+what any relay sees (CONNECTIVITY §4.4: client addresses, timing, sizes, which addresses share a
+topic) and nothing else; anyone who can reach the URL can use it, within the limits above.
 
 ## Security notes
 
@@ -436,9 +536,29 @@ The operator page, `/rpc` and console need the admin token. To rename the hub no
 - The HTTP server is hardened against path traversal, oversized headers and slow clients; at most 48
   connections per LAN address (loopback is exempt), `max_guests` (200) on the bus.
 
+## TLS (`wss://` and the internet relay)
+
+The `websocket` endpoint speaks `wss://` through a TLS client built on the vendored Mbed TLS 3.6
+(`host/third_party/mbedtls`, Apache-2.0; build option `EMBER_HOST_TLS`, ON by default on desktop).
+TLS 1.2 with ECDHE and AEAD ciphers; the certificate chain and the host name are **always**
+verified (there is no switch to turn that off) against the operating system's trust anchors: the
+Security framework's anchors on macOS, the `ROOT` system store on Windows, the distribution's CA
+bundle on Linux (`/etc/ssl/certs/ca-certificates.crt` and the other usual paths). Setting
+`SSL_CERT_FILE` to a PEM file **replaces** those anchors on every platform, for a private CA.
+`host.info` reports `websocket_tls:true` and the `relay` feature.
+
+Internet relay links are created automatically, never by hand: once the user has agreed to the
+internet relay (Settings → Internet relay), emberd opens one `wss://` connection per enabled relay
+while the node is unlocked, follows changes to the list, and closes them all when the relay is
+turned off or the node is locked. Relay sockets send no `User-Agent`, carry messages of at most
+8 KiB, accept `ws://` only for a relay added with `allow_plaintext` to a `.local`, private or
+link-local address, and reconnect with a backoff of 2 s doubling to 5 min (±20 %), reset after 2
+minutes connected. TLS 1.3 is not enabled yet (it needs the PSA crypto layer); every public broker
+used by the defaults speaks TLS 1.2.
+
 ## Limitations
 
-- No `wss://` or `https://`: the WebSocket client endpoint supports `ws://` only.
+- No `https://` client and no TLS on the hub itself (put a reverse proxy in front for that).
 - Windows code paths (Winsock, Win32 serial, WASAPI through miniaudio) are compiled in CI;
   serial ports and sound cards on Windows have not been exercised.
 - Not verified with real radios, TNCs, sound cards or SDR dongles (see *Tests* for what was).

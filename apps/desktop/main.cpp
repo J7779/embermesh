@@ -83,6 +83,13 @@ Usage: emberd [options]
   --local-no-token          allow /rpc from this computer without the token
   --captive-portal          redirect OS connectivity probes to the hub page
   --no-udp                  disable the LAN multicast link (239.83.77.69:47474)
+  --no-nearby               do not advertise/browse _embermesh._tcp (mDNS) or link up with nearby
+                            devices (also: Settings > Nearby devices = connectivity.nearby)
+  --nearby-service NAME     mDNS service type to use instead of _embermesh._tcp (testing)
+  --relay-broker [PORT]     also run the /mqtt relay broker on its own port (default 8438), for
+                            a hub used as a private internet relay behind a TLS reverse proxy
+  --setup-done              acknowledge the Nearby/internet notices for a headless node (what the
+                            app's first-run setup does); without it Nearby starts only after setup
   --link JSON               bring up a link at start (host.link.create params; repeatable)
   --kiss-tcp HOST:PORT      KISS over TCP (Direwolf: 127.0.0.1:8001)
   --kiss-serial PORT[:BAUD] KISS TNC on a serial port
@@ -287,6 +294,19 @@ bool parse_cli(int argc, char** argv, Json* o) {
       o->set("local_no_token", true);
     } else if (a == "--no-udp") {
       o->set("udp", false);
+    } else if (a == "--setup-done") {
+      o->set("setup_done", true);
+    } else if (a == "--relay-broker") {
+      o->set("relay_broker", true);
+      uint64_t bp;
+      if (i + 1 < argc && parse_u64(argv[i + 1], &bp) && bp > 0 && bp <= 65535) {
+        o->set("relay_broker_port", double(bp));
+        ++i;
+      }
+    } else if (a == "--no-nearby") {
+      o->set("nearby", false);
+    } else if (a == "--nearby-service") {
+      if (!val("nearby_service")) return false;
     } else if (a == "--console") {
       o->set("console", true);
     } else if (a == "--attach") {
@@ -678,6 +698,10 @@ int main(int argc, char** argv) {
   hc.hub_autostart = opts.get("hub").as_bool(true);
   hc.hub_restore = hc.hub_autostart;  // --no-hub also keeps a saved hub link down
   hc.hub_port = uint16_t(cfg_int(opts, "port", 8437));
+  hc.nearby = opts.get("nearby").as_bool(true);
+  hc.hub_mqtt = opts.get("relay_broker").as_bool(false);
+  hc.hub_mqtt_port = uint16_t(cfg_int(opts, "relay_broker_port", 8438));
+  hc.nearby_service = opts.get("nearby_service").as_string(hc.nearby_service);
   hc.hub_bind = opts.get("bind").as_string("0.0.0.0");
   if (hc.web_root.empty() && hc.hub_autostart)
     EH_LOGW("no web root found (use --web-root DIR): serving the built-in fallback page");
@@ -760,6 +784,17 @@ int main(int argc, char** argv) {
   }
 
   if (locked_at_start && !is_locked()) apply_profile([&](const std::string& m, const Json& p) { return host->call(m, p); });
+
+  // Connectivity disclosure (CONNECTIVITY §3.9): nothing automatic starts until it is acknowledged.
+  if (!is_locked()) {
+    if (opts.get("setup_done").as_bool(false)) host->call("connectivity.set", Json::parse_or_null(R"({"setup_done":true})"));
+    Json cg = host->call("connectivity.get", Json::object());
+    const Json& cr = cg.get("result");
+    if (cg.get("ok").as_bool(false) && !cr.get("setup_done").as_bool(true)) {
+      std::printf("  Nearby devices: waiting for first-run setup (operator page) or --setup-done.\n    %s\n",
+                  cr.get("nearby").get("notice").as_string().c_str());
+    }
+  }
 
   // ---- banner ----
   Json info = host->call("node.info", Json::object());

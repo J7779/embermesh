@@ -140,183 +140,6 @@ final class PcmFeeder {
   }
 }
 
-/// Camera → luma of the ROI per frame, with a native preview shown where the UI asks.
-final class CameraLumaCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
-  let feeder: LightFeeder
-  private let queue = DispatchQueue(label: "org.embermesh.capture.camera", qos: .userInitiated)
-  private var session: AVCaptureSession?
-  private var device: AVCaptureDevice?
-  private(set) var roi: CaptureROI
-  private var preview: CapturePreviewView?
-  private var lockAt: Date?
-  private(set) var frames = 0
-  private(set) var exposureLocked = false
-
-  init(feeder: LightFeeder, roi: CaptureROI) {
-    self.feeder = feeder
-    self.roi = roi
-  }
-
-  static var hasCamera: Bool {
-    #if targetEnvironment(simulator)
-    return false
-    #else
-    return AVCaptureDevice.default(for: .video) != nil
-    #endif
-  }
-
-  /// Starts the camera (back by default). Throws `unsupported` without a camera, `denied` without permission.
-  func start(camera: String, previewIn host: UIView?, rect: CGRect?, completion: @escaping (RPCError?) -> Void) {
-    AVCaptureDevice.requestAccess(for: .video) { ok in
-      guard ok else { completion(.denied("Camera permission is off. Turn it on in Settings > EmberMesh > Camera.")); return }
-      self.queue.async {
-        let pos: AVCaptureDevice.Position = camera == "front" ? .front : .back
-        guard let dev = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: pos) ?? AVCaptureDevice.default(for: .video) else {
-          completion(.unsupported("no camera on this device")); return
-        }
-        let s = AVCaptureSession()
-        s.beginConfiguration()
-        if s.canSetSessionPreset(.vga640x480) { s.sessionPreset = .vga640x480 }
-        guard let input = try? AVCaptureDeviceInput(device: dev), s.canAddInput(input) else {
-          completion(.io("cannot open the camera")); return
-        }
-        s.addInput(input)
-        let out = AVCaptureVideoDataOutput()
-        out.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
-        out.alwaysDiscardsLateVideoFrames = true
-        out.setSampleBufferDelegate(self, queue: self.queue)
-        guard s.canAddOutput(out) else { completion(.io("cannot read camera frames")); return }
-        s.addOutput(out)
-        s.commitConfiguration()
-        CameraLumaCapture.configureFastFrames(dev)
-        self.session = s
-        self.device = dev
-        self.lockAt = Date().addingTimeInterval(0.8)   // meter the scene first, then lock
-        s.startRunning()
-        DispatchQueue.main.async {
-          if let host, let rect { self.showPreview(in: host, rect: rect) }
-          completion(nil)
-        }
-      }
-    }
-  }
-
-  /// Highest frame rate ≤ 60 fps at ≤ 640×480 (more samples per Morse element), continuous AF/AE
-  /// until the lock.
-  static func configureFastFrames(_ dev: AVCaptureDevice) {
-    guard (try? dev.lockForConfiguration()) != nil else { return }
-    defer { dev.unlockForConfiguration() }
-    var best: (AVCaptureDevice.Format, Double)?
-    for f in dev.formats {
-      let d = CMVideoFormatDescriptionGetDimensions(f.formatDescription)
-      guard d.width <= 1280, d.height <= 720 else { continue }
-      let maxRate = f.videoSupportedFrameRateRanges.map { $0.maxFrameRate }.max() ?? 0
-      let rate = min(60, maxRate)
-      if best == nil || rate > best!.1 { best = (f, rate) }
-    }
-    if let (f, rate) = best, rate >= 30 {
-      dev.activeFormat = f
-      let dur = CMTime(value: 1, timescale: CMTimeScale(rate))
-      dev.activeVideoMinFrameDuration = dur
-      dev.activeVideoMaxFrameDuration = dur
-    }
-    if dev.isExposureModeSupported(.continuousAutoExposure) { dev.exposureMode = .continuousAutoExposure }
-    if dev.isFocusModeSupported(.continuousAutoFocus) { dev.focusMode = .continuousAutoFocus }
-  }
-
-  private func lockExposure() {
-    guard let dev = device, (try? dev.lockForConfiguration()) != nil else { return }
-    if dev.isExposureModeSupported(.locked) { dev.exposureMode = .locked }
-    if dev.isFocusModeSupported(.locked) { dev.focusMode = .locked }
-    if dev.isWhiteBalanceModeSupported(.locked) { dev.whiteBalanceMode = .locked }
-    dev.unlockForConfiguration()
-    exposureLocked = true
-  }
-
-  func update(rect: CGRect?, roi: CaptureROI?, host: UIView?) {
-    if let roi { queue.async { self.roi = roi } }
-    DispatchQueue.main.async {
-      if let roi { self.preview?.roi = roi }
-      if let rect {
-        if let p = self.preview { p.frame = rect } else if let host { self.showPreview(in: host, rect: rect) }
-      }
-    }
-  }
-
-  func stop() {
-    queue.sync {
-      session?.stopRunning()
-      session = nil
-      device = nil
-      feeder.flush()
-    }
-    DispatchQueue.main.async { self.preview?.removeFromSuperview(); self.preview = nil }
-  }
-
-  private func showPreview(in host: UIView, rect: CGRect) {
-    guard let s = session else { return }
-    let v = CapturePreviewView(session: s, roi: roi)
-    v.frame = rect
-    host.addSubview(v)
-    preview = v
-  }
-
-  // MARK: frames (camera queue; also called by tests with synthetic buffers)
-
-  func process(_ sb: CMSampleBuffer) {
-    guard let pb = CMSampleBufferGetImageBuffer(sb) else { return }
-    let t = CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sb)) * 1000
-    guard t.isFinite else { return }
-    CVPixelBufferLockBaseAddress(pb, .readOnly)
-    defer { CVPixelBufferUnlockBaseAddress(pb, .readOnly) }
-    let planar = CVPixelBufferIsPlanar(pb)
-    guard let base = planar ? CVPixelBufferGetBaseAddressOfPlane(pb, 0) : CVPixelBufferGetBaseAddress(pb) else { return }
-    let w = planar ? CVPixelBufferGetWidthOfPlane(pb, 0) : CVPixelBufferGetWidth(pb)
-    let h = planar ? CVPixelBufferGetHeightOfPlane(pb, 0) : CVPixelBufferGetHeight(pb)
-    let bpr = planar ? CVPixelBufferGetBytesPerRowOfPlane(pb, 0) : CVPixelBufferGetBytesPerRow(pb)
-    let level = LumaMath.mean(base: UnsafeRawPointer(base), width: w, height: h, bytesPerRow: bpr, roi: roi)
-    frames += 1
-    feeder.add(timeMs: t, level: level)
-    if let at = lockAt, Date() >= at { lockAt = nil; lockExposure() }
-  }
-
-  func captureOutput(_ output: AVCaptureOutput, didOutput sb: CMSampleBuffer, from connection: AVCaptureConnection) {
-    process(sb)
-  }
-}
-
-/// Native camera preview with the watched region outlined.
-final class CapturePreviewView: UIView {
-  private let layerPreview: AVCaptureVideoPreviewLayer
-  private let box = CAShapeLayer()
-  var roi: CaptureROI { didSet { setNeedsLayout() } }
-
-  init(session: AVCaptureSession, roi: CaptureROI) {
-    layerPreview = AVCaptureVideoPreviewLayer(session: session)
-    self.roi = roi
-    super.init(frame: .zero)
-    layerPreview.videoGravity = .resizeAspectFill
-    layer.addSublayer(layerPreview)
-    box.strokeColor = UIColor.systemOrange.cgColor
-    box.fillColor = UIColor.clear.cgColor
-    box.lineWidth = 2
-    layer.addSublayer(box)
-    clipsToBounds = true
-    layer.cornerRadius = 8
-    isUserInteractionEnabled = false
-    accessibilityLabel = "Camera preview for reading Morse light"
-  }
-  required init?(coder: NSCoder) { fatalError() }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    layerPreview.frame = bounds
-    // ROI is in frame fractions; map through the preview layer's own aspect-fill conversion.
-    let r = layerPreview.layerRectConverted(fromMetadataOutputRect: CGRect(x: roi.x, y: roi.y, width: roi.w, height: roi.h))
-    box.path = UIBezierPath(rect: r.isEmpty ? bounds.insetBy(dx: bounds.width * 0.4, dy: bounds.height * 0.4) : r).cgPath
-  }
-}
-
 /// Microphone → PCM at the session rate. Shares the running sound link's input when there is one
 /// (two engines would fight over the one input); otherwise runs its own AVAudioEngine with the same
 /// measurement-mode session the audio endpoint uses.
@@ -386,13 +209,54 @@ final class CaptureService {
   var previewHost: () -> UIView? = { nil }
   var onEvent: ((String, JSONObject) -> Void)?
   private(set) var camera: CameraLumaCapture?
+  private(set) var preview: PreviewPlacer?
   private(set) var mic: MicPcmCapture?
+  /// Tests / simulator: run the camera pipeline without AVCaptureSession (frames via process()).
+  var simulateCamera = false
+  /// node.info.features of the core (nil = unknown): "morse_frames" means the §12 tracker exists.
+  var coreFeatures: () -> [String]? = { nil }
+  private var observers: [NSObjectProtocol] = []
 
-  init(sink: MorseFeedSink?) { self.sink = sink }
+  init(sink: MorseFeedSink?) {
+    self.sink = sink
+    // The camera (and mic) are released when the app leaves the screen or the device locks.
+    let nc = NotificationCenter.default
+    for n in [UIApplication.didEnterBackgroundNotification, UIApplication.protectedDataWillBecomeUnavailableNotification] {
+      observers.append(nc.addObserver(forName: n, object: nil, queue: .main) { [weak self] _ in self?.stopAll(reason: "background") })
+    }
+    observers.append(nc.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+      self?.updateOrientation()
+    })
+  }
+  deinit { observers.forEach { NotificationCenter.default.removeObserver($0) } }
+
+  private func updateOrientation() {
+    guard let cam = camera else { return }
+    let o = previewHost()?.window?.windowScene?.interfaceOrientation ?? .portrait
+    cam.orientation = GridOrientation.forInterface(o, front: cam.front)
+    if let l = preview?.view.previewLayer?.connection, l.isVideoOrientationSupported {
+      l.videoOrientation = AVCaptureVideoOrientation(rawValue: o.rawValue) ?? .portrait
+    }
+    preview?.layout()
+  }
+
+  /// Background, lock, page left: everything off at once (RPC_API §12 privacy).
+  func stopAll(reason: String) {
+    let had = camera != nil || mic != nil
+    stopCamera()
+    mic?.stop(); mic = nil
+    if had { onEvent?("host.capture.state", ["running": false, "reason": reason]) }
+  }
+
+  private func stopCamera() {
+    preview?.remove(); preview = nil
+    camera?.stop(); camera = nil
+  }
 
   static var features: [String] {
     var f = ["capture_mic_pcm"]
     if CameraLumaCapture.hasCamera { f.insert("capture_camera_luma", at: 0) }
+    f.append("capture_grid")   // camera_luma feeds §12 frames (whole-frame grids), not an ROI
     return f
   }
 
@@ -409,15 +273,26 @@ final class CaptureService {
     guard let sink else { completion(.failure(.busy("node is not running"))); return }
     switch kind {
     case "camera_luma":
-      guard CameraLumaCapture.hasCamera else { completion(.failure(.unsupported("this device has no camera"))); return }
-      camera?.stop()
-      let feeder = LightFeeder(session: session, sink: sink)
-      let cam = CameraLumaCapture(feeder: feeder, roi: CaptureROI(json: p.object("roi")) ?? CaptureROI())
-      feeder.onError = { [weak self] e in self?.failed("camera_luma", e) }
+      guard CameraLumaCapture.hasCamera || simulateCamera else { completion(.failure(.unsupported("this device has no camera"))); return }
+      stopCamera()
+      let cam = CameraLumaCapture(session: session, sink: sink, roi: CaptureROI(json: p.object("roi")) ?? CaptureROI())
+      cam.onFatal = { [weak self] e in self?.failed("camera_luma", e) }
+      cam.onTarget = { [weak self] t, aspect in
+        DispatchQueue.main.async { if self?.camera === cam { self?.preview?.view.setTarget(t, aspect: aspect) } }
+      }
+      if let f = coreFeatures(), !f.contains("morse_frames") { cam.useLevelsFeed() }
       camera = cam
-      cam.start(camera: p.string("camera") ?? "back", previewIn: previewHost(), rect: CaptureService.rect(p.object("rect"))) { err in
+      let o = previewHost()?.window?.windowScene?.interfaceOrientation ?? .portrait
+      cam.orientation = GridOrientation.forInterface(o, front: p.string("camera") == "front")
+      let rect = CaptureService.rect(p.object("rect"))
+      cam.start(camera: p.string("camera") ?? "back", simulated: simulateCamera) { err in
         DispatchQueue.main.async {
-          if let err { self.camera = nil; completion(.failure(err)) } else { completion(.success([:])) }
+          guard self.camera === cam else { cam.stop(); completion(.failure(.busy("stopped"))); return }
+          if let err { self.camera = nil; completion(.failure(err)); return }
+          if let rect, let host = self.previewHost() { self.showPreview(cam, in: host, css: rect) }
+          self.updateOrientation()
+          // zoom_steps: proposed additive field (RPC_API §12 has no zoom yet), set with host.capture.update {zoom}.
+          completion(.success(["zoom_steps": cam.zoomSteps]))
         }
       }
     case "mic_pcm":
@@ -437,16 +312,26 @@ final class CaptureService {
     }
   }
 
+  private func showPreview(_ cam: CameraLumaCapture, in host: UIView, css: CGRect) {
+    let v = CapturePreviewView(session: cam.captureSession)
+    let placer = PreviewPlacer(view: v, host: host, css: css)
+    placer.onNavigate = { [weak self] in self?.stopAll(reason: "page") }
+    preview = placer
+  }
+
   func update(_ p: JSONObject, completion: RPCCompletion) {
     guard p.string("kind") == "camera_luma" else { completion(.success([:])); return }  // nothing to update for the mic
     guard let cam = camera else { completion(.failure(.notFound("camera capture is not running"))); return }
-    cam.update(rect: CaptureService.rect(p.object("rect")), roi: CaptureROI(json: p.object("roi")), host: previewHost())
+    if let r = CaptureService.rect(p.object("rect")) {
+      if let pl = preview { pl.update(css: r) } else if let host = previewHost() { showPreview(cam, in: host, css: r) }
+    }
+    if let z = p.number("zoom") { cam.setZoom(z) }
     completion(.success([:]))
   }
 
   func stop(_ p: JSONObject, completion: RPCCompletion) {
     let kind = p.string("kind")
-    if kind == nil || kind == "camera_luma" { camera?.stop(); camera = nil }
+    if kind == nil || kind == "camera_luma" { stopCamera() }
     if kind == nil || kind == "mic_pcm" { mic?.stop(); mic = nil }
     completion(.success([:]))
   }
@@ -454,7 +339,7 @@ final class CaptureService {
   /// The core closed the session (60 s without feed, morse.rx.stop) or rejected a feed.
   private func failed(_ kind: String, _ e: RPCError) {
     DispatchQueue.main.async {
-      if kind == "camera_luma" { self.camera?.stop(); self.camera = nil } else { self.mic?.stop(); self.mic = nil }
+      if kind == "camera_luma" { self.stopCamera() } else { self.mic?.stop(); self.mic = nil }
       emberLog("capture \(kind) stopped: \(e)")
       self.onEvent?("host.capture.state", ["kind": kind, "running": false, "error": e.message])
     }

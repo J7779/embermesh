@@ -8,6 +8,7 @@ import { formatPos, validPos, dateTime, formatBytes, timeAgo } from '../lib/form
 import { REGIONS } from './setup.js';
 import { meshFields, validateSettings, SETTINGS_DEFAULTS, hostActions } from '../lib/core_spec.js';
 import { APP_LICENCE, THIRD_PARTY, licenceSummary } from '../lib/about.js';
+import { loadConnectivity, connectionsSection } from '../lib/connectivity.js';
 
 
 /** Split a base64 bundle into QR-sized frames: "EMB1 <i>/<n> <data>". Pure; exported for tests. */
@@ -158,8 +159,16 @@ export default async function render(app, params, root) {
       h('dt', null, 'Core features'), h('dd', null, (info.features || []).join(', ') || '—')),
     await licencesSection(app));
 
+  // ---- connections: Nearby devices and the internet relay (RPC_API §11)
+  const connections = connectionsSection(app, await loadConnectivity(app).catch(() => null));
+
   const { settingsEntry } = await import('./accessibility.js');
-  append(page, h('div', { class: 'page-head' }, h('h1', null, 'Settings'), h('a', { class: 'btn small', href: '#/help' }, icon('info', { size: 18 }), 'Instructions')), settingsEntry(), profile, appearance, mesh, position, time, identity, security, bundles, device, about);
+  append(page, h('div', { class: 'page-head' }, h('h1', null, 'Settings'), h('a', { class: 'btn small', href: '#/help' }, icon('info', { size: 18 }), 'Instructions')), settingsEntry(), profile, connections.el, appearance, mesh, position, time, identity, security, bundles, device, about);
+  // #/settings/connections (from the status strip when no link is up): go straight there
+  if (params && params.rest && params.rest[0] === 'connections') {
+    requestAnimationFrame(() => { connections.el.scrollIntoView({ block: 'start' }); const hd = connections.el.querySelector('h2'); if (hd) hd.focus({ preventScroll: true }); });
+  }
+  return connections.cleanup;
 }
 
 // ---------------------------------------------------------------- licences (About)

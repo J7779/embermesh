@@ -1,16 +1,16 @@
 ---
 id: embermesh/morse-reading
-title: "EmberMesh 26: Sending and Reading Morse by Light and Sound"
+title: "EmberMesh 27: Sending and Reading Morse by Light and Sound"
 category: embermesh
 tags: [embermesh, morse, cw, flashlight, lamp, camera, microphone, signalling, decoder, reader, prosigns, practice, sos]
-summary: "Using the Morse screen to send Morse by flashlight, screen or tone and to read it in real time with the camera (a flashlight, lamp or blinking screen) or the microphone (a radio speaker, whistle or tone), with the speeds that work, aiming and the watched box, platform notes, working with people who have no app, a Morse table with prosigns, and practice drills."
+summary: "Using the Morse screen to send Morse by flashlight, screen or tone and to read it in real time with the camera (a flashlight, lamp or blinking screen) or the microphone (a radio speaker, whistle or tone), with the speeds that work, how the camera finds the light by itself, platform notes, working with people who have no app, a Morse table with prosigns, and practice drills."
 source: original
 source_title: EmberMesh Operator Manual
 license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 26
+order: 27
 ---
 
 # Sending and Reading Morse by Light and Sound
@@ -60,8 +60,8 @@ at all**: one flashes it, the other's camera reads it.
    it** has a button **Open the camera reader**).
 2. Rest the phone on something steady, point the back camera at the sender's light, tap **Start
    reading** and tell the sender to begin.
-3. Tap the light in the picture (or tick **Find the blinking light automatically**). Text appears in
-   the transcript as it is decoded. Details: section 3.
+3. The reader finds the blinking light by itself and puts a ring on it; text appears in the
+   transcript as it is decoded. Details: section 3.
 
 ### Advice that matters
 
@@ -111,32 +111,53 @@ screen** / **Cancel**; with reduced motion or Simple mode it asks every time.
 
 ## 3. Reading with the camera
 
-1. **Read by camera**. Choose **Back camera** or **Front camera**.
-2. Tap **Start reading** and allow camera access.
-3. **Aim:** hold the device still (rest it on something), with the other light in the picture.
-4. **The watched box:** the reader only looks at a small box in the picture. **Tap the light, or
-   drag the box onto it.** Or tick **Find the blinking light automatically** and let it search.
-5. Watch the status card: the **lamp** lights on each flash, the **level** bar shows brightness with
-   its threshold mark, the dots and dashes of the character being received appear next to it, and
-   below it the estimated **WPM** and **quality**. Text appears in the transcript as characters are
-   recognised.
+There is no box to place: the reader watches the whole picture and **finds the blinking light by
+itself**, even a distant flashlight that is only a few dots in the picture.
 
-Hints the reader gives, and what to do:
+1. **Read by camera**, then **Start reading**. The first time, allow camera access (it is asked
+   only now, not before). The back camera is used.
+2. **Point the camera roughly at the blinking light** and hold it there. Start reading before the
+   sender begins, so the first characters are not lost.
+3. Watch the line under the picture:
 
-| Hint | Do |
+| Line | Meaning, and what to do |
 |---|---|
-| Too dark to see a light. Point the camera at the light, or move closer. | Aim at the light; get closer |
-| The watched area is fully bright. Tap a darker spot next to the light, or place the box exactly on it. | Move the box, or step back; avoid pointing at the sun or a bright sky |
-| Nothing is blinking in the box. Tap the light, or turn on "Find the blinking light". | Move the box onto the light |
+| Point the camera at a blinking light, then press Start reading. | Not reading yet |
+| Looking for a blinking light… | Searching. Keep the light in the picture and wait for it to blink a few times |
+| Reading the light | Found: a **ring** marks the light being read, the **lamp** next to the line lights with each flash, the dots and dashes of the current character appear, and text arrives in the transcript |
+| Lost the light — keep the camera on it | Not seen for about 2 seconds. Point back at it; the reader picks it up again by itself and keeps the text so far |
+
+- Below it the reader shows the speed and how clear the signal is, for example **12 WPM · signal
+  good** (or **fair**, **weak**).
+- **Several lights blink: tap the one to read.** If more than one light is blinking, tap the right
+  one in the picture. **Automatic** (shown after a tap) lets the reader choose again by itself.
+- **Zoom:** where the camera offers it, buttons such as **1×**, **2×** and **5×** appear under the
+  picture. Zoom in on a far, small light.
+
+**Practical advice:**
+
+- **Hold the device as still as you can**; resting it on a wall or a backpack is best. The reader
+  follows a light that drifts a little in the picture.
+- **Darker is better:** a bright light against a dark background stands out most. Do not point the
+  camera at the sun or a bright sky.
+- Lights that stay on, lights that move without blinking, and the flicker of mains lamps and screens
+  are ignored on purpose.
+- If characters come out wrong or as `□`, ask the sender to go **slower**.
 
 **Speeds that work** (measured on simulated phone cameras): the reader needs about **two camera
 frames per dot**. That is roughly **9 WPM at 15 frames per second, 15 WPM at 24 fps, 20 WPM at
 30 fps**, and 25 WPM or more at 60 fps. Below about 1.8 frames per dot it fails quickly. Most phone
 cameras run at 24-30 fps, so **ask senders to keep to 10-15 WPM**; hand keying is fine.
 
-**Distance and daylight:** the screen says it works "from a few metres up to as far as the camera
-can see the light". That has not been measured with real lights. Darkness, a bright point light and
-a steady device help; in daylight a dim light may not stand out. **Try it** at the distance you need.
+**Distance and daylight:** the screen's tip says it works "from a few metres to as far as the camera
+can see the light, day or night". That has not been measured: the automatic light finder was tested
+on simulated scenes and in the phone apps' own tests, **not with real devices outdoors**. In
+daylight a dim light may not stand out. **Try it** at the distance you need.
+
+**Privacy:** camera pictures never leave the device. Only a coarse brightness pattern goes to the
+decoder; nothing is stored, logged or sent to the mesh. The camera is released when you press
+**Stop**, leave the screen or the app goes to the background ("The camera stopped when the app went
+to the background. Press Start reading to go on.").
 
 ## 4. Reading by sound
 
@@ -160,17 +181,17 @@ to its speaker.
   with a prosign are written as the prosign: `+` as `<AR>`, `=` as `<BT>`, `(` as `<KN>`, `&` as
   `<AS>`.
 - `□` marks a group of dots and dashes the reader could not decode.
-- Buttons: **Clear**, **Copy**, **Send as message…** (send the text into a chat), **Save to notes**
-  (a note titled "Morse received ...").
-- Reading stops when the app leaves the screen. A reading session that gets no input for a minute
-  ends ("Press Start again").
+- Buttons: **Copy**, **Send as message…** (send the text into a chat) and **Clear**. Tick **Save to
+  Notes when I stop** to keep the text as a note titled "Morse received ..." ("Saved to Notes").
+- Reading stops when the app leaves the screen. After a long pause with no input it stops by itself
+  ("Reading stopped after a long pause. Press Start reading to go on.").
 
 ## 6. Per platform
 
 | Platform | Camera | Microphone |
 |---|---|---|
-| Android | The app's own camera capture (exposure and white balance locked after a moment, so auto exposure cannot swamp the flashes), or the in-page camera | Yes, also while a sound-card link uses the microphone |
-| iPhone / iPad | The app's own camera capture with exposure, focus and white balance locked; the in-page camera as an option (**Use the in-page camera instead of the app’s**) | Yes |
+| Android | The app's own camera capture of the whole picture (exposure turned down and locked once the light is found, white balance locked, so a bright point cannot swamp the flashes); zoom steps where the camera has them | Yes, also while a sound-card link uses the microphone |
+| iPhone / iPad | The app's own camera capture of the whole picture, exposure locked once the light is found, white balance locked; zoom steps where the camera has them | Yes |
 | Browser | Only on a secure page: the single file, `https` or `localhost`. **Not on a plain-http hub page** | Same |
 | Computer hub | On the operator page the browser captures camera and microphone | Also from the console: `morse listen` (default input, or `morse listen USB Audio`), `morse status`, `morse stop` |
 

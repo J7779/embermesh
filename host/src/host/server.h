@@ -67,6 +67,9 @@ class HttpServer {
     std::function<void(WsConn&)> on_open;
     std::function<void(WsConn&, uint8_t opcode, std::string& data)> on_message;
     std::function<void(WsConn&)> on_close;
+    // Subprotocols this route speaks (Sec-WebSocket-Protocol). The first one the client offers is
+    // echoed in the 101 response; a client that offers none is still accepted.
+    std::vector<std::string> subprotocols;
   };
   using Handler = std::function<void(const HttpRequest&, const SockAddr& peer, HttpResponse&)>;
 

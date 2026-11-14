@@ -1,6 +1,6 @@
 ---
 id: embermesh/building-from-source
-title: "EmberMesh 31: Building EmberMesh from Source"
+title: "EmberMesh 32: Building EmberMesh from Source"
 category: embermesh
 tags: [embermesh, build, source, compile, build.sh, cmake, emscripten, android, ios, raspberry pi, toolchain, tests, offline]
 summary: "For whoever inherits the code: rebuilding every EmberMesh app from this repository with ./build.sh, its targets and options, the toolchains each target needs, where the results go, and how to keep everything rebuildable without internet."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 31
+order: 32
 ---
 
 # Building EmberMesh from Source

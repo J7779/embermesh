@@ -175,6 +175,7 @@ void Node::open_storage() {
 }
 
 void Node::reset_storage(const std::string* duress_passphrase) {
+  connectivity_shutdown(duress_passphrase ? "locked" : "wipe");  // before any new identity comes up
   if (kv_) {
     kv_->wipe();
     kv_.reset();
@@ -252,6 +253,13 @@ Bytes Node::presentation_blob() const {
   w.u8(static_cast<uint8_t>(std::clamp<int64_t>(settings_.get_int("store_forward_days", 3), 1, 30)));
   w.u8(static_cast<uint8_t>(std::clamp<int64_t>(settings_.get_int("default_ttl_hops", 7), 1, 15)));
   w.u32be(static_cast<uint32_t>(std::clamp<int64_t>(settings_.get_int("beacon_interval_s", 1800), 0, 86400)));
+  // Connectivity (RPC_API §11): bit7 = present (older decoys have zero padding here), bit0 nearby,
+  // bit1 internet relay, bit2 setup done; then the consent time. The relay list does not fit: a decoy
+  // shows the default relays.
+  w.u8(static_cast<uint8_t>(0x80 | (settings_.get_bool("connectivity.nearby", true) ? 1 : 0) |
+                            (settings_.get_bool("connectivity.internet") ? 2 : 0) |
+                            (settings_.get_bool("connectivity.setup_done") ? 4 : 0)));
+  w.u64be(static_cast<uint64_t>(std::max<int64_t>(0, settings_.get_int("connectivity.internet_consent_ts"))));
   return w.take();
 }
 
@@ -268,6 +276,13 @@ void Node::apply_presentation(ByteView blob) {
   uint8_t units = r.u8(), theme = r.u8(), pos = r.u8(), flags = r.u8(), days = r.u8(), ttl = r.u8();
   uint32_t beacon = r.u32be();
   if (!r.ok()) return;
+  uint8_t cflags = r.u8();
+  uint64_t consent_ts = r.u64be();
+  if (r.ok() && (cflags & 0x80)) {
+    settings_.set("connectivity.nearby", (cflags & 1) != 0).set("connectivity.internet", (cflags & 2) != 0);
+    settings_.set("connectivity.setup_done", (cflags & 4) != 0);
+    if (consent_ts) settings_.set("connectivity.internet_consent_ts", static_cast<int64_t>(consent_ts));
+  }
   profile_.set("name", name).set("callsign", proto::valid_callsign(cs) ? cs : std::string()).set("status", status);
   const char* u[] = {"metric", "imperial"};
   const char* t[] = {"dark", "light", "night"};
@@ -485,6 +500,8 @@ void Node::start_engine() {
   }
   for (auto& kv : links_)
     if (kv.second.link) eng_->attach_link(kv.first, kv.second.link.get());
+  relay_children_.clear();
+  connectivity_tick(true);
   if (own_sos_.is_object() && own_sos_.get_bool("active") && !eng_->sos_active()) {
     std::optional<proto::Position> pos;
     proto::Position pp;
@@ -503,8 +520,10 @@ void Node::stop_runtime(bool keep_links) {
   persist_engine_state();
   if (eng_) {
     for (auto& kv : links_) eng_->detach_link(kv.first);
+    for (auto& kv : relay_children_) eng_->detach_link(kv.first);
     eng_.reset();
   }
+  relay_children_.clear();
   if (!keep_links) links_.clear();
 }
 
@@ -689,6 +708,7 @@ void Node::tick(uint64_t now) {
     }
   }
   poll_link_states();
+  connectivity_tick(false);
   morse_.expire(mono_);
   flush_activity(false);
   if (mono_ - last_sweep_ >= kSweepIntervalMs) {

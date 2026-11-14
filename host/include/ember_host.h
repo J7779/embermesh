@@ -66,7 +66,11 @@ EMBER_API const char* ember_host_version(void);
  *      "links":[{host.link.create params},…]   links for this run only (persist:false), re-created
  *                                       after unlock/wipe if missing (additive)
  *      "hub":{"autostart":false,"port":8437,"bind":"0.0.0.0","max_guests":200,
- *             "restore":true}}       restore: reopen a persisted ws_server (hub) link at start
+ *             "restore":true,        restore: reopen a persisted ws_server (hub) link at start
+ *             "mqtt":false,          mqtt: also run the /mqtt relay broker (CONNECTIVITY §4.12)
+ *             "mqtt_port":8438},     on its own listener (never the hub port)
+ *      "nearby":false,                 mDNS Nearby devices (CONNECTIVITY §3), follows connectivity.nearby
+ *      "nearby_service":"_embermesh._tcp"}  (additive)
  *    "data_dir" is only used for host.file.* now (saved/, inbox/); host_links.json is no longer used.
  * Returns NULL on bad JSON or NULL node. */
 EMBER_API ember_host_t* ember_host_create(ember_node* node, const char* config_json);

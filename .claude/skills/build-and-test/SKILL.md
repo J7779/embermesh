@@ -94,6 +94,12 @@ commit anything from it.
 - **Headless Chrome, adb and simulators** must be able to launch: they fail inside restrictive
   command sandboxes and some containers. `CHROME=/path` selects the browser.
 - **`connectedDebugAndroidTest` uninstalls the app** afterwards (its data is gone).
+- Host CMake options: `EMBER_HOST_MDNS` (Nearby, mDNS) and `EMBER_HOST_TLS` (`wss://` on the vendored
+  Mbed TLS) are ON on desktop and OFF on Android/iOS/web. TLS tests generate their CA and certificates
+  at test time with the `openssl` CLI and `python3` (`host/tests/tls_proxy.py`); never commit keys or
+  certificates. `SSL_CERT_FILE` replaces the system trust store for emberd.
+- `EMBER_TEST_AUDIO_JITTER_MS=<ms>` makes the audio_pipe mesh tests deliver audio in bursts (a loaded
+  machine); the handheld_vox and acoustic cases must pass with it.
 - A suite reported **skip** did not run. Never report it as passed; say what was skipped and why.
 - Do not edit generated copies (`apps/android/app/build/…`, `build/`, `dist/`); edit the source
   (`ui/`, `core/`, …) and rebuild.

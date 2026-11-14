@@ -1,6 +1,6 @@
 ---
 id: embermesh/sneakernet
-title: "EmberMesh 24: Sneakernet - Carrying Messages by USB Stick, File and QR Code"
+title: "EmberMesh 25: Sneakernet - Carrying Messages by USB Stick, File and QR Code"
 category: embermesh
 tags: [embermesh, sneakernet, bundle, usb stick, qr code, courier, file, offline, store and forward]
 summary: "Moving messages between groups that have no link at all: exporting bundles to a file or a series of QR codes, carrying them by hand, importing them, and a simple courier routine."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 24
+order: 25
 ---
 
 # Sneakernet: Carrying Messages by Hand

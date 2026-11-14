@@ -255,6 +255,27 @@ void Session::feed_times(const std::vector<double>& times, const std::vector<dou
   collect();
 }
 
+void Session::feed_frames(const GridFrame* frames, size_t n) {
+  if (!light_) return;
+  if (!tracker_) tracker_.reset(new LightTracker());
+  for (size_t i = 0; i < n; ++i) {
+    const modem::MorseTiming& tm = light_->timing();
+    tracker_->frame(frames[i], tm.wpm() > 0 ? tm.dot_ms() : 0);
+    for (const LightSample& s : tracker_->samples()) light_->sample(s.t_ms, s.level);
+  }
+  collect();
+}
+
+void Session::target_pin(double fx, double fy) {
+  if (!light_) return;
+  if (!tracker_) tracker_.reset(new LightTracker());
+  tracker_->pin(fx, fy);
+}
+
+void Session::target_auto() {
+  if (tracker_) tracker_->unpin();
+}
+
 void Session::feed_pcm(const int16_t* pcm, size_t n) {
   if (!audio_) return;
   audio_->feed(pcm, n);
@@ -279,6 +300,10 @@ Status Session::status() const {
   if (light_) {
     s.level = light_->level();
     s.threshold = std::min(std::max(light_->threshold(), 0.0), 1.0);
+    if (tracker_ && (tracker_->started() || tracker_->pinned())) {
+      s.has_target = true;
+      s.target = tracker_->target();
+    }
   } else {
     s.audio = true;
     s.level = audio_->rx().level();
@@ -291,6 +316,7 @@ Status Session::status() const {
 void Session::reset() {
   if (light_) light_->reset();
   if (audio_) audio_->reset();
+  if (tracker_) tracker_->reset();
   transcript_.clear();
   new_.clear();
   chars_ = 0;

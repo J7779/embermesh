@@ -53,7 +53,8 @@ EMBER_HUB_API void ember_hub_destroy(ember_hub* h);
 /* options_json (all optional):
  *   {"port":8437, "bind":"0.0.0.0", "web_root":"/path/to/dist/web", "download_dirs":["…"],
  *    "download_files":["…/embermesh.html"], "max_guests":200, "captive_portal":false,
- *    "version":"0.1.0", "name":"Ann", "node_id":"…"}          (name/node_id: shown in /hub.json)
+ *    "version":"0.1.0", "name":"Ann", "node_id":"…", "mqtt":false}  (name/node_id: shown in
+ *    /hub.json; mqtt:true also runs the /mqtt relay broker on its own "mqtt_port" (default 8438))
  * port 0 = any free port (see ember_hub_status). Restarting with new options is allowed.
  * Returns 0 on success; otherwise -1 and a NUL-terminated message in err (if err_len > 0). */
 EMBER_HUB_API int ember_hub_start(ember_hub* h, const char* options_json, char* err, size_t err_len);

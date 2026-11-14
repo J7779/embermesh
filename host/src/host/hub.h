@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "host/json.h"
+#include "host/mqtt_broker.h"
 #include "host/loop.h"
 #include "host/server.h"
 
@@ -54,6 +55,9 @@ struct HubOptions {
   size_t guest_queue_frames = 64;
   uint64_t guest_abuse_drops = 2000;  // frames dropped within 10 s before the guest is evicted
   std::string version;
+  // /mqtt: minimal MQTT broker so the hub can be an internet relay (CONNECTIVITY §4.12).
+  bool mqtt = false;
+  uint16_t mqtt_port = 8438;  // its own listener: never the hub port (0 = any free port)
 };
 
 class Hub {
@@ -67,6 +71,7 @@ class Hub {
   void stop();
   bool running() const { return server_ && server_->running(); }
   uint16_t port() const { return server_ ? server_->port() : 0; }
+  uint16_t mqtt_port() const { return mqtt_server_ ? mqtt_server_->port() : 0; }
   const HubOptions& options() const { return opt_; }
   std::vector<std::string> urls() const;  // http://<lan-ip>:<port>/ for every usable interface
   size_t guest_count() const;
@@ -93,6 +98,8 @@ class Hub {
   HubDelegate& d_;
   HubOptions opt_;
   std::unique_ptr<HttpServer> server_;
+  std::unique_ptr<MqttBroker> mqtt_;
+  std::unique_ptr<HttpServer> mqtt_server_;  // only /mqtt, nothing else
   uint64_t frames_in_ = 0, frames_out_ = 0, frames_dropped_ = 0, guests_total_ = 0, guests_evicted_ = 0;
   uint64_t frames_rate_limited_ = 0, guests_abusive_ = 0;
   double bus_tokens_ = 0;

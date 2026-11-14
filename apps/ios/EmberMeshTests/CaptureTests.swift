@@ -71,37 +71,58 @@ final class CaptureTests: XCTestCase {
   func testLumaMeanOverROI() {
     let roi = CaptureROI()
     let sb = SyntheticFrames.sampleBuffer(roiLevel: 230, bg: 10, timeMs: 0, roi: roi)
-    let feeder = LightFeeder(session: "s", sink: RecordingSink())
-    let cam = CameraLumaCapture(feeder: feeder, roi: roi)
-    let sink = RecordingSink()
-    let f2 = LightFeeder(session: "s", sink: sink, flushMs: 0)
-    let c2 = CameraLumaCapture(feeder: f2, roi: roi)
-    c2.process(sb)
-    let lv = (sink.feeds.first?["levels"] as? [Double])?.first ?? -1
+    let pb = CMSampleBufferGetImageBuffer(sb)!
+    CVPixelBufferLockBaseAddress(pb, .readOnly)
+    let lv = LumaMath.mean(base: CVPixelBufferGetBaseAddressOfPlane(pb, 0)!, width: 640, height: 480,
+                           bytesPerRow: CVPixelBufferGetBytesPerRowOfPlane(pb, 0), roi: roi)
+    CVPixelBufferUnlockBaseAddress(pb, .readOnly)
     XCTAssertEqual(lv, 230.0 / 255, accuracy: 0.01)
-    _ = cam
     XCTAssertNil(CaptureROI(json: ["x": 0.2, "y": 0.2, "w": 0, "h": 0.1]))
     XCTAssertEqual(CaptureROI(json: ["x": 0.9, "y": 0.9, "w": 0.5, "h": 0.5])?.w ?? 0, 0.1, accuracy: 1e-9)
   }
 
-  /// Synthetic camera frames (30 fps, flashlight Morse with noise and exposure drift) through the
-  /// exact frame path the AVCaptureVideoDataOutput delegate uses; feeds are batched ~100 ms with
-  /// per-frame timestamps.
-  func testCameraFramePathBatchesFeeds() {
+  /// Synthetic camera frames (30 fps, flashlight Morse) through the exact frame path the
+  /// AVCaptureVideoDataOutput delegate uses (on the capture queue): whole-frame grids, ≤ 8 frames /
+  /// 100 ms per feed, timestamps in order.
+  func testCameraFramePathBatchesGridFrames() {
     let sink = RecordingSink()
-    let cam = CameraLumaCapture(feeder: LightFeeder(session: "light1", sink: sink), roi: CaptureROI())
+    let cam = CameraLumaCapture(session: "light1", sink: sink)
     let frames = CaptureTests.lightFrames(text: "SOS", wpm: 10, fps: 30)
-    for (t, lv) in frames { cam.process(SyntheticFrames.sampleBuffer(roiLevel: lv, timeMs: t)) }
-    cam.feeder.flush()
-    XCTAssertEqual(cam.frames, frames.count)
-    let times = sink.feeds.flatMap { ($0["times_ms"] as? [Double]) ?? [] }
-    let levels = sink.feeds.flatMap { ($0["levels"] as? [Double]) ?? [] }
-    XCTAssertEqual(times.count, frames.count)
-    XCTAssertEqual(zip(times, times.dropFirst()).allSatisfy { $0 < $1 }, true)
-    XCTAssertTrue(sink.feeds.allSatisfy { $0.string("session") == "light1" })
-    XCTAssertGreaterThan(sink.feeds.count, frames.count / 8)          // batched
-    XCTAssertLessThanOrEqual(sink.feeds.count, frames.count / 2)
-    XCTAssertGreaterThan(levels.max() ?? 0, 0.7); XCTAssertLessThan(levels.min() ?? 1, 0.3)
+    for (t, lv) in frames { let sb = SyntheticFrames.sampleBuffer(roiLevel: lv, timeMs: t); cam.queue.sync { cam.process(sb) } }
+    cam.queue.sync { cam.grids.flush() }
+    spin(until: 0.2) { false }
+    cam.queue.sync { cam.grids.flush() }
+    XCTAssertEqual(cam.frameCount, frames.count)
+    let fed = sink.feeds.flatMap { ($0["frames"] as? [JSONObject]) ?? [] }
+    XCTAssertEqual(fed.count + cam.grids.dropped, frames.count)
+    XCTAssertEqual(cam.grids.dropped, 0, "a fast core: nothing dropped")
+    XCTAssertTrue(sink.feeds.allSatisfy { ($0["frames"] as? [Any])?.count ?? 0 <= 8 && $0.string("session") == "light1" })
+    let ts = fed.compactMap { $0.number("t_ms") }
+    XCTAssertTrue(zip(ts, ts.dropFirst()).allSatisfy { $0 < $1 }, "never reordered")
+    for f in fed.prefix(3) {
+      XCTAssertEqual(f.int("w"), 48); XCTAssertEqual(f.int("h"), 64, "640×480 sensor → 64×48 → portrait 48×64")
+      XCTAssertEqual(Data(base64Encoded: f.string("max_b64") ?? "")?.count, 48 * 64)
+      XCTAssertEqual(Data(base64Encoded: f.string("mean_b64") ?? "")?.count, 48 * 64)
+    }
+  }
+
+  /// A core from before §12 answers a frames feed with bad_params: the capture switches to the
+  /// section-6 levels feed (centre region) and keeps going.
+  func testOldCoreFallsBackToLevelsFeed() {
+    final class OldCore: MorseFeedSink {
+      var feeds: [JSONObject] = []
+      func morseFeed(_ p: JSONObject, completion: @escaping (RPCResult) -> Void) {
+        feeds.append(p)
+        completion(p["frames"] != nil ? .failure(.badParams("levels or times_ms required")) : .success([:]))
+      }
+    }
+    let core = OldCore()
+    let cam = CameraLumaCapture(session: "s", sink: core)
+    for i in 0..<30 { let sb = SyntheticFrames.sampleBuffer(roiLevel: 200, timeMs: Double(i) * 33); cam.queue.sync { cam.process(sb) } }
+    cam.queue.sync { cam.levels.flush() }
+    XCTAssertEqual(cam.mode, .levels)
+    XCTAssertTrue(core.feeds.contains { $0["levels"] != nil }, "levels feed after the refusal")
+    XCTAssertEqual(core.feeds.filter { $0["frames"] != nil }.count, 1, "frames tried once")
   }
 
   /// 30 fps frames of a lamp keying `text`, with ±4 luma noise, slow brightness drift and frame jitter.
@@ -224,12 +245,15 @@ final class CaptureTests: XCTestCase {
       let sess = try XCTUnwrap(n.ok("morse.rx.start", ["source": "light"])["session"])
       let sid = (sess as? String) ?? "\(sess)"
       let sink = RecordingSink(); sink.forward = n.runner
-      let cam = CameraLumaCapture(feeder: LightFeeder(session: sid, sink: sink), roi: CaptureROI())
+      let cam = CameraLumaCapture(session: sid, sink: sink)
       for (t, lv) in CaptureTests.lightFrames(text: text, wpm: wpm, fps: 30) {
-        cam.process(SyntheticFrames.sampleBuffer(roiLevel: lv, timeMs: 10_000 + t))
+        let sb = SyntheticFrames.sampleBuffer(roiLevel: lv, timeMs: 10_000 + t)
+        cam.queue.sync { cam.process(sb) }
+        if cam.queue.sync(execute: { cam.mode }) == .frames { spin(until: 0.001) { false } }
       }
-      cam.feeder.flush()
+      cam.queue.sync { cam.grids.flush(); cam.levels.flush() }
       spin(until: 1) { false }
+      print("camera luma: feed mode \(cam.mode) (frames = §12 tracker, levels = old core)")
       let st = n.ok("morse.rx.status", ["session": sess])
       let tr = (st.string("transcript") ?? "").replacingOccurrences(of: " ", with: "")
       print("camera luma \(text) @\(wpm) wpm → \"\(st.string("transcript") ?? "")\" wpm=\(st.number("wpm") ?? 0) quality=\(st.number("quality") ?? 0)")

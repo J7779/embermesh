@@ -40,9 +40,11 @@ uint32_t prefix_mask(uint8_t bits) { return bits == 0 ? 0u : ~0u << (32 - bits);
 
 void MeshEngine::Impl::beacon_timers(LinkSlot& L, uint64_t now) {
   if (!cfg.beacons_enabled) return;
-  uint32_t iv = beacon_interval_ms(L.caps);
+  // Relay sessions: every 30 min, extra beacons at most every 2 min (review M4).
+  uint32_t iv = L.scope.relay_session ? 1800000 : beacon_interval_ms(L.caps);
+  uint32_t bgap = L.scope.relay_session ? 120000 : beacon_gap_ms(L.caps);
   if (L.next_beacon_ms == 0) L.next_beacon_ms = now + 300 + rng.uniform(1200);
-  bool soon = L.beacon_soon && now - L.last_beacon_ms >= beacon_gap_ms(L.caps) && !L.nbrs.empty();
+  bool soon = L.beacon_soon && now - L.last_beacon_ms >= bgap && !L.nbrs.empty();
   // Our own fresh message may have been lost to a collision (broadcasts are not acknowledged):
   // advertise the new digest soon after a short post-transmission quiet time, so neighbours that
   // missed it reconcile within seconds rather than a full beacon gap.
@@ -50,7 +52,7 @@ void MeshEngine::Impl::beacon_timers(LinkSlot& L, uint64_t now) {
     // Quiet time counted from the end of our last transmission (others get the channel first).
     uint64_t quiet = std::max<uint64_t>(2000, 4ull * airtime_ms(L, L.caps.mtu));
     uint64_t since = std::max(L.own_new_ms, L.last_tx_end_ms);
-    soon = now >= since + quiet && now - L.last_beacon_ms >= std::min<uint64_t>(beacon_gap_ms(L.caps), 15000) &&
+    soon = now >= since + quiet && now - L.last_beacon_ms >= std::min<uint64_t>(bgap, L.scope.relay_session ? 120000 : 15000) &&
            L.qframes == 0;
   }
   if (soon || now >= L.next_beacon_ms) {
@@ -221,6 +223,8 @@ void MeshEngine::Impl::time_sample(const NodeId& from, uint64_t their_ms, uint8_
 bool MeshEngine::Impl::sync_eligible(const LinkSlot& L, const StoreEntry& e) const {
   if (e.expires_local <= host_now) return false;
   if (!L.caps.encryption_allowed && !legal_cleartext(e.h.sec)) return false;
+  if (L.scope.restricted && !in_scope(L, e.h)) return false;
+  if (L.caps.requires_station_id && (e.flags & kStoredViaRelay)) return false;  // review M12
   return true;
 }
 
@@ -335,7 +339,7 @@ void MeshEngine::Impl::handle_sync(LinkSlot& L, uint32_t hop, const SyncMsg& m) 
   }
   n.round_rx++;
   n.last_sync_ms = host_now;
-  uint32_t budget = cfg.sync_push_limit;
+  uint32_t budget = L.scope.relay_session ? std::min<uint32_t>(cfg.sync_push_limit, 8) : cfg.sync_push_limit;
   // Bytes pushed per neighbour per round, by link speed.
   uint32_t round_cap = fast ? 64 * 1024 : (L.caps.bitrate_bps >= 2400 ? 16 * 1024 : 4 * 1024);
   push_bytes_left_ = n.round_bytes < round_cap ? round_cap - n.round_bytes : 0;

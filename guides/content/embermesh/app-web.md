@@ -89,6 +89,10 @@ On a hub page the connection to the hub is added automatically; nothing to confi
 The browser asks you to pick the serial port or Bluetooth device in its own dialog (it needs a
 click from you). Saved serial and Bluetooth links reopen at the next start without asking.
 
+**Automatic connections:** a web page cannot search the network, so **Nearby devices** is not
+available in a browser (Settings → Connections says so): join a hub or pair with a code instead. The
+**Internet relay** works in a browser while the page is open ([Connections](connections.md)).
+
 **Not possible in a browser:** hosting a hub (browsers cannot accept connections), Wi-Fi broadcast
 (UDP) and plain TCP links (so no Direwolf over TCP, no SDR), Apple peer-to-peer, and Meshtastic over
 Bluetooth (use USB). Use a computer with emberd or a phone app for those.

@@ -64,7 +64,7 @@ Android asks for each one the first time a feature needs it. Refusing only disab
 | Permission (as Android shows it) | Needed for |
 |---|---|
 | **Nearby devices** (Android 12+) | Bluetooth phone-to-phone, Bluetooth TNCs and LoRa boards, classic Bluetooth serial |
-| **Local network** access (Android 17+; "find, connect to, and determine the relative position of nearby devices") | **Every Wi-Fi link and the hub.** Without it they silently time out. Links blocked by it are retried with the prompt when you open the app |
+| **Local network** access (Android 17+; "find, connect to, and determine the relative position of nearby devices") | **Every Wi-Fi link, Nearby devices and the hub.** Asked when Nearby devices is turned on. Without it they silently time out. Links blocked by it are retried with the prompt when you open the app |
 | **Location** | Your GPS position for SOS and check-ins (GPS works with no network). On Android 11 and older also needed for Bluetooth and Wi-Fi scans, and Location must be switched on |
 | Nearby Wi-Fi devices (Android 13+) | Wi-Fi Direct |
 | **Microphone** | Sound-card modem (radio audio, acoustic coupling), reading Morse by sound |
@@ -74,6 +74,13 @@ Android asks for each one the first time a feature needs it. Refusing only disab
 | Ignore battery optimisations | Lets the app open Android's exemption dialog |
 
 ## 4. Connections on Android
+
+**Automatic connections** (switches in **Settings → Connections**, see [Connections](connections.md)):
+**Nearby devices** (on after setup) links up by itself with every EmberMesh device on the same Wi-Fi
+or hotspot; the **Internet relay** (off until you turn it on) reaches contacts far away. Both run only
+while the app is open or its background service runs (no push notifications: a closed app gets nothing over the relay). They appear on Links & radios as **Automatic · nearby device** / **Automatic
+· internet relay** with **Change in Connections**. Everything else, including Bluetooth, is added
+by hand:
 
 All connections are added in **More → Links & radios → Add connection**. Each entry shows a
 description; tap it, fill the **Connection** and **Protocol** cards, give it a **Name**, keep

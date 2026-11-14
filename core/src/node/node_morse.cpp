@@ -1,6 +1,10 @@
-// EmberMesh node — Morse receive sessions (docs/RPC_API.md §6): morse.rx.start / feed / status /
-// reset / stop and the morse.text event. The decoding lives in core/src/morse/rx.*.
+// EmberMesh node — Morse receive sessions (docs/RPC_API.md §6, §12): morse.rx.start / feed /
+// status / reset / stop / target and the morse.text / morse.target events. The decoding lives in
+// core/src/morse/rx.*, the whole-frame light tracker in core/src/morse/light_tracker.*.
 #include <cmath>
+#include <cstdint>
+#include <string>
+#include <vector>
 
 #include "base/codec.h"
 #include "node/node.h"
@@ -23,7 +27,76 @@ Json status_json(const morse_rx::Status& s, bool light) {
     j.set("tone_hz", s.tone_hz);
     j.set("snr_db", s.snr_db);
   }
+  if (s.has_target) {
+    const morse_rx::Target& t = s.target;
+    Json o = Json::object({{"state", morse_rx::target_state_name(t.state)}});
+    if (t.state != morse_rx::Target::kSearching) {
+      o.set("x", std::round(t.x * 1000) / 1000);
+      o.set("y", std::round(t.y * 1000) / 1000);
+      o.set("size", std::round(t.size * 1000) / 1000);
+    }
+    o.set("confidence", t.confidence);
+    o.set("candidates", t.candidates);
+    o.set("pinned", t.pinned);
+    j.set("target", o);
+  }
   return j;
+}
+
+Json target_event(const std::string& id, const morse_rx::Target& t) {
+  Json e = Json::object({{"session", id}, {"state", morse_rx::target_state_name(t.state)}});
+  if (t.state != morse_rx::Target::kSearching) {
+    e.set("x", std::round(t.x * 1000) / 1000);
+    e.set("y", std::round(t.y * 1000) / 1000);
+    e.set("size", std::round(t.size * 1000) / 1000);
+  }
+  e.set("confidence", t.confidence);
+  e.set("candidates", t.candidates);
+  return e;
+}
+
+// frames:[{t_ms, w, h, max_b64, mean_b64?}] (§12). Everything is checked before anything is fed.
+bool read_frames(Params& p, const Json& arr, std::vector<Bytes>* bufs, std::vector<morse_rx::GridFrame>* out) {
+  if (arr.size() == 0) return p.error("frames must not be empty");
+  if (arr.size() > morse_rx::kMaxFramesPerFeed)
+    return p.error("frames has too many frames (max " + std::to_string(morse_rx::kMaxFramesPerFeed) + " per feed)",
+                   "too_large");
+  const size_t max_b64 = (morse_rx::kMaxGridCells + 2) / 3 * 4 + 8;
+  bufs->resize(arr.size() * 2);
+  out->resize(arr.size());
+  for (size_t i = 0; i < arr.size(); ++i) {
+    const Json& f = arr[i];
+    std::string at = "frames[" + std::to_string(i) + "]";
+    if (!f.is_object()) return p.error(at + " must be an object");
+    Params fp(f);
+    double t = 0;
+    int64_t w = 0, h = 0;
+    std::string mx, mn;
+    if (!fp.number("t_ms", &t, -1e15, 1e15, true) || !fp.integer("w", &w, 1, morse_rx::kMaxGridCells, true) ||
+        !fp.integer("h", &h, 1, morse_rx::kMaxGridCells, true) || !fp.str("max_b64", &mx, max_b64, true, false) ||
+        !fp.str("mean_b64", &mn, max_b64, false)) {
+      RpcResult r = fp.fail();
+      return p.error(at + ": " + r.message, r.code.c_str());
+    }
+    if (w * h > morse_rx::kMaxGridCells)
+      return p.error(at + ": w*h must be at most " + std::to_string(morse_rx::kMaxGridCells), "too_large");
+    Bytes& bm = (*bufs)[2 * i];
+    Bytes& bn = (*bufs)[2 * i + 1];
+    if (!base64_decode(mx, bm)) return p.error(at + ".max_b64 is not valid base64");
+    if (bm.size() != static_cast<size_t>(w * h)) return p.error(at + ".max_b64 must hold exactly w*h bytes");
+    morse_rx::GridFrame& g = (*out)[i];
+    g.t_ms = t;
+    g.w = static_cast<int>(w);
+    g.h = static_cast<int>(h);
+    g.max = bm.data();
+    g.mean = nullptr;
+    if (!mn.empty()) {
+      if (!base64_decode(mn, bn)) return p.error(at + ".mean_b64 is not valid base64");
+      if (bn.size() != bm.size()) return p.error(at + ".mean_b64 must hold exactly w*h bytes");
+      g.mean = bn.data();
+    }
+  }
+  return true;
 }
 
 bool read_numbers(Params& p, const char* key, std::vector<double>* out, bool required) {
@@ -85,7 +158,17 @@ RpcResult Node::m_morse_rx_feed(Params& p) {
     for (size_t i = 0; i < x.size(); ++i)
       x[i] = static_cast<int16_t>(static_cast<uint16_t>(pcm[2 * i] | pcm[2 * i + 1] << 8));
     s->feed_pcm(x.data(), x.size());
+  } else if (p.has("frames")) {
+    const Json* arr = nullptr;
+    if (!p.array("frames", &arr, true)) return p.fail();
+    if (p.has("levels")) return rpc_err("bad_params", "give either frames or levels, not both");
+    std::vector<Bytes> bufs;
+    std::vector<morse_rx::GridFrame> frames;
+    if (!read_frames(p, *arr, &bufs, &frames)) return p.fail();
+    s->feed_frames(frames.data(), frames.size());
   } else {
+    if (s->has_frames())
+      return rpc_err("bad_params", "this session is fed with frames; start another session for levels");
     std::vector<double> levels, times;
     if (!read_numbers(p, "levels", &levels, true) || !read_numbers(p, "times_ms", &times, false)) return p.fail();
     if (p.has("times_ms")) {
@@ -101,7 +184,33 @@ RpcResult Node::m_morse_rx_feed(Params& p) {
   std::string text = s->take_new();
   if (!text.empty())
     emit("morse.text", Json::object({{"session", id}, {"source", s->source()}, {"text", text}, {"wpm", st.wpm}}));
+  morse_rx::Target tg;
+  if (s->take_target_event(&tg)) emit("morse.target", target_event(id, tg));
   return rpc_ok(status_json(st, !s->is_audio()));
+}
+
+RpcResult Node::m_morse_rx_target(Params& p) {
+  RpcResult err;
+  morse_rx::Session* s = morse_session(p, &err);
+  if (!s) return err;
+  if (s->is_audio()) return rpc_err("bad_params", "morse.rx.target applies to light sessions");
+  bool autom = false, has_auto = false;
+  double x = 0, y = 0;
+  bool hx = false, hy = false;
+  if (!p.boolean("auto", &autom, &has_auto) || !p.number("x", &x, 0, 1, false, &hx) || !p.number("y", &y, 0, 1, false, &hy))
+    return p.fail();
+  if (has_auto && autom) {
+    if (hx || hy) return rpc_err("bad_params", "give either {x, y} or {auto:true}");
+    s->target_auto();
+  } else if (hx && hy) {
+    s->target_pin(x, y);
+  } else {
+    return rpc_err("bad_params", "x and y (0..1 of the frame) or auto:true are required");
+  }
+  morse_rx::Status st = s->status();
+  morse_rx::Target tg;
+  if (s->take_target_event(&tg)) emit("morse.target", target_event(p.raw().get_string("session"), tg));
+  return rpc_ok(status_json(st, true));
 }
 
 RpcResult Node::m_morse_rx_status(Params& p) {

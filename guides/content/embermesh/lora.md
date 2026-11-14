@@ -1,6 +1,6 @@
 ---
 id: embermesh/lora
-title: "EmberMesh 19: LoRa - Meshtastic, RNode, Reyax Modules and Serial Radios"
+title: "EmberMesh 20: LoRa - Meshtastic, RNode, Reyax Modules and Serial Radios"
 category: embermesh
 tags: [embermesh, lora, meshtastic, rnode, reyax, rylr998, ebyte, hc-12, sik, xbee, ism, 915 mhz, 868 mhz, 433 mhz, duty cycle, antenna]
 summary: "Long-range licence-free links with stock Meshtastic devices, RNode boards, Reyax AT-command modules and transparent serial radios: setup, settings that must match, regional bands and duty-cycle limits, antennas and placement."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 19
+order: 20
 ---
 
 # LoRa: Meshtastic, RNode, Reyax Modules and Serial Radios

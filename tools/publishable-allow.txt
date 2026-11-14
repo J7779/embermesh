@@ -38,6 +38,8 @@ email match @example\.(com|org|net)$                      # RFC 2606 documentati
 email match @[a-z0-9.-]+\.(example|test|invalid|localhost)$ # RFC 2606 reserved TLDs
 email match ^(noreply|no-reply)@                           # generic no-reply senders (NOT *@users.noreply.github.com)
 email match ^git@github\.com$                              # SSH clone URL syntax
+email match ^damaki\.gh@gmail\.com$                       # mbedTLS ChaCha20/Poly1305 author (host/third_party/mbedtls, licence headers)
+email match ^dejong@fox-it\.com$                          # mbedTLS cipher/md layer author (host/third_party/mbedtls, licence headers)
 email match ^mackron@gmail\.com$                           # miniaudio author (host/third_party/miniaudio/miniaudio.h, licence header)
 email match ^MPHotline@usda\.gov$                          # USDA Meat & Poultry Hotline, public (guide source text)
 email match ^fr\.inspection@nara\.gov$                     # Federal Register public contact (FCC rule text)
@@ -90,6 +92,9 @@ coord path guides/content/*                                 # guide texts cite r
 
 # --- Credentials --------------------------------------------------------------------------------------
 credential match (ice-pwd|ice_pwd)                          # WebRTC ICE passwords in synthetic SDP test data
+credential match ^(EXTENDED_MASTER_)?SECRET:$                 # mbedTLS ssl_tls12_client.c:1516 "case MBEDTLS_TLS_EXT_EXTENDED_MASTER_SECRET:" (a case label; the multi-line match is reported in two parts)
+credential match ^[[:space:]]*MBEDTLS_SSL_DEBUG_MSG$        # second part of the same match: the macro on the next line
+credential path host/third_party/mbedtls/library/pk_internal.h # mbedTLS PEM header/footer string constants ("-----BEGIN ... PRIVATE KEY-----"), no key material
 
 # --- Residue words in the guide library (they are ordinary words there) --------------------------------
 residue path guides/content/*                               # ordinary words there (job titles, first names)

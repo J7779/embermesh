@@ -172,7 +172,13 @@ struct HttpServer::Conn : WsConn {
           return;
         }
       }
-      stream.write(ws_server_handshake_response(req));
+      std::string chosen;
+      for (const auto& offered : split(req.header_or("sec-websocket-protocol"), ',')) {
+        std::string o = trim(offered);
+        for (const auto& sp : route_ref.subprotocols)
+          if (chosen.empty() && o == sp) chosen = sp;
+      }
+      stream.write(ws_server_handshake_response(req, chosen));
       mode = Ws;
       route = &route_ref;
       ws_req = std::move(req);

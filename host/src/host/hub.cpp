@@ -73,6 +73,10 @@ Hub::Hub(Loop& loop, HubDelegate& d) : loop_(loop), d_(d) {}
 
 Hub::~Hub() {
   if (pump_timer_) loop_.cancel(pump_timer_);
+  if (mqtt_server_) {
+    mqtt_server_->stop();
+    mqtt_server_.reset();
+  }
   if (server_) {
     server_->stop();
     server_.reset();
@@ -150,11 +154,37 @@ bool Hub::start(const HubOptions& opt, std::string* err) {
   };
   server_->add_ws_route("/rpc", rpc);
 
+
+
   if (!server_->start(err)) {
     server_.reset();
     return false;
   }
   EH_LOGI("hub: listening on %s:%u", opt.bind.c_str(), server_->port());
+  if (opt.mqtt) {
+    // The relay broker gets its own listener: exposing it never exposes /, /ws or /rpc.
+    HttpServer::Options mso;
+    mso.bind = opt.bind;
+    mso.port = opt.mqtt_port;
+    mso.max_conns = 256;
+    mso.max_conns_per_ip = 256;  // the broker enforces 4 per source itself (proxy-aware)
+    mqtt_server_.reset(new HttpServer(loop_, mso));
+    mqtt_server_->set_handler([](const HttpRequest&, const SockAddr&, HttpResponse& resp) {
+      resp.status = 404;
+      resp.content_type = "text/plain; charset=utf-8";
+      resp.body = "not found\n";
+    });
+    mqtt_.reset(new MqttBroker(MqttBroker::Options()));
+    mqtt_->attach(*mqtt_server_, "/mqtt");
+    std::string merr;
+    if (!mqtt_server_->start(&merr)) {
+      EH_LOGW("hub: relay broker not started (%s)", merr.c_str());
+      mqtt_server_.reset();
+      mqtt_.reset();
+    } else {
+      EH_LOGI("hub: relay broker /mqtt on %s:%u", opt.bind.c_str(), mqtt_server_->port());
+    }
+  }
   return true;
 }
 
@@ -208,8 +238,15 @@ void Hub::stop() {
   if (!server_) return;
   server_->stop();
   // Keep the server object alive until its connections are reaped (they may be mid-callback).
+  if (mqtt_server_) mqtt_server_->stop();
   std::shared_ptr<HttpServer> dying(server_.release());
-  loop_.timer(10, [dying] {});
+  std::shared_ptr<HttpServer> mdying(mqtt_server_.release());
+  std::shared_ptr<MqttBroker> broker(mqtt_.release());  // its route callbacks live as long as its server
+  loop_.timer(10, [dying, mdying, broker]() mutable {
+    dying.reset();
+    mdying.reset();
+    broker.reset();
+  });
 }
 
 size_t Hub::guest_count() const { return server_ ? server_->ws_count("/ws") : 0; }
@@ -273,6 +310,11 @@ Json Hub::stats() const {
   s.set("frames_dropped", double(frames_dropped_));
   s.set("guests_total", double(guests_total_));
   s.set("guests_evicted", double(guests_evicted_));
+  if (mqtt_) {
+    Json m = mqtt_->stats();
+    m.set("port", mqtt_port());
+    s.set("mqtt", m);
+  }
   s.set("frames_rate_limited", double(frames_rate_limited_));
   s.set("guests_abusive", double(guests_abusive_));
   return s;

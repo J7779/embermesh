@@ -1,6 +1,6 @@
 ---
 id: embermesh/kiss-tnc-packet
-title: "EmberMesh 18: KISS TNCs and Packet Radio"
+title: "EmberMesh 19: KISS TNCs and Packet Radio"
 category: embermesh
 tags: [embermesh, kiss, tnc, packet radio, ax25, direwolf, mobilinkd, ninotnc, kenwood, aprs, bluetooth, serial, tcp]
 summary: "Using hardware TNCs, Direwolf over TCP, Bluetooth TNCs and radios with a built-in TNC through the kiss link, the settings that matter, and exchanging APRS text messages with ordinary APRS stations."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 18
+order: 19
 ---
 
 # KISS TNCs and Packet Radio

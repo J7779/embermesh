@@ -7,6 +7,7 @@ import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -56,6 +57,97 @@ class LinkManagerTest {
     }
 
     @After fun tearDown() = ctx.shutdown()
+
+    // --- automatic links (RPC_API §11) ------------------------------------------------------------
+
+    private fun autoProbe(lm: LinkManager, role: String = "dial", key: String? = "ffffffff@10.0.0.2"): Pair<Int, Probe> {
+        var p: Probe? = null
+        val id = lm.createAuto("Nearby device", "tcp", JSONObject().put("host", "10.0.0.2").put("port", 47475), "stream",
+            JSONObject().put("preset", "nearby"), "nearby", role, key) { sink -> Probe(JSONObject(), sink).also { p = it } }
+        return id to p!!
+    }
+
+    @Test fun autoLinkPassesAutoFieldsAndIsNeverPersisted() {
+        val lm = manager()
+        val (id, probe) = autoProbe(lm)
+        val add = core.linkAddParams.last()
+        assertFalse(add.getBoolean("persist"))
+        assertEquals("nearby", add.getString("auto")); assertEquals("dial", add.getString("auto_role")); assertEquals("ffffffff@10.0.0.2", add.getString("auto_key"))
+        assertEquals("stream", add.getString("type")); assertEquals("nearby", add.getJSONObject("config").getString("preset"))
+        assertTrue(lm.active(id)!!.connected)
+        lm.sync() // node.ready again: the auto link is not reopened from links.list
+        assertTrue(lm.active(id)!!.endpoint === probe)
+        assertTrue(probes.isEmpty())
+        assertEquals(listOf(lm.active(id)), lm.autoLinks("nearby"))
+        assertTrue(lm.autoLinks("relay").isEmpty())
+    }
+
+    @Test fun droppedNearbyLinkIsRemovedNotReconnected() {
+        val lm = manager()
+        val gone = ArrayList<LinkDef>()
+        lm.onNearbyGone = { gone.add(it) }
+        val (id, probe) = autoProbe(lm)
+        probe.sink.onState(false, "connection closed")
+        assertTrue(probe.closed)
+        assertNull(lm.active(id))
+        assertFalse("the core link went with it", core.links.containsKey(id))
+        assertEquals(listOf(id), gone.map { it.id })
+    }
+
+    @Test fun linkRemovedByTheCoreClosesTheEndpointOnly() {
+        val lm = manager()
+        val (id, probe) = autoProbe(lm, "accept", "@10.0.0.2")
+        core.links.remove(id) // core: duplicate
+        val before = core.calls.count { it == "links.remove" }
+        lm.onRemoved(id)
+        assertTrue(probe.closed)
+        assertNull(lm.active(id))
+        assertEquals(before, core.calls.count { it == "links.remove" })
+        lm.onRemoved(id) // idempotent
+    }
+
+    @Test fun coreRefusalOfAnAutoLinkThrowsBeforeTheEndpointExists() {
+        val lm = manager()
+        autoProbe(lm)
+        var built = false
+        try {
+            lm.createAuto("Nearby device", "tcp", JSONObject(), "stream", JSONObject(), "nearby", "dial", "ffffffff@10.0.0.2") { s -> built = true; Probe(JSONObject(), s) }
+            fail("duplicate dial accepted")
+        } catch (e: HostError) { assertEquals(HostError.BUSY, e.code) }
+        assertFalse(built)
+    }
+
+    @Test fun relayLinksAlwaysValidateTlsAndNeedConsent() {
+        val configs = ArrayList<JSONObject>()
+        val ws = object : EndpointFactory {
+            override val kind = "websocket"
+            override val title = "WS"
+            override val description = ""
+            override val linkTypes = listOf("raw")
+            override fun configSchema(ctx: HostContext): JSONArray = Fields.of { bool("insecure", "Insecure", default = false) }
+            override fun create(ctx: HostContext, config: JSONObject, sink: EndpointSink) = Probe(config, sink).also { configs.add(config) }
+        }
+        val lm = LinkManager(core, EndpointRegistry(listOf(ws, probeFactory)), ctx) { perms.add(it) }
+        val params = JSONObject()
+            .put("endpoint", JSONObject().put("kind", "websocket").put("config", JSONObject().put("url", "wss://r.example/mqtt").put("protocols", JSONArray().put("mqtt"))))
+            .put("link", JSONObject().put("type", "relay").put("config", JSONObject().put("url", "wss://r.example/mqtt")))
+            .put("persist", false).put("auto", "relay").put("auto_key", "wss://r.example/mqtt")
+        try { lm.create(JSONObject(params.toString())); fail("relay without consent") } catch (e: HostError) { assertEquals(HostError.DENIED, e.code) }
+        assertTrue("nothing opened before consent", configs.isEmpty())
+        core.internetConsent = true
+        val id = lm.create(JSONObject(params.toString())).getJSONObject("link").getInt("id")
+        assertFalse("no insecure key on a relay endpoint (the core refuses it)", configs.single().has("insecure"))
+        assertEquals("relay", core.links[id]!!.getString("auto"))
+        assertFalse(core.linkAddParams.last().getBoolean("persist"))
+        assertEquals(1, lm.autoLinks("relay").size)
+        val insecure = JSONObject(params.toString()); insecure.getJSONObject("endpoint").getJSONObject("config").put("insecure", true)
+        try { lm.create(insecure); fail("insecure relay") } catch (e: HostError) { assertEquals(HostError.BAD_PARAMS, e.code) }
+        val noMqtt = JSONObject(params.toString()); noMqtt.getJSONObject("endpoint").getJSONObject("config").remove("protocols")
+        try { lm.create(noMqtt); fail("relay without the mqtt subprotocol") } catch (e: HostError) { assertEquals(HostError.BAD_PARAMS, e.code) }
+        val wrongKind = JSONObject(params.toString()).put("endpoint", JSONObject().put("kind", "serial").put("config", JSONObject()))
+        try { lm.create(wrongKind); fail() } catch (e: HostError) { assertEquals(HostError.BAD_PARAMS, e.code) }
+        try { lm.create(JSONObject(params.toString()).put("auto", "elsewhere")); fail() } catch (e: HostError) { assertEquals(HostError.BAD_PARAMS, e.code) }
+    }
 
     private fun createParams(kind: String = "serial", type: String? = null) = JSONObject()
         .put("name", "Radio").put("endpoint", JSONObject().put("kind", kind).put("config", JSONObject()))

@@ -21,16 +21,38 @@ No hub, no radio, no internet: just phones (and laptops) near each other.
 
 | Devices | Best method | Typical reach |
 |---|---|---|
+| Phones, tablets, computers on one Wi-Fi or one phone's hotspot (Android and iPhone mixed) | **Nearby devices** (automatic, on after setup) | The Wi-Fi network |
 | Any two phones with the app | Bluetooth | Roughly 10-50 m |
 | Android phones (or computers) on one Wi-Fi network or one Android hotspot | Wi-Fi (UDP) | The Wi-Fi network |
 | iPhones and iPads | Apple peer-to-peer | Same room / building |
-| Android with iPhone | Bluetooth (iPhone in the foreground), or TCP over shared Wi-Fi, or a hub | see below |
+| Android with iPhone | Nearby devices on shared Wi-Fi, Bluetooth (iPhone in the foreground), TCP over shared Wi-Fi, or a hub | see below |
 | Browsers only (no app installed) | WebRTC pairing with two codes | The local network |
 | Nothing connects | Sound (speaker to microphone), or files and QR codes | Arm's length / carried by hand |
 
-All of these start the same way: **More → Links & radios → Add connection**, pick the
+**Nearby devices** needs nothing here: it is a switch in **Settings → Connections** and connects
+every EmberMesh device on the same network by itself ([Connections](connections.md)). Everything
+else, **including Bluetooth**, is added by hand. Contacts far away can be reached over the internet
+with the optional internet relay (same chapter).
+
+All the others start the same way: **More → Links & radios → Add connection**, pick the
 connection type, check the settings, tap **Connect**. You can add several links; EmberMesh uses
 all of them at once and relays between them.
+
+## Same Wi-Fi: Nearby devices (automatic)
+
+1. Join all devices to the same Wi-Fi, or to one phone's hotspot.
+2. Make sure **Settings → Connections → Nearby devices** is on (it is after first-run setup).
+3. Allow the local-network prompt if the phone asks (iPhone: "find devices on your local network";
+   Android 17 and newer may ask too).
+4. Keep the apps open (on Android the background service also works).
+
+**You should see:** on **Links & radios** a card per device, **Nearby device** and then
+**Nearby: <name>**, marked **Automatic · nearby device**. Its settings are under **Change in
+Connections**. Others on that network can see your name and EmberMesh identity: read
+[Connections](connections.md) before using it on public Wi-Fi. If nothing appears, see the checklist
+in [Troubleshooting](troubleshooting.md) ("Two phones on the same Wi-Fi do not see each other").
+
+The older manual Wi-Fi link (below) still works alongside it.
 
 ## Bluetooth (phone to phone)
 
@@ -115,6 +137,7 @@ background on iPhone.
 
 In order of preference:
 
+0. **Nearby devices**, when both are on the same Wi-Fi or hotspot (above): nothing to set up.
 1. **A hub.** A laptop, a Raspberry Pi, or one of the phones themselves can run a hub
    (**Links & radios → Hub → Start hub**; see [Setting up a hub](hub-setup.md)). Everyone joins
    the same Wi-Fi (or the hub phone's hotspot) and opens the hub address in a browser, or adds a

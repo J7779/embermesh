@@ -159,6 +159,16 @@ class Node final : public LinkHost, public mesh::MeshDelegate, public mesh::Mesh
     uint64_t act_tx = 0, act_rx = 0;  // bytes not yet reported in link.activity
     uint64_t act_last = 0;            // mono ms of the last link.activity
     uint64_t io_tx_bytes = 0, io_rx_bytes = 0;
+    // Automatic links (docs/RPC_API.md §11): "" | "nearby" | "relay"; never persisted.
+    std::string auto_kind, auto_role, auto_key;
+    std::string auto_neighbour;  // nearby: node id heard on it (hex), once beacons arrived
+  };
+
+  // One session of a relay link attached to the engine as its own (scoped) link.
+  struct RelayChildRec {
+    uint32_t parent = 0;
+    std::string key;
+    Link* link = nullptr;
   };
 
   struct ChannelRec {
@@ -196,6 +206,23 @@ class Node final : public LinkHost, public mesh::MeshDelegate, public mesh::Mesh
   mesh::MeshConfig mesh_config() const;
   void flush_periodic(bool force);
   void sweep();
+  // connectivity (node_connectivity.cpp)
+  RpcResult m_connectivity_get(Params& p);
+  RpcResult m_connectivity_set(Params& p);
+  RpcResult m_connectivity_network_changed(Params& p);
+  Json connectivity_json();
+  void connectivity_tick(bool force);
+  void relay_sync(LinkRec& r);
+  void relay_detach_children(uint32_t parent);
+  void nearby_dedupe();
+  void remove_link_internal(uint32_t id, const char* reason);
+  bool check_auto_link(const std::string& kind, const std::string& role, const std::string& key, const std::string& type,
+                       RpcResult* err);
+  uint32_t relay_child_id(const Link* l) const;
+  bool check_relay_endpoint(const Json& endpoint, RpcResult* err);
+  bool connectivity_ready() const;
+  void mark_channel_relay_allowed(const std::string& id, bool allowed);
+  void connectivity_shutdown(const char* reason);
   uint64_t mesh_now() const;
 
   // --- storage helpers --------------------------------------------------------------------------
@@ -357,6 +384,7 @@ class Node final : public LinkHost, public mesh::MeshDelegate, public mesh::Mesh
   RpcResult m_morse_rx_status(Params& p);
   RpcResult m_morse_rx_reset(Params& p);
   RpcResult m_morse_rx_stop(Params& p);
+  RpcResult m_morse_rx_target(Params& p);
   morse_rx::Session* morse_session(Params& p, RpcResult* err);
   RpcResult m_tools_qr(Params& p);
 
@@ -430,6 +458,12 @@ class Node final : public LinkHost, public mesh::MeshDelegate, public mesh::Mesh
 
   guides::GuideLibrary lib_;
   morse_rx::Sessions morse_;  // morse.rx.* receive sessions (bounded, idle-expired)
+  std::map<uint32_t, RelayChildRec> relay_children_;  // engine link id -> relay session child
+  std::map<NodeId, std::pair<crypto::Key32, crypto::Key32>> relay_root_cache_;  // contact -> (dh_pk, relay root)
+  uint32_t next_relay_child_id_ = 0x40000000u;        // ids of session links (never persisted)
+  std::string nearby_token_;                          // random per node start (CONNECTIVITY §3.2)
+  uint64_t last_connectivity_ms_ = 0;
+  std::string last_connectivity_dump_;
 };
 
 }  // namespace ember::node

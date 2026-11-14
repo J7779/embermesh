@@ -1,6 +1,6 @@
 ---
 id: embermesh/quick-reference
-title: "EmberMesh 30: Glossary and Quick Reference Card"
+title: "EmberMesh 31: Glossary and Quick Reference Card"
 category: embermesh
 tags: [embermesh, reference, glossary, ports, addresses, link types, status, priority, phonetic alphabet, menu, emberd, cheat sheet]
 summary: "One-page reference: where things are in the app, ports and default addresses, link types, link and message status, priorities, check-in and bulletin categories, emberd commands, the phonetic alphabet and a glossary."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 30
+order: 31
 ---
 
 # Glossary and Quick Reference Card
@@ -33,6 +33,8 @@ Per-device guides: [Android](app-android.md), [iPhone/iPad](app-ios.md), [browse
 | Send a typed message by flashlight or screen, read it with a camera | **Tools → Morse send & read** (**Send** / **Read by camera**) |
 | This manual, Connect a radio, What you need, Read Morse code | **Instructions** (the **Help** tab on phones) |
 | Notes, checklists, supply inventory | **More → Notes & lists** |
+| Nearby devices (same Wi-Fi) and the internet relay, relays list | **More → Settings → Connections** |
+| Can I reach this contact now? | **People → Contacts →** the contact → **Reaching <name>** |
 | Name, callsign, region, low power, relaying, position, clock, identity, passphrase, wipe, bundles | **More → Settings** |
 | Airtime and relay statistics | **More → Mesh statistics** |
 | Run a hub on this phone or computer | **More → Links & radios → Hub → Start hub** |
@@ -58,7 +60,9 @@ On wide screens the items under **More** are in the side bar.
 | Wi-Fi / LAN discovery (UDP multicast) | `239.83.77.69` port `47474` |
 | Phone TCP server (Android, iPhone) | port `47475` |
 | Android Wi-Fi Direct | TCP port `47476` |
-| Local network service name | `_embermesh._tcp` |
+| Local network service name (Nearby devices) | `_embermesh._tcp` (TCP port `47475` or any free port) |
+| Default internet relay | `wss://broker.hivemq.com:8884/mqtt` |
+| Your own hub as relay (`emberd --relay-broker`) | port `8438`, path `/mqtt`, behind a TLS proxy: `wss://<your name>/mqtt` |
 | Direwolf KISS over TCP | port `8001` |
 | Meshtastic over TCP | port `4403` |
 | rtl_tcp SDR server | port `1234` |
@@ -83,6 +87,10 @@ Serial speeds: Meshtastic, RNode and Reyax modules **115200**; most KISS TNCs **
 | RNode LoRa radio | `rnode` | RNode firmware boards |
 | LoRa AT-command module (Reyax) | `lora_at` | REYAX RYLR998/498/896/406 |
 | SDR receiver (rtl_tcp) | `rtl_tcp` | Listen only |
+| Internet relay (MQTT) | `relay` | Automatic: the internet relay, shown as **Automatic · internet relay** |
+| (Nearby device) | `stream`, preset `nearby` | Automatic: Nearby devices, shown as **Automatic · nearby device** |
+
+Automatic links have **Change in Connections** instead of settings and Remove.
 
 ## Link card
 
@@ -135,14 +143,14 @@ minutes.
 
 | Setting (Settings → Mesh & relaying) | Default | Range |
 |---|---|---|
-| Relay messages for others | on | |
+| Pass on messages for others | on | |
 | Carry undelivered messages for | 3 days | 1-30 |
 | Announce this node every | 1800 s | 60-86400 s, or 0 = never |
 | Send read receipts | on | |
 | Default hop limit (Advanced) | 7 | 1-15 |
 
 Other defaults: region United States / Canada, position sharing Manual, units metric, theme dark,
-low-power mode off.
+low-power mode off, **Nearby devices on** (after setup), **Internet relay off**.
 
 ## emberd (computer hub) essentials
 
@@ -185,6 +193,8 @@ S Sierra · T Tango · U Uniform · V Victor · W Whiskey · X X-ray · Y Yankee
 | **Hub** | A computer serving the app and the mesh over Wi-Fi (emberd) |
 | **Gateway** | A node with both a local link and a radio link |
 | **Relay** | A node placed to extend range, often unattended |
+| **Internet relay** | Optional: a server on the internet that passes sealed messages between contacts far apart while both apps are open (Settings → Connections). Not the same as a mesh relay |
+| **Nearby devices** | Automatic links to EmberMesh devices on the same Wi-Fi (Settings → Connections). Not the same as **People → Nearby** (everyone heard recently, on any link) |
 | **Net / net control** | A group on agreed frequencies / the person coordinating it |
 | **Net plan** | The announced list of frequencies, modes, tones and schedules |
 | **Node ID** | Your 16-character identity number |

@@ -22,7 +22,11 @@ import java.util.concurrent.CopyOnWriteArrayList
  * LinkManager, HostRouter, node.ready → links sync, link.ptt → PTT), but with its own storage and
  * endpoint factories so several nodes can live in one test process.
  */
-class TestNode(val label: String, val dir: File?, factories: List<EndpointFactory>) : OutboxSink {
+class TestNode(
+    val label: String, val dir: File?, factories: List<EndpointFactory>,
+    /** With a platform: Nearby devices + internet relay exactly as EmberRuntime wires them (RPC_API §11). */
+    nearbyPlatform: org.embermesh.app.connectivity.NearbyPlatform? = null,
+) : OutboxSink {
     val app = InstrumentationRegistry.getInstrumentation().targetContext
     val events = CopyOnWriteArrayList<JSONObject>()
     val ctx = HostContext(app) { e, d -> events.add(JSONObject().put("event", e).put("data", d)) }
@@ -40,9 +44,12 @@ class TestNode(val label: String, val dir: File?, factories: List<EndpointFactor
         override fun onLocationFix(pos: JSONObject) {}
     })
     @Volatile var readyCount = 0
+    val connectivity: org.embermesh.app.connectivity.ConnectivityWiring.Parts? =
+        nearbyPlatform?.let { org.embermesh.app.connectivity.ConnectivityWiring.create(ctx, runner, links, it) { m -> android.util.Log.i("TestNode", "$label: $m") } }
 
     init {
         ctx.pttLinks = { links.pttCandidates() }
+        connectivity?.controller?.setForeground(true)
         runner.start()
     }
 
@@ -54,9 +61,11 @@ class TestNode(val label: String, val dir: File?, factories: List<EndpointFactor
             "node.ready" -> ctx.io.execute {
                 try { registry.setCoreLinkTypes(runner.rpc("links.types")) } catch (_: Throwable) {}
                 links.sync()
+                connectivity?.controller?.refresh()
                 readyCount++
             }
             "link.ptt" -> links.onPtt(data.optInt("link_id"), data.optBoolean("on"))
+            "connectivity.changed", "link.removed" -> org.embermesh.app.connectivity.ConnectivityWiring.onCoreEvent(o.optString("event"), data, connectivity?.controller, links)
         }
     }
 
@@ -77,6 +86,7 @@ class TestNode(val label: String, val dir: File?, factories: List<EndpointFactor
     }
 
     fun close() {
+        connectivity?.controller?.shutdown()
         links.closeAll()
         runner.stop()
         node.close()

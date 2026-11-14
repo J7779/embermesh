@@ -1,5 +1,7 @@
 #include "doctest.h"
+#include "host/endpoint.h"
 #include "host/http.h"
+#include "host/loop.h"
 #include "host/util.h"
 #include "host/ws.h"
 
@@ -235,9 +237,51 @@ TEST_SUITE("websocket") {
     CHECK(ws_parse_url("ws://[::1]:9000", &h, &port, &p, &err));
     CHECK(h == "::1");
     CHECK(p == "/");
-    CHECK_FALSE(ws_parse_url("wss://x/ws", &h, &port, &p, &err));
+    CHECK(ws_parse_url("wss://x/ws", &h, &port, &p, &err) == ws_tls_available());  // wss only with TLS built in
+    bool tls = false;
+    if (ws_tls_available()) {
+      CHECK(ws_parse_url_tls("wss://relay.example.org/mqtt", &h, &port, &p, &tls, &err));
+      CHECK(tls);
+      CHECK(port == 443);
+      CHECK(h == "relay.example.org");
+    }
     CHECK_FALSE(ws_parse_url("ws://x:99999/", &h, &port, &p, &err));
     CHECK_FALSE(ws_parse_url("ws:///x", &h, &port, &p, &err));
     CHECK_FALSE(ws_parse_url("ftp://x", &h, &port, &p, &err));
+  }
+  TEST_CASE("relay sockets (protocols contains mqtt): RPC_API section 11 rules") {
+    struct NullSink : EndpointSink {
+      void ep_rx(Endpoint&, const uint8_t*, size_t) override {}
+      void ep_state(Endpoint&, bool, const std::string&) override {}
+    } sink;
+    EndpointRegistry reg;
+    register_net_endpoints(reg);
+    const EndpointKind* k = reg.find("websocket");
+    REQUIRE(k);
+    Loop loop;
+    auto make = [&](const std::string& cfg, std::string* err) {
+      err->clear();
+      return k->create(loop, sink, Json::parse_or_null(cfg), err) != nullptr;
+    };
+    std::string err;
+    // Not a relay socket: plain ws:// anywhere is fine (hub-to-hub links).
+    CHECK(make(R"({"url":"ws://192.0.2.10:8437/ws"})", &err));
+    // Relay socket, plaintext: refused without allow_plaintext, and to anything but a local host.
+    CHECK_FALSE(make(R"({"url":"ws://192.0.2.10/mqtt","protocols":["mqtt"]})", &err));
+    CHECK_FALSE(make(R"({"url":"ws://192.0.2.10/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK(err.find("local") != std::string::npos);
+    CHECK_FALSE(make(R"({"url":"ws://relay.example.org/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK_FALSE(make(R"({"url":"ws://127.0.0.1:8438/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK(make(R"({"url":"ws://relay-box.local:8438/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK(make(R"({"url":"ws://10.0.0.2:8438/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK(make(R"({"url":"ws://[fe80::1]:8438/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK(make(R"({"url":"ws://[fd00::2]:8438/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    CHECK_FALSE(make(R"({"url":"ws://198.51.100.7/mqtt","protocols":["mqtt"],"allow_plaintext":true})", &err));
+    // "insecure" is never accepted, whatever its value.
+    CHECK_FALSE(make(R"({"url":"wss://relay.example.org/mqtt","protocols":["mqtt"],"insecure":true})", &err));
+    CHECK_FALSE(make(R"({"url":"wss://relay.example.org/mqtt","protocols":["mqtt"],"insecure":false})", &err));
+    CHECK(err.find("insecure") != std::string::npos);
+    // wss:// is accepted exactly when this build has TLS.
+    CHECK(make(R"({"url":"wss://relay.example.org/mqtt","protocols":["mqtt"]})", &err) == ws_tls_available());
   }
 }

@@ -3,6 +3,7 @@ import { h, clear, svg, debounce, append } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { toast, toastError, sheet, confirmDialog, showQr, avatar, empty, segmented, promptDialog, signalBars, skeletonRows } from '../lib/ui.js';
 import { playClass } from '../lib/motion.js';
+import { loadConnectivity, reachText, internetOffer, isRelaySession } from '../lib/connectivity.js';
 import { timeAgo, distance, bearing, compass, formatDistance, formatBytes, formatDuration, displayName, validPos, formatPos } from '../lib/format.js';
 import { hopsLabel, validLinkId } from '../lib/core_spec.js';
 
@@ -78,6 +79,7 @@ async function myCard(app) {
 }
 
 async function addContact(app, done) {
+  const offerSlot = h('div');
   const card = h('textarea', { rows: 3, placeholder: 'Paste an ember: contact card' });
   const nodeId = h('input', { type: 'text', placeholder: '16 hex characters', maxlength: 16, autocapitalize: 'off', spellcheck: 'false' });
   const name = h('input', { type: 'text', placeholder: 'Name (optional)' });
@@ -109,12 +111,18 @@ async function addContact(app, done) {
           submit({ node_id: id, ...(name.value.trim() ? { name: name.value.trim() } : {}) });
         },
       }, 'Add by ID'))),
-    err));
+    err, offerSlot));
+  // relay off: one quiet, one-tap offer to reach contacts at any distance (RPC_API §11)
+  loadConnectivity(app).then(c => { const o = c && internetOffer(app, c); if (o) offerSlot.appendChild(h('div', { class: 'stack' }, h('h3', null, 'Far away?'), o)); }).catch(() => {});
 }
 
 async function contactDetail(app, id, root) {
   const page = h('div', { class: 'page' });
   root.appendChild(page);
+  // reachability changes when links come up or go down (nearby, relay): refresh, gently
+  const refresh = debounce(() => { if (page.isConnected && !page.contains(document.activeElement)) load(); }, 1200);
+  app.on('link.state', refresh);
+  app.on('connectivity.changed', refresh);
   const me = await ownPosition(app);
   let pingSent = 0;
   async function load() {
@@ -127,6 +135,15 @@ async function contactDetail(app, id, root) {
       return;
     }
     const upd = async patch => { try { await app.api.call('contacts.update', { node_id: id, ...patch }); load(); } catch (e) { toastError(e); } };
+    // How they can be reached now (never implies a delivery that has not happened)
+    const [lr, conn] = await Promise.all([app.api.try('links.list', {}, { links: [] }, true), loadConnectivity(app).catch(() => null)]);
+    // Contact.reach (§11 rev 2): how they can be reached now — never a promise of delivery
+    const reach = c.reach ? reachText(c.reach, lr.links) : null;
+    const offer = conn ? internetOffer(app, conn, { onChange: () => setTimeout(load, 1500) }) : null;
+    const reachCard = reach || offer ? h('section', { class: 'card stack reach', 'aria-labelledby': 'reach-h' },
+      h('h2', { id: 'reach-h' }, 'Reaching ' + displayName(c)),
+      reach ? h('p', { class: 'row nowrap reach-' + reach.state }, h('span', { class: 'dot ' + (reach.state === 'none' ? '' : 'up'), 'aria-hidden': 'true' }), h('span', { class: 'grow' }, reach.text)) : null,
+      offer) : null;
     const pingOut = h('span', { class: 'muted small', 'aria-live': 'polite' });
     const cardText = h('textarea', { rows: 3, placeholder: 'Paste their ember:card?… text (from their My card screen)' });
     // A card carries the node's public keys: if it is this node, the keys now match and the contact is verified.
@@ -151,6 +168,7 @@ async function contactDetail(app, id, root) {
               try { await app.api.call('mesh.ping', { node_id: id }); pingSent = Date.now(); pingOut.textContent = 'Ping sent…'; } catch (e) { toastError(e, 'Ping failed'); }
             },
           }, icon('ping'), 'Ping'), pingOut)),
+      reachCard,
       h('div', { class: 'card stack' },
         h('h2', null, 'Verify identity'),
         h('p', { class: 'muted' }, 'Ask them to read their fingerprint words (over the radio, phone or in person). If every word matches the list below, mark the contact as verified.'),
@@ -197,6 +215,7 @@ async function contactDetail(app, id, root) {
 }
 
 function linkLabel(app, id) {
+  if (isRelaySession(id)) return 'internet relay'; // a relay session link (§11 rev 2)
   if (!validLinkId(id)) return '—';
   const l = (app.store.get('links') || []).find(x => x.id === id);
   return l ? (l.name || l.type) : 'link ' + id;

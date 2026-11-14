@@ -43,6 +43,15 @@ hostile.
 from where) is visible to anyone in range; passphrase channels can be attacked offline with weak
 passphrases; verification only means something for contacts you verified yourself; the hub uses
 plain HTTP/WebSocket on the local network; the code has not had an independent security audit.
+**Nearby devices** (on after first-run setup) shows your name and identity to every EmberMesh
+device on the same Wi-Fi or LAN, which can recognise you there again. The **internet relay** (off
+until you consent) sends sealed frames through third-party MQTT brokers: the broker and, on brokers
+that allow wildcard subscriptions, anyone else can see your IP address (broker only), topic names,
+message sizes (padded to six classes), counts and timing, though not contents or who is behind a
+topic; a single default relay is a single point of failure that its operator can block. A
+compromised contact key lets an attacker read and inject that contact's relay traffic from
+anywhere. Channels with a weak passphrase are never relayed. Details: [docs/CONNECTIVITY.md](docs/CONNECTIVITY.md)
+§2, §4.6 and §6.
 
 The full threat model and the mechanisms are in [docs/PROTOCOL.md](docs/PROTOCOL.md) (§4 Security,
 §9 Mesh time, §10 Bounds, §11 Admission control), the hub's in

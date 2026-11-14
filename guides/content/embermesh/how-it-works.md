@@ -17,7 +17,7 @@ order: 2
 
 ## The short version
 
-- Every device running EmberMesh is a **node**. There is no central server.
+- Every device running EmberMesh is a **node**. There is no central server and no account.
 - Nodes pass messages to whatever nodes they can reach: by Bluetooth, Wi-Fi, a radio, a cable,
   a USB stick or a QR code. Each of these is called a **link**.
 - A node that has several links **relays between them automatically**. A laptop with a radio and
@@ -26,6 +26,11 @@ order: 2
   A person walking from one camp to another is a working link.
 - **Direct messages are end-to-end encrypted.** Relays carry them but cannot read them.
 - The **Public** channel is open: anyone can read it, but nobody can forge your name on it.
+- Two connections happen **by themselves** when you allow them: **Nearby devices** links every
+  EmberMesh device on the same Wi-Fi (on after setup), and the optional **Internet relay** reaches
+  your contacts over the internet at any distance while both apps are open (off until you turn it
+  on). Everything else, including Bluetooth and radios, you add under Links & radios. See
+  [Connections](connections.md).
 
 ## The mesh
 
@@ -42,7 +47,7 @@ route. Each node simply re-sends new messages on its other links, a limited numb
   forever.
 - **Duplicates** are recognised and dropped, so the same message arriving by two paths is shown
   once.
-- **Relaying is on by default** (**Settings → Mesh & relaying → Relay messages for others**).
+- **Relaying is on by default** (**Settings → Mesh & relaying → Pass on messages for others**).
   Leave it on: it is what makes the mesh work. Turn it off only to save battery in a crisis.
 - **Blocking** a contact hides their messages from you, but your device still relays their
   traffic for others.
@@ -142,6 +147,10 @@ Things to know:
 - **No forward secrecy.** Encryption uses your long-term keys. Someone who records traffic today
   and later steals your device and passphrase could decrypt what they recorded. See
   [Security](security.md).
+- **Over the internet relay** every frame is sealed end to end with a secret only you and the contact hold: the
+  relay operator sees your IP address, online times and which devices exchange messages, but not
+  names, node IDs or content ([Connections](connections.md)). Nothing received through a relay is
+  passed on to amateur-radio links.
 - **Amateur-radio links carry no encryption.** On any link marked **No encryption (amateur)**,
   EmberMesh sends only signed cleartext with your callsign: the Public channel, open channels,
   SOS, check-ins and bulletins. Encrypted direct messages and private channels are **never** put

@@ -65,6 +65,9 @@ code of the first one (`--no-qr` hides it), and the operator address
 | `--port N`, `--bind ADDR` | Hub port (default 8437); bind address (default all; `127.0.0.1` = this computer only) |
 | `--no-hub` | No web hub (pure radio gateway / relay) |
 | `--no-udp` | No Wi-Fi/LAN multicast link (`239.83.77.69:47474`) |
+| `--no-nearby` | No Nearby devices (automatic local-network links) |
+| `--setup-done` | Acknowledge the Nearby/internet notices on a hub with no screen (what first-run setup does) |
+| `--relay-broker [PORT]` | Also run a private internet relay at `/mqtt` on its own port (default 8438); put it behind a TLS proxy ([Setting up a hub](hub-setup.md)) |
 | `--passphrase-file FILE` | Unlock a passphrase-protected store at start |
 | `--kiss-tcp HOST:PORT`, `--kiss-serial PORT[:BAUD]` | Quick KISS TNC links (Direwolf: `127.0.0.1:8001`) |
 | `--radio "preset=...,in=...,out=...,ptt=..."` | Quick sound-card radio link with a **Radio setup** preset, e.g. `--radio "preset=handheld_vox,in=USB Audio,out=USB Audio"` (see [Baofeng UV-5R](baofeng-uv5r.md)) |
@@ -110,6 +113,13 @@ settings. Guests' pages are separate nodes.
 | `call <method> [json]`, `quit` | Raw call; exit |
 
 ## 5. Connections on a computer
+
+**Automatic connections** ([Connections](connections.md)): emberd takes part in **Nearby devices**
+on its local network once the first-run notice is acknowledged (operator page setup, or
+`--setup-done` on a hub with no screen; `--no-nearby` turns it off). It **cannot use the internet
+relay yet**: Settings → Connections shows "Not available in this app yet: it cannot make encrypted
+(TLS) connections." It can, however, **run** a private relay for phones and browsers
+(`--relay-broker`, see [Setting up a hub](hub-setup.md)).
 
 On the operator page: **Links & radios → Add connection**:
 

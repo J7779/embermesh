@@ -8,6 +8,7 @@ export const APP_LICENCE = { name: 'MIT License', copyright: 'Copyright (c) 2026
 export const THIRD_PARTY = [
   { name: 'Monocypher', version: '4.0.2', licence: 'BSD-2-Clause or CC0-1.0', use: 'cryptography, in every app' },
   { name: 'miniaudio', version: '0.11.21', licence: 'Public domain (Unlicense) or MIT-0', use: 'sound cards, desktop app only' },
+  { name: 'Mbed TLS', version: '3.6.2', licence: 'Apache-2.0', use: 'secure connection to internet relays, desktop app only' },
   { name: 'ZXing core', version: '3.5.3', licence: 'Apache-2.0', use: 'QR scanning, Android app only' },
   { name: 'potion-base-4M', version: '9b3cff412d30', licence: 'MIT', use: 'smart-search model by Minish Lab, 4-bit, inside the guide pack' },
   { name: 'QR Code generator library', version: 'Project Nayuki', licence: 'MIT', use: 'QR code encoder in the core (adapted parts)' },

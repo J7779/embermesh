@@ -34,6 +34,7 @@ struct StreamPreset {
 const StreamPreset kPresets[] = {
     {"cable", 2048, 115200, 0, 0, false, false, false, false, 2},
     {"tcp", 4096, 1000000, 0, 0, false, false, false, true, 1},
+    {"nearby", 4096, 1000000, 0, 0, false, false, false, true, 1},  // automatic LAN links: hello first
     {"ble", 512, 20000, 0, 0, false, false, false, false, 3},
     {"bt_spp", 2048, 200000, 0, 0, false, false, false, true, 3},
     {"ebyte", 200, 2400, 2400, 150, true, true, true, false, 25},
@@ -55,6 +56,7 @@ Schema stream_schema() {
       select("preset", "Device / cable", "cable",
              {{"cable", "USB or serial cable between two devices"},
               {"tcp", "TCP connection (also Wi-Fi Direct)"},
+              {"nearby", "Nearby device (automatic; starts with the EmberMesh hello)"},
               {"ble", "Bluetooth LE (UART adapter or phone-to-phone)"},
               {"bt_spp", "Classic Bluetooth serial (SPP)"},
               {"ebyte", "Ebyte E22 / E32 LoRa module (transparent mode)"},
@@ -216,6 +218,7 @@ class StreamLink final : public LinkBase {
     write_chunk_ = static_cast<size_t>(c.get_int("write_chunk"));
     caps_ = k;
     preset_ = p.id;
+    hello_ = preset_ == "nearby";
     // Receive limit = our mtu (both ends must use the same preset/mtu); bounds per-candidate work.
     if (rx_max_ != k.mtu) {
       rx_max_ = k.mtu;
@@ -242,6 +245,13 @@ class StreamLink final : public LinkBase {
   }
 
   void on_io_state(bool connected) override {
+    hello_got_ = 0;
+    hello_failed_ = false;
+    if (connected && hello_) {
+      // CONNECTIVITY §3.3: "EMNB", version 1, three reserved zero bytes, before anything else.
+      io_write(ByteView(kHello, sizeof kHello));
+      hello_deadline_ = now() + 2000;
+    }
     dec_.reset();
     fecrx_.reset();
     pacer_.reset();
@@ -252,6 +262,17 @@ class StreamLink final : public LinkBase {
   void on_io_bytes(ByteView d) override {
     if (d.empty()) return;
     st_.io_rx_bytes += d.size();
+    if (hello_ && hello_failed_) return;
+    if (hello_ && hello_got_ < sizeof kHello) {
+      size_t n = 0;
+      while (n < d.size() && hello_got_ < sizeof kHello) {
+        if (d[n] != kHello[hello_got_]) { fail_hello("the other side is not an EmberMesh nearby device"); return; }
+        ++hello_got_;
+        ++n;
+      }
+      d = d.sub(n);
+      if (d.empty()) return;
+    }
     last_rx_ms_ = now();
     if (state_ != LinkState::Up) set_state(LinkState::Up);
     uint64_t before = dec_.stats().bad_crc + dec_.stats().bad_header + dec_.stats().oversize;
@@ -269,13 +290,18 @@ class StreamLink final : public LinkBase {
     }, &st_.rx_errors);
   }
 
-  void tick(uint64_t now_ms) override { pump(now_ms); }
+  void tick(uint64_t now_ms) override {
+    if (hello_ && !hello_failed_ && hello_got_ < sizeof kHello && state_ == LinkState::Up && now_ms >= hello_deadline_)
+      fail_hello("no EmberMesh hello within 2 s");
+    pump(now_ms);
+  }
 
   std::string status_json() const override {
     Json j = base_status();
     j.set("preset", preset_).set("fec", fec_).set("fec_roots", roots_).set("pace_bps", pace_bps_);
     j.set("gap_ms", gap_ms_).set("fec_corrected", fec_corrected_);
     j.set("framing_discarded_bytes", dec_.stats().discarded_bytes);
+    if (hello_) j.set("hello", hello_failed_ ? "failed" : hello_got_ >= sizeof kHello ? "ok" : "pending");
     j.set("rx_budget_skipped", dec_.stats().budget_skipped + fecrx_.budget_skipped());
     j.set("caps", caps_json(caps_));
     return j.dump();
@@ -290,8 +316,17 @@ class StreamLink final : public LinkBase {
   }
 
  private:
+  static constexpr uint8_t kHello[8] = {0x45, 0x4D, 0x4E, 0x42, 0x01, 0x00, 0x00, 0x00};
+
+  void fail_hello(const char* why) {
+    hello_failed_ = true;
+    dec_.reset();
+    q_.clear();
+    set_state(LinkState::Error, why);
+  }
+
   void pump(uint64_t t) {
-    if (state_ != LinkState::Up) return;
+    if (state_ != LinkState::Up || (hello_ && (hello_failed_ || hello_got_ < sizeof kHello))) return;
     while (!q_.empty()) {
       if (pace_bps_ && !pacer_.ready(t)) return;
       if (caps_.half_duplex && gap_ms_ && last_rx_ms_ && t < last_rx_ms_ + gap_ms_) return;
@@ -337,6 +372,9 @@ class StreamLink final : public LinkBase {
   uint8_t roots_ = 16;
   size_t write_chunk_ = 0;
   size_t rx_max_ = kRxMax;
+  bool hello_ = false, hello_failed_ = false;
+  size_t hello_got_ = 0;
+  uint64_t hello_deadline_ = 0;
   stream::Decoder dec_;
   FecReceiver fecrx_;
   Pacer pacer_;

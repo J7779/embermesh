@@ -1,6 +1,6 @@
 ---
 id: embermesh/security
-title: "EmberMesh 27: Security and Safety of Your Data"
+title: "EmberMesh 28: Security and Safety of Your Data"
 category: embermesh
 tags: [embermesh, security, privacy, passphrase, lock, duress, panic wipe, backup, identity, verification, encryption, eavesdropping, metadata, forward secrecy]
 summary: "Protecting EmberMesh on your device and on the air: storage passphrase and lock, duress passphrase, panic wipe, identity backup and restore, verifying contacts, what an eavesdropper can and cannot see, and the system's limits."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 27
+order: 28
 ---
 
 # Security and Safety of Your Data
@@ -147,13 +147,18 @@ fake.
 | Anyone you show your **contact card or QR code** | Your node id, name and public keys |
 | Anyone **in radio range or on the same network** | The Public channel, open channels, SOS, check-ins, bulletins, net plans, and every node's announcement (name, callsign, status, public keys, and position if sharing is Automatic) |
 | **Hub guests** | The hub's name, address and node id (from `/hub.json`), and the files offered at `/download/` |
-| Devices on the same Wi-Fi | When a TCP server / local network listener link is on, Android and iPhone advertise a network service of type `_embermesh._tcp` with the anonymous name above |
+| Devices on the same Wi-Fi | With **Nearby devices** on (the default after setup): that a device at your address runs EmberMesh (service `_embermesh._tcp`, named "EmberMesh-" plus a random token that changes at every start and network change); once connected, your **name and EmberMesh identity**, like any mesh neighbour. Phones also announce their own network host name through the system, which on some phones is derived from the device name. A TCP server / local network listener link advertises the same service type with the anonymous name above |
+| A **relay operator** (only with **Internet relay** on) | Your IP address (so roughly where you are), when you are online, roughly how many contacts you have, which other users you exchange messages with, across days and networks; message sizes and timing. **Not** content, names, node ids or keys |
+| Anyone watching a public relay | Topic names, sizes and timing on relays that allow it (those are listed but off by default); not your address or content |
+| Your **contacts** (with Internet relay on) | When you come online |
 | Anyone who sees a **WebRTC pairing code** | This device's local network addresses (and, only if a STUN server was configured, its public internet address); the code is useless after pairing |
 | Outside the app's control | Android itself shows the phone's own Wi-Fi Direct and Bluetooth names to devices it pairs with (system settings) |
 
-**What the apps never send:** no analytics, no tracking, no requests to any internet server. The
-interface talks only to its own app or hub; the phone apps block every outside web address. The only
-traffic is mesh traffic over the links you add.
+**What the apps never send:** no analytics, no tracking, no requests to any internet server of
+ours. The interface talks only to its own app or hub; the phone apps block every outside web
+address. The only traffic is mesh traffic over the links you add, Nearby devices on your local
+network, and, **only if you turn on the Internet relay**, encrypted connections to the relay servers
+listed in Settings → Connections ([Connections](connections.md)).
 
 ## What an eavesdropper can and cannot see
 
@@ -176,6 +181,12 @@ Also remember:
 - **Transmitting reveals where you are.** Anyone with a direction-finding antenna can locate a
   transmitter. A message, a beacon or an SOS all transmit.
 - **Who talks to whom, when, and how much** is visible even when content is not.
+- **The internet relay is a third party.** The default relay is a free service run by another
+  company. If being seen online, or being linked to the people you write to, could put you in
+  danger, leave the internet relay off or use only a relay on your own hub.
+- **Public Wi-Fi with Nearby devices on:** strangers' devices on that network become mesh
+  neighbours and see your name and identity. Turn **Nearby devices** off on networks you do not
+  trust.
 
 ## Limits of the system
 

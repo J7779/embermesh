@@ -1,6 +1,6 @@
 ---
 id: embermesh/running-a-net
-title: "EmberMesh 23: Running a Net on a Shared Frequency"
+title: "EmberMesh 24: Running a Net on a Shared Frequency"
 category: embermesh
 tags: [embermesh, net, net plan, frequency, net control, callsign, amateur, licence-free, frs, gmrs, pmr446, murs, cb, airtime, duty cycle, schedule, check-in, voice]
 summary: "How a gateway announces the frequency plan, how everyone tunes their handhelds to it, licence-free versus amateur bands, the no-encryption and callsign rules, channel discipline, airtime, scheduled check-in windows, and how voice-only radio users take part."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 23
+order: 24
 ---
 
 # Running a Net on a Shared Frequency

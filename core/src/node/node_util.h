@@ -90,8 +90,15 @@ inline int status_rank(std::string_view s) {
   return -1;  // failed / received / unknown
 }
 
+Json default_relays();  // node_connectivity.cpp
+// Settings as shown to the UI: relay passwords removed (docs/RPC_API.md §11).
+Json strip_connectivity_secrets(const Json& settings);
+
 inline Json default_settings() {
-  return Json::object({{"region", "US"},
+  return Json::object({{"connectivity.nearby", true},
+                       {"connectivity.internet", false},
+                       {"connectivity.relays", default_relays()},
+                       {"region", "US"},
                        {"relay_enabled", true},
                        {"store_forward_days", 3},
                        {"beacon_interval_s", 1800},

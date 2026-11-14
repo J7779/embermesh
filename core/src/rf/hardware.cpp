@@ -382,6 +382,23 @@ std::vector<HardwareMethod> build() {
   }
   {
     HardwareMethod m;
+    m.id = "internet_relay";
+    m.title = "Reach contacts over the internet (relay)";
+    m.what_it_connects = "phone or computer ↔ internet ↔ relay server ↔ your contact";
+    m.link_type = "relay";
+    m.any_kinds = {"websocket"};
+    m.items = {I("An internet connection", "Mobile data, Wi-Fi with internet, or satellite internet.", true),
+               I("Nothing else", "The relay is a public or private server reached over a secure WebSocket.", false)};
+    m.note_desktop = "The desktop app checks relay certificates against the computer's own trusted roots "
+                     "(it never falls back to an unencrypted connection).";
+    m.note_web = std::string(kWebSecure);
+    m.steps_summary = "Turn on the internet relay in Settings (it is off until you agree).";
+    m.manual_chapter = "embermesh/connections";
+    m.proven = "emulated";
+    v.push_back(m);
+  }
+  {
+    HardwareMethod m;
     m.id = "sneakernet";
     m.title = "Carry messages on a USB stick or card (sneakernet)";
     m.what_it_connects = "device ↔ storage ↔ device";

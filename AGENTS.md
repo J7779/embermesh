@@ -148,7 +148,11 @@ authors. Anything committed to a public repository is published forever, forks i
   default a name to the OS user, host or device name; never broadcast more than a feature needs.
 - **No telemetry, ever.** No analytics, crash reporting, remote logging, update checks, CDNs,
   fonts or any third-party network request in the apps or the UI. Everything must work with no
-  server and no internet; the UI may only talk to its own origin.
+  server and no internet; the UI may only talk to its own origin. The one exception is the
+  **internet relay** (docs/CONNECTIVITY.md §4): MQTT brokers the user consented to, off by default,
+  sealed frames only, empty client id, no identifying User-Agent. Do not add another relay default,
+  enable one that allows `#` or `+` subscriptions, or send anything before consent; Nearby
+  discovery stays on the local network.
 - **Dependencies:** none at runtime beyond the vendored, permissively licensed code with its
   licence text; every GitHub Action pinned to a commit SHA; toolchains pinned (docs/CI.md "Pinned
   versions").

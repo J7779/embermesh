@@ -3,6 +3,7 @@ import { h, clear, append } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { toastError } from '../lib/ui.js';
 import { simpleOffer } from './accessibility.js';
+import { loadConnectivity, connectChoices, setConnectivity } from '../lib/connectivity.js';
 
 export const REGIONS = [
   ['US', 'United States / Canada (ITU 2)'], ['EU', 'Europe (ITU 1)'], ['UK', 'United Kingdom'], ['AU', 'Australia / NZ'],
@@ -44,11 +45,27 @@ export default async function render(app, _p, root) {
     try {
       const i = await app.api.call('node.set_profile', { name: n, callsign: callsign.value.trim().toUpperCase() });
       await app.api.try('settings.set', { settings: { region: region.value } }, null, true);
-      step2(i || info);
+      const conn = await loadConnectivity(app).catch(() => null);
+      step2(i || info, conn);
     } catch (e) { toastError(e, 'Could not save profile'); }
   }
 
-  function step2(i) {
+  // "Connect to people" (RPC_API §11 rev 2): both notices come from the core; Nearby devices is
+  // recommended and on, the internet relay off until chosen. "Start using EmberMesh" applies them
+  // together with setup_done (hosts start nothing before that).
+  let connChoice = null, connCore = false;
+  function connectCard(conn) {
+    connCore = !!conn;
+    const ch = connectChoices(app, conn);
+    if (!ch) return null;
+    connChoice = ch.choice;
+    return h('section', { class: 'card stack setup-connect', 'aria-labelledby': 'setup-connect-h' },
+      h('h2', { id: 'setup-connect-h' }, 'Connect to people'),
+      h('p', { class: 'small' }, 'Choose how this device finds the people you talk to. You can change both later in Settings → Connections.'),
+      ch.el);
+  }
+
+  function step2(i, conn) {
     append(clear(wrap), 
       h('h1', null, 'Your identity'),
       h('div', { class: 'card stack' },
@@ -58,12 +75,14 @@ export default async function render(app, _p, root) {
         h('div', { class: 'words', 'aria-label': 'Fingerprint words' }, (i.fingerprint || []).map(w => h('span', null, w))),
         h('div', { class: 'notice' }, 'Back up your identity in Settings → Identity. If this device is lost, the backup is the only way to keep your name and contacts\' trust.'),
         h('p', null, 'New to EmberMesh? ', h('a', { href: '#/help', onclick: () => finishTo('#/help') }, 'Read the instructions'), ' · ', h('a', { href: '#/links/radio', onclick: () => finishTo('#/links/radio') }, 'Connect a radio'))),
+      conn ? connectCard(conn) : null,
       h('div', { class: 'row end' }, h('button', { class: 'btn primary', onclick: finish }, 'Start using EmberMesh')));
   }
 
   async function finishTo(hash) { await finish(hash); }
 
   async function finish(to) {
+    if (connCore) await setConnectivity(app, { setup_done: true, ...(connChoice ? connChoice() : {}) }).catch(e => toastError(e, 'Connection choices not saved'));
     await app.api.try('kv.set', { ns: 'ui', key: 'setup_done', value: true }, null, true);
     await app.refreshInfo().catch(() => {});
     await app.refreshSettings();

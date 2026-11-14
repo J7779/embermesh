@@ -220,6 +220,8 @@ struct Neighbour {
   uint32_t round_bytes = 0;      // bytes we pushed to them this round
   bool relay = true;
   bool knows_us = false;         // sent us a direct pairwise-authenticated packet: has our keys
+  bool proven = false;           // identity proven: verified ANNOUNCE (hops 0) or direct pairwise packet
+  NodeId proven_node{};
   Bucket unknown_b, sync_b;      // per-neighbour admission (unknown origins, SYNC messages)
   uint64_t win_start = 0;
   uint32_t win_frames = 0;
@@ -270,6 +272,7 @@ struct Repair {
 struct LinkSlot {
   uint32_t id = 0;
   Link* link = nullptr;
+  LinkScope scope;
   LinkCaps caps;
   LinkState state = LinkState::Down;
   std::array<std::deque<QItem>, 8> q;
@@ -451,6 +454,7 @@ struct MeshEngine::Impl {
 
   MeshStats st;
   Bucket g_unknown, g_sos_unv, g_newid;  // global admission budgets
+  Bucket g_known;                        // known-but-unverifiable, across all links (review L8)
   size_t push_bytes_left_ = 0;            // sync push budget of the message being handled
 
   // --- helpers (engine.cpp) -------------------------------------------------------------------
@@ -519,6 +523,20 @@ struct MeshEngine::Impl {
   // transmit path (tx.cpp)
   static uint8_t link_prio(const proto::Header& h);
   bool allowed_on(const LinkSlot& L, const proto::Header& h) const;
+  bool in_scope(const LinkSlot& L, const proto::Header& h) const;
+  bool reachable_elsewhere(const LinkSlot& L) const;
+  void mark_proven(uint32_t link_id, uint32_t hop_src, const NodeId& node) {
+    auto lit = links.find(link_id);
+    if (lit == links.end()) return;
+    auto nb = lit->second.nbrs.find(hop_src);
+    if (nb == lit->second.nbrs.end()) return;
+    nb->second.proven = true;
+    nb->second.proven_node = node;
+  }
+  bool from_relay_session(uint32_t link_id) const {
+    auto it = links.find(link_id);
+    return it != links.end() && it->second.scope.relay_session;
+  }
   bool can_transmit(LinkSlot& L);
   bool contended(const LinkSlot& L) const {
     return cfg.slow_channel_etiquette && L.caps.half_duplex && L.caps.bitrate_bps < 20000;

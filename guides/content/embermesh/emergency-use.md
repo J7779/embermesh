@@ -1,6 +1,6 @@
 ---
 id: embermesh/emergency-use
-title: "EmberMesh 25: Emergency Use - SOS, Check-ins, Bulletins, Position and Signalling"
+title: "EmberMesh 26: Emergency Use - SOS, Check-ins, Bulletins, Position and Signalling"
 category: embermesh
 tags: [embermesh, emergency, sos, distress, check-in, roll call, bulletins, position, gps, grid, morse, flashlight, signalling, tools]
 summary: "Using the SOS beacon and responding to one, safety check-ins and roll call, the bulletins board, sharing position without phone networks, Morse by flashlight or tone, emergency frequencies, and the offline tools worth knowing."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 25
+order: 26
 ---
 
 # Emergency Use
@@ -18,6 +18,14 @@ order: 25
 Where each control is: [Screens tour](screens-tour.md). Getting ready on your own device:
 [Android](app-android.md), [iPhone/iPad](app-ios.md), [browser](app-web.md),
 [computer](app-desktop.md).
+
+**Do not plan on the internet.** The **Internet relay** ([Connections](connections.md)) reaches
+contacts far away only while the internet works, a third-party relay service is up and both apps
+are open; there are no push notifications. In a disaster the internet, mobile data and the relay
+service may all be gone. Plan on what works without them: nearby phones, hubs, radios and carried
+messages. If the relay is on, it helps while it lasts: an SOS you send also goes to your contacts
+through it, but anything received through a relay is never passed on to
+amateur-radio links.
 
 ## Send an SOS (someone's life is in danger)
 
@@ -145,7 +153,8 @@ spelling** for letters.
 **Send a message by light** (no network needed): **Tools → Morse send & read → Send**, type the
 message (it starts as `SOS`), keep the speed **Normal · 12**, tick **Repeat until I stop** for a
 beacon, and tap **Flash with flashlight** (or **Flash with screen**). Another phone reads it with
-**Read by camera**. Light is not private: anyone who sees it can read it, and it shows where you are.
+**Read by camera**: point it roughly at the light and press **Start reading**; it finds the
+blinking light by itself. Light is not private: anyone who sees it can read it, and it shows where you are.
 Step by step, speeds and safety: [Sending and reading Morse](morse-reading.md).
 
 SOS is · · · — — — · · · sent as one sign. In the dark a flashlight carries much further than a

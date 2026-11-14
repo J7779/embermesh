@@ -45,6 +45,7 @@ One row per connection method, exactly as the app lists them (Instructions → W
 | Serial cable between two devices | yes | — | yes | yes | simulated only |
 | Hub on a hotspot-capable phone or computer | yes | yes | — | yes | simulated only |
 | Join a hub from any browser | yes | yes | yes | yes | simulated only |
+| Reach contacts over the internet (relay) | yes | yes | yes | yes | simulated only |
 | Carry messages on a USB stick or card (sneakernet) | yes | yes | yes | yes | simulated only |
 | QR contact cards and invites | yes | yes | yes | yes | untested on hardware |
 | Morse by light (flashlight, lamp or screen) | yes | yes | yes | yes | simulated only |
@@ -431,6 +432,10 @@ Connects: devices on one network ↔ each other. Works on: Android, iPhone/iPad,
 
 **Steps:** Join the same Wi-Fi; the LAN link finds others automatically. Chapter: [Phone to phone](phone-to-phone.md).
 
+**Nearby devices** (on after first-run setup, in Settings → Connections) does this by itself on
+Android, iPhone/iPad and computers, with nothing to add: same Wi-Fi or hotspot is all it needs (not
+in a browser). See [Connections](connections.md).
+
 ### Serial cable between two devices
 
 Connects: device ↔ device by cable. Works on: Android, Browser, Computer (emberd).
@@ -500,6 +505,30 @@ Connects: phone or laptop ↔ hub. Works on: Android, iPhone/iPad, Browser, Comp
 
 **Steps:** Join the Wi-Fi, open `http://<hub address>:8437/`. Chapter: [Setting up a hub](hub-setup.md).
 
+### Reach contacts over the internet (relay)
+
+Connects: phone or computer ↔ internet ↔ relay server ↔ your contact. Works on: Android,
+iPhone/iPad, Browser. Not yet on Computer (emberd).
+
+```
+   [your phone] --- internet --- [relay server] --- internet --- [contact's phone]
+```
+
+**Required:**
+
+- **An internet connection** — Mobile data, Wi-Fi with internet, or satellite internet.
+
+**Optional:**
+
+- **Nothing else** — The relay is a public or private server reached over a secure WebSocket.
+
+**Platform notes:**
+
+- Computer (emberd): The desktop app checks relay certificates against the computer's own trusted roots (it never falls back to an unencrypted connection). A computer hub can still *run* a relay for others (`--relay-broker`, [Setting up a hub](hub-setup.md)).
+- Both sides need it on, a relay in common and **the app open**: nothing arrives on a phone whose app is closed.
+
+**Steps:** Turn on the internet relay in Settings → Connections (it is off until you agree). Chapter: [Connections](connections.md).
+
 ### Carry messages on a USB stick or card (sneakernet)
 
 Connects: device ↔ storage ↔ device. Works on: Android, iPhone/iPad, Browser, Computer (emberd).
@@ -545,7 +574,7 @@ other devices their screen (see [Sending and reading Morse](morse-reading.md)).
 Connects: light ↔ camera. Works on: Android, iPhone/iPad, Browser, Computer (emberd).
 
 ```
-   [flashlight / lamp / screen] ~~~ blinks ~~~> [camera, watched box on the light]
+   [flashlight / lamp / screen] ~~~ blinks ~~~> [camera finds the blinking light]
 ```
 
 **Optional:**

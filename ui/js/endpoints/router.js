@@ -172,6 +172,7 @@ export class HostRouter {
     if (device.detectLocation(env).available) f.push('location');
     if (device.detectFlash(env).available) f.push('flash');
     if (device.detectSignal(env).torch !== 'no') f.push('torch'); // RPC_API §10: "yes" or "ask"
+    if (this.relaySupported()) f.push('relay'); // RPC_API §11; "nearby" is not possible in a page
     if (device.detectTone(env).available) f.push('tone');
     if (device.detectFile(env).available) f.push('file');
     if (device.detectNotify(env).available) f.push('notify');
@@ -212,6 +213,7 @@ export class HostRouter {
       actions: [...(this.offline ? await this.offline.actions().catch(() => []) : []), ...this.actions()],
       audio: await this.audioHints(),
       signal: device.detectSignal(this.env),
+      websocket_tls: this.relaySupported(), // a browser WebSocket always does wss:// with the platform's checks
       hub: this.hub ? { ...this.hub } : null,
     };
   }
@@ -407,6 +409,68 @@ export class HostRouter {
       if (e) { this.links.delete(id); e.endpoint.close().catch(() => {}); }
     } else if (event === 'link.state' && data && data.link) {
       this._onLinkState(data.link);
+    } else if (event === 'link.removed' && data) {
+      // RPC_API §11: the core removed a link by itself (duplicate nearby link, relay links after
+      // consent was withdrawn): close our endpoint
+      const id = Number(data.id);
+      const e = this.links.get(id);
+      if (e) { this.links.delete(id); e.endpoint.close().catch(() => {}); }
+    } else if (event === 'connectivity.changed' && data) {
+      this._serial(() => this.syncRelays(data)).catch((e) => this.log.warn('[router] relay links:', e && e.message));
+    }
+    if (event === 'node.ready') {
+      this._serial(async () => {
+        const c = await Promise.resolve(this.core.call('connectivity.get', {})).catch(() => null);
+        if (c) await this.syncRelays(c);
+      }).catch(() => {});
+    }
+  }
+
+  /** "relay": this browser's WebSocket does TLS (wss://) and subprotocols. */
+  relaySupported() {
+    const m = this.endpoints.find((x) => x.kind === 'websocket');
+    return !!(m && m.detect(this.env).available);
+  }
+
+  /**
+   * RPC_API §11 "Host side", relays: while connectivity.internet is on, one auto relay link per
+   * enabled relay (endpoint websocket {url, protocols:["mqtt"], allow_plaintext?}); links whose relay
+   * is gone or disabled are removed. Nothing is created while internet is off (no consent).
+   */
+  async syncRelays(c) {
+    if (!this.relaySupported()) return;
+    const internet = c && c.internet;
+    // rev 2: relays connect only while internet.active (enabled, setup done, unlocked)
+    const active = !!(internet && (typeof internet.active === 'boolean' ? internet.active : internet.enabled && c.ready !== false));
+    const want = new Map();
+    if (active) for (const r of internet.relays || []) if (r && r.enabled && typeof r.url === 'string') want.set(r.url, r);
+    const links = (await this._coreLinks()).filter((l) => l.auto === 'relay');
+    for (const l of links) {
+      if (!want.has(l.auto_key)) await this.linkRemove({ id: l.id }).catch(() => {});
+      else want.delete(l.auto_key);
+    }
+    if (!active) return;
+    const m = this._module('websocket');
+    for (const [url, r] of want) {
+      const holder = { id: 0 };
+      const ep = m.create({ url, protocols: ['mqtt'], allow_plaintext: r.allow_plaintext === true, reconnect: true }, this._ctxFor(holder));
+      const name = 'Internet relay (' + hostOf(url) + ')';
+      let l;
+      try {
+        const res = await this.core.call('links.add', {
+          type: 'relay', name, persist: false, auto: 'relay', auto_key: url,
+          config: { url, ...(r.username ? { username: r.username } : {}) },
+          endpoint: { kind: 'websocket', config: { url, protocols: ['mqtt'], ...(r.allow_plaintext ? { allow_plaintext: true } : {}) } },
+        });
+        l = res && res.link;
+      } catch (e) {
+        ep.close().catch(() => {});
+        if (e && (e.code === 'denied' || e.code === 'busy')) continue; // no consent yet / already there
+        throw e;
+      }
+      if (!l || !(l.id > 0)) { ep.close().catch(() => {}); continue; }
+      this._attach(l.id, ep, { name, endpoint: ep.describe(), link: { type: 'relay', config: { url } } }, holder);
+      await this._openAttached(l.id, ep);
     }
   }
 
@@ -744,4 +808,9 @@ export class HostRouter {
     this.pairings.clear();
     await Promise.all(all);
   }
+}
+
+/** Host name of a URL, for link names. */
+function hostOf(url) {
+  try { return new URL(url).host; } catch { return String(url).slice(0, 40); }
 }

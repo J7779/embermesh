@@ -1,6 +1,6 @@
 ---
 id: embermesh/power-and-field
-title: "EmberMesh 28: Power and Field Operation"
+title: "EmberMesh 29: Power and Field Operation"
 category: embermesh
 tags: [embermesh, battery, power, low power, solar, charging, background, android battery optimisation, iphone background, weatherproofing, field kit]
 summary: "Making batteries last: the app's low-power and announce settings, keeping EmberMesh running in the background on Android and iPhone, sizing batteries and solar panels with the app's tools, keeping phones alive, and weatherproofing field equipment."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 28
+order: 29
 ---
 
 # Power and Field Operation
@@ -22,7 +22,7 @@ order: 28
 | **Low-power mode (no animation, fewer refreshes)** | Settings → Region & display | The screen updates less often and without animation. The node also announces itself at most once an hour and sends fewer stored messages per exchange. |
 | **Theme: Dark** | Settings → Region & display | Saves battery on OLED screens. **Night (red)** protects night vision. |
 | **Announce this node every** | Settings → Mesh & relaying | How often your node announces itself: default 1800 s (30 min), 60 s to 86400 s (1 day), or 0 = never automatically. Longer saves airtime and battery; shorter helps others find you. |
-| **Relay messages for others** | Settings → Mesh & relaying | Leave **on**. Turn off only to save battery in an emergency: the mesh depends on relays. |
+| **Pass on messages for others** | Settings → Mesh & relaying | Leave **on**. Turn off only to save battery in an emergency: the mesh depends on relays. |
 | **Carry undelivered messages for** | Settings → Mesh & relaying | Days to keep messages for others: default 3, 1 to 30. Storage, not battery. |
 | **Send read receipts** | Settings → Mesh & relaying | On by default; turning it off saves a little airtime. |
 | **Keep updating** (GPS) | Settings → Position | Follows your position continuously; leave it off and tap **Update from GPS** when needed to save power. |

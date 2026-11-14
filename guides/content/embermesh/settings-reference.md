@@ -42,6 +42,17 @@ touch** (on, where the device can vibrate), **Keyboard shortcuts** (on). Details
 
 Tap **Save profile** after changing these.
 
+### Connections
+
+| Setting | Default | What it changes |
+|---|---|---|
+| **Nearby devices** | on after first-run setup (asked there) | Finds EmberMesh devices on the same Wi-Fi or local network and connects automatically. Others on the network can see your name and EmberMesh identity. Not in the browser app (a web page cannot search the network) |
+| **Internet relay** | off | Reaches contacts (and random-key channels you allow) through relay servers on the internet when they cannot be reached directly. The relay can see your IP address and when you are online. Not yet in the computer program (emberd) |
+| **Relays** | one public relay on, two listed but off | Which relay servers are used (at most 8). **Add your own relay or hub**: **Relay address** (`wss://...`), user name and password only if needed, **Add relay**. Remove one of yours with **Remove this relay?** |
+
+Bluetooth and radio links are never automatic: add them under **Links & radios**. Full explanation
+and what each choice reveals: [Connections](connections.md).
+
 ### Region & display
 
 | Setting | Default | Choices | What it changes |
@@ -55,7 +66,7 @@ Tap **Save profile** after changing these.
 
 | Setting | Default | Range | What it changes / when to change it |
 |---|---|---|---|
-| **Relay messages for others** | on | on/off | Off only to save battery in an emergency: relays are what make the mesh work |
+| **Pass on messages for others** | on | on/off | Your device forwards and carries mesh messages for other people. Off only to save battery in an emergency: relaying is what makes the mesh work. (This is not the internet relay; that is under Connections) |
 | **Carry undelivered messages for** | 3 days | 1–30 days | How long your device keeps messages for people out of reach. Longer for sneakernet and sparse meshes |
 | **Announce this node every** | 1800 s | 60–86400 s, or 0 = never automatically | Longer saves airtime and battery; shorter helps others find you |
 | **Send read receipts** | on | on/off | Tells the sender of a direct message you read it. Off saves a little airtime and privacy |

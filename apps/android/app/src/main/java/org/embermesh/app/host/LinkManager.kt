@@ -34,6 +34,10 @@ data class LinkDef(
     val linkType: String,
     val linkConfig: JSONObject,
     val autostart: Boolean,
+    /** RPC_API §11 automatic links: "nearby" | "relay" | null (never persisted by the core). */
+    val auto: String? = null,
+    val autoRole: String? = null,
+    val autoKey: String? = null,
 ) {
     /** The opaque endpoint object stored in the core with links.add. */
     fun endpointJson(): JSONObject = JSONObject().put("kind", endpointKind).put("config", endpointConfig).also {
@@ -51,6 +55,9 @@ data class LinkDef(
                 endpointConfig = ep.optJSONObject("config") ?: JSONObject(),
                 linkType = l.str("type"), linkConfig = l.optJSONObject("config") ?: JSONObject(),
                 autostart = ep.bool("autostart", true),
+                auto = l.optString("auto", "").ifEmpty { null },
+                autoRole = l.optString("auto_role", "").ifEmpty { null },
+                autoKey = l.optString("auto_key", "").ifEmpty { null },
             )
         }
     }
@@ -76,6 +83,7 @@ class LinkManager(
         @Volatile var attempts = 0
         @Volatile var retry: ScheduledFuture<*>? = null
         @Volatile var pttRelease: ScheduledFuture<*>? = null
+        @Volatile var connectedSince = 0L
         @Volatile var lastStatus: JSONObject = JSONObject()
         override val linkId: Int get() = def.id
 
@@ -103,6 +111,10 @@ class LinkManager(
     }
 
     private val links = ConcurrentHashMap<Int, Active>()
+    /** Called when a nearby link ended (dropped or refused) so discovery may dial the peer again. */
+    @Volatile var onNearbyGone: ((LinkDef) -> Unit)? = null
+    @Volatile var nowMs: () -> Long = System::currentTimeMillis
+    @Volatile var jitter: () -> Double = { 0.8 + java.util.concurrent.ThreadLocalRandom.current().nextDouble() * 0.4 }
     private val syncLock = Any()
 
     fun active(id: Int): Active? = links[id]
@@ -119,6 +131,16 @@ class LinkManager(
         val epConfig = Fields.applyDefaults(factory.configSchema(ctx), ep.optJSONObject("config") ?: JSONObject())
         val link = params.optJSONObject("link") ?: JSONObject()
         val type = link.str("type").ifEmpty { registry.defaultLinkType(factory) }
+        if (type == "relay") {
+            // RPC_API §11: a relay link runs over a relay socket (protocols contains "mqtt"), which
+            // always validates certificates; `insecure` is refused (the core refuses it too).
+            if (kind != "websocket") throw HostError.badParams("relay links run over a websocket endpoint")
+            val protos = epConfig.optJSONArray("protocols")
+            if (protos == null || (0 until protos.length()).none { protos.optString(it) == "mqtt" })
+                throw HostError.badParams("relay links need protocols [\"mqtt\"]")
+            if (epConfig.optBoolean("insecure", false)) throw HostError.badParams("insecure is refused for relay links")
+            epConfig.remove("insecure")
+        }
         val linkConfig = link.optJSONObject("config") ?: JSONObject()
         val name = params.str("name").ifEmpty { factory.title }
         val autostart = params.bool("autostart", true)
@@ -126,16 +148,62 @@ class LinkManager(
 
         ensurePermissions(factory.permissions(ctx, epConfig))
 
-        val draft = LinkDef(0, name, kind, epConfig, type, linkConfig, autostart)
-        val added = core.rpc("links.add", JSONObject()
-            .put("type", type).put("name", name).put("config", linkConfig)
-            .put("endpoint", draft.endpointJson()).apply { if (!persist) put("persist", false) })
+        val auto = params.str("auto").ifEmpty { null }
+        if (auto != null && auto !in setOf("nearby", "relay")) throw HostError.badParams("auto must be nearby or relay")
+        val autoRole = params.str("auto_role").ifEmpty { null }
+        val autoKey = params.str("auto_key").ifEmpty { null }?.take(64)
+        val draft = LinkDef(0, name, kind, epConfig, type, linkConfig, autostart, auto, autoRole, autoKey)
+        val added = core.rpc("links.add", addParams(draft, persist && auto == null))
         val coreLink = added.optJSONObject("link") ?: throw HostError(HostError.INTERNAL, "links.add returned no link")
         val id = coreLink.int("id", 0)
         if (id <= 0) throw HostError(HostError.INTERNAL, "links.add returned no id")
         start(draft.copy(id = id))
         return JSONObject().put("link", coreLink(id) ?: coreLink)
     }
+
+    private fun addParams(d: LinkDef, persist: Boolean): JSONObject = JSONObject()
+        .put("type", d.linkType).put("name", d.name).put("config", d.linkConfig)
+        .put("endpoint", d.endpointJson()).apply {
+            if (!persist) put("persist", false)
+            d.auto?.let { put("auto", it) }
+            d.autoRole?.let { put("auto_role", it) }
+            d.autoKey?.let { put("auto_key", it) }
+        }
+
+    /**
+     * An automatic link over an endpoint the caller already has (a nearby TCP connection that was
+     * accepted or dialled): links.add with persist:false + auto fields, then wire [endpoint] to it.
+     * Throws HostError (busy: the core refuses a duplicate or a 17th nearby link) — the caller closes
+     * its socket then.
+     */
+    fun createAuto(name: String, kind: String, epConfig: JSONObject, type: String, linkConfig: JSONObject,
+                   auto: String, autoRole: String?, autoKey: String?, endpoint: (EndpointSink) -> Endpoint): Int {
+        val def = LinkDef(0, name, kind, epConfig, type, linkConfig, true, auto, autoRole, autoKey?.take(64))
+        val added = core.rpc("links.add", addParams(def, false))
+        val id = added.optJSONObject("link")?.int("id", 0) ?: 0
+        if (id <= 0) throw HostError(HostError.INTERNAL, "links.add returned no id")
+        val a = Active(def.copy(id = id))
+        links.put(id, a)?.let { old -> stopEndpoint(old, report = false) }
+        try {
+            val ep = endpoint(a)
+            a.endpoint = ep
+            ep.open()
+        } catch (t: Throwable) {
+            links.remove(id)
+            try { core.rpc("links.remove", JSONObject().put("id", id)) } catch (_: HostError) {}
+            throw t
+        }
+        return id
+    }
+
+    /** Core event link.removed {id, reason}: the core dropped the link itself — close the endpoint. */
+    fun onRemoved(id: Int) {
+        val a = links.remove(id) ?: return
+        stopEndpoint(a, report = false)
+    }
+
+    /** Automatic links of [auto] ("nearby" / "relay") that are open now. */
+    fun autoLinks(auto: String): List<Active> = links.values.filter { it.def.auto == auto && !it.closedByUser }
 
     /** host.link.remove */
     fun remove(id: Int) {
@@ -231,6 +299,11 @@ class LinkManager(
             val def = LinkDef.fromCoreLink(l) ?: continue
             if (def.id <= 0) continue
             seen.add(def.id)
+            // Automatic links belong to the running discovery / relay controller, not to the saved list.
+            if (def.auto != null) {
+                links[def.id]?.let { reportState(def.id, it.connected, it.error) }
+                continue
+            }
             val existing = links[def.id]
             if (existing != null && !existing.closedByUser && existing.def.endpointKind == def.endpointKind &&
                 existing.def.endpointConfig.toString() == def.endpointConfig.toString()) {
@@ -391,7 +464,7 @@ class LinkManager(
         val changed = a.connected != connected || a.error != error
         a.connected = connected
         a.error = error
-        if (connected) a.attempts = 0
+        if (connected) { a.connectedSince = nowMs(); if (a.def.auto != "relay") a.attempts = 0 }
         if (changed) reportState(a.def.id, connected, error)
         if (!connected) scheduleReconnect(a)
     }
@@ -399,7 +472,20 @@ class LinkManager(
     private fun scheduleReconnect(a: Active) {
         if (a.closedByUser) return
         a.retry?.cancel(false)
-        val delay = backoffMs(a.attempts++)
+        if (a.def.auto == "nearby") {
+            // A nearby connection that dropped is not redialled from here: discovery finds the peer
+            // again. The core link goes away with it.
+            links.remove(a.def.id)
+            stopEndpoint(a, report = false)
+            try { core.rpc("links.remove", JSONObject().put("id", a.def.id)) } catch (_: HostError) {}
+            onNearbyGone?.invoke(a.def)
+            return
+        }
+        val delay = if (a.def.auto == "relay") {
+            if (a.connectedSince > 0 && nowMs() - a.connectedSince >= 120_000L) a.attempts = 0 // was up ≥ 2 min
+            a.connectedSince = 0
+            relayBackoffMs(a.attempts++, 0, nowMs(), jitter())
+        } else backoffMs(a.attempts++)
         a.retry = try {
             ctx.scheduler.schedule({
                 if (links[a.def.id] === a && !a.connected && !a.closedByUser) reopen(a)
@@ -426,6 +512,16 @@ class LinkManager(
 
         /** 2 s, 4 s, 8 s ... capped at 60 s. */
         fun backoffMs(attempt: Int): Long = (2_000L shl attempt.coerceIn(0, 5)).coerceAtMost(60_000L)
+
+        /**
+         * Relay links (CONNECTIVITY §4.9): 2 s … 5 min exponential, ±20 % jitter ([jitter] in 0.8..1.2);
+         * a connection that lasted ≥ 2 min resets the sequence.
+         */
+        fun relayBackoffMs(attempt: Int, connectedSince: Long, now: Long, jitter: Double): Long {
+            val a = if (connectedSince > 0 && now - connectedSince >= 120_000L) 0 else attempt
+            val base = (2_000L shl a.coerceIn(0, 8)).coerceAtMost(300_000L)
+            return (base * jitter.coerceIn(0.8, 1.2)).toLong()
+        }
 
         private fun logd(m: String) { try { Log.d(TAG, m) } catch (_: Throwable) {} }
         private fun logw(m: String) { try { Log.w(TAG, m) } catch (_: Throwable) {} }

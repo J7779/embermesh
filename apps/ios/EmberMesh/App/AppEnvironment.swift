@@ -12,6 +12,8 @@ final class AppEnvironment {
   let node: EmberNode?
   let links: LinkManager
   let host: HostRouter
+  /// Nearby devices + internet relay (RPC_API §11).
+  let connectivity: ConnectivityController
   let notifications = NotificationService()
   let content = WebContent.bundled()
   let guidesPack: MappedFile?
@@ -69,6 +71,8 @@ final class AppEnvironment {
                         factory: { kind, cfg in try HostRouter.makeEndpoint(kind: kind, config: cfg, runner: runner) },
                         availability: HostRouter.availability)
     host = HostRouter(links: links, runner: runner, notifications: notifications)
+    connectivity = ConnectivityController(core: runner, links: links, transport: NearbyNetwork())
+    if !isTesting { connectivity.observeApp() }
     emberLog("core \(EmberNode.version), storage \(storageDir.path), ui bundled: \(content.hasUI), hub web app: \(content.hubRoot?.path ?? "none")")
 
     runner.onEvent = { [weak self] json in self?.coreEvent(json) }
@@ -90,6 +94,7 @@ final class AppEnvironment {
       guard self.autoSyncLinks else { return }
       self.links.syncWithCore { [weak self] in
         guard let self else { return }
+        self.connectivity.refresh()   // nearby + relay links follow connectivity.get
         emberLog("node.ready: links synced (\(self.links.boundIds.count) endpoints open)")
         for h in self.links.endpoints(of: HubEndpoint.self) { h.refreshProbe() }
       }
@@ -110,6 +115,11 @@ final class AppEnvironment {
     for h in webHosts { h.router.sendEvent(json: json) }
     if json.hasPrefix("{\"event\":\"node.ready\"") || (json.contains("\"node.ready\"") && JSON.parseObject(json)?.string("event") == "node.ready") {
       nodeReady()
+    }
+    if json.contains("\"connectivity.changed\"") || json.contains("\"link.removed\""),
+       let o = JSON.parseObject(json), let name = o.string("event"), name == "connectivity.changed" || name == "link.removed" {
+      let data = o.object("data") ?? [:]
+      DispatchQueue.main.async { [self] in if self.autoSyncLinks { self.connectivity.coreEvent(name, data) } }
     }
     // Only events that may need a notification are parsed.
     if json.contains("\"message.new\"") || json.contains("\"sos.received\"") {

@@ -13,9 +13,16 @@ final class FakeLinkCore: LinkCore {
   var locked = false
   var onRx: (() -> Void)?
 
+  /// Answers for other methods (e.g. connectivity.get); nil = default handling.
+  var answer: ((String, JSONObject) -> RPCResult?)?
+
   func call(_ method: String, _ params: JSONObject, completion: RPCCompletion?) {
     calls.append((method, params))
     var r: RPCResult = .success([:])
+    if let a = answer?(method, params) {
+      if let completion { DispatchQueue.main.async { completion(a) } }
+      return
+    }
     switch method {
     case "links.add":
       if failAdd { r = .failure(RPCError("bad_params", "rejected")) } else {

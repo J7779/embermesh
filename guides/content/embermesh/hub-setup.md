@@ -1,6 +1,6 @@
 ---
 id: embermesh/hub-setup
-title: "EmberMesh 14: Setting Up a Hub (Wi-Fi Hotspot Anyone Can Join)"
+title: "EmberMesh 15: Setting Up a Hub (Wi-Fi Hotspot Anyone Can Join)"
 category: embermesh
 tags: [embermesh, hub, emberd, raspberry pi, hotspot, wifi, nmcli, hostapd, macos, windows, operator, server, captive portal]
 summary: "Turn a laptop, Raspberry Pi, Android phone or iPhone into a hub that serves EmberMesh over its own Wi-Fi so any phone can join by opening a web page: running emberd, hotspot recipes per OS, what guests do, the operator page, running as a service, power and placement."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 14
+order: 15
 ---
 
 # Setting Up a Hub
@@ -288,6 +288,44 @@ open the page in their real browser.
 Two hubs on any shared IP network (a long Ethernet cable, a Wi-Fi bridge) can be joined: on one
 hub's operator page add **WebSocket (hub-to-hub)** to `ws://<other hub>:8437/ws` with link type
 **Direct datagrams (Wi-Fi, hub, WebRTC)**. Only `ws://` is supported, not `wss://`.
+
+## Nearby devices on a computer hub
+
+A computer hub also takes part in **Nearby devices**: it announces itself on its local network and
+links up by itself with EmberMesh phones and computers there, once its first-run notice has been
+acknowledged (the operator page's setup screen, or `--setup-done` for a hub with no screen; until
+then emberd prints the notice at start). `--no-nearby` turns this off. A locked hub starts nothing.
+See [Connections](connections.md).
+
+## Your hub as a private internet relay
+
+`emberd --relay-broker` also runs a small internet relay (port `8438`, path `/mqtt`), so contacts
+far apart can use the **Internet relay** with no third party. It stores nothing and logs no
+topics or contents. Off by default.
+
+Phones and browsers connect to relays only with `wss://` and emberd has no encryption (TLS) of its
+own, so it must sit behind a TLS reverse proxy that forwards **only `/mqtt`**, on a machine reachable
+from the internet as, for example, `relay.example.org`:
+
+```
+relay.example.org {
+  reverse_proxy /mqtt 127.0.0.1:8438
+}
+```
+
+(Caddy, which gets certificates by itself; an nginx example is in `apps/desktop/README.md`, "A
+private internet relay".)
+
+1. Start `emberd --bind 127.0.0.1 --relay-broker`, so hub and relay are reachable only through the
+   proxy. (This hub then no longer serves guests on the Wi-Fi; use a separate hub for that.)
+2. Forward only TCP 443 to the proxy. **Never expose the hub port 8437 to the internet.**
+3. On every device: **Settings → Connections → Relays → Add your own relay or hub**, **Relay
+   address** `wss://relay.example.org/mqtt`, **Add relay**.
+
+Limits: at most 200 connected devices, 4 per address, and 256 subscriptions per device (about 250
+contacts each). Anyone who can reach the address can use it, within those limits. Your relay sees
+what any relay sees: addresses, times, sizes and who shares a topic. Try it from outside (for
+example over mobile data) before you depend on it.
 
 ## Placement and power
 

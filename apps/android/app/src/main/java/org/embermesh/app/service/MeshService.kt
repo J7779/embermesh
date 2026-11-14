@@ -32,6 +32,7 @@ class MeshService : Service() {
     override fun onCreate() {
         super.onCreate()
         running = true
+        EmberRuntime.foregroundChanged()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -108,6 +109,7 @@ class MeshService : Service() {
     override fun onDestroy() {
         handler.removeCallbacks(refresher)
         running = false
+        EmberRuntime.foregroundChanged()
         super.onDestroy()
     }
 

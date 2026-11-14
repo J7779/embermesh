@@ -80,11 +80,16 @@ Note: `connectedDebugAndroidTest` uninstalls the app afterwards (its data is gon
 | Audio modem through the real `AudioEndpoint` RX/TX loops: node A's AFSK1200 TX audio, carried in real time by a virtual cable, is decoded by node B (SNR ≈ 20 dB, 0 bad frames); PTT keyed on a serial link's RTS and released after the output latency | `AudioModemTest.afskFrameCrossesTheAudioEndpointLoops` |
 | Real `AudioRecord`/`AudioTrack` on the device open, capture (the emulator's mic is silent) and play a modem transmission | `AudioModemTest.hardwareAudioPathOpensCapturesAndPlays` |
 | Cross-platform over real sockets with the desktop daemon: Public both ways, DM both ways, delivery receipt — over `websocket` (emberd hub `/ws`) and `tcp` (emberd `tcp_server`) | `scripts/e2e_emberd.py` + `EmberdInteropTest` |
+| Nearby devices with two real cores and the production wiring: before setup nothing is advertised; after `setup_done` both advertise `EmberMesh-<token>` with the exact TXT over the real NsdManager, find each other, dial per the token rule, the core's hello passes, the neighbour is proven, Public and DMs (with receipts) flow both ways, one link per pair remains, `nearby:false` stops and closes | `ConnectivityEndToEndTest.nearbyDevicesFindEachOtherAndChatWithoutConfiguration`, `NearbyInstrumentedTest` |
+| Internet relay with two real cores through a local MQTT-over-WebSocket broker: no connection before consent, relay links up after `internet:true`, subprotocol `mqtt` offered, DMs with receipts both ways through the broker, links gone after consent is withdrawn | `ConnectivityEndToEndTest.internetRelayOnlyAfterConsentThenMessagesBothWays` (`MockMqttBroker`) |
 | UDP multicast: app → emberd works through the emulator NAT; emberd → app does not (the emulator does not deliver inbound multicast) — untested between two real phones | `e2e_emberd.py --transports udp` |
 | UI: first-run setup, Public message, guides, hub start/URLs/stop driven through the WebView | manual UI check (no crash/ANR in logcat) |
 | Morse receive inputs: `getUserMedia` in the WebView (own origin only, after the runtime permission) delivers camera frames the page samples for brightness (≈13 fps on the emulator's static virtual scene) and a live 48 kHz microphone track | `BridgeInstrumentedTest.webViewCameraAndMicCapture` |
-| Native capture sources `capture_camera_luma` (Camera2, 640×480 YUV, ≈30 fps, exposure + white balance locked after 1.5 s, torch off, ROI luma from the Y plane, sensor timestamps) and `capture_mic_pcm` (AudioRecord, UNPROCESSED where available, resampled to the session rate) run on the emulator and call `morse.rx.feed` | `MorseCaptureTest.realCameraDeliversLumaFrames`, `realMicDeliversPcm` |
-| The core decodes a generated blinking light (SOS SOS, 10 WPM, 30 fps, ±2 ms frame jitter, exposure noise → "SOS SOS", 9.7 WPM estimated) and a keyed 700 Hz tone at 48 kHz (CQ CQ, 15 WPM → "CQ CQ", resampled to 8 kHz) fed through those sources' own frame/PCM paths | `MorseCaptureTest.syntheticBlinkingLightDecodes`, `syntheticToneDecodes` |
+| Native capture sources `capture_camera_luma` (Camera2 per RPC_API §12: whole-frame max/mean brightness grids, 64 cells on the long side, from the full-resolution Y plane; on the emulator 30 fps, grids accepted by the core's tracker, `zoom_steps`) and `capture_mic_pcm` (AudioRecord, UNPROCESSED where available, resampled to the session rate) run on the emulator and call `morse.rx.feed` | `MorseCaptureTest.realCameraDeliversLumaFrames`, `realMicDeliversPcm` |
+| §12 grid pipeline: a single bright pixel in a 1920×1080 frame with padded rows lands in exactly one cell of the max grid; timestamps are the sensor's; batches ≤ 8 frames / 100 ms; frames dropped (not queued) while the core is busy; a core without the tracker → fallback to the section-6 centre region. Cost of the reduction (every pixel, Kotlin): 1.15 ms mean, 3.3 ms worst per 1080p frame on the emulator | `MorseCaptureTest.gridPipelineSinglePixelTimestampsBatchingAndCost`, `LumaGridTest` (JVM) |
+| The core's tracker finds a 2×2-pixel light blinking "SOS SOS" at 10 WPM in a dark, noisy 1280×720 frame with a steady lamp elsewhere, by itself (target x 0.727, y 0.319 for a light at 0.73, 0.31), and decodes it | `MorseCaptureTest.tinyBlinkingLightIsFoundAndDecoded` |
+| Native preview: exactly inside the page's rect (±1 px) for two rects, a rect partly above the page (clipped at the web view's top) and in landscape; taps fall through to the page; the ring at `target` (locked: full, `max(size × width, 28 dp)`; lost: dimmed; searching: none); preview gone at once on stop; camera released and `host.capture.state {running:false}` when the app goes to the background | `CapturePreviewTest` |
+| The core decodes a generated blinking light (SOS SOS, 10 WPM, 30 fps, ±2 ms frame jitter, exposure noise → "SOS SOS", 9.7 WPM estimated) and a keyed 700 Hz tone at 48 kHz (CQ CQ, 15 WPM → "CQ CQ", resampled to 8 kHz) fed through those sources' own frame/PCM paths | `MorseCaptureTest.levelsFallbackStillDecodes`, `syntheticToneDecodes` |
 | Morse microphone capture while an audio-modem link holds the microphone: both keep receiving audio | `MorseCaptureTest.micCaptureCoexistsWithAudioLink` |
 | Morse sending by light (RPC_API §10): `host.signal.flash` resolves with `{used, stopped, timing}`; modes auto/torch/screen; `host.signal.stop` ends a flash in 1–3 ms with the torch off; a second flash stops the first; limits → `bad_params`; the screen flash restores brightness, keep-screen-on and the window foreground exactly, also when the app goes to the background mid-flash; with this app's camera reader holding the camera, `auto` uses the screen and `torch` returns `busy`. On the emulator's virtual torch (its only flash unit is on the front camera, so the tests opt in to it; production requires a back camera): mean edge lateness 0.2–0.5 ms, worst 2–10 ms, drift ≤ 1.3 ms over "PARIS PARIS" at 5/12/20 WPM, `setTorchMode` ≈ 1 ms per call. Tone sending is sample-accurate | `LightSendingTest`, `MorseCaptureTest.flashKeyingTiming`, `LightSenderTest` (JVM: drift, stop, limits, modes, camera busy) |
 | Handheld on VOX through the virtual cable (VOX model: envelope detector, the first 250 ms of every transmission clipped, 400 ms hang) with the core's `handheld_vox` preset (400 ms VOX tone, 600 ms lead-in): frames decode | `AudioModemTest.handheldVoxPresetSurvivesVoxClipping` |
@@ -147,10 +152,25 @@ These are additive; the shared UI may ignore them.
 - `host.hub.start {port?}` / `host.hub.stop` / `host.hub.status` → `{running, urls, clients, port,
   web_root:"web"|"ui-only"|"builtin", link_id?, error?}`; event `host.hub.clients`. Feature `hub`.
 - `host.link.configure` (above). Feature `link_configure`.
-- `host.capture.start/update/stop` (RPC_API §6) for `camera_luma` and `mic_pcm` (features
+- `host.capture.start/update/stop` (RPC_API §6, §12) for `camera_luma` and `mic_pcm` (features
   `capture_camera_luma`, `capture_mic_pcm`); extras: `sample_rate` for `mic_pcm` (the session's rate,
-  default 8000) and `host.capture.status` (frames, fps, exposure lock, level, samples, feeds, last
-  error). The camera preview is a native view over the page at the CSS-pixel `rect`.
+  default 8000) and `host.capture.status` (frames, fps, grid, exposure/white-balance lock, target
+  state, zoom, per-frame reduction cost, feeds, dropped frames, last error). `camera_luma` start
+  returns `{zoom_steps, frame:{w,h}}`; update takes `rect` and `zoom`; `roi` is no longer used (the
+  core's tracker watches the whole frame).
+- Camera reader (§12): the rear camera with the widest lens; 60 fps when a ≥ 1280×720 YUV size runs at
+  60, else 30; the largest YUV size up to 1920×1080 at that rate, preferring the page rectangle's
+  aspect; continuous-video autofocus (or fixed at infinity); exposure −1 EV, AE locked while the
+  tracker reports `locked` (a core without the tracker: after 1.5 s); white balance locked after
+  1.5 s; torch off; no scene mode (HDR/night) and no video stabilisation; zoom 1/2/5 where the camera
+  has it. Every frame's full Y plane is max-pooled into the grid on the camera thread (no
+  allocation), rotated/mirrored to what the user sees, and fed in batches from one sender thread;
+  frames that arrive while the core is busy are dropped. Frames never leave the capture layer; the
+  camera is released on stop, when the page is left and when the app goes to the background.
+- Native preview (§12): a TextureView with the whole camera frame stretched into the page's rect,
+  upright for the display rotation, clipped to the web view, not interactive (taps reach the page),
+  with the accent ring drawn at `target`. The activity's own overlay margins count the root's
+  system-bar padding twice; the preview corrects its position itself (`PreviewOverlay.fixPlacement`).
 - `host.signal.stats` → `{flash: timing}` of the last `host.signal.flash` (the same object as its
   result's `timing`: the standard `max_late_ms, mean_late_ms, edges` plus `abs_p95_ms, abs_max_ms,
   call_mean_ms, call_max_ms, total_error_ms, light`).
@@ -188,7 +208,7 @@ These are additive; the shared UI may ignore them.
 | `serial` | done, not yet tried with real chips | Our own drivers for CDC-ACM, CP210x, CH340/CH341, FTDI (including H-type chips) and PL2303 (H/HX/TA/TB/HXN). Handles the USB permission prompt and hot-plug. Keys PTT with RTS or DTR on `link.ptt`. |
 | `ble` | done, not yet tried on hardware | Central for Nordic-UART-style peripherals (UUIDs can be changed), `profile:"kiss_ble"` (Mobilinkd TNC3/TNC4 BLE KISS API `00000001-ba2a-…`), or `profile:"meshtastic"`: the Meshtastic Bluetooth API (service `6ba1b218-…`; ToRadio write, FromNum notify, FromRadio read until empty), adapted like the iOS app: every FromRadio protobuf reaches the core as `94 C3 len <protobuf>` and the core's stream frames are written one protobuf per ToRadio write, so the `meshtastic` link keeps `framing:"stream"`. Scan marks Meshtastic radios and pre-selects the profile. |
 | `bt_spp` | done, not yet tried on hardware | RFCOMM SPP. Tries a secure socket, then an insecure one, then channel 1. Scanning lists paired devices plus devices found by discovery. |
-| `tcp`, `tcp_server`, `websocket` | done | Our own RFC 6455 client (`ws://` and `wss://`). The TCP server advertises `_embermesh._tcp`. NSD scanning works for `tcp` and `websocket`. |
+| `tcp`, `tcp_server`, `websocket` | done | Our own RFC 6455 client (`ws://` and `wss://`, certificate chain and host name validated; `protocols` sent as `Sec-WebSocket-Protocol` and required back; no User-Agent; relay sockets per "Nearby devices and the internet relay"). A manually created TCP server advertises `_embermesh._tcp` without `ember=1`, so Nearby devices never auto-dials it. NSD scanning works for `tcp` and `websocket`. |
 | `wifi_direct` | partial | Group owner listens on TCP 47476 and the client connects to it. Only lightly tested; the emulator has no P2P. |
 | `loopback` | done | Echoes frames back; used for tests. |
 | `ws_server` (hub) | done, emulator-tested | The host library's HTTP + WebSocket hub (`host/include/ember_hub.h`, the hub-only C API) behind `cpp/hub_jni.cpp`, on its own native loop thread, as one datagram endpoint under a core `raw` link (all guests share it; the mesh engine relays). Port 8437, bound to 0.0.0.0, so it is reachable on the phone's own hotspot and on any Wi-Fi it joined (hotspot addresses listed first). Serves `assets/web` (extracted once per app version to `filesDir/hub-web`), `/hub.json`, `/download/EmberMesh.apk`; `/rpc` remote control is refused on phones. `ember_host.h` is not used: it must be the only `ember_poll` consumer, but the Kotlin node runner drives the node. |
@@ -222,6 +242,68 @@ Device services:
     rise time are not measured.
 - `host.signal.tone`: sine tone with ramps.
 - `host.notify`, `host.keep_awake`.
+
+## Nearby devices and the internet relay
+
+Contract: RPC_API §11 (revision 2), design and threat model: `docs/CONNECTIVITY.md`. Code:
+`connectivity/` (`NearbyManager`, `RelayManager`, `ConnectivityController`, `ConnectivityWiring`,
+`LocalNets`) and `endpoint/net/Nsd.kt` (`NsdNearbyPlatform`).
+
+- The host follows the core: `connectivity.get` on every `node.ready` and the
+  `connectivity.changed` event. Nothing listens, advertises, browses, dials, accepts or connects
+  unless the core reports `nearby.active` / `internet.active`, which require `ready` (first-run
+  setup applied and the node unlocked). When `ready` goes false (lock, wipe, duress) discovery
+  stops and every automatic endpoint is closed. Both also run only while the app is in front or
+  its foreground service runs.
+- **Nearby devices** (`connectivity.nearby`, core default on): TCP listeners bound only to the
+  local-network interfaces' addresses (Wi-Fi, Ethernet, hotspot; never cellular, VPN or the
+  wildcard address), port 47475 or any free port; the NSD service `EmberMesh-<token>` of type
+  `_embermesh._tcp` with TXT exactly `ember=1 v=1 link=stream t=<token>` (`token` from the core);
+  continuous browsing. Entries without `ember=1`, `v=1`, `link=stream` and an 8-hex `t` are
+  ignored. The smaller token dials at once; the other side dials after 8 s if no connection from
+  that peer arrived. Only on-link addresses are used (own IPv4 subnet, IPv6 link-local, ULA in the
+  interface prefix), at most 4 per instance, IPv6 link-local first, then IPv4, 250 ms apart; the
+  first to connect wins. Inbound connections are accepted only from on-link sources, at most 2 per
+  IPv4 address or IPv6 /64 and 4 new ones per source per minute; at most 4 new dials per minute.
+  Each connection becomes `links.add {type:"stream", config:{preset:"nearby"}, persist:false,
+  auto:"nearby", auto_role, auto_key}` with `auto_key` `"<token>@<address>"` (dial) or
+  `"@<address>"` (accept); the core sends and checks the 8-byte hello and removes links that fail
+  it, are duplicates or are evicted (`link.removed` closes the socket). A dropped nearby link is
+  removed, never redialled by LinkManager; discovery dials again. On a network change the host
+  calls `connectivity.network_changed` and re-advertises with the new token.
+- **Bluetooth LE is not automatic on Android yet.** The revision 2 contract needs one link per BLE
+  connection (the hello is per link) and a BLE local name `EM<token>`. Android's advertising API
+  cannot set a local name without renaming the phone's Bluetooth adapter, which is the owner's
+  device name. Manually created `ble_peer` links work as before.
+- **Internet relay** (`connectivity.internet`, default off; the relay list comes from the core and
+  is never hard-coded): while `internet.active`, one `host.link.create {endpoint:{kind:"websocket",
+  config:{url, protocols:["mqtt"], allow_plaintext?}}, link:{type:"relay", config:{url}},
+  persist:false, auto:"relay", auto_key:url}` per enabled relay. A websocket whose `protocols`
+  contain `mqtt` is a relay socket: certificate chain and host name always validated, `insecure`
+  refused, `ws://` only with `allow_plaintext` to a LAN, link-local or `.local` host, messages
+  capped at 8 KiB. No websocket sends a User-Agent. Reconnects back off 2 s … 5 min with ±20 %
+  jitter, reset after 2 minutes connected. The only idle traffic is the MQTT keepalive (no
+  WebSocket pings). Automatic links never hold the CPU wake lock by themselves.
+- Permissions: Local network (Android 17+) is asked when the user turns Nearby devices on — the
+  first-run "Connect to people" card (`connectivity.set {setup_done:true, nearby}`), the upgrade
+  notice, or Settings → Connections — never at launch. The page's own sentence comes before the
+  system dialog. A refusal does not turn the switch off. Without that permission on Android 17,
+  NSD is not used at all, because browsing would open a system device picker over the app. NSD
+  itself needs no prompt below Android 17, so the `ready` gate is what keeps it from starting early.
+
+**What another device can observe.** On the same Wi-Fi, anyone can see that a device at this IP
+and MAC address runs EmberMesh (`EmberMesh-<token>`, `_embermesh._tcp`), its listening port and the
+token. The token changes at every start and every network change and is not derived from the node
+id or anything stable. Android's own mDNS responder also announces the phone's mDNS host name; the
+app cannot change it, and on some phones it is derived from the device name. The advertisement
+carries no owner name, model, node id or version. Anyone who connects to the port, and so every
+nearby EmberMesh device, sees what every mesh neighbour sees: the node id, the display name and
+callsign the user set, the public keys, and Public traffic. These are stable, so observers in
+several places can recognise the same person; the first-run notice says so. Within Bluetooth range
+nothing changes: there is no automatic BLE, and a manual `ble_peer` link advertises the service
+UUID and a random tie-break token, never the Bluetooth name. Through an internet relay, the relay
+operator sees the phone's IP address, when it is online and which topics it uses; messages are
+sealed (CONNECTIVITY §4.5).
 
 ## Sideloading (no app store)
 
@@ -289,7 +371,7 @@ No keystore is part of this repository and none must ever be committed (`.gitign
 | `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE` | Pick interfaces for multicast and list hub addresses (hotspot first) |
 | `CHANGE_WIFI_STATE` | Wi-Fi Direct and Wi-Fi locks for LAN links |
 | `CHANGE_WIFI_MULTICAST_STATE` | Multicast lock: LAN discovery / UDP mesh `239.83.77.69` |
-| `ACCESS_LOCAL_NETWORK` (runtime, Android 17+) | **Every Wi-Fi/LAN link and the hub.** Apps targeting API 37 cannot reach or be reached on LAN addresses without it — connections just time out (on the emulator, TCP/WebSocket to the host fail until it is granted). Requested when a LAN link or the hub is created; links blocked by it are retried with the prompt when the app is opened. |
+| `ACCESS_LOCAL_NETWORK` (runtime, Android 17+) | **Every Wi-Fi/LAN link, Nearby devices and the hub.** Apps targeting API 37 cannot reach or be reached on LAN addresses without it — connections just time out (on the emulator, TCP/WebSocket to the host fail until it is granted). Requested when a LAN link or the hub is created, and when the user turns Nearby devices on; links blocked by it are retried with the prompt when the app is opened. |
 | `NEARBY_WIFI_DEVICES` (runtime, 13+, `neverForLocation`) | Wi-Fi Direct |
 | `BLUETOOTH`, `BLUETOOTH_ADMIN` (≤ Android 11) | Bluetooth on old Android |
 | `BLUETOOTH_SCAN` (`neverForLocation`), `BLUETOOTH_CONNECT`, `BLUETOOTH_ADVERTISE` (runtime, 12+) | BLE phone-to-phone mesh, BLE TNCs / Meshtastic, Bluetooth SPP |
@@ -395,7 +477,9 @@ Nothing that reaches other devices carries the phone's or owner's name unless th
 - Hub `/hub.json` `name`: the user's profile name, else `EmberMesh hub <first 4 hex of the node id>`.
 - BLE peer advertising: service UUID + a random tie-break token; the Bluetooth device name is never
   included (scan response empty). Other phones list us as "EmberMesh phone".
-- TCP server NSD (`_embermesh._tcp`) service name: `EmberMesh-<random 4 hex>` per start.
+- Nearby NSD (`_embermesh._tcp`): `EmberMesh-<token>` with TXT `ember=1 v=1 link=stream t=<token>`,
+  the token random per start and network change (see "What another device can observe" above). A manually created TCP
+  server: `EmberMesh-<random 8 hex>` with TXT `link=stream` only.
 - The core is created with `device_name:"Android"` (no model, no user-set device name).
 - Outside the app's control: Android itself shows the phone's Wi-Fi Direct name to Wi-Fi Direct peers
   and the Bluetooth name to devices it pairs with (Bluetooth SPP / BLE GAP); both are system settings.

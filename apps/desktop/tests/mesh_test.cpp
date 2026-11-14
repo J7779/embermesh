@@ -4,11 +4,19 @@
 #include "daemon_harness.h"
 #include "doctest.h"
 #include "remote_rpc.h"
+#ifdef EMBER_HOST_HAVE_MDNS
+#include "host/mdns.h"
+#endif
 #include <algorithm>
+#include <sys/wait.h>
+#include <spawn.h>
+#include <cstdlib>
+#include <csignal>
 #include <chrono>
 #include <thread>
 
 using namespace mesh;
+using namespace ember_host;
 
 // Memory bounds below are for a normal build. A sanitizer build of the daemon keeps freed memory in
 // quarantine and adds shadow memory, so its resident size says little: allow several times more
@@ -40,6 +48,8 @@ std::string link_arg(const std::string& name, const std::string& endpoint, const
 }
 
 std::string tag() { return ember_host::random_hex(3); }
+
+void test_wait_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
 
 std::string msg_status(Daemon& d, const std::string& conv, const std::string& text) {
   return d.find_message(conv, text).get("status").as_string();
@@ -779,9 +789,13 @@ TEST_SUITE("mesh") {
     std::string a2b = ember_host::path_join(tmp.path, "a2b.pcm"), b2a = ember_host::path_join(tmp.path, "b2a.pcm");
     // The "radio": VOX needs 250 ms of audio before it transmits (that start is lost), hangs 500 ms,
     // FM voice band 300-3000 Hz.
-    auto radio = [](const std::string& in, const std::string& out) {
+    // EMBER_TEST_AUDIO_JITTER_MS: deliver the audio in irregular bursts (reproduces slow CI VMs).
+    const char* jenv = std::getenv("EMBER_TEST_AUDIO_JITTER_MS");
+    int jitter = jenv ? std::atoi(jenv) : 0;
+    auto radio = [jitter](const std::string& in, const std::string& out) {
       return link_arg("handheld", R"({"kind":"audio_pipe","config":{"input_path":")" + in + R"(","output_path":")" + out +
-                                      R"(","vox_attack_ms":250,"vox_hang_ms":500,"tx_highpass_hz":300,"tx_lowpass_hz":3000}})",
+                                      R"(","vox_attack_ms":250,"vox_hang_ms":500,"tx_highpass_hz":300,"tx_lowpass_hz":3000,"block_jitter_ms":)" +
+                                      std::to_string(jitter) + "}}",
                       R"({"type":"audio","config":{"preset":"handheld_vox"}})");
     };
     REQUIRE(a.start({"--callsign", "Q0TVA-1", "--link", radio(b2a, a2b)}));
@@ -800,16 +814,30 @@ TEST_SUITE("mesh") {
     // Finding (core): with this preset a node that hears a new neighbour's beacon does not answer on
     // the link, so the node that powered up first is not learned until its next beacon. Record it,
     // then announce (what any first message would also do).
-    if (!wait_peer(b, a.node_id(), 20000)) {
-      MESSAGE("FINDING: B did not learn A within 20 s of hearing B's beacon on A (no answer on a handheld_vox link); announcing");
-      a.rpc("mesh.announce");  // one side at a time: simultaneous announcements would collide
-      wait_peer(b, a.node_id(), 30000);
+    // One half-duplex channel whose audio may arrive late (busy computer): a node keys up only
+    // when both radios are idle, and the side that does not know the other yet announces, one side
+    // at a time, until both know each other — bounded by a deadline, never by a fixed sleep.
+    auto idle = [&](Daemon& d) {
+      Json l = d.link_by_name("handheld");
+      return !l.get("status").get("transmitting").as_bool(true);
+    };
+    auto knows = [&](Daemon& d, const std::string& id) {
+      Json r = d.result("mesh.peers");
+      for (const auto& p : r.get("peers").elements())
+        if (p.get("node_id").as_string() == id && p.get("has_keys").as_bool(false)) return true;
+      return false;
+    };
+    auto quiet_channel = [&] { return wait_until([&] { return idle(a) && idle(b); }, 60000, 50); };
+    uint64_t deadline = ember_host::steady_ms() + 240000;
+    int nudges = 0;
+    while (!(knows(a, b.node_id()) && knows(b, a.node_id())) && ember_host::steady_ms() < deadline) {
+      if (wait_until([&] { return knows(a, b.node_id()) && knows(b, a.node_id()); }, 15000)) break;
+      REQUIRE(quiet_channel());
+      Daemon& who = !knows(b, a.node_id()) ? a : b;  // the one the other side has not learned
+      who.rpc("mesh.announce");
+      ++nudges;
     }
-    if (!wait_peer(a, b.node_id(), 20000)) {
-      wait_until([&] { return !b.link_by_name("handheld").get("status").get("transmitting").as_bool(true); }, 20000);
-      b.rpc("mesh.announce");
-    }
-    if (!wait_peer(a, b.node_id(), 90000) || !wait_peer(b, a.node_id(), 60000)) {
+    if (!(knows(a, b.node_id()) && knows(b, a.node_id()))) {
       Json la = a.link_by_name("handheld"), lb = b.link_by_name("handheld");
       Json ma = la.get("status"), mb = lb.get("status");
       ma.set("caps", Json());
@@ -817,12 +845,15 @@ TEST_SUITE("mesh") {
       FAIL("no peer over the VOX radio; A " << la.get("stats").dump() << " A host " << la.get("host").dump() << " A modem " << ma.dump()
                                             << " | B " << lb.get("stats").dump() << " B host " << lb.get("host").dump() << " B modem " << mb.dump());
     }
+    if (nudges) MESSAGE("FINDING (core): the radios learned each other only after " << nudges << " announcement(s): no reply to a new neighbour");
     std::string t = tag();
-    public_one_way(a, b, "through vox " + t, 90000);
-    public_one_way(b, a, "vox back " + t, 90000);
-    Json st = a.link_by_name("handheld").get("host");
-    MESSAGE("vox key-ups at A's radio: " << a.link_by_name("handheld").dump().find("vox_keyups"));
-    (void)st;
+    REQUIRE(quiet_channel());
+    public_one_way(a, b, "through vox " + t, 120000);
+    REQUIRE(quiet_channel());
+    public_one_way(b, a, "vox back " + t, 120000);
+    Json ast = a.link_by_name("handheld").get("host").get("status");
+    MESSAGE("A's simulated radio: " << ast.get("vox_keyups").as_int() << " VOX key-ups, " << ast.get("stalls").as_int(0)
+                                    << " stalls, jitter " << jitter << " ms");
   }
 
   TEST_CASE("acoustic preset through a degraded audio path") {
@@ -1137,5 +1168,192 @@ TEST_SUITE("mesh") {
       CHECK(probe.find(secret) == std::string::npos);
       CHECK(ember_host::to_lower(ni.get("device_name").as_string()).find(secret) == std::string::npos);
     }
+  }
+
+  TEST_CASE("internet relay over wss through a TLS proxy to the built-in broker") {
+    // RPC_API §11 end to end: two daemons with no link between them reach each other only through
+    // the /mqtt broker of the first one, behind a TLS-terminating proxy (as a real deployment puts
+    // it behind a reverse proxy). The CA and the certificate are generated here, in the temp dir;
+    // the daemons trust that CA through SSL_CERT_FILE.
+    TestDir tmp;
+    {
+      Daemon probe("relay-probe", tmp.path);
+      REQUIRE(probe.start());
+      if (!probe.result("host.info").get("websocket_tls").as_bool(false)) {
+        MESSAGE("this emberd has no TLS (EMBER_HOST_TLS=OFF): no relay links: skipping");
+        return;
+      }
+    }
+    auto sh = [](const std::string& c) { return std::system((c + " >/dev/null 2>&1").c_str()) == 0; };
+    if (!sh("openssl version") || !sh("python3 -c pass")) {
+      MESSAGE("openssl or python3 not available: skipping");
+      return;
+    }
+    std::string d = ember_host::path_join(tmp.path, "pki");
+    ember_host::make_dirs(d);
+    auto P = [&](const char* f) { return "'" + ember_host::path_join(d, f) + "'"; };
+    ember_host::write_file_atomic(ember_host::path_join(d, "leaf.ext"),
+                                  "subjectAltName=DNS:localhost\nbasicConstraints=CA:FALSE\nextendedKeyUsage=serverAuth\n");
+    REQUIRE(sh("openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:prime256v1 -out " + P("ca.key")));
+    REQUIRE(sh("openssl req -x509 -new -key " + P("ca.key") + " -out " + P("ca.pem") + " -subj '/CN=EmberMesh test CA' -days 2"));
+    REQUIRE(sh("openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:prime256v1 -out " + P("leaf.key")));
+    REQUIRE(sh("openssl req -new -key " + P("leaf.key") + " -out " + P("leaf.csr") + " -subj '/CN=localhost'"));
+    REQUIRE(sh("openssl x509 -req -in " + P("leaf.csr") + " -CA " + P("ca.pem") + " -CAkey " + P("ca.key") +
+               " -CAcreateserial -out " + P("leaf.pem") + " -days 2 -extfile " + P("leaf.ext")));
+
+    uint16_t broker_port = free_tcp_port();
+    Daemon a("relay-a", tmp.path), b("relay-b", tmp.path);
+    a.extra = {"--relay-broker", std::to_string(broker_port)};
+    ::setenv("SSL_CERT_FILE", ember_host::path_join(d, "ca.pem").c_str(), 1);
+    bool started = a.start() && b.start();
+    ::unsetenv("SSL_CERT_FILE");
+    REQUIRE(started);
+
+    // The TLS proxy in front of the broker.
+    std::string port_file = ember_host::path_join(d, "proxy.port");
+    std::vector<std::string> pargs = {"python3", ember_host::path_join(repo_dir(), "host/tests/tls_proxy.py"),
+                                      ember_host::path_join(d, "leaf.pem"), ember_host::path_join(d, "leaf.key"),
+                                      std::to_string(broker_port), port_file};
+    std::vector<char*> pargv;
+    for (auto& x : pargs) pargv.push_back(&x[0]);
+    pargv.push_back(nullptr);
+    pid_t proxy = -1;
+    REQUIRE(posix_spawnp(&proxy, "python3", nullptr, nullptr, pargv.data(), environ) == 0);
+    struct Reap {
+      pid_t p;
+      ~Reap() {
+        ::kill(p, SIGTERM);
+        int st;
+        ::waitpid(p, &st, 0);
+      }
+    } reap{proxy};
+    std::string pp;
+    REQUIRE(wait_until([&] { return ember_host::read_file(port_file, &pp) && !pp.empty(); }, 10000));
+    std::string url = "wss://localhost:" + std::to_string(std::atoi(pp.c_str())) + "/mqtt";
+
+    Json ia = a.result("host.info");
+    bool feat = false;
+    for (const auto& f : ia.get("features").elements()) feat |= f.as_string() == "relay";
+    CHECK(feat);
+
+    // Contacts first (cards carry the keys), then consent and the relay list.
+    for (auto pr : {std::make_pair(&a, &b), std::make_pair(&b, &a)}) {
+      Json c = Json::object();
+      c.set("card", pr.second->result("identity.card").get("card"));
+      Json r = pr.first->rpc("contacts.add", c);
+      REQUIRE_MESSAGE(r.get("ok").as_bool(false), r.dump());
+    }
+    Json set = J(R"({"setup_done":true,"internet":true,"relays":[{"enabled":true}]})");
+    Json relays = set.get("relays");
+    Json r0 = relays.at(0);
+    r0.set("url", url);
+    Json rl = Json::array();
+    rl.push(r0);
+    set.set("relays", rl);
+    for (Daemon* x : {&a, &b}) {
+      Json r = x->rpc("connectivity.set", set);
+      REQUIRE_MESSAGE(r.get("ok").as_bool(false), r.dump());
+    }
+    auto relay_link = [](Daemon& x) {
+      Json ls = x.result("links.list");
+      for (const auto& l : ls.get("links").elements())
+        if (l.get("type").as_string() == "relay") return l;
+      return Json();
+    };
+    for (Daemon* x : {&a, &b})
+      REQUIRE_MESSAGE(wait_until([&] { return relay_link(*x).get("status").get("mqtt_state").as_string() == "up"; }, 30000),
+                      x->name << ": " << x->result("links.list").dump() << " | " << x->result("connectivity.get").get("internet").dump());
+    Json la = relay_link(a);
+    CHECK(la.get("auto_key").as_string() == url);
+    CHECK(la.get("endpoint").get("config").get("url").as_string() == url);
+    CHECK_MESSAGE(la.get("host").get("status").get("protocol").as_string() == "mqtt", la.get("host").dump());  // subprotocol negotiated
+
+    dm_one_way(a, b, "relay dm a->b " + tag(), 60000);
+    dm_one_way(b, a, "relay dm b->a " + tag(), 60000);
+
+    // Withdrawing consent removes the relay link (the core and the host both act on it).
+    REQUIRE(b.rpc("connectivity.set", J(R"({"internet":false})")).get("ok").as_bool(false));
+    CHECK(wait_until([&] { return relay_link(b).is_null(); }, 10000));
+  }
+
+  TEST_CASE("nearby devices find each other by mDNS with no links configured") {
+#ifndef EMBER_HOST_HAVE_MDNS
+    MESSAGE("built without EMBER_HOST_MDNS: skipping");
+    return;
+#else
+    TestDir tmp;
+    // Capability probe: can this machine bind 5353 with address reuse and hear its own multicast
+    // on 224.0.0.251? (Some CI containers have no multicast route.) Detected, never assumed.
+    {
+      std::string e;
+      sock_t s = udp_socket(4, &e);
+      bool ok = s != kInvalidSock && udp_bind(s, "0.0.0.0", 5353, true, &e);
+      if (ok) ok = udp_join_multicast_v4(s, "224.0.0.251", "", &e);
+      bool heard = false;
+      if (ok) {
+        udp_set_multicast_ttl_loop(s, 1, true);
+        SockAddr g;
+        resolve_numeric("224.0.0.251", 5353, &g, 4);
+        mdns::Builder q;
+        q.question("_embermesh-probe" + ember_host::random_hex(3) + "._tcp.local", mdns::kPTR);
+        std::string pkt = q.finish();
+        udp_sendto(s, pkt.data(), pkt.size(), g);
+        uint8_t buf[9000];
+        heard = wait_until([&] {
+          SockAddr from;
+          long n = udp_recvfrom(s, buf, sizeof buf, &from);
+          return n == long(pkt.size()) && std::memcmp(buf, pkt.data(), pkt.size()) == 0;
+        }, 3000, 20);
+      }
+      if (s != kInvalidSock) sock_close(s);
+      if (!ok || !heard) {
+        MESSAGE("mDNS multicast is not available on this machine (" << (ok ? "own query not heard back" : e) << "): skipping");
+        return;
+      }
+    }
+    std::string svc = "_embermesh-t" + ember_host::random_hex(3) + "._tcp";
+    Daemon a("near-a", tmp.path), b("near-b", tmp.path);
+    a.nearby_service = b.nearby_service = svc;
+    REQUIRE(a.start());
+    REQUIRE(b.start());
+    // Nothing starts before the first-run disclosure was acknowledged (the UI does this call).
+    CHECK_FALSE(a.result("host.info").get("nearby").get("running").as_bool(true));
+    for (Daemon* d : {&a, &b}) REQUIRE(d->rpc("connectivity.set", J(R"({"setup_done":true})")).get("ok").as_bool());
+    REQUIRE(wait_until([&] { return a.result("host.info").get("nearby").get("running").as_bool(false) ||
+                                    a.result("host.info").get("nearby").has("error"); }, 10000));
+    Json ia = a.result("host.info");
+    bool feat = false;
+    for (const auto& f : ia.get("features").elements()) feat |= f.as_string() == "nearby";
+    CHECK(feat);
+    CHECK(ia.get("websocket_tls").is_bool());
+    if (!ia.get("nearby").get("running").as_bool(false) && ia.get("nearby").has("error")) {
+      MESSAGE("mDNS could not start in emberd here: " << ia.get("nearby").dump() << ": skipping");
+      return;
+    }
+    REQUIRE_MESSAGE(ia.get("nearby").get("running").as_bool(false), ia.get("nearby").dump());
+    // Exactly one nearby link each (the smaller token dials; the other accepts).
+    auto nearby_links = [](Daemon& d) {
+      int n = 0;
+      Json r = d.result("links.list");
+      for (const auto& l : r.get("links").elements())
+        if (l.get("endpoint").get("auto").as_string() == "nearby" && l.get("state").as_string() == "up") ++n;
+      return n;
+    };
+    REQUIRE_MESSAGE(wait_until([&] { return nearby_links(a) >= 1 && nearby_links(b) >= 1; }, 30000),
+                    "A " << a.result("host.info").get("nearby").dump() << " | B " << b.result("host.info").get("nearby").dump());
+    REQUIRE(wait_peer(a, b.node_id(), 20000));
+    exchange(a, b, "nearby");
+    test_wait_ms(2000);
+    CHECK(nearby_links(a) == 1);
+    CHECK(nearby_links(b) == 1);
+    // Turning Nearby off (connectivity.nearby) closes the links — only when the core has it.
+    Json off = a.rpc("connectivity.set", J(R"({"nearby":false})"));
+    if (off.get("ok").as_bool(false)) {
+      CHECK(wait_until([&] { return nearby_links(a) == 0; }, 10000));
+      CHECK_FALSE(a.result("host.info").get("nearby").get("running").as_bool(true));
+    } else {
+      MESSAGE("core has no connectivity.set yet: the off switch is not exercised");
+    }
+#endif
   }
 }

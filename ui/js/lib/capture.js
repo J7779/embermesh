@@ -177,3 +177,84 @@ export function captureUnavailableReason(env, kind = 'camera') {
   }
   return 'This browser or app view does not offer ' + kind + ' access. Try a current Chrome, Firefox or Safari, or the EmberMesh app for your device.';
 }
+
+// ------------------------------------------------------------------ whole-frame grids (RPC_API §12)
+
+/** Bytes → base64 (btoa over latin-1 chunks). */
+export function bytesToB64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+export function b64ToBytes(b64) {
+  const bin = atob(String(b64 || ''));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/**
+ * Grid for a frame of width × height: 64 cells across for wide frames (64×36 at 16:9), 48×36 at
+ * 4:3; always w·h ≤ 4096 and the aspect close to the frame's. Pure.
+ */
+export function gridSizeFor(width, height) {
+  const a = width > 0 && height > 0 ? width / height : 16 / 9;
+  let w, h;
+  if (a >= 1) { h = 36; w = Math.round(36 * a); if (w > 64) { w = 64; h = Math.max(1, Math.round(64 / a)); } }
+  else { w = 36; h = Math.round(36 / a); if (h > 64) { h = 64; w = Math.max(1, Math.round(64 * a)); } }
+  while (w * h > 4096) { w = Math.max(1, w - 1); h = Math.max(1, Math.round(w / a)); }
+  return { w, h };
+}
+
+/**
+ * Max-pooled (and mean) luma of an RGBA frame into a gw × gh grid, row by row from the top-left of
+ * the image as shown (`mirror` flips left↔right first). Every pixel belongs to exactly one cell, so a
+ * light covering a single pixel decides its cell's max. Luma = (77 R + 150 G + 29 B) >> 8. Pure.
+ * → {max: Uint8Array, mean: Uint8Array}
+ */
+export function maxPoolLuma(rgba, width, height, gw, gh, { mirror = false, out } = {}) {
+  const n = gw * gh;
+  const max = out && out.max && out.max.length === n ? out.max.fill(0) : new Uint8Array(n);
+  const mean = out && out.mean && out.mean.length === n ? out.mean : new Uint8Array(n);
+  const sum = new Uint32Array(n), cnt = new Uint32Array(n);
+  // column → cell index once per frame (cheap), row → cell row per row
+  const colCell = new Uint16Array(width);
+  for (let x = 0; x < width; x++) { const sx = mirror ? width - 1 - x : x; colCell[x] = Math.min(gw - 1, Math.floor(sx * gw / width)); }
+  for (let y = 0; y < height; y++) {
+    const rowBase = Math.min(gh - 1, Math.floor(y * gh / height)) * gw;
+    let i = y * width * 4;
+    for (let x = 0; x < width; x++, i += 4) {
+      const l = (77 * rgba[i] + 150 * rgba[i + 1] + 29 * rgba[i + 2]) >> 8;
+      const c = rowBase + colCell[x];
+      if (l > max[c]) max[c] = l;
+      sum[c] += l; cnt[c]++;
+    }
+  }
+  for (let c = 0; c < n; c++) mean[c] = cnt[c] ? Math.round(sum[c] / cnt[c]) : 0;
+  return { max, mean };
+}
+
+/**
+ * Collects grid frames into morse.rx.feed batches: at most `maxFrames` frames or `maxMs` of frame
+ * time per batch, never reordered (a frame older than the last one is dropped). add() returns a
+ * batch {frames:[…]} when one is full; flush() returns what is left (or null).
+ */
+export class FrameBatcher {
+  constructor(maxFrames = 8, maxMs = 100) { this.maxFrames = maxFrames; this.maxMs = maxMs; this.frames = []; this.lastT = -Infinity; }
+  add(t_ms, w, h, max, mean) {
+    if (!(t_ms > this.lastT)) return null;
+    this.lastT = t_ms;
+    this.frames.push({ t_ms: Math.round(t_ms * 10) / 10, w, h, max_b64: bytesToB64(max), ...(mean ? { mean_b64: bytesToB64(mean) } : {}) });
+    if (this.frames.length >= this.maxFrames || t_ms - this.frames[0].t_ms >= this.maxMs) return this.flush();
+    return null;
+  }
+  flush() { if (!this.frames.length) return null; const b = { frames: this.frames }; this.frames = []; return b; }
+}
+
+/** Confidence 0..1 → a word for people (weak / fair / good). Pure. */
+export function confidenceWord(c) {
+  if (c === null || c === undefined || c === '') return '';
+  const v = Number(c);
+  if (!Number.isFinite(v)) return '';
+  return v < 0.34 ? 'weak' : v < 0.67 ? 'fair' : 'good';
+}

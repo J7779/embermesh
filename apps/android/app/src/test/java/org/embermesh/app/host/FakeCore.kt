@@ -16,6 +16,11 @@ class FakeCore(var supportsLinks: Boolean = true) : CoreApi {
     /** When true, links.configure stores a new `endpoint` descriptor (a core that supports it). */
     var configureStoresEndpoint = false
     var locked = false
+    /** connectivity.get result (RPC_API §11); null = a core without it (not_implemented). */
+    var connectivity: JSONObject? = null
+    /** connectivity.internet: the core refuses relay links without it (denied). */
+    var internetConsent = false
+    val linkAddParams = CopyOnWriteArrayList<JSONObject>()
 
     private fun ok(r: JSONObject) = JSONObject().put("ok", true).put("result", r).toString()
     private fun err(code: String) = JSONObject().put("ok", false).put("error", JSONObject().put("code", code).put("message", code)).toString()
@@ -27,9 +32,19 @@ class FakeCore(var supportsLinks: Boolean = true) : CoreApi {
         if (!supportsLinks && method.startsWith("links.")) return err("not_implemented")
         return when (method) {
             "links.add" -> {
+                linkAddParams.add(p)
+                val auto = p.optString("auto", "")
+                if (p.getString("type") == "relay" && !internetConsent) return err("denied")
+                if (auto == "nearby") {
+                    val nearby = links.values.filter { it.optString("auto") == "nearby" }
+                    if (nearby.size >= 16) return err("busy")
+                    if (p.optString("auto_role") == "dial" && nearby.any { it.optString("auto_key") == p.optString("auto_key") && it.optString("auto_role") == "dial" }) return err("busy")
+                }
                 val id = nextId++
                 val l = JSONObject().put("id", id).put("type", p.getString("type")).put("name", p.optString("name"))
                     .put("config", p.optJSONObject("config") ?: JSONObject()).put("endpoint", p.optJSONObject("endpoint")).put("state", "down")
+                for (k in listOf("auto", "auto_role", "auto_key")) if (p.has(k)) l.put(k, p.get(k))
+                if (auto.isNotEmpty() || p.has("persist")) l.put("persist", false)
                 links[id] = l
                 ok(JSONObject().put("link", l))
             }
@@ -52,6 +67,7 @@ class FakeCore(var supportsLinks: Boolean = true) : CoreApi {
             "links.endpoint_state" -> { endpointStates.add(p); ok(JSONObject()) }
             "settings.get" -> ok(JSONObject().put("settings", settings))
             "settings.set" -> { val s = p.getJSONObject("settings"); s.keys().forEach { settings.put(it, s.get(it)) }; ok(JSONObject().put("settings", settings)) }
+            "connectivity.get" -> connectivity?.let { ok(JSONObject(it.toString())) } ?: err("not_implemented")
             "node.info" -> ok(JSONObject().put("node_id", "0123456789abcdef"))
             else -> err("not_implemented")
         }

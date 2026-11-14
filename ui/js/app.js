@@ -326,7 +326,9 @@ function buildStrip() {
     // state by shape and words too, not colour alone: a warning icon when no link is up
     linksEl.className = 's-item ' + (up ? 'ok' : 'bad');
     pill(linksEl, up ? 'link' : 'alert', up + '/' + links.length, up ? ' links' : ' links — none up');
-    linksEl.setAttribute('aria-label', up + ' of ' + links.length + ' links up' + (up ? '' : ' — no connection'));
+    linksEl.setAttribute('aria-label', up + ' of ' + links.length + ' links up' + (up ? '' : ' — no connection. Open Connections settings'));
+    // nothing up: the way out is Settings → Connections (Nearby devices, internet relay)
+    linksEl.setAttribute('href', up ? '#/links' : '#/settings/connections');
     linksEl.title = linksEl.getAttribute('aria-label');
     const now = Date.now();
     const heard = (app.store.get('peers') || []).filter(p => now - (p.last_seen_ts || 0) < 15 * 60e3).length;
@@ -532,6 +534,7 @@ async function boot() {
     await app.refreshInfo().catch(() => {});
     await app.refreshSettings();
     strip.refresh(); refreshSos(); refreshUnread();
+    upgradeNoticeIfNeeded();
   };
   if (!app.store.get('locked')) { strip.refresh(); refreshSos(); refreshUnread(); }
   // Scrolled state for sticky headers (a hairline appears once content runs underneath).
@@ -541,7 +544,29 @@ async function boot() {
   }, { capture: true, passive: true });
   await route();
   booted = true;
+  upgradeNoticeIfNeeded();
   try { document.dispatchEvent(new CustomEvent('ember:ready')); } catch { /* old WebView */ }
+}
+
+/**
+ * Installs set up before Nearby devices / the internet relay existed have setup_done false on a node
+ * that already has a name: show the one-time notice (RPC_API §11 rev 2); hosts start nothing until
+ * it is acknowledged. First-run setup records it itself.
+ */
+let upgradeShown = false;
+async function upgradeNoticeIfNeeded() {
+  const info = app.store.get('info');
+  if (upgradeShown || app.store.get('locked') || !info || !info.name) return;
+  try {
+    const m = await import('./lib/connectivity.js');
+    const c = await m.loadConnectivity(app);
+    if (c && c.setup_done === false && !upgradeShown) {
+      upgradeShown = true;
+      // a routine notice: never during the start-up animation (it would cut it short)
+      const { afterBoot } = await import('./lib/bootgate.js');
+      afterBoot(() => m.upgradeNotice(app, c).then(ok => { if (!ok) upgradeShown = false; }));
+    }
+  } catch (e) { console.warn('connectivity', e && e.message); }
 }
 
 /** Chrome < 84 WebViews have no flex `gap`: mark <html> so app.css adds margins instead. */

@@ -52,6 +52,34 @@ export function torchErrorText(e) {
   return 'The flashlight could not be used: ' + ((e && e.message) || 'unknown error') + '.';
 }
 
+/**
+ * host.signal.flash that Stop always wins against (also when Stop comes before the call reached
+ * the host): stop() sends host.signal.stop at once and again every 150 ms while the flash call is
+ * still in flight, and the result reads stopped. → {promise, stop() → Promise<error|null>}
+ * `call(method, params)` is app.api.call. Exported for tests.
+ */
+export function stoppableFlash(call, params) {
+  let stopped = false, inFlight = false, timer = 0;
+  const promise = (async () => {
+    inFlight = true;
+    try {
+      const r = await call('host.signal.flash', params);
+      return stopped ? { ...(r || {}), stopped: true } : r;
+    } finally { inFlight = false; clearInterval(timer); }
+  })();
+  return {
+    promise,
+    stop() {
+      if (stopped) return Promise.resolve(null);
+      stopped = true;
+      const send = () => Promise.resolve(call('host.signal.stop', {})).then(() => null, e => e);
+      // the flash may not have reached the host yet: repeat the stop until the call returns
+      timer = setInterval(() => { if (inFlight) send(); else clearInterval(timer); }, 150);
+      return send();
+    },
+  };
+}
+
 const fmtSecs = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return s >= 60 ? Math.floor(s / 60) + ' min ' + (s % 60) + ' s' : s + ' s'; };
 const symbols = code => code.replace(/\./g, '·').replace(/-/g, '−');
 
@@ -162,7 +190,9 @@ export function sendPanel(app, box) {
         if (light === 'tone') last = await playTone(app, sig.pattern, () => cancelled);
         else {
           try {
-            last = await app.api.call('host.signal.flash', { pattern_ms: sig.pattern, mode: light });
+            if (cancelled) break; // Stop pressed before the light started: never start it
+            run.flash = stoppableFlash((m, p) => app.api.call(m, p), { pattern_ms: sig.pattern, mode: light });
+            try { last = await run.flash.promise; } finally { run.flash = null; }
           } catch (e) {
             if (light === 'torch') {
               // explain, refresh what the host now knows (a browser remembers "no torch"), offer the screen
@@ -180,6 +210,7 @@ export function sendPanel(app, box) {
         if (last && last.stopped) cancelled = true;
         if (repeat.checked && !cancelled) await pause(Math.max(2000, 7 * dotMs(wpm)), () => cancelled);
       } while (repeat.checked && !cancelled);
+      if (!last && cancelled) { result.textContent = 'Stopped.'; announce('Stopped.'); }
       if (last) {
         const r = cancelled ? { ...last, stopped: true } : last;
         let msg = resultText(r, light);
@@ -205,9 +236,8 @@ export function sendPanel(app, box) {
     if (!running) return;
     running.cancel();
     if (running.light === 'tone' && !app.has('tone')) return; // page tone: cancelled above
-    try { await app.api.call('host.signal.stop'); } catch (e) {
-      if (UNAVAILABLE.has(e.code)) { statusLine.textContent = 'This device cannot stop the light early: it stops when the message ends.'; announce(statusLine.textContent); }
-    }
+    const e = running.flash ? await running.flash.stop() : await app.api.call('host.signal.stop').then(() => null, x => x);
+    if (e && UNAVAILABLE.has(e.code)) { statusLine.textContent = 'This device cannot stop the light early: it stops when the message ends.'; announce(statusLine.textContent); }
   });
   primary.addEventListener('click', () => send(primaryAction(torch).light));
   alt.addEventListener('click', () => send('screen'));

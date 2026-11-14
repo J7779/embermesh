@@ -349,3 +349,39 @@ test('Send screen: primary action and messages for every torch state and result'
   assert.match(torchErrorText({ code: 'unsupported' }), /No flashlight/);
   assert.match(torchErrorText({ code: 'io_error', message: 'busy' }), /busy/);
 });
+
+// ------------------------------------------------------------------ Stop always wins
+import { stoppableFlash } from '../js/screens/morse_send.js';
+
+test('Stop wins even when the flash call has not reached the host yet', async () => {
+  // a host whose flash call arrives late: a stop that arrives first is a no-op there
+  const log = [];
+  let running = null;
+  const call = async (m, p) => {
+    log.push(m);
+    if (m === 'host.signal.stop') { if (running) running(); return {}; }
+    await new Promise(r => setTimeout(r, 300)); // in transit
+    return new Promise(res => {
+      const t = setTimeout(() => { running = null; res({ used: 'torch', stopped: false }); }, 5000);
+      running = () => { clearTimeout(t); running = null; res({ used: 'torch', stopped: true }); };
+    });
+  };
+  const f = stoppableFlash(call, { pattern_ms: [100], mode: 'torch' });
+  await new Promise(r => setTimeout(r, 20));
+  const t0 = Date.now();
+  assert.equal(await f.stop(), null);
+  const r = await f.promise;
+  assert.equal(r.stopped, true);
+  assert.ok(Date.now() - t0 < 1500, 'the message is not flashed to its end');
+  assert.ok(log.filter(m => m === 'host.signal.stop').length >= 2, 'stop repeated until the flash had started');
+});
+
+test('a stop on a host without host.signal.stop reports why; a stop after the end changes nothing', async () => {
+  const call = async m => { if (m === 'host.signal.stop') throw Object.assign(new Error('x'), { code: 'unsupported' }); return { used: 'screen', stopped: false }; };
+  const f = stoppableFlash(call, { pattern_ms: [100] });
+  const r = await f.promise;
+  assert.equal(r.stopped, false);
+  const e = await f.stop();
+  assert.equal(e.code, 'unsupported');
+  assert.equal(await f.stop(), null, 'second stop is a no-op');
+});

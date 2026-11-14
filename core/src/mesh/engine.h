@@ -103,6 +103,23 @@ struct PeerLink {
   uint64_t last_rx_ms = 0;
 };
 
+// What may cross a link (internet relay sessions, docs/CONNECTIVITY.md §4.7). An unrestricted link
+// (the default) carries everything the other rules allow. A restricted link carries, in both
+// directions, only: direct packets between us and `peer`; packets of `channel`; ANNOUNCE and SOS
+// broadcasts originated by us or by `peer`. Reconciliation on it covers only those packets, and
+// received packets outside the scope are dropped. Hop-local control frames are not affected.
+struct LinkScope {
+  bool restricted = false;
+  // An internet relay session (docs/CONNECTIVITY.md §4): sends nothing while its contact is heard
+  // directly on another link (fallback), beacons every 30 min, small reconciliation pushes, and
+  // nothing received on it is ever forwarded to amateur-radio links.
+  bool relay_session = false;
+  bool has_peer = false;
+  NodeId peer{};
+  bool has_channel = false;
+  uint32_t channel = 0;
+};
+
 struct PeerInfo {
   NodeId id{};
   bool has_keys = false;
@@ -140,6 +157,7 @@ struct MeshStats {
   uint64_t dropped_expired = 0;
   uint64_t dropped_rate = 0;
   uint64_t dropped_auth = 0;        // forged / failed verification / undecryptable
+  uint64_t dropped_scope = 0;       // arrived on a restricted link but outside its scope
   uint64_t suppressed = 0;          // rebroadcasts cancelled because neighbours already relayed
   uint64_t tx_frames = 0, rx_frames = 0, rx_bad = 0;
   uint64_t delivered = 0;           // payloads handed to the delegate
@@ -165,6 +183,7 @@ struct StoredMeta {
 constexpr uint8_t kStoredOwn = 1;
 constexpr uint8_t kStoredTransmittable = 2;
 constexpr uint8_t kStoredUnverified = 4;  // origin unknown when stored (lowest storage class)
+constexpr uint8_t kStoredViaRelay = 8;    // received over an internet relay: never put on amateur links
 
 class MeshDelegate {
  public:
@@ -281,6 +300,11 @@ class MeshEngine {
   // --- links -------------------------------------------------------------------------------------
   // link_id must be non-zero and unique. The engine never deletes the Link.
   bool attach_link(uint32_t link_id, Link* link);
+  // Sets the scope of an attached link (no effect for unknown ids; reset on detach).
+  void set_link_scope(uint32_t link_id, const LinkScope& scope);
+  // Neighbours of a link whose identity is proven (verified ANNOUNCE with hops 0 from that hop id, or a
+  // direct pairwise-authenticated packet); never from unauthenticated beacons. Used for nearby duplicates.
+  std::vector<NodeId> proven_neighbours(uint32_t link_id) const;
   void detach_link(uint32_t link_id);
   void on_frame(uint32_t link_id, ByteView frame, const RxMeta& meta);
 

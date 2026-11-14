@@ -1,6 +1,6 @@
 ---
 id: embermesh/handheld-audio-modem
-title: "EmberMesh 16: Handheld Radios with the Sound-Card Modem"
+title: "EmberMesh 17: Handheld Radios with the Sound-Card Modem"
 category: embermesh
 tags: [embermesh, audio, modem, handheld, walkie-talkie, baofeng, kenwood, cable, trrs, usb sound card, vox, ptt, acoustic coupling, afsk1200, robust, txdelay, squelch, levels]
 summary: "Turning any handheld radio into a data link with the audio link: acoustic coupling, cables for phones and computers, VOX versus serial PTT, setting levels with the app's meters, choosing a modem, TX delay, squelch, and fixing decode failures."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 16
+order: 17
 ---
 
 # Handheld Radios with the Sound-Card Modem

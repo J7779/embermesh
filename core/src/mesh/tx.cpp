@@ -34,11 +34,46 @@ uint8_t MeshEngine::Impl::link_prio(const Header& h) {
 // (signed, MAC'd or self-authenticating). Ciphertext is never queued for them, whoever made it.
 bool MeshEngine::Impl::allowed_on(const LinkSlot& L, const Header& h) const {
   if (!L.caps.encryption_allowed && !legal_cleartext(h.sec)) return false;
+  if (L.scope.restricted && !in_scope(L, h)) return false;
   return true;
+}
+
+// Scope of a restricted link (LinkScope in engine.h): symmetric, so both ends of a relay session
+// agree on what is in it and their reconciliation digests match.
+bool MeshEngine::Impl::in_scope(const LinkSlot& L, const Header& h) const {
+  const LinkScope& s = L.scope;
+  if (!s.restricted) return true;
+  switch (h.dst_type) {
+    case DestType::Node:
+      return s.has_peer && ((h.origin == me && h.dst_node == s.peer) || (h.origin == s.peer && h.dst_node == me));
+    case DestType::Channel:
+      return s.has_channel && h.channel == s.channel;
+    case DestType::Broadcast:
+      // Channel sessions: members who are not contacts learn each other's keys (review M11).
+      if (s.has_channel) return h.kind == Kind::Announce || h.kind == Kind::Whois;
+      return s.has_peer && (h.kind == Kind::Announce || h.kind == Kind::Sos) && (h.origin == me || h.origin == s.peer);
+  }
+  return false;
+}
+
+// Fallback rule of relay sessions (CONNECTIVITY §4.9): the contact was heard directly (hops 0) on
+// another link that is not a relay session within the last 3 minutes.
+bool MeshEngine::Impl::reachable_elsewhere(const LinkSlot& L) const {
+  if (!L.scope.relay_session || !L.scope.has_peer) return false;
+  auto pit = peers.find(L.scope.peer);
+  if (pit == peers.end()) return false;
+  uint64_t now = mesh_now();  // PeerLink times are mesh time
+  for (const PeerLink& pl : pit->second.info.links) {
+    if (pl.link_id == L.id || now > pl.last_rx_ms + 180000) continue;
+    auto lit = links.find(pl.link_id);
+    if (lit != links.end() && !lit->second.scope.relay_session && lit->second.state == LinkState::Up) return true;
+  }
+  return false;
 }
 
 bool MeshEngine::Impl::can_transmit(LinkSlot& L) {
   if (!L.link || L.state != LinkState::Up || L.caps.mtu < kMinMtu) return false;
+  if (reachable_elsewhere(L)) return false;
   if (L.caps.requires_station_id && callsign.empty()) { L.st.blocked_no_callsign++; return false; }
   return true;
 }
@@ -141,6 +176,7 @@ bool MeshEngine::Impl::enqueue_unit(LinkSlot& L, uint8_t inner_type, ByteView co
 bool MeshEngine::Impl::send_raw_packet_on(LinkSlot& L, ByteView raw, const Header& h, uint8_t prio, uint64_t wire,
                                           bool own) {
   if (!allowed_on(L, h)) { L.st.blocked_legal++; return false; }
+
   if (!can_transmit(L)) return false;
   // Frames that wait too long in a queue are stale for flooding purposes (DTN sync will resend).
   uint64_t keep = prio == 0 ? 30 * 60000ull : (prio >= 6 ? 10 * 60000ull : 15 * 60000ull);
@@ -170,6 +206,8 @@ void MeshEngine::Impl::schedule_flood(const PacketView& pv, uint64_t wire, uint3
     // Slow shared channel with a single neighbour: it is the one we just heard it from.
     if (same && contended(L) && L.nbrs.size() <= 1) continue;
     if (!allowed_on(L, pv.h)) { L.st.blocked_legal++; continue; }
+    // Nothing that arrived over an internet relay goes onto amateur radio (review M12).
+    if (L.caps.requires_station_id && from_relay_session(from_link)) { L.st.blocked_legal++; continue; }
     if (L.floods.size() >= kMaxFloodsPerLink) continue;
     uint32_t air = airtime_ms(L, pv.raw.size() + 8);
     uint64_t delay;

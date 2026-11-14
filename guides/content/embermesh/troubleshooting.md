@@ -1,6 +1,6 @@
 ---
 id: embermesh/troubleshooting
-title: "EmberMesh 29: Troubleshooting and Known Limits"
+title: "EmberMesh 30: Troubleshooting and Known Limits"
 category: embermesh
 tags: [embermesh, troubleshooting, problems, errors, fix, limits, untested, android, iphone, ios, browser, desktop, bluetooth, wifi, audio, kiss, meshtastic, rnode, lora]
 summary: "How to verify a link yourself, symptom-cause-fix tables for every link type, message problems, and an honest list of what is untested or unsupported on each platform."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 29
+order: 30
 ---
 
 # Troubleshooting and Known Limits
@@ -44,6 +44,9 @@ order: 29
 - **Firefox and Safari** (and mobile browsers) are untested; the browser capability table is from
   the browsers' documentation.
 - Long unattended running, battery life and range on real hardware.
+- **Nearby devices** and the **internet relay** have not been proven between many real phones in
+  the field (the public relays themselves were checked to accept connections and carry a test
+  message).
 
 This does not mean it will not work. It means **you must test each link yourself** before you depend
 on it, using the procedure below, and keep a fallback (voice radio, a courier, a bundle on a stick).
@@ -88,7 +91,7 @@ adapter? [What you need](what-you-need.md).
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Stays **Queued** | No link up, or no link allowed for this message | Add or fix a link. Encrypted messages never use amateur links: the message box shows "not via ... (no encryption allowed)" |
+| Stays **Queued** | No link up, or no link allowed for this message | Add or fix a link; the contact page's **Reaching** card says whether the person can be reached now. Encrypted messages never use amateur links: the message box shows "not via ... (no encryption allowed)" |
 | Direct message stays **Sent**, never **Delivered** | Recipient out of reach; it is stored and retried | Wait; it is re-sent a few times at growing intervals, then stays stored and is handed over by store-and-forward until it expires |
 | **Failed** | Retries exhausted or expired | Tap the message → **Retry** |
 | **⚠ unverified sender** on a message, bulletin, check-in or SOS | The sender's key is unknown here | Add and verify the contact (words or QR); until then treat the name with suspicion. The tag disappears if an authenticated copy arrives |
@@ -106,6 +109,40 @@ adapter? [What you need](what-you-need.md).
 | Android cannot find an iPhone | iPhone app in the background (iOS hides the advertisement) | Bring EmberMesh to the foreground on the iPhone |
 | An old Android phone is never found | It cannot advertise | Let it connect to a newer phone instead |
 | Connects, then drops | Distance or obstacles | Move closer; keep both apps open |
+
+## Two phones on the same Wi-Fi do not see each other (Nearby devices)
+
+Go through this list in order:
+
+1. **Same network?** Both on the same Wi-Fi name, not one on mobile data or on a second Wi-Fi
+   (phones switch silently). A phone's own hotspot counts as one network.
+2. **Nearby devices on, on both?** **Settings → Connections → Nearby devices**. The Connections status line says
+   "Looking for nearby devices" (or "1 nearby device connected") when it is on, **Nearby devices
+   off** when it is not.
+3. **Local-network permission.** iPhone: **Settings** (the iPhone's) → **EmberMesh** → **Local
+   Network** on. Android 17 and newer: allow local-network access when asked; open the app again
+   to get the prompt.
+4. **Both apps open.** An iPhone finds and is found only while EmberMesh is open; an Android phone
+   while open or with its background service running.
+5. **Guest or public Wi-Fi** often isolates devices from each other. Use one phone's hotspot (the
+   others join it) or a hub instead.
+6. **A browser** cannot find devices by itself: join a hub or pair with a code under Links & radios.
+7. Still nothing: add a manual link (Wi-Fi UDP on Android and computers, TCP, Apple peer-to-peer)
+   as in [Phone to phone](phone-to-phone.md), or use Bluetooth, which is never automatic.
+
+## Internet relay
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Contact page says **Not reachable right now.** although both have internet | The other side has the relay off, is not using the same relay, or their app is closed | Both turn on **Internet relay**, keep at least one relay in common, and keep the app open. Nothing arrives on a phone whose app is closed; there are no push notifications |
+| Messages arrive only when the other person opens the app | That is how it works: delivery only while both apps run | Agree times to be online; use radio and other links for anything urgent |
+| Relay line says **Not connected** or **Waiting to connect** | No internet, the relay service is down, or a network blocks it | Check the internet; add another relay or your own (Settings → Connections → Relays) |
+| "Not started yet: finish setting up to connect." | First-run setup not finished | Finish setup |
+| "Not available in this app yet: it cannot make encrypted (TLS) connections." | The computer program (emberd) cannot be a relay client yet | Use a phone or browser for the relay; a hub can still *be* a relay (`--relay-broker`) |
+| A channel never reaches far-away members | Channels with a typed passphrase not rated strong are never relayed ("Not offered over the internet relay: ..."); others only after **Also over the internet relay** is switched on | Use a channel with a random key and switch it on in the channel's menu (the menu at the top of the conversation) |
+| A relay is refused when adding it | Address must start with `wss://` (or `ws://` only with **Allow an unencrypted connection (ws://)**); at most 8 relays | Correct the address; remove one you no longer use |
+
+Remember: the relay is a convenience while the internet works. See [Connections](connections.md).
 
 ## Wi-Fi (UDP), TCP, hub and WebRTC
 

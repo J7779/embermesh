@@ -62,7 +62,10 @@ network range can listen, transmit, replay and forge, and every input may be hos
       the manual never present it as private.
 - [ ] Defaults stay anonymous: no OS user, host, device or Bluetooth name in anything broadcast;
       pairing codes and cards say what they reveal (LAN addresses, node id, public keys).
-- [ ] No telemetry, analytics, remote logging, update pings or third-party requests.
+- [ ] No telemetry, analytics, remote logging, update pings or third-party requests. The only
+      exception is the consented internet relay (docs/CONNECTIVITY.md §4): nothing before consent
+      and `ready`; per-contact scoped sessions; sealed frames; replay/rate/breaker checks kept; a
+      default relay only if verified to refuse `#` and `+` (date recorded in §4.1).
 
 ## 6. Amateur bands
 
@@ -79,6 +82,10 @@ network range can listen, transmit, replay and forge, and every input may be hos
 - [ ] No `pull_request_target`, no untrusted input (titles, branch names) interpolated into `run:`.
 - [ ] Vendored code is permissive, unmodified, with its licence file, listed in
       `THIRD_PARTY_LICENSES.md` and `ui/js/lib/about.js`; `tools/ci/check-licences.sh` passes.
+- [ ] `host/src/host/mdns.cpp`, `host/src/host/mqtt_broker.cpp` and `host/src/host/tls.cpp` (config
+      `host/src/host/tls_mbedtls_config.h`) parse untrusted network input; relay-socket rules live in
+      `check_websocket_config()` in `host/src/host/endpoints/net_endpoints.cpp`. Certificate
+      verification stays `MBEDTLS_SSL_VERIFY_REQUIRED` with a host name set.
 - [ ] actionlint and shellcheck pass (`docs/CI.md` "Publish checks").
 
 ## 8. Reporting a vulnerability

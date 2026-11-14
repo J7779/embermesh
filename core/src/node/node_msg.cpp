@@ -460,6 +460,38 @@ Json Node::contact_json(const Json& rec) const {
     for (const auto& l : peer->links)
       if (!best || l.last_rx_ms > best->last_rx_ms) best = &l;
   c.set("via_link", best ? best->link_id : 0);
+  // reach (RPC_API §11): the kind of link the contact was last heard on directly within 15 minutes,
+  // preferring any non-relay path; never a delivery claim.
+  {
+    uint64_t now = eng_ ? eng_->now_ms() : 0;
+    const mesh::PeerLink* direct = nullptr;
+    const mesh::PeerLink* relay = nullptr;
+    if (peer)
+      for (const auto& l : peer->links) {
+        if (now > l.last_rx_ms + 15 * 60000ull) continue;
+        bool is_relay = relay_children_.count(l.link_id) > 0;
+        const mesh::PeerLink*& slot = is_relay ? relay : direct;
+        if (!slot || l.last_rx_ms > slot->last_rx_ms) slot = &l;
+      }
+    Json reach = Json::object();
+    const mesh::PeerLink* use = direct ? direct : relay;
+    std::string path = "none";
+    if (use) {
+      if (!direct) path = "relay";
+      else {
+        auto it = links_.find(use->link_id);
+        const std::string t = it == links_.end() ? std::string() : it->second.type;
+        if (it != links_.end() && it->second.auto_kind == "nearby") path = "nearby";
+        else if (t == "kiss" || t == "audio" || t == "meshtastic" || t == "rnode" || t == "lora_at" || t == "rtl_tcp") path = "radio";
+        else path = "network";
+      }
+      reach.set("link_id", use->link_id);
+    }
+    reach.set("path", path);
+    if (peer && peer->last_seen_ms && now >= peer->last_seen_ms)
+      reach.set("heard_s", static_cast<int64_t>((now - peer->last_seen_ms) / 1000));
+    c.set("reach", std::move(reach));
+  }
   if (best && best->has_rssi) c.set("rssi", best->rssi_dbm);
   if (best && best->has_snr) c.set("snr", best->snr_db);
   if (peer && peer->position) c.set("position", position_to_json(*peer->position, peer->position_ms));
@@ -593,7 +625,37 @@ Json Node::channel_json(const ChannelRec& c) {
   j.set("is_default", c.rec.get_bool("is_default")).set("muted", c.rec.get_bool("muted"));
   j.set("unread", mit != conv_meta_.end() ? mit->second.get_int("unread") : 0);
   j.set("members_seen", static_cast<int64_t>(c.rec.get("members").size()) + 1);
+  if (c.key.encrypted) {
+    j.set("relay", c.rec.get_bool("relay"));
+    j.set("relay_allowed", c.rec.get_bool("relay_allowed"));
+  } else {
+    j.set("relay", false).set("relay_allowed", false);
+  }
   return j;
+}
+
+// Internet relay opt-in for a channel (CONNECTIVITY §4.8): only random-key or strong-passphrase channels.
+void Node::mark_channel_relay_allowed(const std::string& id, bool allowed) {
+  auto it = channels_.find(id);
+  if (it == channels_.end() || !it->second.key.encrypted) return;
+  if (allowed && !it->second.rec.get_bool("relay_allowed")) {
+    it->second.rec.set("relay_allowed", true);
+    db_put_json("channels", B(id), it->second.rec);
+  }
+}
+
+std::string passphrase_strength(const std::string& pass) {
+  bool lo = false, up = false, dg = false, ot = false;
+  size_t words = 1;
+  for (char c : pass) {
+    lo |= c >= 'a' && c <= 'z';
+    up |= c >= 'A' && c <= 'Z';
+    dg |= c >= '0' && c <= '9';
+    ot |= !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'));
+    words += c == ' ';
+  }
+  int classes = lo + up + dg + ot;
+  return (pass.size() >= 20 || (words >= 4 && pass.size() >= 16)) ? "strong" : (pass.size() >= 12 && classes >= 2) ? "fair" : "weak";
 }
 
 void Node::emit_channel(const std::string& id) {
@@ -675,20 +737,7 @@ RpcResult Node::m_channels_create(Params& p) {
   // Every packet of a passphrase channel lets an eavesdropper test guesses offline (review L2):
   // report how guessable the passphrase is, and offer random keys shared only by invite.
   std::string strength;
-  if (!pass.empty()) {
-    bool lo = false, up = false, dg = false, ot = false;
-    size_t words = 1;
-    for (char c : pass) {
-      lo |= c >= 'a' && c <= 'z';
-      up |= c >= 'A' && c <= 'Z';
-      dg |= c >= '0' && c <= '9';
-      ot |= !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'));
-      words += c == ' ';
-    }
-    int classes = lo + up + dg + ot;
-    strength = (pass.size() >= 20 || (words >= 4 && pass.size() >= 16)) ? "strong"
-             : (pass.size() >= 12 && classes >= 2) ? "fair" : "weak";
-  }
+  if (!pass.empty()) strength = passphrase_strength(pass);
   proto::ChannelKey key;
   if (random_key) {
     crypto::Key32 k;
@@ -703,6 +752,14 @@ RpcResult Node::m_channels_create(Params& p) {
   if (!add_channel(key, display, &ch))
     return ch.is_null() ? rpc_err("busy", "a different channel already uses this channel id; choose another name or passphrase")
                         : rpc_err("io_error", "could not save channel");
+  if (random_key) {
+    channels_[hex32(key.id)].rec.set("random_key", true);
+    db_put_json("channels", B(hex32(key.id)), channels_[hex32(key.id)].rec);
+  }
+  if (random_key || strength == "strong") {
+    mark_channel_relay_allowed(hex32(key.id), true);
+    ch = channel_json(channels_[hex32(key.id)]);
+  }
   Json res = Json::object({{"channel", ch}});
   if (!strength.empty()) res.set("passphrase_strength", strength);
   return rpc_ok(res);
@@ -718,6 +775,7 @@ RpcResult Node::m_channels_invite(Params& p) {
   u.add("v", "1").add("ch", id).add("n", it->second.rec.get_string("name"));
   if (it->second.key.encrypted)
     u.add("k", base64url_encode(ByteView(it->second.key.key.data(), it->second.key.key.size())));
+  if (it->second.key.encrypted && it->second.rec.get_bool("random_key")) u.add("r", "1");  // relay-eligible key
   return rpc_ok(Json::object({{"invite", u.to_string()}}));
 }
 
@@ -747,6 +805,12 @@ RpcResult Node::m_channels_join(Params& p) {
     if (!ch.empty() && ch != hex32(key.id)) return rpc_err("bad_params", "invite is corrupt (channel id mismatch)");
     Json out;
     if (!add_channel(key, display, &out)) return rpc_err(out.is_null() ? "busy" : "io_error", out.is_null() ? "a different channel already uses this channel id" : "could not save channel");
+    if (key.encrypted && u.get("r") == "1") {
+      auto cit = channels_.find(hex32(key.id));
+      if (cit != channels_.end()) { cit->second.rec.set("random_key", true); db_put_json("channels", B(hex32(key.id)), cit->second.rec); }
+      mark_channel_relay_allowed(hex32(key.id), true);
+      out = channel_json(channels_[hex32(key.id)]);
+    }
     return rpc_ok(Json::object({{"channel", out}}));
   }
   std::string display, err;
@@ -755,21 +819,30 @@ RpcResult Node::m_channels_join(Params& p) {
   if (pass.empty() && proto::normalize_channel_name(display) == "public")
     return rpc_ok(Json::object({{"channel", channel_json(channels_["public"])}}));
   proto::ChannelKey key = pass.empty() ? proto::open_channel(display) : proto::derive_channel_key(display, pass);
+  bool strong = !pass.empty() && passphrase_strength(pass) == "strong";
   crypto::wipe(pass.data(), pass.size());
   Json out;
   if (!add_channel(key, display, &out)) return rpc_err(out.is_null() ? "busy" : "io_error", out.is_null() ? "a different channel already uses this channel id" : "could not save channel");
+  if (strong) {
+    mark_channel_relay_allowed(hex32(key.id), true);
+    out = channel_json(channels_[hex32(key.id)]);
+  }
   return rpc_ok(Json::object({{"channel", out}}));
 }
 
 RpcResult Node::m_channels_update(Params& p) {
   std::string id;
-  bool muted = false, hm = false;
-  if (!p.str("id", &id, 16, true) || !p.boolean("muted", &muted, &hm)) return p.fail();
+  bool muted = false, hm = false, relay = false, hr = false;
+  if (!p.str("id", &id, 16, true) || !p.boolean("muted", &muted, &hm) || !p.boolean("relay", &relay, &hr)) return p.fail();
   auto it = channels_.find(id);
   if (it == channels_.end()) return rpc_err("not_found", "no such channel");
-  if (hm) {
-    it->second.rec.set("muted", muted);
+  if (hr && relay && !(it->second.key.encrypted && it->second.rec.get_bool("relay_allowed")))
+    return rpc_err("denied", "only channels with a random key or a strong passphrase can go over the internet relay");
+  if (hm) it->second.rec.set("muted", muted);
+  if (hr) it->second.rec.set("relay", relay);
+  if (hm || hr) {
     db_put_json("channels", B(id), it->second.rec);
+    if (hr) connectivity_tick(true);
   }
   Json out = channel_json(it->second);
   emit("channel.updated", Json::object({{"channel", out}}));

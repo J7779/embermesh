@@ -51,8 +51,8 @@ The manual uses the normal names. With Simple mode on, the same things are calle
 | Chats | Messages |
 | SOS | Send for help |
 | Emergency | Send for help |
-| Links | Connections |
-| Links & radios | Connections |
+| Links | Radios and links |
+| Links & radios | Radios and links |
 | Bulletins | Notice board |
 | Instructions (the Help tab on phones) | How to use |
 | Survival library | Guides |

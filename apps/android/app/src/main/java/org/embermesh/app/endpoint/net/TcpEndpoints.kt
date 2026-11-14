@@ -136,7 +136,9 @@ class TcpServerEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
                 ss.bind(InetSocketAddress(port))
                 server = ss
                 tick = ctx.scheduler.scheduleWithFixedDelay({ arbiter.tick() }, 30, 30, TimeUnit.MILLISECONDS)
-                if (advertise && ctx.hasContext) nsd = Nsd.register(ctx, Nsd.anonymousName(), port)
+                // A manually created server: findable in "Scan" lists, but without ember=1/v=1 so
+                // Nearby discovery never auto-dials it (CONNECTIVITY §3.2). Nothing identifying.
+                if (advertise && ctx.hasContext) nsd = Nsd.register(ctx, "EmberMesh-" + Nsd.randomToken(), port, mapOf("link" to "stream"))
                 sink.onState(true)
                 publish()
                 while (!closed) {
@@ -198,7 +200,17 @@ class TcpServerEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
 /** WebSocket client (hub guest mode: ws://<hub>:8437/ws, one mesh frame per binary message). */
 class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: EndpointSink) : Endpoint(config, sink) {
     private val url = config.str("url").trim()
-    private val insecure = config.bool("insecure", false)
+    private val protocols: List<String> = protocolsOf(config)
+    /**
+     * A relay socket (RPC_API §11, CONNECTIVITY §4.11): `protocols` contains "mqtt". Then the TLS
+     * certificate chain and host name are always validated (`insecure` is refused), `ws://` is
+     * allowed only with `allow_plaintext` to a LAN / link-local / `.local` host, and messages are
+     * capped at 8 KiB.
+     */
+    private val relaySocket = "mqtt" in protocols
+    private val allowPlaintext = config.bool("allow_plaintext", false)
+    private val insecure = config.bool("insecure", false) && !relaySocket
+    private val maxMessage = if (relaySocket) RELAY_MAX_MESSAGE else MAX_MESSAGE
     private val pingS = config.int("ping_interval_s", 25).coerceIn(0, 600)
     @Volatile private var closed = false
     @Volatile private var socket: Socket? = null
@@ -210,6 +222,11 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
 
     override fun open() {
         val u = try { WsCodec.parseUrl(url) } catch (e: IllegalArgumentException) { throw HostError.badParams(e.message ?: "bad url") }
+        if (relaySocket) {
+            if (config.bool("insecure", false)) throw HostError.badParams("relay sockets always validate certificates (insecure refused)")
+            if (!u.secure && !(allowPlaintext && org.embermesh.app.connectivity.LocalNets.isLanHost(u.host)))
+                throw HostError.badParams("this relay needs wss:// (plain ws:// only with allow_plaintext and a LAN or .local host)")
+        }
         ctx.io.execute {
             try {
                 val s = connect(u)
@@ -258,7 +275,9 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
     private fun handshake(u: WsCodec.Url, input: InputStream, o: OutputStream) {
         val key = Base64Std.encode(ByteArray(16).also { rnd.nextBytes(it) })
         val req = "GET ${u.path} HTTP/1.1\r\nHost: ${u.hostHeader}\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n" +
-            "Sec-WebSocket-Key: $key\r\nSec-WebSocket-Version: 13\r\nUser-Agent: EmberMesh-Android\r\n\r\n"
+            "Sec-WebSocket-Key: $key\r\nSec-WebSocket-Version: 13\r\n" +
+            (if (protocols.isNotEmpty()) "Sec-WebSocket-Protocol: ${protocols.joinToString(", ")}\r\n" else "") +
+            "\r\n" // no User-Agent: nothing that names the app or device
         o.writeFlush(req.toByteArray(Charsets.US_ASCII))
         val head = readHttpHead(input)
         val lines = head.split("\r\n")
@@ -266,6 +285,10 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
         if (!status.startsWith("HTTP/1.1 101") && !status.startsWith("HTTP/1.0 101")) throw java.io.IOException("upgrade refused: $status")
         val accept = lines.drop(1).firstOrNull { it.startsWith("sec-websocket-accept:", true) }?.substringAfter(':')?.trim()
         if (accept != WsCodec.acceptKey(key)) throw java.io.IOException("bad Sec-WebSocket-Accept")
+        if (protocols.isNotEmpty()) {
+            val chosen = lines.drop(1).firstOrNull { it.startsWith("sec-websocket-protocol:", true) }?.substringAfter(':')?.trim()
+            if (chosen == null || chosen !in protocols) throw java.io.IOException("server did not accept subprotocol ${protocols.joinToString()}")
+        }
     }
 
     private fun readHttpHead(input: InputStream): String {
@@ -280,9 +303,9 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
     }
 
     private fun readLoop(input: InputStream) {
-        val asm = WsCodec.Assembler(MAX_MESSAGE)
+        val asm = WsCodec.Assembler(maxMessage)
         while (!closed) {
-            val f = WsCodec.readFrame(input, MAX_MESSAGE)
+            val f = WsCodec.readFrame(input, maxMessage)
             lastRx = System.currentTimeMillis()
             val (op, payload) = asm.push(f) ?: continue
             when (op) {
@@ -317,7 +340,10 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
         sink.onState(false, t?.message ?: "connection closed")
     }
 
-    override fun write(data: ByteArray) { writer?.offer(data) }
+    override fun write(data: ByteArray) {
+        if (data.size > maxMessage) { sink.log("dropping a ${data.size}-byte message (cap $maxMessage)"); return }
+        writer?.offer(data)
+    }
 
     override fun close() {
         if (!closed) {
@@ -333,6 +359,19 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
 
     companion object {
         const val MAX_MESSAGE = 1024 * 1024
+        const val RELAY_MAX_MESSAGE = 8 * 1024
+        private val TOKEN = Regex("^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,32}$")
+
+        /** `protocols` (RFC 6455 subprotocol tokens, ≤ 8); anything else is a bad_params error. */
+        fun protocolsOf(c: JSONObject): List<String> {
+            val a = c.optJSONArray("protocols") ?: return emptyList()
+            if (a.length() > 8) throw HostError.badParams("protocols: at most 8")
+            return (0 until a.length()).map { i ->
+                val p = a.optString(i, "")
+                if (!TOKEN.matches(p)) throw HostError.badParams("protocols: invalid token")
+                p
+            }
+        }
     }
 
     object Factory : EndpointFactory {
@@ -346,7 +385,8 @@ class WebSocketEndpoint(private val ctx: HostContext, config: JSONObject, sink: 
         override fun configSchema(ctx: HostContext): JSONArray = Fields.of {
             text("url", "Hub URL", default = "ws://192.168.43.1:8437/ws", required = true, help = "ws://<hub ip>:8437/ws")
             number("ping_interval_s", "Keepalive", default = 25, min = 0, max = 600, unit = "s", advanced = true)
-            bool("insecure", "Accept any TLS certificate (wss)", default = false, advanced = true)
+            bool("insecure", "Accept any TLS certificate (wss)", default = false, advanced = true,
+                help = "Never used for internet relays, which always validate certificates.")
         }
         override fun scan(ctx: HostContext, timeoutMs: Long): JSONArray = Nsd.discover(ctx, timeoutMs) { h, p, name ->
             JSONObject().put("url", "ws://${if (h.contains(':')) "[$h]" else h}:$p/ws").also { it.put("_name", name) }

@@ -297,7 +297,7 @@ test('mock: interop conversations io:<network>, hops 0 = direct, 24-hex ids', as
 test('mock: links use the real catalogue, caps follow licence, audio meter fields, removal event', async () => {
   const b = fresh();
   const types = (await b.call('links.types')).types.map(t => t.type);
-  assert.deepEqual(types, ['raw', 'stream', 'kiss', 'audio', 'meshtastic', 'rnode', 'lora_at', 'rtl_tcp']);
+  assert.deepEqual(types, ['raw', 'stream', 'kiss', 'audio', 'meshtastic', 'rnode', 'lora_at', 'rtl_tcp', 'relay']); // relay: RPC_API §11
   const hi = await b.call('host.info');
   assert.ok(!hi.endpoint_kinds.find(k => k.kind === 'ble_peer').link_types.includes('raw'), 'raw is not offered for ble_peer');
   assert.ok(Array.isArray(hi.actions) && hi.actions.length);

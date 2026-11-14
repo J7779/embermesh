@@ -25,6 +25,7 @@
 #include "dsp/resampler.h"
 #include "modem/cw_rx.h"
 #include "modem/morse_timing.h"
+#include "morse/light_tracker.h"
 
 namespace ember {
 namespace morse_rx {
@@ -35,6 +36,7 @@ constexpr size_t kTranscriptChars = 4000;
 constexpr size_t kMaxLevelsPerFeed = 20000;
 constexpr size_t kMaxPcmBytesPerFeed = 4u << 20;
 constexpr uint32_t kMinAudioRate = 8000, kMaxAudioRate = 192000;
+constexpr size_t kMaxFramesPerFeed = 64;  // brightness grids per morse.rx.feed (§12)
 
 class LightKeyer {
  public:
@@ -87,6 +89,8 @@ struct Status {
   std::string pending;
   bool audio = false;
   double tone_hz = 0, snr_db = 0;
+  bool has_target = false;  // light sessions fed with whole-frame grids (§12)
+  Target target;
 };
 
 class Session {
@@ -99,6 +103,14 @@ class Session {
   // Light: uniformly spaced samples from t_ms, or per-sample times (same length as levels).
   void feed_uniform(double t_ms, double dt_ms, const std::vector<double>& levels);
   void feed_times(const std::vector<double>& times_ms, const std::vector<double>& levels);
+  // Light: whole-frame brightness grids (§12); the tracker finds the light. Frames must be valid
+  // (the RPC layer checks sizes); invalid ones are ignored.
+  void feed_frames(const GridFrame* frames, size_t n);
+  bool has_frames() const { return tracker_ && tracker_->started(); }
+  void target_pin(double fx, double fy);  // a tap, 0..1 of the frame
+  void target_auto();
+  // A morse.target event is due (state change, or movement at most 5 times a second).
+  bool take_target_event(Target* t) { return tracker_ && tracker_->started() && tracker_->take_event(t); }
   // Audio: mono s16le.
   void feed_pcm(const int16_t* pcm, size_t n);
   // New text since the last call (for the morse.text event); also appended to the transcript.
@@ -117,6 +129,7 @@ class Session {
   modem::MorseTiming::Config tc_;
   std::unique_ptr<LightKeyer> light_;
   std::unique_ptr<AudioDecoder> audio_;
+  std::unique_ptr<LightTracker> tracker_;  // created on the first frames feed
   std::string transcript_, new_;
   uint64_t chars_ = 0;
 };

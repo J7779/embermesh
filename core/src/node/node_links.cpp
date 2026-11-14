@@ -185,6 +185,12 @@ Json Node::link_json(const LinkRec& r) {
   j.set("state", state_name(st));
   if (!error.empty()) j.set("error", error);
   j.set("endpoint", r.endpoint.is_object() ? r.endpoint : Json::object());
+  if (!r.auto_kind.empty()) {
+    j.set("auto", r.auto_kind);
+    if (!r.auto_role.empty()) j.set("auto_role", r.auto_role);
+    j.set("auto_key", r.auto_key);
+    if (!r.auto_neighbour.empty()) j.set("neighbour", r.auto_neighbour);
+  }
   // Config: what the driver actually runs with — schema defaults, then the driver preset for keys
   // the user did not set, then the user's keys and the profile callsign the node copies in place of
   // N0CALL; the callsign the driver really transmits with (e.g. a licence-free pseudo id) wins.
@@ -208,6 +214,17 @@ Json Node::link_json(const LinkRec& r) {
   if (r.config.is_object())
     for (const auto& kv : r.config.members())
       if (cfg.has(kv.first) && !kv.second.is_null()) overrides.set(kv.first, kv.second);
+  if (r.type == "relay") {  // relay credentials are never echoed (they come from connectivity.relays)
+    if (overrides.has("password")) overrides.set("password", "");
+    if (cfg.is_object() && cfg.has("password")) cfg.set("password", "");
+    Json ep = j.get("endpoint");
+    if (ep.get("config").is_object() && ep.get("config").has("password")) {
+      Json ec = ep.get("config");
+      ec.set("password", "");
+      ep.set("config", std::move(ec));
+      j.set("endpoint", std::move(ep));
+    }
+  }
   j.set("overrides", std::move(overrides));
   j.set("config", std::move(cfg));
   j.set("caps", caps_to_json(r.link ? r.link->caps() : LinkCaps()));
@@ -222,6 +239,12 @@ Json Node::link_json(const LinkRec& r) {
   if (blocked_no_callsign(r.link.get(), eng_.get())) {
     j.set("blocked", "no_callsign");
     if (status.get_string("last_error").empty()) status.set("last_error", kNoCallsignError);
+  }
+  if (r.type == "relay") {
+    Json ids = Json::array();
+    for (const auto& kv : relay_children_)
+      if (kv.second.parent == r.id) ids.push(kv.first);
+    status.set("session_link_ids", std::move(ids));
   }
   j.set("status", std::move(status));
   j.set("persist", r.persist);
@@ -290,7 +313,12 @@ void Node::load_links() {
 
 void Node::link_frame_received(Link& link, ByteView frame, const RxMeta& meta) {
   LinkRec* r = link_by_ptr(&link);
-  if (!r || !eng_) return;
+  if (!r) {  // a session of a relay link (attached to the engine as its own link)
+    uint32_t cid = relay_child_id(&link);
+    if (cid && eng_) eng_->on_frame(cid, frame, meta);
+    return;
+  }
+  if (!eng_) return;
   eng_->on_frame(r->id, frame, meta);
 }
 
@@ -336,9 +364,18 @@ RpcResult Node::m_links_add(Params& p) {
   const Json* cfg = nullptr;
   const Json* ep = nullptr;
   bool persist = true;
+  std::string auto_kind, auto_role, auto_key;
   if (!p.str("type", &type, 32, true, false) || !p.str("name", &name, 64, false) || !p.object("config", &cfg, false) ||
-      !p.object("endpoint", &ep, false) || !p.boolean("persist", &persist))
+      !p.object("endpoint", &ep, false) || !p.boolean("persist", &persist) || !p.str("auto", &auto_kind, 16, false) ||
+      !p.str("auto_role", &auto_role, 16, false) || !p.str("auto_key", &auto_key, 64, false))
     return p.fail();
+  {
+    RpcResult aerr;
+    if (!check_auto_link(auto_kind, auto_role, auto_key, type, &aerr)) return aerr;
+    if (type == "relay" && !check_relay_endpoint(ep ? *ep : Json::object(), &aerr)) return aerr;
+    if (!auto_kind.empty()) persist = false;  // automatic links are never persisted
+    if (!utf8_valid(auto_key)) return rpc_err("bad_params", "auto_key must be valid UTF-8");
+  }
   if (!utf8_valid(name)) return rpc_err("bad_params", "name must be valid UTF-8");
   if ((cfg && cfg->dump().size() > kMaxLinkJson) || (ep && ep->dump().size() > kMaxLinkJson))
     return rpc_err("too_large", "config / endpoint too large (16 KiB)");
@@ -359,6 +396,21 @@ RpcResult Node::m_links_add(Params& p) {
   r.config = cfg ? *cfg : Json::object();
   r.endpoint = ep ? *ep : Json::object();
   r.persist = persist;
+  r.auto_kind = auto_kind;
+  r.auto_role = auto_kind == "nearby" ? auto_role : "";
+  r.auto_key = auto_key;
+  if (auto_kind == "nearby") r.name = "Nearby device";
+  if (type == "relay") {
+    // The host never sees relay credentials (connectivity.get does not return passwords): the node
+    // fills them in from the relay list entry with this address.
+    const Json& rl = settings_.get("connectivity.relays");
+    if (rl.is_array())
+      for (const Json& e : rl.items())
+        if (e.get_string("url") == (auto_key.empty() ? r.config.get_string("url") : auto_key)) {
+          if (!e.get_string("username").empty()) r.config.set("username", e.get_string("username"));
+          if (!e.get_string("password").empty()) r.config.set("password", e.get_string("password"));
+        }
+  }
   std::string err;
   // An unset LoRa "region" follows the node's region setting (stored explicitly, so a later change
   // of the setting never retunes an existing radio). If that makes an otherwise valid config fail
@@ -433,6 +485,7 @@ RpcResult Node::m_links_remove(Params& p) {
   if (!p.integer("id", &id, 1, 0x7fffffff, true)) return p.fail();
   auto it = links_.find(static_cast<uint32_t>(id));
   if (it == links_.end()) return rpc_err("not_found", "no such link");
+  relay_detach_children(it->first);
   if (eng_) eng_->detach_link(it->first);
   Json lj = link_json(it->second);
   lj.set("state", "down").set("removed", true);

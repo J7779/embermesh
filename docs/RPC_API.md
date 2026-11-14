@@ -430,6 +430,8 @@ are stable strings; the UI ignores malformed entries and non-`host.*` methods. E
 | `host.endpoint.state` | `{link_id, connected, error?}` |
 | `host.hub.clients` | `{clients}` |
 | `host.location` | `Position` |
+| `connectivity.changed` | `Connectivity` (section 11) |
+| `link.removed` | `{id, reason}` (section 11) |
 
 ## 5. Transport of RPC between UI and backends
 
@@ -631,10 +633,10 @@ in the page's local storage so they can be applied before the core has started):
 | Key | Values | Meaning |
 |---|---|---|
 | `simple_mode` | bool (default false) | Simple mode: larger text and touch targets, fewer choices per screen, plain wording, only the essential destinations in the navigation (Chats, SOS, Guides, Instructions, Settings), no decorative motion. Every feature stays reachable from "More". |
-| `motion` | `"system"` (default) / `"full"` / `"reduced"` / `"off"` | Animation level. `system` follows the platform's reduce-motion setting. Low-power mode and Simple mode force at most `reduced`. |
+| `motion` | `"system"` (default) / `"full"` / `"reduced"` / `"off"` | Animation level. `system` follows the platform's reduce-motion setting. Low-power mode and Simple mode force at most `reduced`. The start-up animation follows only an explicit `reduced`/`off` (see below). |
 | `text_scale` | number 0.85–1.6 (default 1) | Text size multiplier, on top of the platform's own font scaling. |
 | `high_contrast` | bool (default false, or the platform's setting) | Stronger borders and text contrast in every theme. |
-| `boot_animation` | `"full"` (default) / `"short"` / `"off"` | The start-up animation. Never delays the app: it ends as soon as the app is ready, on any tap or key press, and after a hard time limit. |
+| `boot_animation` | `"full"` (default) / `"short"` / `"off"` | The start-up animation (rules below). |
 
 A host may report platform accessibility state in `host.info.accessibility = {reduce_motion?,
 font_scale?, screen_reader?, high_contrast?, bold_text?}` and emit `host.accessibility` with the same
@@ -645,6 +647,37 @@ return `unsupported`.
 
 Test hooks: `?noboot=1` skips the start-up animation, `?motion=off` forces motion off, and both are
 automatic under browser automation (`navigator.webdriver`), so automated walks stay deterministic.
+
+**Start-up animation — the same on every platform** (web/PWA, single file, iOS, Android, the
+desktop daemon's operator page):
+
+- Every page load plays the **full** animation (2.4 s, then a ~0.6 s hand-over) — a cold start of a
+  native app, a browser visit, a reload. Returning to a running app from the background does not
+  replay it (the page is not reloaded). Being ready early, having seen it before, a late start,
+  low-power mode **and the platform's reduce-motion setting** do not shorten or skip it (owner
+  decision; the rest of the UI keeps following the platform setting); the app keeps loading
+  underneath and the hand-over waits for the animation's minimum. It has no flashing: one gradual
+  glow swell, no strobing or large-area luminance flicker.
+- Only choices made inside the app change it: `boot_animation` `"short"` (1.25 s) or `"off"` (one
+  still frame); `motion` explicitly `"reduced"` → the calm variant (still logo, the name fades in),
+  explicitly `"off"` → one still frame; `simple_mode` → the calm variant. `motion: "system"` (follow
+  the platform) does not affect it. The start-up animation reads the stored preferences, not the
+  effective motion. The Accessibility screen says so next to the setting.
+- Any tap, click or key press skips it at once; so does a dialog or toast appearing (an SOS). A
+  hard cap of 2.9 s from its first frame hands over even if the app is still loading.
+- Timing counts from the **first frame anyone sees**, never from navigation start: animation frames
+  only run while the page is visible, and a native shell that covers the page with its launch screen
+  sets `window.__emberHost.launchRemoved = true` and dispatches `ember:launch-removed` on `window`
+  when it removes it; the page holds the still logo (identical to the launch screen) until then
+  (at most 1.5 s without the signal). A page hidden before its first frame starts at frame 0 when
+  shown.
+- Where no 2D canvas is available (very old or locked-down web views) the calm variant is shown.
+- Diagnostics (read-only): `window.__emberBoot = {variant, active, reason, canvas, osReduce, at:{module,
+  frame0, removed?, ready?, out?, done?}}` (`performance.now()` ms; `canvas` null when not needed;
+  `osReduce` = the platform asks for reduced motion).
+
+Test hooks for it: `?noboot=1` and `navigator.webdriver` skip it, `?boot=full|short|reduced|off`
+forces a variant (also under automation), `?bootpause=<ms>` freezes a frame.
 
 ## 9. Hosted web app and fully offline installs (additive)
 
@@ -738,3 +771,252 @@ Rules for the UI:
 Old hosts that ignore `mode` and return `{}` remain valid: the UI treats a missing `used` as
 unknown and a missing `host.signal.stop` (`unsupported` / `not_implemented`) as "cannot stop the
 torch early" and says so.
+
+## 11. Nearby devices and the internet relay (additive)
+
+Design, threat model and rationale: [CONNECTIVITY.md](CONNECTIVITY.md) (revision 2). Wire format of
+relay messages: [PROTOCOL.md §12](PROTOCOL.md#12-internet-relay-framing); nearby hello:
+CONNECTIVITY §3.3.
+
+### Core methods
+
+| Method | Params | Result |
+|---|---|---|
+| `connectivity.get` | — | `Connectivity` |
+| `connectivity.set` | `{setup_done?:true, nearby?, internet?, relays?}` | `Connectivity` — `internet:true` records consent (`consent_ts`); `internet:false` removes every relay link; `nearby:false` removes every nearby link |
+| `connectivity.network_changed` | — | `{token}` — the host's network changed: a new nearby token (re-advertise with it) |
+
+```
+Connectivity = {
+  ready,            // true when setup is done AND the node is unlocked: hosts start nothing before this
+  setup_done,       // first-run (or upgrade) disclosure acknowledged: connectivity.set {setup_done:true}
+  nearby:   {enabled, active, token, notice, links},
+  internet: {enabled, active, consent_ts?, notice, relays:[Relay]},
+  available_link_types:["stream","relay"]
+}
+Relay = {url, enabled, allow_plaintext?, username?, note?, state:"off"|"down"|"connecting"|"up"|"error", error?, link_id?}
+```
+
+* `active` = `enabled && ready`. Hosts advertise/browse/dial/accept only while `nearby.active`, and
+  connect relays only while `internet.active`.
+* `setup_done` is set by the UI when the user applies first-run setup ("Start using EmberMesh" on the
+  "Your identity" step, whose "Connect to people" card shows both notices) or acknowledges the
+  one-time upgrade notice. It cannot be unset (wipe resets it).
+* `nearby.notice` and `internet.notice` are the texts to show, produced by the core (the internet
+  notice names the enabled relays). `nearby.token`: 8 lowercase hex digits, random per start and per
+  `connectivity.network_changed`. `nearby.links`: nearby links that are up.
+* `Relay.state` is `"off"` whenever the internet relay is off or the relay is disabled. `relays` in
+  `connectivity.set` replaces the whole list (≤ 8; `url` = `wss://host[:port][/path]`, or `ws://` only
+  with `allow_plaintext:true` and a LAN, link-local or `.local` host). `username`/`password` may be
+  given; **passwords are never returned** (not by `connectivity.get`, `settings.get` or `links.list`)
+  and hosts never need them: the core attaches the credentials of the relay with that `url` to the
+  relay link itself. Default list: `wss://broker.hivemq.com:8884/mqtt` (enabled — verified to refuse
+  `#` and `+`), `wss://broker.emqx.io:8084/mqtt` and `wss://test.mosquitto.org:8081/mqtt` (listed,
+  disabled: they let anyone watch topic names, sizes and timing). `note` is a core-provided description
+  of a default relay (why it is off; that it is a free service with no guarantee); the UI shows it.
+* There is no "bridge the whole mesh" option.
+
+Settings keys behind these (shown by `settings.get`, passwords removed; **`settings.set` refuses every
+`connectivity.*` key** — use `connectivity.set`): `connectivity.setup_done`, `connectivity.nearby`
+(default true), `connectivity.internet` (default false), `connectivity.internet_consent_ts`,
+`connectivity.relays`. UI naming: the existing `relay_enabled` setting is "Pass on messages for
+others"; this feature is "Internet relay". Wipe resets these keys; the duress decoy carries
+`setup_done`, `nearby`, `internet` and `consent_ts` (not the relay list: a decoy shows the defaults).
+
+### Events
+
+| Event | Data |
+|---|---|
+| `connectivity.changed` | `Connectivity` — after `connectivity.set`, lock/unlock, and when a relay link or the nearby count changes |
+| `link.removed` | `{id, reason}` — the core removed a link by itself; the host closes its endpoint. `reason`: `"duplicate"` (another link to the same proven device), `"nearby_off"`, `"hello_failed"` (no valid hello within 2 s), `"evicted"` (an unproven nearby link made room), `"relay_off"` (internet relay switched off), `"relay_removed"` (relay disabled or deleted), `"locked"` (lock or duress), `"wipe"` |
+
+A relay topic paused by the circuit breaker does not remove a link; it shows in the relay link's
+`status.topics_paused`.
+
+### Links
+
+* `links.add` accepts `auto?:"nearby"|"relay"`, `auto_role?:"dial"|"accept"` (nearby) and `auto_key?`
+  (≤ 64). Auto links are never persisted. Nearby: `auto_key` = `"<token>@<address>"` when dialing,
+  `"@<address>"` when accepting (`"<ble token>@ble"` is reserved for the deferred automatic BLE links,
+  CONNECTIVITY §3.5); refused (`denied`) unless `nearby.active`;
+  `busy` for a second dial with the same `auto_key` that is not down; at most 16 nearby links — when
+  full, the oldest nearby link without a proven identity is evicted (`link.removed reason:"evicted"`),
+  and if all are proven the new one is refused (`busy`). Relay: refused (`denied`) unless
+  `internet.active`; refused (`denied`) if the endpoint config has `insecure` or a `ws://` URL without
+  `allow_plaintext` to a LAN host.
+* `Link` echoes `auto`, `auto_role`, `auto_key` and, for nearby links, `neighbour` (node id) once the
+  neighbour has **proven** its identity (a verified ANNOUNCE with hops 0 from that hop id, or a direct
+  pairwise-authenticated packet). Names: the core names a nearby link `"Nearby device"` until then and
+  `"Nearby: <display name>"` after.
+* Link type `stream`, `config.preset:"nearby"`: the driver sends and requires the 8-byte hello
+  `45 4D 4E 42 01 00 00 00` (CONNECTIVITY §3.3).
+* Link type `relay` (MQTT 3.1.1 over a `websocket` endpoint): config `url` (required for a usable
+  link), `keepalive_s` (60..1200, default 240, randomised ±40 s), `username?`, `password?` (attached by
+  the core). The relay link itself carries no mesh traffic (`caps.mtu` 0); **every contact and every
+  relayed channel is its own session link** inside the core (ids ≥ 0x40000000, not in `links.list`;
+  they may appear as `link_id` in `peer.seen` and `mesh.stats.per_link`, where the UI shows "internet
+  relay"). `status`: `mqtt_state` (`consent_required` / `disconnected` / `waiting_for_time` /
+  `connecting` / `up`), `sessions`, `session_link_ids`, `topics`, `topics_paused`, `topics_refused`,
+  `rx_messages`, `tx_messages`, `rx_bad_seal`, `rx_replay`, `rx_wrong_hop`, `rx_own_echo`,
+  `rx_out_of_epoch`, `rx_dropped_rate`, `rx_unknown_topic`, `rx_bad_publish`, `breaker_trips`,
+  `reconnects`.
+
+### Channels and contacts
+
+* `Channel` gains `relay` (bool, default false) and `relay_allowed` (bool: the channel has a random key,
+  or its passphrase was rated strong when created or joined). `channels.update {id, relay?}`: `relay:true`
+  is refused (`denied`) unless `relay_allowed`. Invites of random-key channels carry `r=1`.
+* `Contact` gains `reach = {path:"nearby"|"network"|"radio"|"relay"|"none", link_id?, heard_s?}`: the
+  kind of link on which the contact was last heard directly (hops 0) within 15 minutes — `nearby`
+  (automatic nearby link), `network` (any other IP link: LAN, hub, TCP, WebRTC…), `radio` (kiss,
+  audio, meshtastic, rnode, lora_at), `relay` (an internet relay session; only when no other direct
+  path is fresh) — else `none`; `heard_s` = seconds since the contact was last heard on any path
+  (absent if never). It describes reachability, never delivery: delivery is only what
+  `message.status` reports.
+
+### Host side
+
+* `host.info.features` gains `"nearby"` and `"relay"` (the latter only when the `websocket` endpoint has
+  TLS); `host.info` adds `websocket_tls:bool`.
+* `websocket` endpoint config gains `protocols?:[string]` (sent as `Sec-WebSocket-Protocol`) and
+  `allow_plaintext?`. A socket whose `protocols` contains `"mqtt"` is a relay socket: TLS certificate and
+  host name validated against the platform trust store, `insecure` refused, `ws://` refused unless
+  `allow_plaintext` and a LAN/link-local/`.local` host, no User-Agent naming EmberMesh, messages
+  ≤ 8 KiB.
+* Nearby, while `nearby.active`: listen (TCP, any port) bound to the local-network interface only;
+  advertise `_embermesh._tcp` with instance `EmberMesh-<token>`, TXT exactly `ember=1`, `v=1`,
+  `link=stream`, `t=<token>` (desktop: SRV target `EmberMesh-<token>.local`, A/AAAA = interface IPv4 and
+  IPv6 link-local only); browse; dial per CONNECTIVITY §3.4 (the smaller token dials, the other after
+  8 s). Normative limits: dial only on-link/private addresses on the interface's subnet, ≤ 4 addresses
+  per instance, ≤ 4 new dials per minute; accept only on-link/private sources, ≤ 2 connections per
+  source IPv4 address or IPv6 /64, ≤ 4 new connections per minute per source. Every connection becomes
+  `host.link.create {endpoint:{kind:"tcp", …}, link:{type:"stream", config:{preset:"nearby"}},
+  persist:false, auto:"nearby", auto_role, auto_key}`; the core sends the hello. v1 automatic Nearby is
+  Wi-Fi/LAN only: hosts do not advertise, scan or dial Bluetooth automatically (`ble_peer` remains a
+  link the user adds by hand; future design in CONNECTIVITY §3.5). On a network change call
+  `connectivity.network_changed` and re-advertise.
+* Relay, while `internet.active`: for every enabled relay
+  `host.link.create {endpoint:{kind:"websocket", config:{url, protocols:["mqtt"], allow_plaintext?}},
+  link:{type:"relay", config:{url}}, persist:false, auto:"relay", auto_key:url}`; reconnect the endpoint
+  with exponential backoff 2 s … 5 min (±20 %), reset after 2 minutes connected; follow
+  `connectivity.changed`; close the endpoint on `link.removed`. A host without TLS creates no relay
+  links.
+* On `ready:false` (lock, wipe, duress) stop all discovery and close every automatic endpoint.
+
+## 12. Morse camera reader: the light is found automatically (additive)
+
+The camera reader must work when someone simply points the camera roughly at a blinking light — a
+flashlight far away that covers a few pixels, a phone screen across a room — without dragging a box
+onto it. The watched region (`roi`, section 6) is therefore replaced by a tracker in the core that
+looks at the whole frame. Section 6 stays valid: `levels` feeds keep working for old hosts.
+
+**Frames.** A capture source (the page's own `getUserMedia` capture, or a native
+`capture_camera_luma` host) reduces every camera frame to a small brightness grid and feeds it:
+
+| Method | Params | Result |
+|---|---|---|
+| `morse.rx.feed` | `{session, frames:[{t_ms, w, h, max_b64, mean_b64?}, …]}` | `MorseStatus` (below) |
+| `morse.rx.target` | `{session, x, y}` (0..1 of the frame) or `{session, auto:true}` | `MorseStatus` |
+
+- The grid covers the whole camera frame (no cropping), `w × h` cells with `w·h ≤ 4096`, aspect
+  close to the camera's (for example 64×36 for 16:9, 48×36 for 4:3), cell order row by row from the
+  top-left of the image as shown to the user (hosts apply rotation and mirroring first).
+- `max_b64`: one byte per cell, the **largest** luma (0–255) among the pixels the cell covers, taken
+  from the full-resolution frame (or the highest resolution the platform delivers at ≥ 24 frames a
+  second). Max-pooling is the point: a light that covers a single pixel still decides its cell.
+  `mean_b64` (optional, same layout) is the cell's average luma and helps reject glare.
+- `t_ms` is the frame's capture timestamp on a monotonic clock. Frames may be batched (several per
+  call) but never reordered; at most 8 frames or 100 ms per call. A host that drops frames says
+  nothing — timestamps tell the core.
+- Core limits (every frame is checked before any is used; one bad frame rejects the whole call and
+  nothing is fed): `frames` non-empty and at most **64** per call (`too_large` beyond); `w`, `h`
+  integers ≥ 1 with `w·h ≤ 4096` (`too_large` beyond); `max_b64` (and `mean_b64` when given)
+  standard base64 of exactly `w·h` bytes; `t_ms` a number within ±1e15 — otherwise `bad_params`.
+  A duplicate or out-of-order frame is ignored, a jump back of more than 5 s is taken as a new
+  clock. A session fed with `frames` refuses `levels` feeds (`bad_params`: start another session),
+  and one call cannot carry both. The grid size may change between frames (rotation); the tracker
+  rescales what it knows.
+- Camera settings every host applies when it can: rear camera, ≥ 30 frames a second (60 when
+  available), auto-focus continuous or fixed at infinity, **exposure biased down and locked once the
+  tracker reports `locked`** (a bright point must not bloom or drive auto-exposure up and down with
+  each flash), white balance locked, torch off, no HDR/night mode, widest lens by default. The
+  UI offers 2× / 5× zoom steps where the device has them; zoom changes only what the grid covers.
+
+**Tracker (core).** For light sessions fed with `frames` the core finds cells whose brightness
+switches on and off with Morse-like timing (marks and gaps between about 40 ms and 3 s, strong
+contrast against that cell's own background, repeated), prefers the candidate with the clearest
+keying, follows it as the camera moves (a hand-held phone drifts and shakes; the light may jump
+several cells between frames and leave the frame for a moment), ignores steady lights, slow
+changes of the whole scene, flicker from mains lighting and displays (100/120 Hz aliasing), and
+moving lights that do not key. It derives the brightness signal for the existing decoder from the
+tracked cell and its immediate neighbours. A user tap (`morse.rx.target {x,y}`) pins the nearest
+candidate until `auto:true`; without a tap everything is automatic.
+
+- A light is read once it has shown at least four marks with Morse structure (a dash, or element
+  gaps and longer gaps): the first lock comes about 1–1.5 s after keying starts at 12–15 WPM and
+  about 3 s at 5 WPM. What the light sent before the lock is kept and replayed to the decoder, so
+  the first characters are not lost.
+- Steady, periodically blinking (standby LEDs, aliased flicker), slowly changing, large or moving
+  things are not read, so a scene without a keyed light produces no text. The price: a sender who
+  keys nothing but `E E E …` or `T T T …` is not recognised.
+- The light being read is kept while it blinks. The reader moves to another keyed light only when
+  the current one has been dark for the "lost" time, has stayed lit for more than 3 s (a lamp, not
+  a key), or — after a zoom step or a jerk of the camera — when a light of the same brightness
+  starts blinking just after the current one went dark (the same light, seen elsewhere).
+- `morse.rx.target {session, x, y}` pins the light nearest to the tap within about 4 cells (a
+  keyed one preferred). With nothing there yet, the pin waits for a light to appear at that spot;
+  meanwhile `state` is `"searching"` and nothing else is read. A pinned light is read without the
+  Morse-structure check, but only while its contrast is real (no text from noise). `{session,
+  auto:true}` releases the pin and keeps reading the same light. Both return `MorseStatus`;
+  `bad_params` for an audio session, a missing `x` or `y`, values outside 0..1, or `x, y` together
+  with `auto`. `morse.rx.reset` also clears the tracker and the pin.
+
+`MorseStatus` gains `target: {state:"searching"|"locked"|"lost", x, y (0..1, centre of the tracked
+light; present unless searching), size (0..1 of the frame width, for drawing a ring), confidence
+(0..1), candidates (number of blinking lights seen), pinned (bool: a tap is in force)}`, present
+once the session has been fed `frames` (or tapped) and absent for `levels` sessions. `state` is
+`"searching"` until a keyed light is found, `"locked"` while it is being read, `"lost"` when it has
+not been seen for more than about 2 s (precisely max(2 s, 7.5 dots); the transcript is kept; the
+tracker reacquires by itself), and `"searching"` again after about 10 s without it. Event
+`morse.target {session, state, x?, y?, size?, confidence, candidates}` is emitted on state changes
+and at most 5 times a second (of frame time) while the position, size, confidence or number of
+candidates changes.
+
+**Privacy.** Camera frames never leave the capture layer: only the brightness grids reach the
+core, nothing is stored, logged or sent to the mesh, and the camera is released when the reader
+stops, the screen is left, the app goes to the background or the page is hidden. The permission is
+requested when the user starts reading, not before.
+
+**Native preview.** A host that shows its own camera preview draws it exactly inside the rectangle
+the UI passes (`rect`, CSS pixels relative to the web view's visible viewport, updated through
+`host.capture.update` on layout change, rotation and scroll), clipped to it, under the page's
+fixed header and bottom bar — never over them — and removes it at once on `host.capture.stop`.
+A native preview is drawn above the page, so the page cannot draw on it: the host itself draws
+the marker ring on its preview from `target` (`morse.target` events) — a thin ring in the app's
+accent colour (#ff8a3d) centred on `x, y`, diameter `max(size × preview width, 28 pt)`, shown only
+while `state` is `"locked"` (dimmed for `"lost"`, absent while `"searching"`), moved smoothly, no
+other box, text or control. Taps on the preview are delivered to the page as usual (the preview is
+not interactive); the page turns a tap inside the rectangle into `morse.rx.target`. With in-page
+capture the UI draws the same ring over its `<video>`. The state text and everything else is
+always the page's. The reader screen does not scroll while the
+camera is running, so the rectangle does not move under the finger.
+
+**Zoom, frame shape and capture state.** `host.capture.start` for `camera_luma` returns
+`{zoom_steps:[1, 2, 5], frame:{w, h}}`: the optical/digital steps this camera offers (`[1]` when
+it has none) and the shape of the camera frame as the user sees it (after rotation). The UI gives
+its preview rectangle that aspect ratio, so the host shows the whole frame without cropping or
+stretching and `target` coordinates map one-to-one onto the rectangle; a host that must crop maps
+the ring through its crop. `host.capture.update` accepts `{zoom}` with one of the steps. In-page capture offers the same through the track's
+`zoom` capability when the browser has it. As in section 6, a capture that stops by itself (the
+app went to the background, the screen locked, the page was left, the permission was revoked)
+emits `host.capture.state {kind, running:false, error?}` and the UI returns to its idle state.
+
+**Old cores and old hosts.** A core without the tracker rejects a `frames` feed with error
+`bad_params` or `unsupported`; a capture source that gets that answer on its first feed falls back
+to the section-6 watched region (centre of the frame) for the rest of the session. A core with the
+tracker lists `"morse_frames"` in `node.info.features`; sources should check that first.
+
+**UI.** One screen, no jargon: the live preview with a ring on the light being read, a plain state
+line ("Looking for a blinking light…", "Reading the light", "Lost the light — keep the camera on
+it"), the transcript in large type, a signal lamp, the speed, and Start/Stop. No box to drag, no
+"quality %" without words, no mention of capture internals.

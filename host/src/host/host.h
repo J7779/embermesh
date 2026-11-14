@@ -29,6 +29,7 @@
 #include "host/hub.h"
 #include "host/json.h"
 #include "host/loop.h"
+#include "host/nearby.h"
 
 namespace ember_host {
 
@@ -60,6 +61,10 @@ struct HostConfig {
   // hub
   bool hub_autostart = false;               // start the hub at start()
   bool hub_restore = true;                  // reopen a persisted ws_server (hub) link at start
+  // Nearby devices (CONNECTIVITY §3): mDNS + TCP auto links, following connectivity.nearby.
+  // Off by default for embedders that do their own discovery (phones); emberd turns it on.
+  bool nearby = false;
+  std::string nearby_service = "_embermesh._tcp";  // tests use a private service type
   std::string hub_bind = "0.0.0.0";
   uint16_t hub_port = 8437;
   std::string web_root;
@@ -69,6 +74,8 @@ struct HostConfig {
   bool local_no_token = false;
   bool captive_portal = false;
   size_t hub_max_guests = 200;
+  bool hub_mqtt = false;                    // /mqtt relay broker (CONNECTIVITY §4.12), its own port
+  uint16_t hub_mqtt_port = 8438;
   uint32_t max_tick_interval_ms = 1000;     // upper bound between ticks even if the core says idle
 
   // Reads the JSON form used by the C API (keys == field names, plus "hub":{port,bind,...}).
@@ -77,7 +84,11 @@ struct HostConfig {
 
 enum class CallOrigin { Local, Remote };
 
-class Host : public EndpointSink, public HubDelegate {
+// Relay reconnect backoff (RPC_API §11): returns the next delay (base 2 s ... 5 min, +-20 % from
+// `rnd`, 0..65535) and doubles *backoff_ms. Exposed for tests.
+uint32_t relay_backoff_step(uint32_t* backoff_ms, uint16_t rnd);
+
+class Host : public EndpointSink, public HubDelegate, public NearbyHostApi {
  public:
   Host(ember_node* node, HostConfig cfg, CoreApi core = CoreApi::real(),
        EndpointRegistry registry = make_default_registry());
@@ -129,6 +140,11 @@ class Host : public EndpointSink, public HubDelegate {
   void hub_clients_changed(size_t guests) override;
   Json hub_probe_info() override;
 
+  // NearbyHostApi
+  uint32_t nearby_install(std::unique_ptr<Endpoint> ep, const Json& add_params) override;
+  void nearby_remove(uint32_t id) override;
+  std::string nearby_network_changed() override;
+
  private:
   struct LinkRec {
     uint32_t id = 0;
@@ -141,9 +157,13 @@ class Host : public EndpointSink, public HubDelegate {
     std::unique_ptr<Endpoint> ep;
     uint64_t retry_timer = 0;
     uint32_t backoff_ms = 1000;
+    uint64_t up_since_ms = 0;  // relay backoff: when the current connection came up
     bool connected = false;
     std::string error;
     uint64_t opened_ms = 0;
+    bool auto_nearby = false;  // created by Nearby: removed when its connection ends
+    bool auto_relay = false;   // an internet relay socket (RPC_API §11), keyed by its URL
+    std::string auto_key;
   };
 
   Json call_on_loop(const std::string& method, const Json& params, CallOrigin origin);
@@ -221,6 +241,13 @@ class Host : public EndpointSink, public HubDelegate {
     uint64_t fed_samples = 0;
   };
   std::unique_ptr<Capture> capture_;
+  void refresh_nearby(const Json* connectivity = nullptr);
+  // RPC_API §11: one relay link per enabled relay while `internet.active` (TLS builds only).
+  void refresh_relays(const Json* connectivity = nullptr);
+  void relay_install(const std::string& url, bool allow_plaintext);
+  void relay_remove(uint32_t id);
+  bool relays_refreshing_ = false;
+  std::unique_ptr<Nearby> nearby_;
   bool syncing_ = false;
   bool locked_warned_ = false;
   std::vector<std::unique_ptr<Endpoint>> dying_;

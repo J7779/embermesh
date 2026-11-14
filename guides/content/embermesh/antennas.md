@@ -1,6 +1,6 @@
 ---
 id: embermesh/antennas
-title: "EmberMesh 21: Antennas You Can Build"
+title: "EmberMesh 22: Antennas You Can Build"
 category: embermesh
 tags: [embermesh, antenna, ground plane, dipole, j-pole, slim jim, yagi, tape measure yagi, lora antenna, coax, feedline, swr, choke, balun, safety, lightning, rf exposure]
 summary: "When a better antenna helps, the app's antenna designer tools, fully worked builds from scavenged materials (quarter-wave ground plane, dipole, J-pole, Slim Jim, tape-measure Yagi, LoRa quarter-wave), feedline choice and loss, checking an antenna without an SWR meter, and safety."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 21
+order: 22
 ---
 
 # Antennas You Can Build

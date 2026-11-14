@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.embermesh.app.capture.CameraLumaSource
 import org.embermesh.app.capture.MicPcmSource
 import org.embermesh.app.capture.MorseFeeder
-import org.embermesh.app.capture.Roi
+import org.embermesh.app.capture.GridFeeder
 import org.embermesh.app.services.MorseKeyer
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -48,41 +48,131 @@ class MorseCaptureTest {
     private fun session(n: TestNode, src: String, extra: JSONObject = JSONObject()): Any =
         n.rpc("morse.rx.start", extra.put("source", src)).get("session")
 
-    /** A generated blinking light (SOS SOS at 10 WPM, 30 fps, exposure noise) through the camera source's frame path. */
-    @Test fun syntheticBlinkingLightDecodes() {
+    private fun edgesFor(text: String, wpm: Int, leadMs: Double): Pair<List<Pair<Double, Boolean>>, Double> {
+        val dotMs = MorseKeyer.dotMs(wpm).toDouble()
+        val edges = ArrayList<Pair<Double, Boolean>>()
+        var acc = leadMs
+        for ((i, u) in units(text).withIndex()) { edges.add(acc to (i % 2 == 0)); acc += u * dotMs }
+        return edges to acc
+    }
+
+    /**
+     * §12: a far-away flashlight — a 2×2-pixel light blinking "SOS SOS" (10 WPM) somewhere in a dark,
+     * noisy 1280×720 frame at 30 fps, plus a steady lamp elsewhere — through the camera source's frame
+     * path (whole-frame max grids) into the core's tracker, which must find it by itself and decode it.
+     */
+    @Test fun tinyBlinkingLightIsFoundAndDecoded() {
+        val n = TestNode("tiny", null, emptyList())
+        try {
+            assumeTrue("core has no morse.rx yet", morseSupported(n))
+            val s = session(n, "light")
+            val grids = GridFeeder(n.runner, s, java.util.concurrent.Executor { it.run() })
+            val src = CameraLumaSource(n.ctx, MorseFeeder(n.runner, s), grids, "back", null)
+            val w = 1280; val h = 720
+            val frame = ByteBuffer.allocateDirect(w * h)
+            val rnd = java.util.Random(3)
+            val (edges, endMs) = edgesFor("SOS SOS", 10, 1500.0)
+            val lx = (0.73 * w).toInt(); val ly = (0.31 * h).toInt()
+            val frameMs = 1000.0 / 30
+            var t = 0.0; var ts = 5_000_000_000L
+            val noise = ByteArray(w * h) { (18 + rnd.nextInt(9)).toByte() }
+            while (t < endMs + 2000) {
+                val lit = edges.lastOrNull { it.first <= t }?.second ?: false
+                frame.clear(); frame.put(noise, 0, noise.size)
+                for (dy in 0..1) for (dx in 0..1) frame.put((ly + dy) * w + lx + dx, (if (lit) 250 else 22).toByte())
+                frame.put((0.2 * h).toInt() * w + (0.2 * w).toInt(), 240.toByte()) // a steady lamp
+                frame.position(0)
+                src.processFrame(frame, w, 1, w, h, ts + (rnd.nextInt(5) - 2) * 1_000_000L)
+                t += frameMs; ts += (frameMs * 1e6).toLong()
+            }
+            grids.flush()
+            assumeTrue("core without the §12 tracker (fell back to levels)", !grids.fellBack)
+            val st = n.rpc("morse.rx.status", JSONObject().put("session", s))
+            Log.i("MorseCaptureTest", "tiny light: frames=${src.frames} feeds=${grids.feeds} status=$st stats=${src.stats()}")
+            assertTrue(st.toString(), st.getString("transcript").replace(" ", "").contains("SOSSOS"))
+            val tg = st.optJSONObject("target")
+            if (tg != null && tg.has("x")) {
+                assertEquals("tracked where the light is: $tg", 0.73, tg.getDouble("x"), 0.05)
+                assertEquals(0.31, tg.getDouble("y"), 0.05)
+            }
+        } finally { n.close() }
+    }
+
+    /** Section-6 fallback (a core without frames): the source feeds centre-region levels. */
+    @Test fun levelsFallbackStillDecodes() {
         val n = TestNode("light", null, emptyList())
         try {
             assumeTrue("core has no morse.rx yet", morseSupported(n))
             val s = session(n, "light")
             val feeder = MorseFeeder(n.runner, s)
-            val src = CameraLumaSource(n.ctx, feeder, Roi.CENTRE, "back", null)
+            val src = CameraLumaSource(n.ctx, feeder, null, "back", null)
             val w = 160; val h = 120
             val frame = ByteBuffer.allocateDirect(w * h)
             val rnd = java.util.Random(1)
-            val dotMs = MorseKeyer.dotMs(10).toDouble()
-            val pattern = units("SOS SOS")
+            val (edges, endMs) = edgesFor("SOS SOS", 10, 1000.0)
             var t = 0.0
             val frameMs = 1000.0 / 30
             var ts = 1_000_000_000L
-            // 1 s dark lead-in, the message, 1 s dark tail.
-            val edges = ArrayList<Pair<Double, Boolean>>()
-            var acc = 1000.0
-            for ((i, u) in pattern.withIndex()) { edges.add(acc to (i % 2 == 0)); acc += u * dotMs }
-            val end = acc + 1500
-            while (t < end) {
+            while (t < endMs + 1500) {
                 val lit = edges.lastOrNull { it.first <= t }?.second ?: false
                 val base = if (lit) 220 else 35
                 frame.clear()
                 for (i in 0 until w * h) frame.put((base + rnd.nextInt(21) - 10).coerceIn(0, 255).toByte())
                 frame.flip()
-                src.processFrame(frame, w, 1, w, h, ts + (rnd.nextInt(5) - 2) * 1_000_000L) // ±2 ms frame jitter
+                src.processFrame(frame, w, 1, w, h, ts + (rnd.nextInt(5) - 2) * 1_000_000L)
                 t += frameMs; ts += (frameMs * 1e6).toLong()
             }
             feeder.flushLight()
             val st = n.rpc("morse.rx.status", JSONObject().put("session", s))
-            Log.i("MorseCaptureTest", "light: frames=${src.frames} status=$st")
             assertTrue(st.toString(), st.getString("transcript").replace(" ", "").contains("SOSSOS"))
         } finally { n.close() }
+    }
+
+    /**
+     * The camera source's frame path on the device: a single bright pixel lands in exactly one cell
+     * of the max grid (as the user sees it, sensor 0°), timestamps are the sensor's, batches ≤ 8 / 100 ms.
+     * Also measures the per-frame cost at 1920×1080 with padded rows.
+     */
+    @Test fun gridPipelineSinglePixelTimestampsBatchingAndCost() {
+        val fed = java.util.concurrent.CopyOnWriteArrayList<JSONObject>()
+        val core = object : org.embermesh.app.core.CoreApi {
+            override fun call(method: String, paramsJson: String): String { fed.add(JSONObject(paramsJson)); return """{"ok":true,"result":{"transcript":""}}""" }
+            override fun linkRx(linkId: Int, data: ByteArray, off: Int, len: Int) {}
+            override fun audioRx(linkId: Int, samples: ShortArray, count: Int, sampleRate: Int) {}
+            override fun audioTx(linkId: Int, out: ShortArray, max: Int, sampleRate: Int) = 0
+            override fun wake() {}
+        }
+        val ctx = org.embermesh.app.host.HostContext(app)
+        val grids = GridFeeder(core, 1, java.util.concurrent.Executor { it.run() })
+        val src = CameraLumaSource(ctx, MorseFeeder(core, 1), grids, "back", null)
+        try {
+            val w = 1920; val h = 1080; val stride = 1984
+            val frame = ByteBuffer.allocateDirect(stride * h)
+            val bg = ByteArray(stride * h) { 30 }
+            val base = 7_000_000_000L
+            for (k in 0 until 150) {
+                frame.clear(); frame.put(bg); frame.position(0)
+                if (k == 3) frame.put(777 * stride + 1311, 255.toByte())
+                src.processFrame(frame, stride, 1, w, h, base + k * 33_333_333L)
+            }
+            grids.flush()
+            val frames = fed.flatMap { p -> p.getJSONArray("frames").let { a -> (0 until a.length()).map { a.getJSONObject(it) } } }
+            assertEquals(150, frames.size)
+            for ((k, f) in frames.withIndex()) assertEquals(Math.round((base + k * 33_333_333L) / 1e5) / 10.0, f.getDouble("t_ms"), 0.05)
+            for (p in fed) { val a = p.getJSONArray("frames"); assertTrue(a.length() in 1..8)
+                assertTrue(a.getJSONObject(a.length() - 1).getDouble("t_ms") - a.getJSONObject(0).getDouble("t_ms") <= 100.0) }
+            val f3 = frames[3]
+            assertEquals(64, f3.getInt("w")); assertEquals(36, f3.getInt("h"))
+            val mx = android.util.Base64.decode(f3.getString("max_b64"), 0)
+            val hot = mx.indices.filter { (mx[it].toInt() and 0xff) == 255 }
+            assertEquals(listOf((777 * 36 / 1080) * 64 + 1311 * 64 / 1920), hot)
+            assertTrue(android.util.Base64.decode(frames[4].getString("max_b64"), 0).all { it.toInt() == 30 })
+            val st = src.stats()
+            Log.i("MorseCaptureTest", "grid cost 1920x1080 (stride $stride): mean ${st.getDouble("reduce_ms_mean")} ms, max ${st.getDouble("reduce_ms_max")} ms per frame")
+            InstrumentationRegistry.getInstrumentation().sendStatus(98, android.os.Bundle().apply {
+                putString("stream", "grid cost 1920x1080: mean ${st.getDouble("reduce_ms_mean")} ms, max ${st.getDouble("reduce_ms_max")} ms per frame\n") })
+            assertTrue("per-frame reduction too slow for 30 fps: $st", st.getDouble("reduce_ms_mean") < 33.0)
+        } finally { src.stop(); ctx.shutdown() }
     }
 
     /** A keyed 700 Hz tone at 48 kHz ("CQ CQ" at 15 WPM) through the mic source's PCM path (resampled to 8 kHz). */
@@ -124,15 +214,19 @@ class MorseCaptureTest {
         val session = JSONObject(EmberRuntime.core.call("morse.rx.start", JSONObject().put("source", "light").toString()))
             .optJSONObject("result")?.opt("session") ?: 1
         assertTrue(EmberRuntime.router.handle("host.info", JSONObject()).getJSONArray("features").toString().contains("capture_camera_luma"))
-        EmberRuntime.router.handle("host.capture.start", JSONObject().put("kind", "camera_luma").put("session", session))
+        val started = EmberRuntime.router.handle("host.capture.start", JSONObject().put("kind", "camera_luma").put("session", session))
         try {
+            val steps = started.getJSONArray("zoom_steps")
+            assertEquals(1, steps.getInt(0))
             TestNode.waitUntil(8000, "60 camera frames") { cap.status().getJSONObject("camera_luma").getLong("frames") >= 60 }
-            TestNode.waitUntil(4000, "exposure locked") { cap.status().getJSONObject("camera_luma").getBoolean("ae_locked") }
+            TestNode.waitUntil(4000, "white balance locked") { cap.status().getJSONObject("camera_luma").getBoolean("awb_locked") }
+            if (steps.length() > 1) EmberRuntime.router.handle("host.capture.update", JSONObject().put("kind", "camera_luma").put("zoom", steps.get(1)))
+            Thread.sleep(500)
             val st = cap.status().getJSONObject("camera_luma")
-            Log.i("MorseCaptureTest", "real camera: $st")
+            Log.i("MorseCaptureTest", "real camera: zoom_steps=$steps $st")
             assertTrue(st.toString(), st.getDouble("fps") >= 10)
-            assertTrue(st.getDouble("level") in 0.0..1.0)
-            assertTrue(st.getLong("samples") >= 60)
+            assertTrue("grids (§12) or levels (old core) reach the core: $st", st.getLong("grid_frames") >= 50 || st.getLong("samples") >= 50)
+            assertTrue("64 cells on the long side: $st", "64" in st.getString("grid").split("x"))
         } finally {
             EmberRuntime.router.handle("host.capture.stop", JSONObject().put("kind", "camera_luma"))
         }

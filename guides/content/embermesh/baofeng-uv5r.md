@@ -1,6 +1,6 @@
 ---
 id: embermesh/baofeng-uv5r
-title: "EmberMesh 17: Messages Through a Baofeng UV-5R (and Other Radios)"
+title: "EmberMesh 18: Messages Through a Baofeng UV-5R (and Other Radios)"
 category: embermesh
 tags: [embermesh, baofeng, uv-5r, bf-f8hp, uv-82, handheld, vox, ptt, k1, aioc, digirig, acoustic, radio wizard, quansheng, yaesu, kenwood, icom, anytone, frs, cb]
 summary: "A careful, complete walkthrough for sending EmberMesh messages through the common Baofeng UV-5R handheld: what you need, the radio settings from the app's verified profile, the VOX, PTT-interface and no-cable methods, setting levels, a first on-air test, running it from Android, iPhone, a browser or a computer, legal notes, common failures, and a shorter guide to the other radios the app knows."
@@ -10,7 +10,7 @@ license: CC0-1.0
 attribution: EmberMesh contributors
 retrieved: 2026-11-13
 part_of: embermesh/manual
-order: 17
+order: 18
 ---
 
 # Messages Through a Baofeng UV-5R (and Other Radios)

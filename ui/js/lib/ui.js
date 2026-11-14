@@ -3,9 +3,12 @@ import { h, svg, clear, append } from './dom.js';
 import { icon } from './icons.js';
 import { initials, hueFor } from './format.js';
 import { leave, ghostLeave, playClass, motionLevel } from './motion.js';
+import { afterBoot, bootDone, isUrgent } from './bootgate.js';
 
 // ---------------------------------------------------------------- toasts
 export function toast(text, opts = {}) {
+  // routine toasts wait for the start-up animation's hand-over; SOS and failures never wait
+  if (!isUrgent(opts) && !bootDone()) { afterBoot(() => toast(text, opts)); return; }
   const host = document.getElementById('toasts');
   if (!host) return;
   const t = h('div', { class: 'toast ' + (opts.kind || ''), role: opts.kind === 'bad' || opts.kind === 'sos' ? 'alert' : 'status' },
@@ -58,7 +61,7 @@ export function sheet(title, body, opts = {}) {
     closed = true;
     // Gone for every purpose at once (focus, back button, tests); only its picture animates out.
     ov.removeEventListener('keydown', onKey);
-    ghostLeave(ov, 'overlay', 'overlay-ghost', 240, [['sheet', 'sheet-ghost']]);
+    ghostLeave(ov, 'overlay', 'scrim-ghost', 240, [['sheet', 'sheet-ghost']]);
     openSheets = openSheets.filter(c => c !== close);
     if (prevFocus && prevFocus.focus) try { prevFocus.focus(); } catch { /* gone */ }
     opts.onClose && opts.onClose(result);

@@ -161,6 +161,9 @@ struct Daemon {
   std::string stdin_path = "/dev/null";
   bool hub = true;
   bool set_name = true;  // pass --name (false: test the anonymous default)
+  // Nearby (mDNS auto links) is off in tests unless asked for, with a private service type so
+  // parallel tests and real devices on the LAN never see each other.
+  std::string nearby_service;
 
   Daemon(const std::string& n, const std::string& base_dir) : name(n) {
     dir = ember_host::path_join(base_dir, n);
@@ -198,6 +201,12 @@ struct Daemon {
       args.push_back(name);
     }
     if (!hub) args.push_back("--no-hub");
+    if (nearby_service.empty()) {
+      args.push_back("--no-nearby");
+    } else {
+      args.push_back("--nearby-service");
+      args.push_back(nearby_service);
+    }
     for (auto& a : extra) args.push_back(a);
     for (auto& a : more) args.push_back(a);
     std::vector<char*> argv;

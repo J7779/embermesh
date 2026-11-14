@@ -171,7 +171,7 @@ enum EndpointCatalog {
       config: [
         .text("url", "Hub address", "ws://192.168.4.1:8437/ws", help: "Shown on the hub's screen, e.g. ws://10.0.0.2:8437/ws", required: true),
       ],
-      linkTypes: ["raw"], preferredLinkType: "raw"),
+      linkTypes: ["raw", "relay"], preferredLinkType: "raw"),
     EndpointKindSpec(
       kind: "udp", title: "Wi-Fi network broadcast (UDP)",
       description: "Talk to every EmberMesh device on the same Wi-Fi or hotspot at once.",

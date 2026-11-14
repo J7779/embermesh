@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "host/loop.h"
 #include "host/stream.h"
@@ -19,8 +20,11 @@ class WsClient {
     size_t max_message = 1 << 20;
     uint64_t ping_interval_ms = 30000;
     uint64_t timeout_ms = 90000;  // no input for this long -> drop
-    uint32_t connect_timeout_ms = 10000;
+    uint32_t connect_timeout_ms = 10000;  // TCP connect, and again the TLS + upgrade handshake
     std::string origin;
+    std::vector<std::string> protocols;  // Sec-WebSocket-Protocol offered (e.g. {"mqtt"})
+    bool send_user_agent = true;         // relay sockets send no User-Agent (RPC_API §11)
+    std::string tls_ca_file_for_tests;   // wss:// trusts only this PEM file (host tests only)
   };
   explicit WsClient(Loop& loop) : WsClient(loop, Options()) {}
   WsClient(Loop& loop, Options opt);
@@ -36,6 +40,7 @@ class WsClient {
   void abort();  // drop the TCP connection now, no callbacks
   bool is_open() const { return state_ == Open; }
   size_t pending() const { return stream_.pending(); }
+  const std::string& protocol() const { return protocol_; }  // the subprotocol the server chose
 
   std::function<void()> on_open;
   std::function<void(uint8_t opcode, std::string& data)> on_message;
@@ -50,6 +55,8 @@ class WsClient {
   void schedule_tick();
   void tick();
   bool send_frame(uint8_t op, const void* data, size_t len);
+  void raw_write(const std::string& bytes);  // through TLS when wss://
+  void send_upgrade();
 
   Loop& loop_;
   Options opt_;
@@ -57,8 +64,14 @@ class WsClient {
   State state_ = Idle;
   std::string key_, host_header_, path_;
   std::string head_buf_;
+  std::string protocol_;
+  std::string tls_host_;
+  struct Tls;  // defined in ws_client.cpp (empty without EMBER_HOST_TLS)
+  std::unique_ptr<Tls> tls_;
+  bool use_tls_ = false;
   WsDecoder dec_;
   uint64_t last_input_ = 0, last_ping_ = 0, close_deadline_ = 0;
+  uint64_t handshake_deadline_ = 0;  // TLS + HTTP upgrade must finish within connect_timeout_ms
   uint64_t tick_timer_ = 0;
   uint16_t peer_close_code_ = kWsCloseAbnormal;
   std::string peer_close_reason_;

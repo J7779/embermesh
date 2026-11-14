@@ -15,7 +15,7 @@ const read = id => '#/help/read/' + enc(id);
 /** Task groups (slugs under embermesh/). Unknown chapters go to "More". Exported for tests. */
 export const GROUPS = [
   ['Start here', ['quick-start', 'screens-tour', 'library-search', 'how-it-works', 'quick-reference']],
-  ['Connect devices', ['what-you-need', 'phone-to-phone', 'hub-setup', 'spreading-the-app']],
+  ['Connect devices', ['what-you-need', 'phone-to-phone', 'connections', 'hub-setup', 'spreading-the-app']],
   ['Radios', ['radio-gateway', 'handheld-audio-modem', 'baofeng-uv5r', 'kiss-tnc-packet', 'lora', 'sdr-listening', 'antennas', 'relays-and-repeaters', 'running-a-net']],
   ['Emergencies and the field', ['emergency-use', 'morse-reading', 'power-and-field', 'sneakernet']],
   ['Settings, accessibility and security', ['settings-reference', 'accessibility', 'security']],

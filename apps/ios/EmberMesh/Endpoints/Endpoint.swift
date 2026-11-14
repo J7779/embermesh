@@ -30,6 +30,26 @@ protocol Endpoint: AnyObject {
   var wantsAutoReconnect: Bool { get }
 }
 
+/// Reconnect timing for client endpoints (LinkManager): exponential from 2 s up to `capSeconds`,
+/// optional ±jitter, backoff reset immediately on connect (resetAfterSeconds 0) or only after the
+/// link stayed up that long (relays: CONNECTIVITY §4.9 "2 s … 5 min, ±20 %, reset after 2 min").
+struct ReconnectPolicy: Equatable {
+  var capSeconds: Double = 60
+  var jitter: Double = 0
+  var resetAfterSeconds: Double = 0
+  static let standard = ReconnectPolicy()
+  static let relay = ReconnectPolicy(capSeconds: 300, jitter: 0.2, resetAfterSeconds: 120)
+
+  func delay(attempt n: Int, random: Double = Double.random(in: -1...1)) -> Double {
+    let base = min(capSeconds, pow(2.0, Double(min(n, 20))) * 2)
+    return max(1, base * (1 + jitter * random))
+  }
+}
+
+extension Endpoint {
+  var reconnectPolicy: ReconnectPolicy { (self as? WebSocketEndpoint)?.isRelay == true ? .relay : .standard }
+}
+
 /// Shared plumbing: thread-safe state + delegate calls.
 class BaseEndpoint: NSObject, Endpoint {
   let kind: String

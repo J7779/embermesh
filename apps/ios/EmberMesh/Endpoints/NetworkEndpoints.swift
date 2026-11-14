@@ -295,8 +295,39 @@ final class UdpMulticastEndpoint: BaseEndpoint {
 }
 
 /// WebSocket client for hub guest mode: ws://<hub>:8437/ws, one binary message per mesh frame.
+/// Relay sockets (RPC_API §11 rev 2): a websocket whose `protocols` contains "mqtt".
+enum RelaySocketPolicy {
+  static let maxMessage = 8 * 1024
+  /// A generic User-Agent: never the app's name (URLSession's default would name EmberMesh).
+  static let userAgent = "mqtt"
+
+  /// LAN / link-local / `.local` hosts (the only ones a plaintext relay may use).
+  static func isLANHost(_ host: String) -> Bool {
+    let h = host.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+    if h.hasSuffix(".local") || h == "local" { return true }
+    return LocalNet.isPrivateOrLinkLocal(h)
+  }
+
+  /// nil if allowed: wss://, or ws:// with allow_plaintext AND a LAN host; `insecure` is never allowed.
+  static func check(url: URL?, config: JSONObject) -> RPCError? {
+    if config["insecure"] != nil, EndpointConfig(config).bool("insecure", false) {
+      return .denied("relay sockets always validate TLS certificates (no insecure option)")
+    }
+    guard let url, let scheme = url.scheme?.lowercased(), let host = url.host else { return .badParams("relay url is not a URL") }
+    if scheme == "wss" { return nil }
+    if scheme == "ws", EndpointConfig(config).bool("allow_plaintext", false), isLANHost(host) { return nil }
+    return .denied("relay links need wss:// (ws:// only with allow_plaintext to a LAN, link-local or .local host)")
+  }
+}
+
+/// Also the transport of `relay` links (RPC_API §11): `protocols` is sent as Sec-WebSocket-Protocol
+/// (relays: ["mqtt"]); TLS (`wss://`) uses URLSession's default server-trust evaluation against the
+/// system trust store and the host name — this class implements no authentication-challenge
+/// handler, so there is no way to accept an invalid certificate.
 final class WebSocketEndpoint: BaseEndpoint, URLSessionWebSocketDelegate {
   private let url: URL
+  let protocols: [String]
+  var isRelay: Bool { protocols.contains("mqtt") }
   private var session: URLSession?
   private var task: URLSessionWebSocketTask?
   private let opQueue: OperationQueue = { let q = OperationQueue(); q.maxConcurrentOperationCount = 1; return q }()
@@ -309,6 +340,12 @@ final class WebSocketEndpoint: BaseEndpoint, URLSessionWebSocketDelegate {
       throw RPCError.badParams("Hub address must look like ws://192.168.4.1:8437/ws")
     }
     url = u
+    let ps = (config["protocols"] as? [Any])?.compactMap { $0 as? String } ?? []
+    guard ps.count <= 8, ps.allSatisfy({ !$0.isEmpty && $0.count <= 64 && $0.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || "-._".contains($0)) } }) else {
+      throw RPCError.badParams("protocols must be up to 8 WebSocket subprotocol tokens")
+    }
+    protocols = ps
+    if ps.contains("mqtt"), let e = RelaySocketPolicy.check(url: u, config: config) { throw e }
     super.init(kind: "websocket")
   }
 
@@ -319,8 +356,18 @@ final class WebSocketEndpoint: BaseEndpoint, URLSessionWebSocketDelegate {
       cfg.waitsForConnectivity = false
       cfg.timeoutIntervalForRequest = 15
       let s = URLSession(configuration: cfg, delegate: self, delegateQueue: self.opQueue)
-      let t = s.webSocketTask(with: self.url)
-      t.maximumMessageSize = 1 << 20
+      let t: URLSessionWebSocketTask
+      if self.isRelay {
+        // No identifying headers: a generic User-Agent instead of URLSession's "<app>/<build> CFNetwork…".
+        var req = URLRequest(url: self.url)
+        req.setValue(RelaySocketPolicy.userAgent, forHTTPHeaderField: "User-Agent")
+        req.setValue(self.protocols.joined(separator: ", "), forHTTPHeaderField: "Sec-WebSocket-Protocol")
+        t = s.webSocketTask(with: req)
+        t.maximumMessageSize = RelaySocketPolicy.maxMessage
+      } else {
+        t = self.protocols.isEmpty ? s.webSocketTask(with: self.url) : s.webSocketTask(with: self.url, protocols: self.protocols)
+        t.maximumMessageSize = 1 << 20
+      }
       self.session = s
       self.task = t
       t.resume()
@@ -375,10 +422,15 @@ final class WebSocketEndpoint: BaseEndpoint, URLSessionWebSocketDelegate {
   }
 
   override func write(_ data: Data) {
+    if isRelay, data.count > RelaySocketPolicy.maxMessage { return }   // relay messages ≤ 8 KiB
     opQueue.addOperation { self.task?.send(.data(data)) { _ in } }
   }
 
-  override var status: JSONObject { ["url": url.absoluteString] }
+  override var status: JSONObject {
+    var o: JSONObject = ["url": url.absoluteString, "tls": url.scheme?.lowercased() == "wss"]
+    if !protocols.isEmpty { o["protocols"] = protocols }
+    return o
+  }
 }
 
 /// Bonjour browse for `_embermesh._tcp` (EmberMesh tcp_server listeners and desktop hubs).

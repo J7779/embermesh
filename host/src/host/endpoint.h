@@ -60,6 +60,9 @@ class Endpoint {
   virtual Json status() const { return Json::object(); }
   // Should the host re-open this endpoint after it closes with an error? (TCP/WS client/serial: yes.)
   virtual bool auto_reconnect() const { return true; }
+  // Relay sockets (RPC_API §11): reconnect backoff 2 s ... 5 min with +-20 % jitter, reset only
+  // after 2 min connected. Others: 1 s doubling to 30 s.
+  virtual bool relay_backoff() const { return false; }
   // Audio endpoints are fed from a device thread; the node runner ticks faster while one is open.
   virtual bool is_audio() const { return false; }
 

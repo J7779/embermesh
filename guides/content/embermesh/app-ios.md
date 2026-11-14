@@ -80,7 +80,7 @@ works only while connected to the hub. See [Operating the web app](app-web.md).
 | Prompt | Needed for |
 |---|---|
 | **Bluetooth** | Phone-to-phone chat, Bluetooth TNCs, Meshtastic radios |
-| **Local Network** | Apple peer-to-peer, finding other devices, the TCP listener, hubs, Wi-Fi links |
+| **Local Network** | Nearby devices (asked when first-run setup is applied), Apple peer-to-peer, finding other devices, the TCP listener, hubs, Wi-Fi links |
 | **Microphone** | Sound-card modem while such a link runs, and reading Morse by sound (nothing is recorded or stored) |
 | **Camera** | Scanning QR contact cards and invites, reading Morse by camera |
 | **Location** (While Using) | Your position in SOS and check-ins (GPS works without network) |
@@ -90,6 +90,13 @@ works only while connected to the hub. See [Operating the web app](app-web.md).
 change any of them later.
 
 ## 4. Connections on iPhone and iPad
+
+**Automatic connections** (switches in **Settings → Connections**, see [Connections](connections.md)):
+**Nearby devices** (on after setup) links up by itself with every EmberMesh device on the same Wi-Fi
+or hotspot; the **Internet relay** (off until you turn it on) reaches contacts far away. Both run only
+while the app is open on the screen (in the background they stop; no push notifications). They appear on Links & radios as **Automatic · nearby device** / **Automatic
+· internet relay** with **Change in Connections**. Everything else, including Bluetooth, is added
+by hand:
 
 Add them in **More → Links & radios → Add connection**; every setting can be changed later with the
 link card's **Settings**.
@@ -185,7 +192,7 @@ are protected by iOS until the phone is first unlocked after starting. See [Secu
 | The app will not open after a week | Free signature expired: re-run from Xcode, or use the Safari hub page |
 | Android cannot find the iPhone over Bluetooth | Bring EmberMesh to the screen on the iPhone |
 | Wi-Fi broadcast shows unavailable | Expected; use Local network listener / TCP, Apple peer-to-peer or a hub |
-| Nothing works over Wi-Fi | **Settings → This device → iOS permissions**: allow Local Network |
+| Nothing works over Wi-Fi, Nearby devices finds nobody | **Settings → This device → iOS permissions**: allow Local Network; keep EmberMesh on the screen |
 | Hub stops | The app left the screen; keep it open and awake |
 | Radio never transmits | iOS cannot key PTT by cable: turn on VOX or press PTT |
 | Bluetooth radio asks for a PIN | Meshtastic radios may request their pairing PIN |

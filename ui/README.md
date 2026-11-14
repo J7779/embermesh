@@ -13,6 +13,11 @@ cd ui && python3 -m http.server 8000
 #      http://localhost:8000/?mock=1&locked=1 lock screen (passphrase: demo)
 #      http://localhost:8000/?mock=1&unsupported=guides.categories,files.send   graceful degradation
 #      http://localhost:8000/?mock=1&torch=yes|ask|no|refused   Morse by light: flashlight states
+#      http://localhost:8000/?mock=1&internet=1[&relay=fail][&paused=1]&nearby=0   Connections: relay on / failing / paused, Nearby off
+#      http://localhost:8000/?mock=1&upgrade=1   an existing install that has not seen the connectivity notice yet
+#      http://localhost:8000/?mock=1&nativecam=1[&lights=2]   Morse camera reader with a simulated native camera (moving light)
+#      http://localhost:8000/?mock=1&morseframes=0   a core without the light tracker (old watched-region feed, no ring)
+#      (…&unsupported=connectivity.get = an older core; …&unsupported=feature:nearby,feature:relay = a host without them)
 #      http://localhost:8000/                 real WASM core (needs ui/wasm/ from the web build)
 #      http://localhost:8000/?remote=1&token=…  control a desktop daemon over /rpc
 ```
@@ -74,12 +79,22 @@ js/lib/store.js       tiny observable store
 js/lib/morse.js       text → Morse → on/off timing; sending by light (§10): encodeText (prosigns <AR>,
                       skipped characters), buildSignal (pattern + per-character spans), speed limits
                       (torch 12 WPM default / 15 max, screen ≤ 7 WPM = ≤ 3 flashes/s) with the evidence
+js/lib/connectivity.js  Nearby devices + internet relay (RPC_API §11): consent text, reachability per
+                      contact (from mesh.peers × links.list), relay URL rules, Settings → Connections,
+                      the one-tap offer on the contact page / add-contact sheet
+js/mock/connectivity.js  mock connectivity.get/set/network_changed (RPC_API §11 rev 2): ready/setup_done gating,
+                      core notices, default relays with notes, automatic links, link.removed reasons,
+                      Contact.reach, relay sessions, channel relay flags
+js/mock/camera_sim.js simulated native camera for the Morse reader (§12 grids of a drifting keyed light)
+js/lib/bootgate.js    routine toasts / notices wait for the start-up animation's hand-over (ember:bootdone)
 js/lib/ui.js          toasts, sheets/dialogs, QR rendering, hold-to-confirm, file pick/save
 js/lib/icons.js       inline SVG icon paths
 js/screens/*.js       chats, people (contacts/peers/radar/stats), sos, bulletins, links,
                       radio (Connect a radio wizard, #/links/radio), morse (send / read by camera /
                       read by sound, #/tools/morse; Send is morse_send.js: flashlight or screen via
-                      host.signal.flash {mode}, preview, progress, Stop), help (Instructions, #/help, #/help/hardware),
+                      host.signal.flash {mode}, preview, progress, Stop; the camera reader finds the
+                      light itself (§12 whole-frame grids from lib/capture*.js, ring from `target`;
+                      a native preview gets its ring from the host), no box to drag), help (Instructions, #/help, #/help/hardware),
                       hardware ("What you need" cards and matrix),
                       guides, tools, extras (notes/checklists/inventory), settings, setup,
                       lock, more
@@ -258,8 +273,8 @@ describes Simple mode (source: `GLOSSARY` in js/lib/simple.js).
 | Chats | Messages |
 | SOS | Send for help |
 | Emergency | Send for help |
-| Links | Connections |
-| Links & radios | Connections |
+| Links | Radios and links |
+| Links & radios | Radios and links |
 | Bulletins | Notice board |
 | Instructions | How to use |
 | Survival library | Guides |

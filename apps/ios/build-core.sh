@@ -173,11 +173,12 @@ if [ "$XCFRAMEWORK" = 1 ]; then
   rm -rf "$HDR" "$OUT/EmberCore.xcframework"
   mkdir -p "$HDR/ember"
   cp "$REPO"/core/include/ember/ember.h "$HDR/ember/"
-  cp "$HERE"/native/ember_ios_hub.h "$HDR/"
+  cp "$HERE"/native/ember_ios_hub.h "$HERE"/native/ember_ios_grid.h "$HDR/"
   cat > "$HDR/module.modulemap" <<'EOF'
 module CEmber {
   header "ember/ember.h"
   header "ember_ios_hub.h"
+  header "ember_ios_grid.h"
   link "c++"
   export *
 }

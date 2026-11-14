@@ -5,8 +5,10 @@ import android.provider.Settings
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.embermesh.app.endpoint.ble.BlePeerEndpoint
+import org.embermesh.app.connectivity.NearbyRecord
 import org.embermesh.app.endpoint.net.Nsd
 import org.json.JSONObject
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -41,7 +43,11 @@ class PrivacyDefaultsTest {
             assertAnonymous("hub name", probe.getString("name"))
             assertTrue(probe.getString("name").startsWith("EmberMesh hub"))
         }
-        repeat(5) { assertAnonymous("NSD service name", Nsd.anonymousName()) }
+        repeat(5) { assertAnonymous("NSD service name", "EmberMesh-" + Nsd.randomToken()) }
+        val token = org.json.JSONObject(EmberRuntime.core.call("connectivity.get", "{}")).optJSONObject("result")
+            ?.optJSONObject("nearby")?.optString("token")?.takeIf { it.isNotEmpty() } ?: Nsd.randomToken()
+        assertAnonymous("nearby instance", NearbyRecord.instanceName(token))
+        assertEquals("nearby TXT carries nothing but the contract keys", setOf("ember", "v", "link", "t"), NearbyRecord.txt(token).keys)
         assertFalse("BLE scan response must not include the device name", BlePeerEndpoint.scanResponse().includeDeviceName)
     }
 }
