@@ -1,0 +1,46 @@
+name: Set up the Android toolchain
+description: >-
+  JDK 21 (Temurin), the Android SDK packages apps/android requires (platform 37, build-tools,
+  NDK 27.1.12297006, SDK CMake 3.22.1) installed with the runner's sdkmanager, and Gradle caching.
+  Keep the versions equal to apps/android/app/build.gradle.kts (tools/ci/check-pins.sh checks them).
+inputs:
+  cache-read-only:
+    description: Restore the Gradle cache without saving it (true for pull requests)
+    required: false
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - name: JDK 21
+      uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+      with:
+        distribution: temurin
+        java-version: '21'
+
+    - name: Android SDK packages
+      shell: bash
+      run: |
+        sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+        [ -n "$sdk" ] && [ -d "$sdk" ] || { echo "::error::ANDROID_HOME is not set on this runner"; exit 1; }
+        sdkmanager=""
+        for c in "$sdk/cmdline-tools/latest/bin/sdkmanager" "$sdk"/cmdline-tools/*/bin/sdkmanager; do
+          if [ -x "$c" ]; then sdkmanager="$c"; break; fi
+        done
+        [ -n "$sdkmanager" ] || { echo "::error::sdkmanager not found under $sdk/cmdline-tools"; exit 1; }
+        (yes || true) | "$sdkmanager" --licenses > /dev/null 2>&1 || true
+        "$sdkmanager" --install \
+          "platforms;android-37.0" "build-tools;37.0.0" "build-tools;36.0.0" \
+          "ndk;27.1.12297006" "cmake;3.22.1" "platform-tools" > "$RUNNER_TEMP/sdkmanager.log" 2>&1 \
+          || { tail -50 "$RUNNER_TEMP/sdkmanager.log"; exit 1; }
+        echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+        echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+        for p in platforms/android-37.0 ndk/27.1.12297006 cmake/3.22.1; do
+          [ -d "$sdk/$p" ] || { echo "::error::$p missing after sdkmanager"; tail -50 "$RUNNER_TEMP/sdkmanager.log"; exit 1; }
+        done
+
+    - name: Gradle
+      uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+      with:
+        cache-provider: basic
+        cache-read-only: ${{ inputs.cache-read-only }}
+        add-job-summary: on-failure

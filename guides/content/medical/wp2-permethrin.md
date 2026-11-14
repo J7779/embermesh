@@ -1,0 +1,81 @@
+---
+id: medical/wp2-permethrin
+title: Permethrin
+category: medical
+tags: [permethrin, medicine]
+summary: Permethrin is a medication and an insecticide.
+source: https://en.wikipedia.org/w/index.php?title=Permethrin&oldid=1380028185
+source_title: Wikipedia: Permethrin
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Permethrin", Wikipedia, The Free Encyclopedia (revision 1380028185), https://en.wikipedia.org/w/index.php?title=Permethrin&oldid=1380028185 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Permethrin
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed. Background reading, not a substitute for trained medical care; drug doses and treatments differ by person and situation._
+
+**Permethrin** is a medication and an insecticide. As a medication, it is used to treat scabies and lice. It is applied to the skin as a cream or lotion. As an insecticide, it can be sprayed onto outer clothing or mosquito nets to kill the insects that touch them.
+
+Side effects include rash and irritation where it is applied. Use during pregnancy appears to be safe, and it is approved for use on and around people over the age of two months in the United States. Permethrin is in the pyrethroid family of medications. It works by disrupting the function of the neurons of arthropods such as lice, mites, insects, and shrimp, making it highly toxic to these animals. It is also highly toxic to fish. It is of low toxicity to birds and mammals. However, cats are more sensitive to it than other mammals due to much slower metabolism.
+
+Permethrin was discovered in 1972. It is on the World Health Organization's List of Essential Medicines. In 2022, it was the 351st most commonly prescribed medication in the United States, with more than 40,000 prescriptions.
+
+## Uses
+
+### Medical use
+
+Permethrin is available for topical use as a cream or lotion. It is indicated for prevention and treatment in exposed individuals of head lice and treatment of scabies.
+Historically one treatment has been found to be curative. A single application of permethrin is more effective than a single oral dose of ivermectin for scabies. In addition permethrin provides more rapid symptomatic relief than ivermectin. When a second dose of ivermectin is given days later, the efficacy between permethrin and ivermectin approach parity. Contact with eyes should be avoided.
+
+### Insect incapacitation
+
+As a personal protective measure, 0.5% permethrin is applied to outer clothing. It is a cloth impregnant, notably in mosquito nets and field wear. While permethrin may be marketed as an insect repellent, it does not prevent insects from landing. Instead it works by incapacitating or killing insects on contact before they can bite. In 2016, Consumer Reports found that, as consecutive washes reduce permethrin concentration, incapacitation becomes too slow to prevent bites. In these cases, other common topical repellents such as picaridin may be applied to the clothing, though some, such as DEET and IR3535, can damage certain synthetic fabrics.
+
+Permethrin is also used on flea collars and for flea and tick treatments for dogs. Permethrin is not safe for cats at the high concentrations (45% or higher) used on dog products, but generally does not cause issues at 5% or lower concentrations.
+
+### Insecticide
+
+- In agriculture, to protect crops (a drawback is that it is lethal to bees)
+- In agriculture, to kill livestock parasites
+- For industrial and domestic insect control
+- In the textile industry, to prevent insect attack of woollen products
+- In aviation, the WHO, IHR and ICAO require arriving aircraft be disinsected prior to embarkation, departure, descent, or deplaning in certain countries. Aircraft disinsection with permethrin-based products is recommended only prior to embarkation. Prior to departure (after boarding), at the top of descent or on arrival, d-phenothrin-based (1R-trans phenothrin) aircraft insecticides are recommended.
+
+### Pest control
+
+In agriculture, permethrin is mainly used on cotton, wheat, maize, and alfalfa crops. Its use is controversial because, as a broad-spectrum chemical, it kills indiscriminately; as well as the intended pests, it can harm beneficial insects, including honey bees, as well as cats and aquatic life.
+
+Permethrin kills ticks and mosquitoes on contact with treated clothing. A method of reducing deer tick populations by treating rodent vectors involves stuffing biodegradable cardboard tubes with permethrin-treated cotton. Mice collect the cotton for lining their nests. Permethrin on the cotton kills any immature ticks feeding on the mice.
+
+Permethrin is used in tropical areas to prevent mosquito-borne disease such as dengue fever and malaria. Mosquito nets used to cover beds may be treated with a solution of permethrin. This increases the effectiveness of the bed net by killing parasitic insects before they are able to find gaps or holes in the net. Personnel working in malaria-endemic areas may be instructed to treat their clothing with permethrin as well.
+
+Permethrin is the most commonly used insecticide worldwide for the protection of wool from keratinophagous insects such as *Tineola bisselliella*.
+
+To better protect soldiers from the risk and annoyance of biting insects, the British and US armies are treating all new uniforms with permethrin.
+
+Permethrin (as well as other long-term pyrethroids) is effective over several months, in particular when used indoors. International studies report that permethrin can be detected in house dust, in fine dust, and on indoor surfaces even years after the application. Its degradation rate under indoor conditions is approximately 10% after 3 months.
+
+### Resistance
+
+In *Aedes aegypti* permethrin resistance is via "knockdown resistance" (kdr) mutations which is common to pyrethroids and DDT. This differs to the most common mechanism of insecticide resistance evolution which is selection for preexisting, low-frequency alleles. García et al. 2009 found that a kdr allele has rapidly spread throughout Mexico and become dominant there.
+
+Historically, permethrin has been noted to be a highly effective treatment for scabies, however resistance appears to be on the rise. In a recent European study, permethrin resistant-scabies was noted in nearly 3 out of 4 cases. In this population, treatment with benzyl benzoate had a considerably higher cure rate. In general continued permethrin-efficacy depends on local epidemiological trends, and cannot necessarily be taken for granted.
+
+## Adverse effects
+
+Permethrin is moderately toxic if ingested, causing abdominal pain, sore throat, nausea and vomiting. If inhaled, permethrin may cause headache, respiratory irritation, difficulty breathing, dizziness, nausea and vomiting. Inhalation is more likely from aerosols than from vapors from surfaces and clothing, as permethrin has a low vapor pressure and volatilizes slowly.
+
+Topical application of permethrin can cause mild skin irritation, burning, and paresthesia. Permethrin has little systemic absorption, and is considered safe for topical use in adults and children over the age of two months. The FDA has assigned it as pregnancy category B. Animal studies have suggested that it may cause endocrine disruption by interfering with estrogenic activity and have shown no effects on fertility or teratogenicity, but studies in humans have not been performed. The excretion of permethrin in breastmilk is unknown, and it is recommended that breastfeeding be temporarily discontinued during treatment. Skin reactions are uncommon. Excessive exposure to permethrin can cause nausea, headache, muscle weakness, excessive salivation, shortness of breath, and seizures. Worker exposure to the chemical can be monitored by measurement of the urinary metabolites, while severe overdose may be confirmed by measurement of permethrin in serum or blood plasma.
+
+Permethrin does not present any notable genotoxicity or immunotoxicity in humans and farm animals, but is classified by the EPA as a likely human carcinogen when ingested, based on reproducible studies in which mice fed permethrin developed liver and lung tumors. A 2018 review failed to link permethrin exposure in humans to cancer.
+
+## Environment
+
+Permethrin has a half-life of about 40 days in soil, 1–3 weeks on the surface of plants, over 20 days indoors, and 19–27 hours in the water column. Permethrin-contaminated indoor surfaces can be decontaminated with bleach.
+
+## Brand names
+
+In Nordic countries and North America, a permethrin formulation for lice treatment is marketed under trade name Nix, available over the counter. Johnson & Johnson's UK brand Lyclear covers an assortment of different products, mostly non-insecticidal, but a few of which are based on permethrin.
+
+Stronger concentrations of permethrin are used to treat scabies (which embed inside the skin), compared to lice (which remain outside the skin). In the U.S. the more concentrated products such as Elimite are available by prescription only.

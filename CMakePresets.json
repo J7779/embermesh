@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "linux-gcc",
+      "displayName": "Linux, GCC, Ninja",
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": { "CMAKE_C_COMPILER": "gcc", "CMAKE_CXX_COMPILER": "g++" }
+    },
+    {
+      "name": "linux-clang",
+      "displayName": "Linux, Clang (libstdc++), Ninja",
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": { "CMAKE_C_COMPILER": "clang", "CMAKE_CXX_COMPILER": "clang++" }
+    },
+    {
+      "name": "linux-asan",
+      "displayName": "Linux, GCC, ASan + UBSan (Debug)",
+      "inherits": "linux-gcc",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "EMBER_SANITIZE": "ON" }
+    },
+    {
+      "name": "windows-msvc",
+      "displayName": "Windows, Visual Studio 2022, x64",
+      "inherits": "base",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64"
+    },
+    {
+      "name": "windows-msvc-arm64",
+      "displayName": "Windows, Visual Studio 2022, ARM64",
+      "inherits": "base",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "ARM64"
+    },
+    {
+      "name": "windows-mingw",
+      "displayName": "Windows, MinGW-w64 GCC (MSYS2 UCRT64), Ninja",
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": { "CMAKE_C_COMPILER": "gcc", "CMAKE_CXX_COMPILER": "g++" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "linux-gcc", "configurePreset": "linux-gcc" },
+    { "name": "linux-clang", "configurePreset": "linux-clang" },
+    { "name": "linux-asan", "configurePreset": "linux-asan" },
+    { "name": "windows-msvc", "configurePreset": "windows-msvc", "configuration": "Release" },
+    { "name": "windows-msvc-arm64", "configurePreset": "windows-msvc-arm64", "configuration": "Release" },
+    { "name": "windows-mingw", "configurePreset": "windows-mingw" }
+  ],
+  "testPresets": [
+    { "name": "linux-gcc", "configurePreset": "linux-gcc", "output": { "outputOnFailure": true }, "execution": { "timeout": 900 } },
+    { "name": "linux-clang", "configurePreset": "linux-clang", "output": { "outputOnFailure": true }, "execution": { "timeout": 900 } },
+    { "name": "linux-asan", "configurePreset": "linux-asan", "output": { "outputOnFailure": true }, "execution": { "timeout": 1800 } },
+    { "name": "windows-msvc", "configurePreset": "windows-msvc", "configuration": "Release", "output": { "outputOnFailure": true }, "execution": { "timeout": 900 } },
+    { "name": "windows-mingw", "configurePreset": "windows-mingw", "output": { "outputOnFailure": true }, "execution": { "timeout": 900 } }
+  ]
+}

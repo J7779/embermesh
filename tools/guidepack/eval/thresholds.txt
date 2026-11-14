@@ -1,0 +1,23 @@
+# Pass/fail thresholds for `guidepack eval --thresholds` (CI: the "guides_search_quality" test).
+# Set about 0.02-0.03 below the values measured for the committed model (potion-base-4M, 4-bit
+# weights and vectors) on the full corpus, so ordinary corpus growth passes and a real
+# regression fails. Re-measure and update together with the model, the query set or the ranking.
+#
+#   <mode> <split> <type> <metric> <min>     metric: mrr | r1 | r5 | r10
+#   ask <type|all|split:NAME> <metric> <min> metric: mrr | r1 | r5
+#   guard exact                              no exact-term query may rank worse with hybrid than
+#                                            with keywords alone
+#   require semantic                         the pack must carry a usable semantic section
+#
+# Measured (all 195 queries): keyword MRR 0.759, hybrid MRR 0.801, hybrid R@10 0.908;
+# held-out test split hybrid MRR 0.852; lay wording hybrid MRR 0.708; ask passage hit@5 0.826.
+require semantic
+keyword all  all   mrr 0.73
+hybrid  all  all   mrr 0.78
+hybrid  all  all   r10 0.88
+hybrid  test all   mrr 0.82
+hybrid  all  lay   mrr 0.68
+hybrid  all  quest mrr 0.82
+hybrid  all  exact mrr 0.98
+ask     all  r5        0.80
+guard   exact

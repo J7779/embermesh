@@ -1,0 +1,13 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Shell scripts must keep LF endings on every platform; these files are binary.
+*.sh   text eol=lf
+gradlew text eol=lf
+*.bat  text eol=crlf
+*.jar  binary
+*.png  binary
+*.ekv  binary
+*.emodel binary
+*.pack binary
+*.p12  binary

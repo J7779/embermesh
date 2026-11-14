@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EmberMesh</title>
+<!-- Placeholder page used by apps/web/build.sh only while ui/index.html does not exist yet.
+     It talks to the WASM core directly and offers a raw RPC console. -->
+<style>
+  :root { color-scheme: dark light; --bg:#14110f; --fg:#f3ece6; --mut:#a99c92; --acc:#f2702a; --card:#211c19; }
+  body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  main { max-width:860px; margin:0 auto; padding:16px; }
+  h1 { color:var(--acc); font-size:22px; margin:8px 0 4px; }
+  .card { background:var(--card); border-radius:10px; padding:12px 14px; margin:12px 0; }
+  pre { white-space:pre-wrap; word-break:break-word; margin:0; font:12px/1.4 ui-monospace, monospace; }
+  input, textarea, button { font:inherit; color:inherit; background:#2c2521; border:1px solid #4a3f38; border-radius:6px; padding:6px 8px; }
+  textarea { width:100%; box-sizing:border-box; min-height:60px; }
+  button { background:var(--acc); color:#140b05; border:0; font-weight:600; cursor:pointer; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .mut { color:var(--mut); }
+  li.off { color:var(--mut); }
+</style>
+</head>
+<body>
+<main>
+  <h1>EmberMesh</h1>
+  <div class="mut">Web core (placeholder page — the full UI is not built yet)</div>
+  <div class="card"><b>Node</b><pre id="info">starting…</pre></div>
+  <div class="card"><b>Connections this browser supports</b><ul id="kinds"></ul></div>
+  <div class="card">
+    <b>RPC console</b>
+    <div class="row"><input id="method" value="node.info" size="28" aria-label="method"><button id="send" type="button">Call</button></div>
+    <textarea id="params" aria-label="params">{}</textarea>
+    <pre id="out"></pre>
+  </div>
+  <div class="card"><b>Events</b><pre id="events"></pre></div>
+</main>
+<script type="module">
+  const q = new URLSearchParams(location.search);
+  const mod = q.get('remote') === '1' ? await import('./js/backends/remote.js') : await import('./js/backends/wasm.js');
+  const backend = new mod.default();
+  const $ = (id) => document.getElementById(id);
+  backend.on('*', (ev, data) => { $('events').textContent = `${ev} ${JSON.stringify(data)}\n` + $('events').textContent.slice(0, 4000); });
+  try {
+    await backend.init();
+    window.emberBackend = backend;
+    $('info').textContent = JSON.stringify(await backend.call('node.info'), null, 2);
+    const hi = await backend.call('host.info');
+    for (const k of hi.endpoint_kinds) {
+      const li = document.createElement('li');
+      li.textContent = k.available ? `${k.title}` : `${k.title} — ${k.unavailable_reason}`;
+      if (!k.available) li.className = 'off';
+      $('kinds').appendChild(li);
+    }
+  } catch (e) {
+    $('info').textContent = `failed: ${e.code || ''} ${e.message}`;
+  }
+  $('send').onclick = async () => {
+    let params = {};
+    try { params = JSON.parse($('params').value || '{}'); } catch { $('out').textContent = 'params must be JSON'; return; }
+    try { $('out').textContent = JSON.stringify(await backend.call($('method').value.trim(), params), null, 2); }
+    catch (e) { $('out').textContent = `error ${e.code}: ${e.message}`; }
+  };
+</script>
+</body>
+</html>

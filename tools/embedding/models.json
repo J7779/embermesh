@@ -1,0 +1,47 @@
+{
+  "_comment": "Pinned upstream sources for tools/embedding/convert.py. Every file is fetched from the model's official Hugging Face repository at a fixed commit and checked against the SHA-256 below before use. Licence evidence: the model card metadata of each repository (README.md front matter 'license: mit', API cardData.license = 'mit', tag 'license:mit') at the pinned commit.",
+  "potion-base-2M": {
+    "repo": "minishlab/potion-base-2M",
+    "commit": "389b9f64be5aa4ae7a6bc6fe95ef20ce485ae5da",
+    "license": "MIT",
+    "files": {
+      "README.md": "38af170acce93b5eb0c4e18659ab0b30581b2f6860f3e12d8ba8b8751e249363",
+      "config.json": "b2a89173391ca774c2d7323090a993a9a1553faa5b40eb37bb7cec6685fbea47",
+      "model.safetensors": "f95ffde02ad06f63ae38eb9d400038cd5ccaf8411ec3cb650c6025113f96cbb8",
+      "tokenizer.json": "e67e803f624fb4d67dea1c730d06e1067e1b14d830e2c2202569e3ef0f70bb50"
+    }
+  },
+  "potion-base-4M": {
+    "repo": "minishlab/potion-base-4M",
+    "commit": "9b3cff412d30be9ae8603fe10224c224f3401869",
+    "license": "MIT",
+    "files": {
+      "README.md": "f0d13fe7a9aa2369a71b14eb4e1fa11dfa27498713e1fc600165b4b9cbc53705",
+      "config.json": "90a28f209637bea10a440b69c1b41b72a24c4cb7d378030172f89c671c254c80",
+      "model.safetensors": "8a7140edd17ffab30ddcff1135eda127df57abfae856203dbd7b3d061295c31a",
+      "tokenizer.json": "e67e803f624fb4d67dea1c730d06e1067e1b14d830e2c2202569e3ef0f70bb50"
+    }
+  },
+  "potion-base-8M": {
+    "repo": "minishlab/potion-base-8M",
+    "commit": "bf8b056651a2c21b8d2565580b8569da283cab23",
+    "license": "MIT",
+    "files": {
+      "README.md": "de8ec91bf63c5f4c0e20751c227b2d049953e1cab5f8d5d44211c59a44795bdd",
+      "config.json": "2a6ac0e9aaa356a68a5688070db78fc3a464fefe85d2f06a1905ce3718687553",
+      "model.safetensors": "f65d0f325faadc1e121c319e2faa41170d3fa07d8c89abd48ca5358d9a223de2",
+      "tokenizer.json": "e67e803f624fb4d67dea1c730d06e1067e1b14d830e2c2202569e3ef0f70bb50"
+    }
+  },
+  "potion-retrieval-32M": {
+    "repo": "minishlab/potion-retrieval-32M",
+    "commit": "6fc8051fab2a1e0ee76689cf08c853792ac285e7",
+    "license": "MIT",
+    "files": {
+      "README.md": "dd46f9828de776831d173b39b3dfb5ee9b8e5cb756daa3739afab1ab5d6542fd",
+      "config.json": "63c00d90824c832c04ec1d02b6a983fb90489bf049f29fbff15ba481b8a432ee",
+      "model.safetensors": "07609e5bd33aad37900b3fd62f4ec96f6daec88ca4d46b9d8b928bfababf6ea0",
+      "tokenizer.json": "7d75cbc54318138807c401b0f0c9721117c628b39de8e8e0edb6cb17e0ee7d18"
+    }
+  }
+}

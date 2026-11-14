@@ -1,0 +1,69 @@
+---
+id: community/nimh-stress
+title: I'm So Stressed Out! Understanding and Managing Stress
+category: community
+tags: [stress, anxiety, coping, relaxation, mental health, overwhelmed]
+summary: The difference between stress and anxiety, how stress affects the body, and practical ways to manage it.
+source: https://www.nimh.nih.gov/health/publications/so-stressed-out-fact-sheet
+source_title: I’m So Stressed Out! Fact Sheet
+license: "Public Domain (US Government work, 17 U.S.C. §105)"
+attribution: U.S. National Institute of Mental Health (NIMH), National Institutes of Health
+retrieved: 2026-11-13
+---
+# I'm So Stressed Out! Understanding and Managing Stress
+
+Feeling overwhelmed? Read this fact sheet to learn whether it’s stress or anxiety, and what you can do to cope.
+
+## Is it stress or anxiety?
+
+Life can be stressful—you may feel stressed about performance at school, traumatic events (such as a pandemic, a natural disaster, or an act of violence), or a life change. Everyone feels stress from time to time.
+
+What is stress? Stress is the physical or mental response to an external cause, such as having a lot of homework or having an illness. A stressor may be a one-time or short-term occurrence, or it can happen repeatedly over a long time.
+
+What is anxiety? Anxiety is your body's reaction to stress and can occur even if there is no current threat.
+
+If that anxiety doesn’t go away and begins to interfere with your life, it could affect your health. You could experience problems with sleeping, or with your immune, digestive, cardiovascular, and reproductive systems. You also may be at higher risk for developing a mental illness such as an anxiety disorder or depression. Read more about anxiety disorders.
+
+**So, how do you know when to seek help?**
+
+## Stress vs. Anxiety
+
+| Stress | Both Stress and Anxiety | Anxiety |
+| --- | --- | --- |
+| - Generally is a response to an external cause, such as taking a big test or arguing with a friend. - Goes away once the situation is resolved. - Can be positive or negative. For example, it may inspire you to meet a deadline, or it may cause you to lose sleep. | Both stress and anxiety can affect your mind and body. You may experience symptoms such as: - Excessive worry - Uneasiness - Tension - Headaches or body pain - High blood pressure - Loss of sleep | - Generally is internal, meaning it's your reaction to stress. - Usually involves a persistent feeling of apprehension or dread that doesn't go away, and that interferes with how you live your life. - Is constant, even if there is no immediate threat. |
+
+## It’s important to manage your stress.
+
+Everyone experiences stress, and sometimes that stress can feel overwhelming. You may be at risk for an anxiety disorder if it feels like you can’t manage the stress and if the symptoms of your stress:
+
+- Interfere with your everyday life.
+- Cause you to avoid doing things.
+- Seem to be always present.
+
+## Coping With Stress and Anxiety
+
+Learning what causes or triggers your stress and what coping techniques work for you can help reduce your anxiety and improve your daily life. It may take trial and error to discover what works best for you. Here are some activities you can try when you start to feel overwhelmed:
+
+- Keep a journal.
+- Download an app that provides relaxation exercises (such as deep breathing or visualization) or tips for practicing mindfulness, which is a psychological process of actively paying attention to the present moment.
+- Exercise, and make sure you are eating healthy, regular meals.
+- Stick to a sleep routine, and make sure you are getting enough sleep.
+- Avoid drinking excess caffeine such as soft drinks or coffee.
+- Identify and challenge your negative and unhelpful thoughts.
+- Reach out to your friends or family members who help you cope in a positive way.
+
+## Recognize When You Need More Help
+
+If you are struggling to cope, or the symptoms of your stress or anxiety won’t go away, it may be time to talk to a professional. Psychotherapy (also called talk therapy) and medication are the two main treatments for anxiety, and many people benefit from a combination of the two.
+
+If you are in immediate distress or are thinking about hurting yourself, call or text the 988 Suicide & Crisis Lifeline at **988** or chat at **988lifeline.org** .
+
+If you or someone you know has a mental illness, is struggling emotionally, or has concerns about their mental health, there are ways to get help. Read more about getting help.
+
+## Source
+
+Source: National Institute of Mental Health. NIMH information is in the public domain. Use does not imply endorsement by NIMH or NIH. Links and images were removed during conversion; the text is otherwise unchanged.
+
+Original pages:
+
+- I’m So Stressed Out! Fact Sheet: https://www.nimh.nih.gov/health/publications/so-stressed-out-fact-sheet

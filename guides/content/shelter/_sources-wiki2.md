@@ -1,0 +1,99 @@
+# Sources added by the wiki2 sweep for the `shelter` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `shelter/wb2-diy-house-insulation` — Do-It-Yourself: House insulation — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/House_insulation&oldid=3229113
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `shelter/wp2-a-frame-building` — A-frame building — https://en.wikipedia.org/w/index.php?title=A-frame_building&oldid=1380587067
+  - `shelter/wp2-adobe` — Adobe — https://en.wikipedia.org/w/index.php?title=Adobe&oldid=1385612757
+  - `shelter/wp2-bamboo-construction` — Bamboo construction — https://en.wikipedia.org/w/index.php?title=Bamboo_construction&oldid=1385183851
+  - `shelter/wp2-blast-shelter` — Blast shelter — https://en.wikipedia.org/w/index.php?title=Blast_shelter&oldid=1383330224
+  - `shelter/wp2-brick` — Brick — https://en.wikipedia.org/w/index.php?title=Brick&oldid=1378498497
+  - `shelter/wp2-building-insulation` — Building insulation — https://en.wikipedia.org/w/index.php?title=Building_insulation&oldid=1382073402
+  - `shelter/wp2-cement` — Cement — https://en.wikipedia.org/w/index.php?title=Cement&oldid=1384654864
+  - `shelter/wp2-charcoal` — Charcoal — https://en.wikipedia.org/w/index.php?title=Charcoal&oldid=1382313196
+  - `shelter/wp2-chimney-fire` — Chimney fire — https://en.wikipedia.org/w/index.php?title=Chimney_fire&oldid=1366263683
+  - `shelter/wp2-chimney` — Chimney — https://en.wikipedia.org/w/index.php?title=Chimney&oldid=1380101025
+  - `shelter/wp2-clay-panel` — Clay panel — https://en.wikipedia.org/w/index.php?title=Clay_panel&oldid=1213363500
+  - `shelter/wp2-concrete` — Concrete — https://en.wikipedia.org/w/index.php?title=Concrete&oldid=1383984514
+  - `shelter/wp2-coppicing` — Coppicing — https://en.wikipedia.org/w/index.php?title=Coppicing&oldid=1377243654
+  - `shelter/wp2-cordwood-construction` — Cordwood construction — https://en.wikipedia.org/w/index.php?title=Cordwood_construction&oldid=1333551739
+  - `shelter/wp2-dugout-shelter` — Dugout (shelter) — https://en.wikipedia.org/w/index.php?title=Dugout_(shelter)&oldid=1380996876
+  - `shelter/wp2-earth-shelter` — Earth shelter — https://en.wikipedia.org/w/index.php?title=Earth_shelter&oldid=1384842814
+  - `shelter/wp2-earthbag-construction` — Earthbag construction — https://en.wikipedia.org/w/index.php?title=Earthbag_construction&oldid=1336146985
+  - `shelter/wp2-earthquake-resistant-structures` — Earthquake-resistant structures — https://en.wikipedia.org/w/index.php?title=Earthquake-resistant_structures&oldid=1370946053
+  - `shelter/wp2-earthship` — Earthship — https://en.wikipedia.org/w/index.php?title=Earthship&oldid=1382195154
+  - `shelter/wp2-fireplace` — Fireplace — https://en.wikipedia.org/w/index.php?title=Fireplace&oldid=1378368618
+  - `shelter/wp2-firewood` — Firewood — https://en.wikipedia.org/w/index.php?title=Firewood&oldid=1381942310
+  - `shelter/wp2-flue` — Flue — https://en.wikipedia.org/w/index.php?title=Flue&oldid=1371119121
+  - `shelter/wp2-foundation-engineering` — Foundation (engineering) — https://en.wikipedia.org/w/index.php?title=Foundation_(engineering)&oldid=1368412007
+  - `shelter/wp2-geodesic-dome` — Geodesic dome — https://en.wikipedia.org/w/index.php?title=Geodesic_dome&oldid=1383448228
+  - `shelter/wp2-hammock` — Hammock — https://en.wikipedia.org/w/index.php?title=Hammock&oldid=1385226218
+  - `shelter/wp2-hempcrete` — Hempcrete — https://en.wikipedia.org/w/index.php?title=Hempcrete&oldid=1384715685
+  - `shelter/wp2-hogan` — Hogan — https://en.wikipedia.org/w/index.php?title=Hogan&oldid=1337171332
+  - `shelter/wp2-hypocaust` — Hypocaust — https://en.wikipedia.org/w/index.php?title=Hypocaust&oldid=1352204292
+  - `shelter/wp2-joist` — Joist — https://en.wikipedia.org/w/index.php?title=Joist&oldid=1359308920
+  - `shelter/wp2-lath-and-plaster` — Lath and plaster — https://en.wikipedia.org/w/index.php?title=Lath_and_plaster&oldid=1377872426
+  - `shelter/wp2-lime-mortar` — Lime mortar — https://en.wikipedia.org/w/index.php?title=Lime_mortar&oldid=1372129994
+  - `shelter/wp2-lime-plaster` — Lime plaster — https://en.wikipedia.org/w/index.php?title=Lime_plaster&oldid=1379867694
+  - `shelter/wp2-log-building` — Log building — https://en.wikipedia.org/w/index.php?title=Log_building&oldid=1256206638
+  - `shelter/wp2-longhouse` — Longhouse — https://en.wikipedia.org/w/index.php?title=Longhouse&oldid=1383936125
+  - `shelter/wp2-masonry-heater` — Masonry heater — https://en.wikipedia.org/w/index.php?title=Masonry_heater&oldid=1380883545
+  - `shelter/wp2-masonry` — Masonry — https://en.wikipedia.org/w/index.php?title=Masonry&oldid=1383566110
+  - `shelter/wp2-mudbrick` — Mudbrick — https://en.wikipedia.org/w/index.php?title=Mudbrick&oldid=1345474898
+  - `shelter/wp2-nubian-vault` — Nubian vault — https://en.wikipedia.org/w/index.php?title=Nubian_vault&oldid=1384629161
+  - `shelter/wp2-ondol` — Ondol — https://en.wikipedia.org/w/index.php?title=Ondol&oldid=1384941741
+  - `shelter/wp2-papercrete` — Papercrete — https://en.wikipedia.org/w/index.php?title=Papercrete&oldid=1305395035
+  - `shelter/wp2-passive-solar-building-design` — Passive solar building design — https://en.wikipedia.org/w/index.php?title=Passive_solar_building_design&oldid=1380766524
+  - `shelter/wp2-pit-house` — Pit-house — https://en.wikipedia.org/w/index.php?title=Pit-house&oldid=1374166690
+  - `shelter/wp2-plaster` — Plaster — https://en.wikipedia.org/w/index.php?title=Plaster&oldid=1380989526
+  - `shelter/wp2-pole-building-framing` — Pole building framing — https://en.wikipedia.org/w/index.php?title=Pole_building_framing&oldid=1382804395
+  - `shelter/wp2-pollarding` — Pollarding — https://en.wikipedia.org/w/index.php?title=Pollarding&oldid=1376291310
+  - `shelter/wp2-poncho` — Poncho — https://en.wikipedia.org/w/index.php?title=Poncho&oldid=1374509024
+  - `shelter/wp2-rafter` — Rafter — https://en.wikipedia.org/w/index.php?title=Rafter&oldid=1378548821
+  - `shelter/wp2-rain-gutter` — Rain gutter — https://en.wikipedia.org/w/index.php?title=Rain_gutter&oldid=1336037849
+  - `shelter/wp2-retreat-survivalism` — Retreat (survivalism) — https://en.wikipedia.org/w/index.php?title=Retreat_(survivalism)&oldid=1360453047
+  - `shelter/wp2-rocket-mass-heater` — Rocket mass heater — https://en.wikipedia.org/w/index.php?title=Rocket_mass_heater&oldid=1338929796
+  - `shelter/wp2-roman-concrete` — Roman concrete — https://en.wikipedia.org/w/index.php?title=Roman_concrete&oldid=1382664110
+  - `shelter/wp2-roof` — Roof — https://en.wikipedia.org/w/index.php?title=Roof&oldid=1378213221
+  - `shelter/wp2-rubble-trench-foundation` — Rubble trench foundation — https://en.wikipedia.org/w/index.php?title=Rubble_trench_foundation&oldid=1382618713
+  - `shelter/wp2-russian-stove` — Russian stove — https://en.wikipedia.org/w/index.php?title=Russian_stove&oldid=1351493199
+  - `shelter/wp2-safe-room` — Safe room — https://en.wikipedia.org/w/index.php?title=Safe_room&oldid=1378289371
+  - `shelter/wp2-seismic-retrofit` — Seismic retrofit — https://en.wikipedia.org/w/index.php?title=Seismic_retrofit&oldid=1382038219
+  - `shelter/wp2-shed` — Shed — https://en.wikipedia.org/w/index.php?title=Shed&oldid=1378555863
+  - `shelter/wp2-sleeping-bag` — Sleeping bag — https://en.wikipedia.org/w/index.php?title=Sleeping_bag&oldid=1383098158
+  - `shelter/wp2-sleeping-pad` — Sleeping pad — https://en.wikipedia.org/w/index.php?title=Sleeping_pad&oldid=1349617285
+  - `shelter/wp2-storm-cellar` — Storm cellar — https://en.wikipedia.org/w/index.php?title=Storm_cellar&oldid=1380309194
+  - `shelter/wp2-straw-bale-construction` — Straw-bale construction — https://en.wikipedia.org/w/index.php?title=Straw-bale_construction&oldid=1339454325
+  - `shelter/wp2-superadobe` — Superadobe — https://en.wikipedia.org/w/index.php?title=Superadobe&oldid=1353077518
+  - `shelter/wp2-tarpaulin` — Tarpaulin — https://en.wikipedia.org/w/index.php?title=Tarpaulin&oldid=1373566208
+  - `shelter/wp2-tent` — Tent — https://en.wikipedia.org/w/index.php?title=Tent&oldid=1377640884
+  - `shelter/wp2-thatching` — Thatching — https://en.wikipedia.org/w/index.php?title=Thatching&oldid=1381090106
+  - `shelter/wp2-thermal-mass` — Thermal mass — https://en.wikipedia.org/w/index.php?title=Thermal_mass&oldid=1383474223
+  - `shelter/wp2-timber-framing` — Timber framing — https://en.wikipedia.org/w/index.php?title=Timber_framing&oldid=1380886886
+  - `shelter/wp2-tipi` — Tipi — https://en.wikipedia.org/w/index.php?title=Tipi&oldid=1381676978
+  - `shelter/wp2-trombe-wall` — Trombe wall — https://en.wikipedia.org/w/index.php?title=Trombe_wall&oldid=1376013841
+  - `shelter/wp2-truss` — Truss — https://en.wikipedia.org/w/index.php?title=Truss&oldid=1352695137
+  - `shelter/wp2-ventilation-architecture` — Ventilation (architecture) — https://en.wikipedia.org/w/index.php?title=Ventilation_(architecture)&oldid=1375961096
+  - `shelter/wp2-wall-stud` — Wall stud — https://en.wikipedia.org/w/index.php?title=Wall_stud&oldid=1378679622
+  - `shelter/wp2-wattle-and-daub` — Wattle and daub — https://en.wikipedia.org/w/index.php?title=Wattle_and_daub&oldid=1375230800
+  - `shelter/wp2-weatherstripping` — Weatherstripping — https://en.wikipedia.org/w/index.php?title=Weatherstripping&oldid=1338132537
+  - `shelter/wp2-whitewash` — Whitewash — https://en.wikipedia.org/w/index.php?title=Whitewash&oldid=1371674697
+  - `shelter/wp2-wigwam` — Wigwam — https://en.wikipedia.org/w/index.php?title=Wigwam&oldid=1383811784
+  - `shelter/wp2-wood-burning-stove` — Wood-burning stove — https://en.wikipedia.org/w/index.php?title=Wood-burning_stove&oldid=1378390725
+  - `shelter/wp2-wood-drying` — Wood drying — https://en.wikipedia.org/w/index.php?title=Wood_drying&oldid=1384862488
+  - `shelter/wp2-wood-fuel` — Wood fuel — https://en.wikipedia.org/w/index.php?title=Wood_fuel&oldid=1369000083
+  - `shelter/wp2-wood-shingle` — Wood shingle — https://en.wikipedia.org/w/index.php?title=Wood_shingle&oldid=1356103153
+  - `shelter/wp2-yurt` — Yurt — https://en.wikipedia.org/w/index.php?title=Yurt&oldid=1383220938

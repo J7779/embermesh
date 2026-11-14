@@ -1,0 +1,41 @@
+name: Set up the Emscripten SDK
+description: >-
+  Installs the pinned Emscripten SDK into .toolchains/emsdk, where build.sh and apps/web/build.sh
+  look for it, and caches it per OS, architecture and version.
+inputs:
+  version:
+    description: Emscripten version; must match apps/web/README.md (tools/ci/check-pins.sh checks it)
+    required: false
+    default: '6.0.13'
+runs:
+  using: composite
+  steps:
+    - name: Restore emsdk ${{ inputs.version }}
+      id: cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .toolchains/emsdk
+        key: emsdk-${{ runner.os }}-${{ runner.arch }}-${{ inputs.version }}-v1
+
+    - name: Install emsdk ${{ inputs.version }}
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        EMSDK_VERSION: ${{ inputs.version }}
+      run: |
+        rm -rf .toolchains/emsdk
+        mkdir -p .toolchains
+        # emsdk is tagged with the Emscripten versions it installs.
+        git clone --quiet --depth 1 --branch "$EMSDK_VERSION" https://github.com/emscripten-core/emsdk.git .toolchains/emsdk \
+          || git clone --quiet --depth 1 https://github.com/emscripten-core/emsdk.git .toolchains/emsdk
+        .toolchains/emsdk/emsdk install "$EMSDK_VERSION"
+        .toolchains/emsdk/emsdk activate "$EMSDK_VERSION"
+        # The downloaded archives are not needed after installation; keep the cache small.
+        rm -rf .toolchains/emsdk/downloads/* .toolchains/emsdk/.git
+
+    - name: Check emcc
+      shell: bash
+      run: |
+        # shellcheck disable=SC1091
+        source .toolchains/emsdk/emsdk_env.sh >/dev/null 2>&1
+        emcc --version | head -1

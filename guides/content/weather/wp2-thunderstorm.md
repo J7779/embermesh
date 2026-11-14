@@ -1,0 +1,46 @@
+---
+id: weather/wp2-thunderstorm
+title: Thunderstorm
+category: weather
+tags: [thunderstorm, electrical storm, lightning storm, thundershowers, weather]
+summary: A thunderstorm, also known as an electrical storm or a lightning storm, is a storm characterized by the presence of lightning and thunder.
+source: https://en.wikipedia.org/w/index.php?title=Thunderstorm&oldid=1377497196
+source_title: Wikipedia: Thunderstorm
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Thunderstorm", Wikipedia, The Free Encyclopedia (revision 1377497196), https://en.wikipedia.org/w/index.php?title=Thunderstorm&oldid=1377497196 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Thunderstorm
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+A **thunderstorm**, also known as an **electrical storm** or a **lightning storm**, is a storm characterized by the presence of lightning and thunder. Relatively weak thunderstorms are sometimes called **thundershowers**. Thunderstorms occur in cumulonimbus clouds. They are usually accompanied by strong winds and often produce heavy rain and sometimes snow, sleet, or hail, but some thunderstorms can produce little or no precipitation at all. Thunderstorms may line up in a series or become a rainband, known as a squall line. Strong or severe thunderstorms include some of the most dangerous weather phenomena, including large hail, strong winds, and tornadoes. Some of the most persistent severe thunderstorms, known as supercells, rotate as do cyclones. While most thunderstorms move with the mean wind flow through the layer of the troposphere that they occupy, vertical wind shear sometimes causes a deviation in their course at a right angle to the wind shear direction.
+
+Thunderstorms result from the rapid upward movement of warm, moist air, sometimes along a front. However, some kind of cloud forcing, whether it is a front, shortwave trough, or another system is needed for the air to rapidly accelerate upward. As the warm, moist air moves upward, it cools, condenses, and forms a cumulonimbus cloud that can reach heights of over 20 km. As the rising air reaches its dew point temperature, water vapor condenses into water droplets or ice, reducing pressure locally within the thunderstorm cell. Any precipitation falls the long distance through the clouds towards the Earth's surface. As the droplets fall, they collide with other droplets and become larger. The falling droplets create a downdraft as it pulls cold air with it, and this cold air spreads out at the Earth's surface, occasionally causing strong winds that are commonly associated with thunderstorms.
+
+Thunderstorms can form and develop in any geographic location but most frequently within the mid-latitude, where warm, moist air from tropical latitudes collides with cooler air from polar latitudes. Thunderstorms are responsible for the development and formation of many severe weather phenomena, which can be potentially hazardous. Damage that results from thunderstorms is mainly inflicted by downburst winds, large hailstones, and flash flooding caused by heavy precipitation. Stronger thunderstorm cells are capable of producing tornadoes and waterspouts.
+
+There are three types of thunderstorms: single-cell, multi-cell, and supercell. Supercell thunderstorms are the strongest and most severe. Mesoscale convective systems formed by favorable vertical wind shear within the tropics and subtropics can be responsible for the development of hurricanes. Dry thunderstorms, with no precipitation, can cause the outbreak of wildfires from the heat generated from the cloud-to-ground lightning that accompanies them. Several means are used to study thunderstorms: weather radar, weather stations, and video photography. Past civilizations held various myths concerning thunderstorms and their development as late as the 18th century. Beyond the Earth's atmosphere, thunderstorms have also been observed on the planets of Jupiter, Saturn, Neptune, and, probably, Venus.
+
+## Life cycle
+
+Warm air has a lower density than cool air, so warmer air rises upwards and cooler air will settle at the bottom. Clouds form when relatively warmer air, carrying moisture, rises within cooler air. The moist air rises, and, as it does so, it cools and some of the water vapor in that rising air condenses. When the moisture condenses, it releases energy known as latent heat of condensation, which allows the rising packet of air to cool less than the cooler surrounding air continuing the cloud's ascension. If enough instability is present in the atmosphere, this process will continue long enough for cumulonimbus clouds to form and produce lightning and thunder. Meteorological indices such as convective available potential energy (CAPE) and the lifted index can be used to assist in determining potential upward vertical development of clouds. Generally, thunderstorms require moisture, an unstable air mass, and a lifting force in order to form.
+
+All thunderstorms, regardless of type, go through three stages: the developing stage, the mature stage, and the dissipation stage. The average thunderstorm has a 24 km diameter. Depending on the conditions present in the atmosphere, each of these three stages take an average of 30 minutes.
+
+### Developing stage
+
+The first stage of a thunderstorm is the cumulus stage or developing stage. During this stage, masses of moisture are lifted upwards into the atmosphere. The trigger for this lift can be solar illumination, where the heating of the ground produces thermals, or where two winds converge forcing air upwards, or where winds blow over terrain of increasing elevation. The moisture carried upward cools into liquid drops of water due to lower temperatures at high altitude, which appear as *towering cumulus* clouds. As the water vapor condenses into liquid, latent heat is released, which warms the air, causing it to become less dense than the surrounding, drier air. The air then continues to rise in an updraft through the process of convection. This process creates a low-pressure zone within and beneath the forming thunderstorm.
+
+### Mature stage
+
+In the mature stage of a thunderstorm, the warmed air continues to rise until it reaches an area of warmer air and can rise no farther. Often this 'cap' is the tropopause. The air is instead forced to spread out, giving the storm a characteristic anvil shape. The resulting cloud is called *cumulonimbus incus*. The water droplets coalesce into larger and heavier droplets and freeze to become ice particles. As these fall, they melt to become rain. If the updraft is strong enough, the droplets are held aloft long enough to become so large that they do not melt completely but fall as hail. While updrafts are still present, the falling rain drags the surrounding air with it, creating *downdrafts* as well. The simultaneous presence of both an updraft and a downdraft marks the mature stage of the storm and produces cumulonimbus clouds. During this stage, considerable internal turbulence can occur, which manifests as strong winds, severe lightning, and even tornadoes.
+
+Typically, if there is little wind shear, the storm will rapidly enter the dissipating stage and 'rain itself out', but, if there is sufficient change in wind speed or direction, the downdraft will be separated from the updraft, and the storm may become a supercell, where the mature stage can sustain itself for several hours.
+
+### Dissipating stage
+
+In the dissipation stage, the thunderstorm is dominated by the downdraft. If atmospheric conditions do not support super cellular development, this stage occurs rather quickly, approximately 20–30 minutes into the life of the thunderstorm. The downdraft will push down out of the thunderstorm, hit the ground and spread out. This phenomenon is known as a downburst. The cool air carried to the ground by the downdraft cuts off the inflow of the thunderstorm, the updraft disappears and the thunderstorm will dissipate. Thunderstorms in an atmosphere with virtually no vertical wind shear weaken as soon as they send out an outflow boundary in all directions, which then quickly cuts off its inflow of relatively warm, moist air, and kills the thunderstorm's further growth. The downdraft hitting the ground creates an outflow boundary. This can cause downbursts, a potential hazardous condition for aircraft to fly through, as a substantial change in wind speed and direction occurs, resulting in a decrease of airspeed and the subsequent reduction in lift for the aircraft. The stronger the outflow boundary is, the stronger the resultant vertical wind shear becomes.
+
+_(Later sections of the original article were left out of this offline copy for length: Classification, Motion, Hazards, Safety precautions, Frequent occurrences, Energy, Studies, Mythology and religion, Outside of Earth.)_

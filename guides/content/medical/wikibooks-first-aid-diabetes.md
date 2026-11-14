@@ -1,0 +1,69 @@
+---
+id: medical/wikibooks-first-aid-diabetes
+title: First Aid: Diabetic Emergencies
+category: medical
+tags: [diabetes, low blood sugar, hypoglycemia, high blood sugar, give sugar, diabetic confused]
+summary: Recognising low and high blood sugar emergencies and giving sugar when in doubt.
+source: https://en.wikibooks.org/w/index.php?title=First_Aid/Diabetes&oldid=3284183
+source_title: Wikibooks: First Aid (Diabetes)
+license: CC BY-SA 4.0
+attribution: "Wikibooks contributors, \"First Aid/Diabetes\", Wikibooks, The Free Textbook Project (revision 3284183), https://en.wikibooks.org/w/index.php?title=First_Aid/Diabetes&oldid=3284183. Adapted for the EmberMesh offline library: converted to Markdown; references, images and navigation removed. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)."
+retrieved: 2026-11-13
+part_of: medical/wikibooks-first-aid
+order: 29
+---
+
+# First Aid: Diabetic Emergencies
+
+_From the community-written Wikibooks textbook "First Aid" (CC BY-SA 4.0). Practices change; where it differs from the field-manual guides in this library, prefer the more recent source._
+
+## Introduction
+
+- **Diabetes**: a disease causing an inability to regulate the level of sugar (glucose) in the blood
+
+- **Insulin**: a hormone that allows glucose to travel from the bloodstream into the cells
+
+## Hypoglycemia (Insulin Shock)
+
+Hypoglycemia is a diabetic condition where the body has an insufficient amount of blood sugar. It presents suddenly and should always be considered an emergency.
+
+### Causes
+
+- Lack of food (low glucose)
+- Excessive exercise
+- Too much insulin
+- Vomited meal
+
+### Recognition
+
+The hypoglycemic victim will present with the following symptoms and may appear to be under the influence of drugs or alcohol. It can also be confused with stroke or cardiac disorders.
+
+- Pale, cool, clammy
+- Dizziness, weakness
+- Hunger
+- Confusion (like being drunk)
+- Strong, rapid pulse (May be normal in some patients)
+- Seizures
+
+### Treatment
+
+When hypoglycemia is suspected, notify EMS immediately. The victim should be transported to a hospital as soon as possible. Treat the victim for shock and monitor their vital signs, including blood sugar readings (if possible). If the patient is conscious and able to swallow, administer any form of glucose (candy juice, soda, Monogel) carefully. **Only give crushed glucose, glucose gel and/or very small amounts of fluid behind the lips of an unconscious victim** as objects or fluid in the oral cavity easily can become an airway obstruction. Some victims carry with them glucagon injections as a rapid treatment for severe insulin shock. The victim should know how to administer it, and should administer it themselves.
+
+## Hyperglycemia
+
+Hyperglycemia is a condition in which the body's blood sugar level is too high to maintain. This condition presents less commonly than hypoglycemia and usually occurs very slowly, over the course of several days. Although it is most commonly observed in diabetics, a mild form can also occur in anyone who consumes too much sugar. While the mild form can be harmless, aside from a general feeling of malaise, hyperglycemia in a diabetic is a serious, potentially life threatening situation that requires prompt identification and treatment. Left untreated, ketoacidosis can develop which might lead to a coma or death.
+
+There are several main causes of hyperglycemia. Generally it has to do with an imbalance between insulin and glucose. Without enough insulin, the body cannot break down glucose. A diabetic can be taking their normal insulin dosage and still have hyperglycemia. Should they fail to follow their standard dietary arrangements, the excess of food (and glucose) can rapidly overwhelm the body's stores of insulin. In addition to medication and dietary errors, the immune system can also be the culprit. When infection occurs, metabolism can be drastically increased. This surprise increase can, like excessive food, consume too much insulin.
+
+Regardless of the cause of a suspected case of hyperglycemia, the immediate priority for the first responder is recognizing hyperglycemia. The symptoms of a case are;
+
+- Flush/redness of skin
+- Fruity breath (sign of diabetic ketoacidosis)
+- Deep or rapid respirations
+- Dehydration/extreme thirst/excessive urination
+- Loss of appetite
+- Low blood pressure
+- Weakness/dizziness
+- Weak, rapid pulse
+
+Prompt treatment can prevent further complications and serious emergencies. EMS should be called immediately. Next, the first responder should focus on stabilizing the victim. Follow any instructions from the dispatcher as much as possible. Whenever contradicted by this section, follow the dispatcher. Every victim should be treated for shock and have their vital signs monitored constantly. Insulin is not an emergency medication and should not be given by the first aid provider. Improper administration of insulin can cause insulin shock and cause unconsciousness.

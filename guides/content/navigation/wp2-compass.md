@@ -1,0 +1,48 @@
+---
+id: navigation/wp2-compass
+title: Compass
+category: navigation
+tags: [compass, navigation]
+summary: A compass is a device that shows the cardinal directions used for navigation and geographic orientation.
+source: https://en.wikipedia.org/w/index.php?title=Compass&oldid=1376670463
+source_title: Wikipedia: Compass
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Compass", Wikipedia, The Free Encyclopedia (revision 1376670463), https://en.wikipedia.org/w/index.php?title=Compass&oldid=1376670463 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Compass
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+A **compass** is a device that shows the cardinal directions used for navigation and geographic orientation. It typically consists of a magnetized needle or another element, such as a compass card or compass rose, that pivots to align itself with magnetic north. Other methods may be used, including gyroscopes, magnetometers, and GPS receivers.
+
+Compasses often show angles in degrees: north corresponds to 0°, and the angles increase clockwise, so east is 90°, south is 180°, and west is 270°. These numbers allow the compass to show azimuths or bearings which are commonly stated in degrees. If local variation between magnetic north and true north is known, then direction of magnetic north also gives direction of true north.
+
+Among the Four Great Inventions, the magnetic compass was first invented as a device for divination as early as the Chinese Han dynasty (since c. 206 BC), and later adopted for navigation by the Song dynasty Chinese during the 11th century. The first usage of a compass recorded in Western Europe occurred around 1190 and in the Islamic world in the 13th century.
+
+The magnetic compass is the most familiar compass type. It functions as a pointer to "magnetic north", the local magnetic meridian, because the magnetized needle at its heart aligns itself with the horizontal component of the Earth's magnetic field. The magnetic field exerts a torque on the needle, pulling the North end or *pole* of the needle approximately toward the Earth's North magnetic pole, and pulling the other toward the Earth's South magnetic pole. The needle is mounted on a low-friction pivot point, in better compasses a jewel bearing, so it can turn easily. When the compass is held level, the needle turns until, after a few seconds to allow oscillations to die out, it settles into its equilibrium orientation.
+
+In navigation, directions on maps are usually expressed with reference to geographical or true north, the direction toward the Geographical North Pole, the rotation axis of the Earth. Depending on where the compass is located on the surface of the Earth the angle between true north and magnetic north, called magnetic declination can vary widely with geographic location. The local magnetic declination is given on most maps, to allow the map to be oriented with a compass parallel to true north. The locations of the Earth's magnetic poles slowly change with time, which is referred to as geomagnetic secular variation. The effect of this means a map with the latest declination information should be used. Some magnetic compasses include means to manually compensate for the magnetic declination, so that the compass shows true directions.
+
+## Design
+
+Modern compasses usually use a magnetized needle or dial inside a capsule completely filled with a liquid (lamp oil, mineral oil, white spirits, purified kerosene, or ethyl alcohol are common). While older designs commonly incorporated a flexible rubber diaphragm or airspace inside the capsule to allow for volume changes caused by temperature or altitude, some modern liquid compasses use smaller housings and/or flexible capsule materials to accomplish the same result. The liquid inside the capsule serves to damp the movement of the needle, reducing oscillation time and increasing stability. Key points on the compass, including the north end of the needle are often marked with phosphorescent, photoluminescent, or self-luminous materials to enable the compass to be read at night or in poor light. As the compass fill liquid is noncompressible under pressure, many ordinary liquid-filled compasses will operate accurately underwater to considerable depths.
+
+Many modern compasses incorporate a baseplate and protractor tool, and are referred to variously as "orienteering", "baseplate", "map compass" or "protractor" designs. This type of compass uses a separate magnetized needle inside a rotating capsule, an orienting "box" or gate for aligning the needle with magnetic north, a transparent base containing map orienting lines, and a bezel (outer dial) marked in degrees or other units of angular measurement. The capsule is mounted in a transparent baseplate containing a *direction-of-travel* (DOT) indicator for use in taking bearings directly from a map.
+
+Other features found on modern orienteering compasses are map and romer scales for measuring distances and plotting positions on maps, luminous markings on the face or bezels, various sighting mechanisms (mirror, prism, etc.) for taking bearings of distant objects with greater precision, gimbal-mounted, "global" needles for use in differing hemispheres, special rare-earth magnets to stabilize compass needles, adjustable declination for obtaining instant true bearings without resorting to arithmetic, and devices such as inclinometers for measuring gradients. The sport of orienteering has also resulted in the development of models with extremely fast-settling and stable needles utilizing rare-earth magnets for optimal use with a topographic map, a land navigation technique known as *terrain association*. Many marine compasses designed for use on boats with constantly shifting angles use dampening fluids such as isopar M or isopar L to limit the rapid fluctuation and direction of the needle.
+
+The military forces of a few nations, notably the United States Army, continue to issue field compasses with magnetized compass dials or cards instead of needles. A magnetic card compass is usually equipped with an optical, lensatic, or prismatic sight, which allows the user to read the bearing or azimuth off the compass card while simultaneously aligning the compass with the objective (see photo). Magnetic card compass designs normally require a separate protractor tool in order to take bearings directly from a map.
+
+The U.S. M-1950 military lensatic compass does not use a liquid-filled capsule as a damping mechanism, but rather electromagnetic induction to control oscillation of its magnetized card. A "deep-well" design is used to allow the compass to be used globally with a card tilt of up to 8 degrees without impairing accuracy. As induction forces provide less damping than fluid-filled designs, a needle lock is fitted to the compass to reduce wear, operated by the folding action of the rear sight/lens holder. The use of air-filled induction compasses has declined over the years, as they may become inoperative or inaccurate in freezing temperatures or extremely humid environments due to condensation or water ingress.
+
+Some military compasses, like the U.S. M-1950 (Cammenga 3H) military lensatic compass, the Silva 4b *Militaire*, and the Suunto M-5N(T) contain the radioactive material tritium and a combination of phosphors. The U.S. M-1950 equipped with self-luminous lighting contains 120 mCi (millicuries) of tritium. The purpose of the tritium and phosphors is to provide illumination for the compass, via radioluminescent tritium illumination, which does not require the compass to be "recharged" by sunlight or artificial light. However, tritium has a half-life of only about 12 years, so a compass that contains 120 mCi of tritium when new will contain only 60 when it is 12 years old, 30 when it is 24 years old, and so on. Consequently, the illumination of the display will fade.
+
+Mariners' compasses can have two or more magnets permanently attached to a compass card, which moves freely on a pivot. A *lubber line*, which can be a marking on the compass bowl or a small fixed needle, indicates the ship's heading on the compass card. Traditionally the card is divided into thirty-two points (known as *rhumbs*), although modern compasses are marked in degrees rather than cardinal points. The glass-covered box (or bowl) contains a suspended gimbal within a binnacle. This preserves the horizontal position.
+
+The magnetic compass is very reliable at moderate latitudes, but in geographic regions near the Earth's magnetic poles it becomes unusable. As the compass is moved closer to one of the magnetic poles, the magnetic declination, the difference between the direction to geographical north and magnetic north, becomes greater and greater. At some point close to the magnetic pole the compass will not indicate any particular direction but will begin to drift. Also, the needle starts to point up or down when getting closer to the poles, because of the so-called magnetic inclination. Cheap compasses with bad bearings may get stuck because of this and therefore indicate a wrong direction.
+
+_(This section is shortened.)_
+
+_(Later sections of the original article were left out of this offline copy for length: the rest of Design, Variants, Construction, Use, Non-magnetic compasses.)_

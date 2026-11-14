@@ -1,0 +1,94 @@
+# Sources added by the wiki2 sweep for the `weather` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `weather/wp2-air-mass` — Air mass — https://en.wikipedia.org/w/index.php?title=Air_mass&oldid=1355451359
+  - `weather/wp2-altocumulus-cloud` — Altocumulus cloud — https://en.wikipedia.org/w/index.php?title=Altocumulus_cloud&oldid=1382951279
+  - `weather/wp2-altostratus-cloud` — Altostratus cloud — https://en.wikipedia.org/w/index.php?title=Altostratus_cloud&oldid=1376838376
+  - `weather/wp2-anemometer` — Anemometer — https://en.wikipedia.org/w/index.php?title=Anemometer&oldid=1385560449
+  - `weather/wp2-arcus-cloud` — Arcus cloud — https://en.wikipedia.org/w/index.php?title=Arcus_cloud&oldid=1362283767
+  - `weather/wp2-atmospheric-pressure` — Atmospheric pressure — https://en.wikipedia.org/w/index.php?title=Atmospheric_pressure&oldid=1378470837
+  - `weather/wp2-blizzard` — Blizzard — https://en.wikipedia.org/w/index.php?title=Blizzard&oldid=1380859322
+  - `weather/wp2-chinook-wind` — Chinook wind — https://en.wikipedia.org/w/index.php?title=Chinook_wind&oldid=1368862027
+  - `weather/wp2-cirrocumulus-cloud` — Cirrocumulus cloud — https://en.wikipedia.org/w/index.php?title=Cirrocumulus_cloud&oldid=1357084056
+  - `weather/wp2-cirrostratus-cloud` — Cirrostratus cloud — https://en.wikipedia.org/w/index.php?title=Cirrostratus_cloud&oldid=1351360703
+  - `weather/wp2-cirrus-cloud` — Cirrus cloud — https://en.wikipedia.org/w/index.php?title=Cirrus_cloud&oldid=1382463382
+  - `weather/wp2-cold-front` — Cold front — https://en.wikipedia.org/w/index.php?title=Cold_front&oldid=1384663566
+  - `weather/wp2-corona-optical-phenomenon` — Corona (optical phenomenon) — https://en.wikipedia.org/w/index.php?title=Corona_(optical_phenomenon)&oldid=1367465822
+  - `weather/wp2-cumulonimbus-cloud` — Cumulonimbus cloud — https://en.wikipedia.org/w/index.php?title=Cumulonimbus_cloud&oldid=1380166443
+  - `weather/wp2-cumulus-cloud` — Cumulus cloud — https://en.wikipedia.org/w/index.php?title=Cumulus_cloud&oldid=1384625680
+  - `weather/wp2-cumulus-humilis-cloud` — Cumulus humilis cloud — https://en.wikipedia.org/w/index.php?title=Cumulus_humilis_cloud&oldid=1372702944
+  - `weather/wp2-derecho` — Derecho — https://en.wikipedia.org/w/index.php?title=Derecho&oldid=1383939318
+  - `weather/wp2-dew-point` — Dew point — https://en.wikipedia.org/w/index.php?title=Dew_point&oldid=1374206378
+  - `weather/wp2-dew` — Dew — https://en.wikipedia.org/w/index.php?title=Dew&oldid=1383657176
+  - `weather/wp2-downburst` — Downburst — https://en.wikipedia.org/w/index.php?title=Downburst&oldid=1372366538
+  - `weather/wp2-drizzle` — Drizzle — https://en.wikipedia.org/w/index.php?title=Drizzle&oldid=1363870330
+  - `weather/wp2-dust-devil` — Dust devil — https://en.wikipedia.org/w/index.php?title=Dust_devil&oldid=1378416169
+  - `weather/wp2-dust-storm` — Dust storm — https://en.wikipedia.org/w/index.php?title=Dust_storm&oldid=1382860792
+  - `weather/wp2-extratropical-cyclone` — Extratropical cyclone — https://en.wikipedia.org/w/index.php?title=Extratropical_cyclone&oldid=1380287225
+  - `weather/wp2-foehn-wind` — Foehn wind — https://en.wikipedia.org/w/index.php?title=Foehn_wind&oldid=1383427140
+  - `weather/wp2-fog` — Fog — https://en.wikipedia.org/w/index.php?title=Fog&oldid=1382807346
+  - `weather/wp2-freezing-rain` — Freezing rain — https://en.wikipedia.org/w/index.php?title=Freezing_rain&oldid=1367019477
+  - `weather/wp2-frost-heaving` — Frost heaving — https://en.wikipedia.org/w/index.php?title=Frost_heaving&oldid=1379668340
+  - `weather/wp2-frost` — Frost — https://en.wikipedia.org/w/index.php?title=Frost&oldid=1372151439
+  - `weather/wp2-funnel-cloud` — Funnel cloud — https://en.wikipedia.org/w/index.php?title=Funnel_cloud&oldid=1369449084
+  - `weather/wp2-graupel` — Graupel — https://en.wikipedia.org/w/index.php?title=Graupel&oldid=1372458380
+  - `weather/wp2-haboob` — Haboob — https://en.wikipedia.org/w/index.php?title=Haboob&oldid=1375669089
+  - `weather/wp2-hail` — Hail — https://en.wikipedia.org/w/index.php?title=Hail&oldid=1371034155
+  - `weather/wp2-halo-optical-phenomenon` — Halo (optical phenomenon) — https://en.wikipedia.org/w/index.php?title=Halo_(optical_phenomenon)&oldid=1377327342
+  - `weather/wp2-heat-lightning` — Heat lightning — https://en.wikipedia.org/w/index.php?title=Heat_lightning&oldid=1363542914
+  - `weather/wp2-high-pressure-area` — High-pressure area — https://en.wikipedia.org/w/index.php?title=High-pressure_area&oldid=1361047302
+  - `weather/wp2-humidity` — Humidity — https://en.wikipedia.org/w/index.php?title=Humidity&oldid=1385596705
+  - `weather/wp2-hygrometer` — Hygrometer — https://en.wikipedia.org/w/index.php?title=Hygrometer&oldid=1365005295
+  - `weather/wp2-ice-pellets` — Ice pellets — https://en.wikipedia.org/w/index.php?title=Ice_pellets&oldid=1369779490
+  - `weather/wp2-ice-storm` — Ice storm — https://en.wikipedia.org/w/index.php?title=Ice_storm&oldid=1361770580
+  - `weather/wp2-inversion-meteorology` — Inversion (meteorology) — https://en.wikipedia.org/w/index.php?title=Inversion_(meteorology)&oldid=1382187989
+  - `weather/wp2-katabatic-wind` — Katabatic wind — https://en.wikipedia.org/w/index.php?title=Katabatic_wind&oldid=1384699069
+  - `weather/wp2-lake-effect-snow` — Lake-effect snow — https://en.wikipedia.org/w/index.php?title=Lake-effect_snow&oldid=1385354055
+  - `weather/wp2-lee-waves` — Lee waves — https://en.wikipedia.org/w/index.php?title=Lee_waves&oldid=1381523803
+  - `weather/wp2-lenticular-cloud` — Lenticular cloud — https://en.wikipedia.org/w/index.php?title=Lenticular_cloud&oldid=1385447518
+  - `weather/wp2-low-pressure-area` — Low-pressure area — https://en.wikipedia.org/w/index.php?title=Low-pressure_area&oldid=1377859473
+  - `weather/wp2-mammatus-cloud` — Mammatus cloud — https://en.wikipedia.org/w/index.php?title=Mammatus_cloud&oldid=1384466009
+  - `weather/wp2-microclimate` — Microclimate — https://en.wikipedia.org/w/index.php?title=Microclimate&oldid=1385320019
+  - `weather/wp2-monsoon` — Monsoon — https://en.wikipedia.org/w/index.php?title=Monsoon&oldid=1385300886
+  - `weather/wp2-nimbostratus-cloud` — Nimbostratus cloud — https://en.wikipedia.org/w/index.php?title=Nimbostratus_cloud&oldid=1374488388
+  - `weather/wp2-noreaster` — Nor'easter — https://en.wikipedia.org/w/index.php?title=Nor%27easter&oldid=1381846514
+  - `weather/wp2-occluded-front` — Occluded front — https://en.wikipedia.org/w/index.php?title=Occluded_front&oldid=1358483106
+  - `weather/wp2-orographic-lift` — Orographic lift — https://en.wikipedia.org/w/index.php?title=Orographic_lift&oldid=1379150030
+  - `weather/wp2-precipitation` — Precipitation — https://en.wikipedia.org/w/index.php?title=Precipitation&oldid=1385507909
+  - `weather/wp2-rain-gauge` — Rain gauge — https://en.wikipedia.org/w/index.php?title=Rain_gauge&oldid=1378055777
+  - `weather/wp2-rain-shadow` — Rain shadow — https://en.wikipedia.org/w/index.php?title=Rain_shadow&oldid=1354085908
+  - `weather/wp2-rain` — Rain — https://en.wikipedia.org/w/index.php?title=Rain&oldid=1383274305
+  - `weather/wp2-red-sky-at-morning` — Red sky at morning — https://en.wikipedia.org/w/index.php?title=Red_sky_at_morning&oldid=1339474263
+  - `weather/wp2-rime-ice` — Rime ice — https://en.wikipedia.org/w/index.php?title=Rime_ice&oldid=1383406994
+  - `weather/wp2-sea-breeze` — Sea breeze — https://en.wikipedia.org/w/index.php?title=Sea_breeze&oldid=1362362617
+  - `weather/wp2-snow` — Snow — https://en.wikipedia.org/w/index.php?title=Snow&oldid=1372800586
+  - `weather/wp2-snowpack` — Snowpack — https://en.wikipedia.org/w/index.php?title=Snowpack&oldid=1383664489
+  - `weather/wp2-squall-line` — Squall line — https://en.wikipedia.org/w/index.php?title=Squall_line&oldid=1383413179
+  - `weather/wp2-squall` — Squall — https://en.wikipedia.org/w/index.php?title=Squall&oldid=1371348833
+  - `weather/wp2-st-elmos-fire` — St. Elmo's fire — https://en.wikipedia.org/w/index.php?title=St._Elmo%27s_fire&oldid=1382145117
+  - `weather/wp2-stevenson-screen` — Stevenson screen — https://en.wikipedia.org/w/index.php?title=Stevenson_screen&oldid=1346489435
+  - `weather/wp2-stratocumulus-cloud` — Stratocumulus cloud — https://en.wikipedia.org/w/index.php?title=Stratocumulus_cloud&oldid=1354923778
+  - `weather/wp2-stratus-cloud` — Stratus cloud — https://en.wikipedia.org/w/index.php?title=Stratus_cloud&oldid=1357912781
+  - `weather/wp2-sun-dog` — Sun dog — https://en.wikipedia.org/w/index.php?title=Sun_dog&oldid=1384737251
+  - `weather/wp2-supercell` — Supercell — https://en.wikipedia.org/w/index.php?title=Supercell&oldid=1384740159
+  - `weather/wp2-thunder` — Thunder — https://en.wikipedia.org/w/index.php?title=Thunder&oldid=1383909499
+  - `weather/wp2-thunderstorm` — Thunderstorm — https://en.wikipedia.org/w/index.php?title=Thunderstorm&oldid=1377497196
+  - `weather/wp2-tornado` — Tornado — https://en.wikipedia.org/w/index.php?title=Tornado&oldid=1383132353
+  - `weather/wp2-ultraviolet-index` — Ultraviolet index — https://en.wikipedia.org/w/index.php?title=Ultraviolet_index&oldid=1384692838
+  - `weather/wp2-wall-cloud` — Wall cloud — https://en.wikipedia.org/w/index.php?title=Wall_cloud&oldid=1343600195
+  - `weather/wp2-warm-front` — Warm front — https://en.wikipedia.org/w/index.php?title=Warm_front&oldid=1356090367
+  - `weather/wp2-waterspout` — Waterspout — https://en.wikipedia.org/w/index.php?title=Waterspout&oldid=1370495497
+  - `weather/wp2-weather-station` — Weather station — https://en.wikipedia.org/w/index.php?title=Weather_station&oldid=1382049675
+  - `weather/wp2-weather-vane` — Weather vane — https://en.wikipedia.org/w/index.php?title=Weather_vane&oldid=1384393940
+  - `weather/wp2-wet-bulb-globe-temperature` — Wet-bulb globe temperature — https://en.wikipedia.org/w/index.php?title=Wet-bulb_globe_temperature&oldid=1379894270
+  - `weather/wp2-wet-bulb-temperature` — Wet-bulb temperature — https://en.wikipedia.org/w/index.php?title=Wet-bulb_temperature&oldid=1383662673
+  - `weather/wp2-whiteout-weather` — Whiteout (weather) — https://en.wikipedia.org/w/index.php?title=Whiteout_(weather)&oldid=1267043542
+  - `weather/wp2-wind` — Wind — https://en.wikipedia.org/w/index.php?title=Wind&oldid=1381679076
+  - `weather/wp2-windsock` — Windsock — https://en.wikipedia.org/w/index.php?title=Windsock&oldid=1377812765

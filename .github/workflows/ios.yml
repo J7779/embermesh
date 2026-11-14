@@ -1,0 +1,101 @@
+name: iOS
+
+# Simulator build and the XCTest suite (unit + integration against the real core) on a macOS
+# runner, plus an unsigned generic-device build that proves the app compiles for iPhone hardware.
+# No archive, no .ipa, no signing: distributing iOS builds needs an Apple team (apps/ios/README.md).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ios:
+    name: Simulator build + XCTest, unsigned device build
+    runs-on: macos-26
+    timeout-minutes: 75
+    env:
+      EMBER_TEST_RESULTS: build/test-results
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Xcode and a simulator
+        run: |
+          mkdir -p build/ci-logs
+          tools/ci/select-xcode.sh 2>&1 | tee build/ci-logs/xcode.txt
+
+      - name: Guide library, simulator build, unsigned device build (build.sh)
+        id: build
+        run: |
+          set -o pipefail
+          ./build.sh guides ios 2>&1 | tee build/ci-logs/ios-build.log
+
+      - name: XCTest suite on the simulator (build.sh)
+        id: test
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          ./build.sh test --only ios --device-tests --strict 2>&1 | tee build/ci-logs/ios-test.log
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### iOS"
+            echo
+            echo "$(xcodebuild -version | tr '\n' ' '); $(grep 'first available iPhone' build/ci-logs/xcode.txt 2>/dev/null)"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests xcresult "EmberMeshTests (XCTest, simulator)" build/test-results/ios.xcresult
+            echo
+            echo "Built (not uploaded; iOS builds are not distributed):"
+            echo
+            for a in dist/ios/simulator/EmberMesh.app dist/ios/device/EmberMesh.app; do
+              [ -d "$a" ] && echo "- \`$a\` $(du -sh "$a" | cut -f1)"
+            done
+            if [ -d build/test-results/ios.xcresult ]; then
+              echo
+              python3 tools/ci/report.py xcresult-failures build/test-results/ios.xcresult
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results and logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ios-test-results
+          path: |
+            build/test-results/
+            build/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn
+
+  summary:
+    name: iOS summary
+    if: always()
+    needs: [ios]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/ci
+      - name: Required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 tools/ci/needs-summary.py "iOS"

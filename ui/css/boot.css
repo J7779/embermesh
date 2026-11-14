@@ -1,0 +1,44 @@
+/* Start-up animation (js/boot/). First frame = native launch screens (README "Launch screen"):
+   the logo on #17110f, 30 % of the shorter side, centred — or at the rectangle a native shell
+   passes as --launch-logo-x/-y (top-left) and --launch-logo-size, in CSS px of this viewport. */
+#ember-boot {
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 70; background: #17110f; overflow: hidden;
+  touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  animation: eb-failsafe 0s 4s forwards !important; /* no script: out of the way after 4 s */
+}
+#ember-boot.eb-js { animation: none !important; }
+@keyframes eb-failsafe { to { visibility: hidden; } }
+#ember-boot.eb-live { background: transparent; }
+#ember-boot.eb-out { pointer-events: none; }
+#ember-boot canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.eb-logo {
+  position: absolute; overflow: visible; left: calc(50% - 15vmin); top: calc(50% - 15vmin); width: 30vmin; height: 30vmin;
+  left: var(--launch-logo-x, calc(50% - 15vmin)); top: var(--launch-logo-y, calc(50% - 15vmin));
+  width: var(--launch-logo-size, 30vmin); height: var(--launch-logo-size, 30vmin);
+}
+.eb-word {
+  position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; opacity: 0; color: #fff4e8;
+  font: 700 6vmin/1 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  top: calc(50% + 16.3vmin); top: calc(var(--launch-logo-y, calc(50% - 15vmin)) + var(--launch-logo-size, 30vmin) * 1.043);
+  font-size: calc(var(--launch-logo-size, 30vmin) * 0.2);
+}
+.eb-free .eb-logo { left: calc(50% - 15vmin); top: calc(50% - 15vmin); width: 30vmin; height: 30vmin; } /* rotated: rect stale */
+.eb-free .eb-word { top: calc(50% + 16.3vmin); font-size: 6vmin; }
+.eb-word span { color: #ff8a3d; }
+.eb-live .eb-logo, .eb-live .eb-word { visibility: hidden; }
+.eb-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[data-theme="light"]#ember-boot { background: #f4f2ee; }
+[data-theme="light"] .eb-l { stroke: #c45416; stroke-opacity: .6; }
+[data-theme="light"] .eb-n { fill: #e8702a; }
+[data-theme="light"] .eb-word { color: #2a1610; }
+[data-theme="light"] .eb-word span { color: #b34700; }
+/* night: strictly red on black */
+[data-theme="night"]#ember-boot { background: #000; }
+[data-theme="night"] .eb-l { stroke: #ff3b30; stroke-opacity: .5; }
+[data-theme="night"] .eb-n { fill: #e02a20; }
+[data-theme="night"] .eb-f0 { stop-color: #5a0000; }
+[data-theme="night"] .eb-f1 { stop-color: #a01810; }
+[data-theme="night"] .eb-f2, [data-theme="night"] .eb-word { stop-color: #e02a20; color: #ff3b30; }
+[data-theme="night"] .eb-c0 { stop-color: #ff3b30; }
+[data-theme="night"] .eb-c1 { stop-color: #ff4a3a; }
+[data-theme="night"] .eb-word span { color: #b3221a; }

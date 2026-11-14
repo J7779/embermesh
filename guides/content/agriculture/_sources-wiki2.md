@@ -1,0 +1,242 @@
+# Sources added by the wiki2 sweep for the `agriculture` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `agriculture/wb2-beekeeping-part1` — Beekeeping (Wikibooks) (part 1 of 6: Beekeeping, Why Keep Bees, Starting Right…) — https://en.wikibooks.org/w/index.php?title=Beekeeping&oldid=4659767 — pages: Beekeeping (rev 4659767); Beekeeping/Why Keep Bees (rev 4096361); Beekeeping/Starting Right (rev 2627527); Beekeeping/First Time (rev 3225474); Beekeeping/Obtaining Bees (rev 4659780); Beekeeping/Hobby Beekeeping (rev 3225489)
+  - `agriculture/wb2-beekeeping-part2` — Beekeeping (Wikibooks) (part 2 of 6: Residential Beekeeping, Leading practices, The Honey Bee…) — https://en.wikibooks.org/w/index.php?title=Beekeeping/Residential_Beekeeping&oldid=4531725 — pages: Beekeeping/Residential Beekeeping (rev 4531725); Beekeeping/Leading practices (rev 3225494); Beekeeping/The Honey Bee (rev 4659769); Beekeeping/Queen Bee (rev 3225513); Beekeeping/Drone Bee (rev 3761090); Beekeeping/Queen Locating (rev 3225512); Beekeeping/Pheromones (rev 4097580); Beekeeping/Hive Bodies (rev 2694145); Beekeeping/Foundation (rev 3225471)
+  - `agriculture/wb2-beekeeping-part3` — Beekeeping (Wikibooks) (part 3 of 6: Langstroth Hive, British National (or Modified National), WBC Hive…) — https://en.wikibooks.org/w/index.php?title=Beekeeping/Langstroth_Hive&oldid=4017680 — pages: Beekeeping/Langstroth Hive (rev 4017680); Beekeeping/British National (or Modified National) (rev 3520383); Beekeeping/WBC Hive (rev 2427114); Beekeeping/Top Bar Hive (rev 4325474); Beekeeping/Kenya Top Bar Hives (rev 3225492); Beekeeping/Tanzanian Top Bar Hives (rev 4097582); Beekeeping/Warre (rev 4030643); Beekeeping/Smoker (rev 3225506)
+  - `agriculture/wb2-beekeeping-part4` — Beekeeping (Wikibooks) (part 4 of 6: Hive Tool, Bee Brush, Entrance Reducer…) — https://en.wikibooks.org/w/index.php?title=Beekeeping/Hive_Tool&oldid=3225488 — pages: Beekeeping/Hive Tool (rev 3225488); Beekeeping/Bee Brush (rev 3476621); Beekeeping/Entrance Reducer (rev 3225475); Beekeeping/Mouse Guard (rev 3225497); Beekeeping/Swarm Prevention (rev 3268762); Beekeeping/Recipes for the Bees (rev 4659770)
+  - `agriculture/wb2-beekeeping-part5` — Beekeeping (Wikibooks) (part 5 of 6: Honey, Comb Honey, Varieties of Honey…) — https://en.wikibooks.org/w/index.php?title=Beekeeping/Honey&oldid=4659774 — pages: Beekeeping/Honey (rev 4659774); Beekeeping/Comb Honey (rev 3225465); Beekeeping/Varieties of Honey (rev 4659779); Beekeeping/Varroa Mite (rev 4659777); Beekeeping/Nosema (rev 4097579); Beekeeping/Wax Moth (rev 3225523); Beekeeping/Acute Bee Paralysis (rev 4097572)
+  - `agriculture/wb2-beekeeping-part6` — Beekeeping (Wikibooks) (part 6 of 6: Chronic Paralysis Virus, Kashmir Bee Virus, Birds…) — https://en.wikibooks.org/w/index.php?title=Beekeeping/Chronic_Paralysis_Virus&oldid=4097576 — pages: Beekeeping/Chronic Paralysis Virus (rev 4097576); Beekeeping/Kashmir Bee Virus (rev 4097578); Beekeeping/Birds (rev 4097574); Beekeeping/Frequently Asked Questions (rev 4319279); Beekeeping/Glossary (rev 4583663)
+  - `agriculture/wb2-diy-homemade-hydroponics-wick-system` — Do-It-Yourself: Homemade hydroponics wick system — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/Homemade_hydroponics_wick_system&oldid=4469467
+  - `agriculture/wb2-horticulture-food-plants-part1` — Horticulture (Wikibooks): Growing Vegetables, Fruit and Useful Plants (part 1 of 5: Potato, Tomato, Garlic) — https://en.wikibooks.org/w/index.php?title=Horticulture/Potato&oldid=4207365 — pages: Horticulture/Potato (rev 4207365); Horticulture/Tomato (rev 4372815); Horticulture/Garlic (rev 4667639)
+  - `agriculture/wb2-horticulture-food-plants-part2` — Horticulture (Wikibooks): Growing Vegetables, Fruit and Useful Plants (part 2 of 5: Lettuce, Spinach, Pisum…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Lettuce&oldid=4622172 — pages: Horticulture/Lettuce (rev 4622172); Horticulture/Spinach (rev 4627060); Horticulture/Pisum (rev 3321107); Horticulture/Brassica (rev 4421170); Horticulture/Capsicum (rev 4418793); Horticulture/Cucurbita (rev 4418828); Horticulture/Cucumber (rev 4302571)
+  - `agriculture/wb2-horticulture-food-plants-part3` — Horticulture (Wikibooks): Growing Vegetables, Fruit and Useful Plants (part 3 of 5: Chard, Asparagus, Fragaria x ananassa…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Chard&oldid=4091454 — pages: Horticulture/Chard (rev 4091454); Horticulture/Asparagus (rev 4418788); Horticulture/Fragaria x ananassa (rev 4532882); Horticulture/Malus (rev 4622190); Horticulture/Pyrus (rev 3321103)
+  - `agriculture/wb2-horticulture-food-plants-part4` — Horticulture (Wikibooks): Growing Vegetables, Fruit and Useful Plants (part 4 of 5: Prunus, Vitis, Taraxacum…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Prunus&oldid=3321105 — pages: Horticulture/Prunus (rev 3321105); Horticulture/Vitis (rev 4669828); Horticulture/Taraxacum (rev 4627078); Horticulture/Alliaria petiolata (rev 4042243); Horticulture/Claytonia virginica (rev 4210396); Horticulture/Barbarea vulgaris (rev 3336131); Horticulture/Cyperus esculentus (rev 3336187)
+  - `agriculture/wb2-horticulture-food-plants-part5` — Horticulture (Wikibooks): Growing Vegetables, Fruit and Useful Plants (part 5 of 5: Allium schoenophrasum, Thymus, Salix) — https://en.wikibooks.org/w/index.php?title=Horticulture/Allium_schoenophrasum&oldid=4222633 — pages: Horticulture/Allium schoenophrasum (rev 4222633); Horticulture/Thymus (rev 3321119); Horticulture/Salix (rev 4622276)
+  - `agriculture/wb2-horticulture-garden-methods-part1` — Horticulture (Wikibooks): Compost, Mulch, Sowing and Garden Methods (part 1 of 3: Compost Introduction, The Benefits of Compost, Hot Composting…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Compost_Introduction&oldid=4028187 — pages: Horticulture/Compost Introduction (rev 4028187); Horticulture/The Benefits of Compost (rev 4188608); Horticulture/Hot Composting (rev 4028191); Horticulture/Bokashi (rev 4028194); Horticulture/Vermicomposting/transwiki (rev 4627605); Horticulture/Mulch (rev 3319794)
+  - `agriculture/wb2-horticulture-garden-methods-part2` — Horticulture (Wikibooks): Compost, Mulch, Sowing and Garden Methods (part 2 of 3: Paper Mulch Barriers, Straw, No Till Gardening…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Paper_Mulch_Barriers&oldid=3319791 — pages: Horticulture/Paper Mulch Barriers (rev 3319791); Horticulture/Straw (rev 4196524); Horticulture/No Till Gardening (rev 3319824); Horticulture/Square Foot Gardening (rev 3319832); Horticulture/Elements of a Garden Location (rev 4028177); Horticulture/Sowing (rev 4028200); Horticulture/Layering (rev 3704610)
+  - `agriculture/wb2-horticulture-garden-methods-part3` — Horticulture (Wikibooks): Compost, Mulch, Sowing and Garden Methods (part 3 of 3: Irrigation, Pruning of Fruit Trees, The Importance of Studying Weeds) — https://en.wikibooks.org/w/index.php?title=Horticulture/Irrigation&oldid=4673058 — pages: Horticulture/Irrigation (rev 4673058); Horticulture/Pruning of Fruit Trees (rev 4538862); Horticulture/The Importance of Studying Weeds (rev 3320869)
+  - `agriculture/wb2-horticulture-pests-and-diseases-part1` — Horticulture (Wikibooks): Garden Pests and Plant Diseases (part 1 of 4: Biological Pest Control, Aphids) — https://en.wikibooks.org/w/index.php?title=Horticulture/Biological_Pest_Control&oldid=3336141 — pages: Horticulture/Biological Pest Control (rev 3336141); Horticulture/Aphids (rev 4091601)
+  - `agriculture/wb2-horticulture-pests-and-diseases-part2` — Horticulture (Wikibooks): Garden Pests and Plant Diseases (part 2 of 4: Caterpillars) — https://en.wikibooks.org/w/index.php?title=Horticulture/Caterpillars&oldid=3585348
+  - `agriculture/wb2-horticulture-pests-and-diseases-part3` — Horticulture (Wikibooks): Garden Pests and Plant Diseases (part 3 of 4: Beetles, Slugs, Nematodes…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Beetles&oldid=3369224 — pages: Horticulture/Beetles (rev 3369224); Horticulture/Slugs (rev 4028276); Horticulture/Nematodes (rev 2577787); Horticulture/Mites (rev 3685931); Horticulture/Whiteflies (rev 3502633); Horticulture/Thrips (rev 1502683)
+  - `agriculture/wb2-horticulture-pests-and-diseases-part4` — Horticulture (Wikibooks): Garden Pests and Plant Diseases (part 4 of 4: Mealybugs, Earwigs, Sawflies…) — https://en.wikibooks.org/w/index.php?title=Horticulture/Mealybugs&oldid=1502626 — pages: Horticulture/Mealybugs (rev 1502626); Horticulture/Earwigs (rev 4490337); Horticulture/Sawflies (rev 1502652); Horticulture/Squash Vine Borer (rev 1502666); Horticulture/Wasps (rev 4059332); Horticulture/Rusts (rev 4314285); Horticulture/Phytophthora (rev 4622231); Horticulture/Phytopathology (rev 4245851)
+  - `agriculture/wb2-hydroculture-part1` — Hydroculture (Wikibooks): Growing Plants without Soil (part 1 of 2: Orchid, Hydroculture, Substrates…) — https://en.wikibooks.org/w/index.php?title=Hydroculture/Passive/Orchid&oldid=3437234 — pages: Hydroculture/Passive/Orchid (rev 3437234); Hydroculture (rev 4028280); Hydroculture/Substrates (rev 3263116); Hydroculture/Nutrition (rev 2481203); Hydroculture/Aqua/Ponics1 (rev 3371946); Hydroculture/DIY (rev 2466877); Hydroculture/Aqua (rev 2425036); Hydroculture/Passive/Bottle (rev 3371948); Hydroculture/Root/Rot (rev 3319723); Hydroculture/Aeration (rev 4222362); Hydroculture/Physiology/Aquatic (rev 2465528); Hydroculture/Physiology/Rhizosphere (rev 2760850); Hydroculture/Propagation (rev 4429961); Hydroculture/Aqua/Bin (rev 2466671); Hydroculture/Aero/Bucket (rev 2437736)
+  - `agriculture/wb2-hydroculture-part2` — Hydroculture (Wikibooks): Growing Plants without Soil (part 2 of 2: Appendments, Passive) — https://en.wikibooks.org/w/index.php?title=Hydroculture/Nutrition/Appendments&oldid=2466680 — pages: Hydroculture/Nutrition/Appendments (rev 2466680); Hydroculture/Biofilter/Passive (rev 2465353)
+  - `agriculture/wb2-permaculture-design-part1` — Permaculture Design (Wikibooks) (part 1 of 4: Permaculture Design, Ethics, principles, methods and outcomes, Characteristics…) — https://en.wikibooks.org/w/index.php?title=Permaculture_Design&oldid=4607378 — pages: Permaculture Design (rev 4607378); Permaculture Design/Ethics, principles, methods and outcomes (rev 4571376); Permaculture Design/Characteristics (rev 4592285); Permaculture Design/Designer's checklist (rev 3484785); Permaculture Design/How to/Some ways to improve your soils (rev 4592283); Permaculture Design/How to/Effective but non toxic sprays (rev 3427653); Permaculture Design/How to/Creating a natural balance (rev 4315048); Permaculture Design/How to/Planting plans/A planting plan for Dunedin New Zealand (rev 4369165)
+  - `agriculture/wb2-permaculture-design-part2` — Permaculture Design (Wikibooks) (part 2 of 4: Soil, Dunedin New Zealand, Observation…) — https://en.wikibooks.org/w/index.php?title=Permaculture_Design/Soil&oldid=4647105 — pages: Permaculture Design/Soil (rev 4647105); Permaculture Design/How to/Planting Calendars/Dunedin New Zealand (rev 4449004); Permaculture Design/Observation (rev 3269026); Permaculture Design/Zone design (rev 4538311); Permaculture Design/Zone design/Zone 1 Food Garden (rev 3269027)
+  - `agriculture/wb2-permaculture-design-part3` — Permaculture Design (Wikibooks) (part 3 of 4: Fundamentals, Animals) — https://en.wikibooks.org/w/index.php?title=Permaculture_Design/Fundamentals&oldid=4026170 — pages: Permaculture Design/Fundamentals (rev 4026170); Permaculture Design/Animals (rev 4591247)
+  - `agriculture/wb2-permaculture-design-part4` — Permaculture Design (Wikibooks) (part 4 of 4: Darwin Australia, Crop rotation) — https://en.wikibooks.org/w/index.php?title=Permaculture_Design/How_to/Planting_Calendars/Darwin_Australia&oldid=3358010 — pages: Permaculture Design/How to/Planting Calendars/Darwin Australia (rev 3358010); Permaculture Design/Crop rotation (rev 3698788)
+  - `agriculture/wb2-raising-chickens-part1` — Raising Chickens (Wikibooks) (part 1 of 2: Raising Chickens, Building a Pen, shelter…) — https://en.wikibooks.org/w/index.php?title=Raising_Chickens&oldid=4027796 — pages: Raising Chickens (rev 4027796); Raising Chickens/Building a Pen (rev 3442593); Raising Chickens/shelter (rev 3689133); Raising Chickens/Choosing a breed (rev 3353539); Raising Chickens/Watering (rev 3930766); Raising Chickens/Chicks (rev 3708275); Raising Chickens/Feeding (rev 3930769); Raising Chickens/Keeping your chickens happy (rev 3930762); Raising Chickens/Other information (rev 3930761); Raising Chickens/Death/Butchering (rev 3930763); Raising Chickens/Death (rev 4369155)
+  - `agriculture/wb2-raising-chickens-part2` — Raising Chickens (Wikibooks) (part 2 of 2: Winters) — https://en.wikibooks.org/w/index.php?title=Raising_Chickens/Winters&oldid=3930765
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `agriculture/wp2-agroforestry` — Agroforestry — https://en.wikipedia.org/w/index.php?title=Agroforestry&oldid=1385035730
+  - `agriculture/wp2-alfalfa` — Alfalfa — https://en.wikipedia.org/w/index.php?title=Alfalfa&oldid=1385536723
+  - `agriculture/wp2-animal-husbandry` — Animal husbandry — https://en.wikipedia.org/w/index.php?title=Animal_husbandry&oldid=1373636183
+  - `agriculture/wp2-animal-slaughter` — Animal slaughter — https://en.wikipedia.org/w/index.php?title=Animal_slaughter&oldid=1385603337
+  - `agriculture/wp2-aphid` — Aphid — https://en.wikipedia.org/w/index.php?title=Aphid&oldid=1383655883
+  - `agriculture/wp2-apple` — Apple — https://en.wikipedia.org/w/index.php?title=Apple&oldid=1384778956
+  - `agriculture/wp2-aquaculture` — Aquaculture — https://en.wikipedia.org/w/index.php?title=Aquaculture&oldid=1383223988
+  - `agriculture/wp2-aquaponics` — Aquaponics — https://en.wikipedia.org/w/index.php?title=Aquaponics&oldid=1380913913
+  - `agriculture/wp2-archimedes-screw` — Archimedes' screw — https://en.wikipedia.org/w/index.php?title=Archimedes%27_screw&oldid=1382280165
+  - `agriculture/wp2-ard-plough` — Ard (plough) — https://en.wikipedia.org/w/index.php?title=Ard_(plough)&oldid=1350756046
+  - `agriculture/wp2-avian-influenza` — Avian influenza — https://en.wikipedia.org/w/index.php?title=Avian_influenza&oldid=1384988453
+  - `agriculture/wp2-barley` — Barley — https://en.wikipedia.org/w/index.php?title=Barley&oldid=1382936684
+  - `agriculture/wp2-beehive` — Beehive — https://en.wikipedia.org/w/index.php?title=Beehive&oldid=1379322290
+  - `agriculture/wp2-beetroot` — Beetroot — https://en.wikipedia.org/w/index.php?title=Beetroot&oldid=1383579296
+  - `agriculture/wp2-biochar` — Biochar — https://en.wikipedia.org/w/index.php?title=Biochar&oldid=1384603133
+  - `agriculture/wp2-biological-pest-control` — Biological pest control — https://en.wikipedia.org/w/index.php?title=Biological_pest_control&oldid=1378698309
+  - `agriculture/wp2-bone-meal` — Bone meal — https://en.wikipedia.org/w/index.php?title=Bone_meal&oldid=1370831826
+  - `agriculture/wp2-bordeaux-mixture` — Bordeaux mixture — https://en.wikipedia.org/w/index.php?title=Bordeaux_mixture&oldid=1378432885
+  - `agriculture/wp2-broodiness` — Broodiness — https://en.wikipedia.org/w/index.php?title=Broodiness&oldid=1385528268
+  - `agriculture/wp2-brown-rat` — Brown rat — https://en.wikipedia.org/w/index.php?title=Brown_rat&oldid=1382038797
+  - `agriculture/wp2-buckwheat` — Buckwheat — https://en.wikipedia.org/w/index.php?title=Buckwheat&oldid=1384222416
+  - `agriculture/wp2-budding` — Budding — https://en.wikipedia.org/w/index.php?title=Budding&oldid=1385260769
+  - `agriculture/wp2-butcher` — Butcher — https://en.wikipedia.org/w/index.php?title=Butcher&oldid=1382622390
+  - `agriculture/wp2-cabbage` — Cabbage — https://en.wikipedia.org/w/index.php?title=Cabbage&oldid=1384003797
+  - `agriculture/wp2-carrot` — Carrot — https://en.wikipedia.org/w/index.php?title=Carrot&oldid=1382940760
+  - `agriculture/wp2-cassava` — Cassava — https://en.wikipedia.org/w/index.php?title=Cassava&oldid=1384658657
+  - `agriculture/wp2-castration` — Castration — https://en.wikipedia.org/w/index.php?title=Castration&oldid=1380188517
+  - `agriculture/wp2-cattle` — Cattle — https://en.wikipedia.org/w/index.php?title=Cattle&oldid=1383768318
+  - `agriculture/wp2-chicken-manure` — Chicken manure — https://en.wikipedia.org/w/index.php?title=Chicken_manure&oldid=1349966853
+  - `agriculture/wp2-chicken` — Chicken — https://en.wikipedia.org/w/index.php?title=Chicken&oldid=1384640453
+  - `agriculture/wp2-chickpea` — Chickpea — https://en.wikipedia.org/w/index.php?title=Chickpea&oldid=1383890522
+  - `agriculture/wp2-chili-pepper` — Chili pepper — https://en.wikipedia.org/w/index.php?title=Chili_pepper&oldid=1382947295
+  - `agriculture/wp2-chinampa` — Chinampa — https://en.wikipedia.org/w/index.php?title=Chinampa&oldid=1381264338
+  - `agriculture/wp2-clover` — Clover — https://en.wikipedia.org/w/index.php?title=Clover&oldid=1384835333
+  - `agriculture/wp2-cold-frame` — Cold frame — https://en.wikipedia.org/w/index.php?title=Cold_frame&oldid=1357191399
+  - `agriculture/wp2-common-carp` — Common carp — https://en.wikipedia.org/w/index.php?title=Common_carp&oldid=1381951282
+  - `agriculture/wp2-common-sunflower` — Common sunflower — https://en.wikipedia.org/w/index.php?title=Common_sunflower&oldid=1383621123
+  - `agriculture/wp2-container-garden` — Container garden — https://en.wikipedia.org/w/index.php?title=Container_garden&oldid=1354731971
+  - `agriculture/wp2-cooking-banana` — Cooking banana — https://en.wikipedia.org/w/index.php?title=Cooking_banana&oldid=1383677608
+  - `agriculture/wp2-cowpea` — Cowpea — https://en.wikipedia.org/w/index.php?title=Cowpea&oldid=1382950060
+  - `agriculture/wp2-cucumber` — Cucumber — https://en.wikipedia.org/w/index.php?title=Cucumber&oldid=1384250413
+  - `agriculture/wp2-cucurbita-pepo` — Cucurbita pepo — https://en.wikipedia.org/w/index.php?title=Cucurbita_pepo&oldid=1378575313
+  - `agriculture/wp2-cucurbita` — Cucurbita — https://en.wikipedia.org/w/index.php?title=Cucurbita&oldid=1385198425
+  - `agriculture/wp2-cutting-plant` — Cutting (plant) — https://en.wikipedia.org/w/index.php?title=Cutting_(plant)&oldid=1363484534
+  - `agriculture/wp2-damping-off` — Damping off — https://en.wikipedia.org/w/index.php?title=Damping_off&oldid=1380661513
+  - `agriculture/wp2-deworming` — Deworming — https://en.wikipedia.org/w/index.php?title=Deworming&oldid=1304554595
+  - `agriculture/wp2-diatomaceous-earth` — Diatomaceous earth — https://en.wikipedia.org/w/index.php?title=Diatomaceous_earth&oldid=1383559102
+  - `agriculture/wp2-domestic-duck` — Domestic duck — https://en.wikipedia.org/w/index.php?title=Domestic_duck&oldid=1373713577
+  - `agriculture/wp2-domestic-goose` — Domestic goose — https://en.wikipedia.org/w/index.php?title=Domestic_goose&oldid=1382460315
+  - `agriculture/wp2-domestic-rabbit` — Domestic rabbit — https://en.wikipedia.org/w/index.php?title=Domestic_rabbit&oldid=1384751794
+  - `agriculture/wp2-domestic-sheep-reproduction` — Domestic sheep reproduction — https://en.wikipedia.org/w/index.php?title=Domestic_sheep_reproduction&oldid=1378102590
+  - `agriculture/wp2-domestic-turkey` — Domestic turkey — https://en.wikipedia.org/w/index.php?title=Domestic_turkey&oldid=1378365388
+  - `agriculture/wp2-donkey` — Donkey — https://en.wikipedia.org/w/index.php?title=Donkey&oldid=1384654296
+  - `agriculture/wp2-draft-horse` — Draft horse — https://en.wikipedia.org/w/index.php?title=Draft_horse&oldid=1385030997
+  - `agriculture/wp2-dry-stone` — Dry stone — https://en.wikipedia.org/w/index.php?title=Dry_stone&oldid=1375988780
+  - `agriculture/wp2-dryland-farming` — Dryland farming — https://en.wikipedia.org/w/index.php?title=Dryland_farming&oldid=1381252822
+  - `agriculture/wp2-egg-incubation` — Egg incubation — https://en.wikipedia.org/w/index.php?title=Egg_incubation&oldid=1343027276
+  - `agriculture/wp2-erysiphaceae` — Erysiphaceae — https://en.wikipedia.org/w/index.php?title=Erysiphaceae&oldid=1371061050
+  - `agriculture/wp2-espalier` — Espalier — https://en.wikipedia.org/w/index.php?title=Espalier&oldid=1380279050
+  - `agriculture/wp2-f1-hybrid` — F1 hybrid — https://en.wikipedia.org/w/index.php?title=F1_hybrid&oldid=1384228904
+  - `agriculture/wp2-farrier` — Farrier — https://en.wikipedia.org/w/index.php?title=Farrier&oldid=1381209204
+  - `agriculture/wp2-fence` — Fence — https://en.wikipedia.org/w/index.php?title=Fence&oldid=1385430491
+  - `agriculture/wp2-fertilizer` — Fertilizer — https://en.wikipedia.org/w/index.php?title=Fertilizer&oldid=1382563012
+  - `agriculture/wp2-finger-millet` — Finger millet — https://en.wikipedia.org/w/index.php?title=Finger_millet&oldid=1385571776
+  - `agriculture/wp2-fish-pond` — Fish pond — https://en.wikipedia.org/w/index.php?title=Fish_pond&oldid=1356961562
+  - `agriculture/wp2-flail-tool` — Flail (tool) — https://en.wikipedia.org/w/index.php?title=Flail_(tool)&oldid=1383469637
+  - `agriculture/wp2-flax` — Flax — https://en.wikipedia.org/w/index.php?title=Flax&oldid=1383449275
+  - `agriculture/wp2-fodder` — Fodder — https://en.wikipedia.org/w/index.php?title=Fodder&oldid=1384076425
+  - `agriculture/wp2-foot-and-mouth-disease` — Foot-and-mouth disease — https://en.wikipedia.org/w/index.php?title=Foot-and-mouth_disease&oldid=1385351866
+  - `agriculture/wp2-free-range` — Free range — https://en.wikipedia.org/w/index.php?title=Free_range&oldid=1379476490
+  - `agriculture/wp2-fruit-tree-propagation` — Fruit tree propagation — https://en.wikipedia.org/w/index.php?title=Fruit_tree_propagation&oldid=1380681311
+  - `agriculture/wp2-fruit-tree-pruning` — Fruit tree pruning — https://en.wikipedia.org/w/index.php?title=Fruit_tree_pruning&oldid=1314043490
+  - `agriculture/wp2-fungiculture` — Fungiculture — https://en.wikipedia.org/w/index.php?title=Fungiculture&oldid=1383604799
+  - `agriculture/wp2-garlic` — Garlic — https://en.wikipedia.org/w/index.php?title=Garlic&oldid=1383089471
+  - `agriculture/wp2-germination` — Germination — https://en.wikipedia.org/w/index.php?title=Germination&oldid=1366328442
+  - `agriculture/wp2-goat-cheese` — Goat cheese — https://en.wikipedia.org/w/index.php?title=Goat_cheese&oldid=1385114045
+  - `agriculture/wp2-goat` — Goat — https://en.wikipedia.org/w/index.php?title=Goat&oldid=1383773403
+  - `agriculture/wp2-grafting` — Grafting — https://en.wikipedia.org/w/index.php?title=Grafting&oldid=1383023781
+  - `agriculture/wp2-granary` — Granary — https://en.wikipedia.org/w/index.php?title=Granary&oldid=1377508764
+  - `agriculture/wp2-grazing` — Grazing — https://en.wikipedia.org/w/index.php?title=Grazing&oldid=1372141391
+  - `agriculture/wp2-greenhouse` — Greenhouse — https://en.wikipedia.org/w/index.php?title=Greenhouse&oldid=1381108882
+  - `agriculture/wp2-hand-pollination` — Hand-pollination — https://en.wikipedia.org/w/index.php?title=Hand-pollination&oldid=1299603914
+  - `agriculture/wp2-harrow-tool` — Harrow (tool) — https://en.wikipedia.org/w/index.php?title=Harrow_(tool)&oldid=1354901263
+  - `agriculture/wp2-hay` — Hay — https://en.wikipedia.org/w/index.php?title=Hay&oldid=1385593864
+  - `agriculture/wp2-hedge` — Hedge — https://en.wikipedia.org/w/index.php?title=Hedge&oldid=1369473697
+  - `agriculture/wp2-hoe-tool` — Hoe (tool) — https://en.wikipedia.org/w/index.php?title=Hoe_(tool)&oldid=1355453974
+  - `agriculture/wp2-hoof` — Hoof — https://en.wikipedia.org/w/index.php?title=Hoof&oldid=1370137427
+  - `agriculture/wp2-horizontal-top-bar-hive` — Horizontal top-bar hive — https://en.wikipedia.org/w/index.php?title=Horizontal_top-bar_hive&oldid=1384054565
+  - `agriculture/wp2-horse-harness` — Horse harness — https://en.wikipedia.org/w/index.php?title=Horse_harness&oldid=1365828129
+  - `agriculture/wp2-horse` — Horse — https://en.wikipedia.org/w/index.php?title=Horse&oldid=1384350711
+  - `agriculture/wp2-horseshoe` — Horseshoe — https://en.wikipedia.org/w/index.php?title=Horseshoe&oldid=1383605013
+  - `agriculture/wp2-hotbed` — Hotbed — https://en.wikipedia.org/w/index.php?title=Hotbed&oldid=1367001369
+  - `agriculture/wp2-hugelkultur` — Hügelkultur — https://en.wikipedia.org/w/index.php?title=H%C3%BCgelkultur&oldid=1380425457
+  - `agriculture/wp2-hydroponics` — Hydroponics — https://en.wikipedia.org/w/index.php?title=Hydroponics&oldid=1379375133
+  - `agriculture/wp2-insecticidal-soap` — Insecticidal soap — https://en.wikipedia.org/w/index.php?title=Insecticidal_soap&oldid=1375924678
+  - `agriculture/wp2-integrated-pest-management` — Integrated pest management — https://en.wikipedia.org/w/index.php?title=Integrated_pest_management&oldid=1384619855
+  - `agriculture/wp2-intercropping` — Intercropping — https://en.wikipedia.org/w/index.php?title=Intercropping&oldid=1360692020
+  - `agriculture/wp2-irrigation` — Irrigation — https://en.wikipedia.org/w/index.php?title=Irrigation&oldid=1385385231
+  - `agriculture/wp2-jerusalem-artichoke` — Jerusalem artichoke — https://en.wikipedia.org/w/index.php?title=Jerusalem_artichoke&oldid=1378057939
+  - `agriculture/wp2-keyline-design` — Keyline design — https://en.wikipedia.org/w/index.php?title=Keyline_design&oldid=1336450266
+  - `agriculture/wp2-langstroth-hive` — Langstroth hive — https://en.wikipedia.org/w/index.php?title=Langstroth_hive&oldid=1380690203
+  - `agriculture/wp2-leek` — Leek — https://en.wikipedia.org/w/index.php?title=Leek&oldid=1384737928
+  - `agriculture/wp2-lentil` — Lentil — https://en.wikipedia.org/w/index.php?title=Lentil&oldid=1383890563
+  - `agriculture/wp2-liming-soil` — Liming (soil) — https://en.wikipedia.org/w/index.php?title=Liming_(soil)&oldid=1319486540
+  - `agriculture/wp2-loam` — Loam — https://en.wikipedia.org/w/index.php?title=Loam&oldid=1380693921
+  - `agriculture/wp2-maize` — Maize — https://en.wikipedia.org/w/index.php?title=Maize&oldid=1383485160
+  - `agriculture/wp2-manure` — Manure — https://en.wikipedia.org/w/index.php?title=Manure&oldid=1385518302
+  - `agriculture/wp2-mastitis` — Mastitis — https://en.wikipedia.org/w/index.php?title=Mastitis&oldid=1360859800
+  - `agriculture/wp2-milking` — Milking — https://en.wikipedia.org/w/index.php?title=Milking&oldid=1382498772
+  - `agriculture/wp2-millet` — Millet — https://en.wikipedia.org/w/index.php?title=Millet&oldid=1384625625
+  - `agriculture/wp2-mule` — Mule — https://en.wikipedia.org/w/index.php?title=Mule&oldid=1383774029
+  - `agriculture/wp2-neem-oil` — Neem oil — https://en.wikipedia.org/w/index.php?title=Neem_oil&oldid=1358350620
+  - `agriculture/wp2-nitrogen-fixation` — Nitrogen fixation — https://en.wikipedia.org/w/index.php?title=Nitrogen_fixation&oldid=1375800692
+  - `agriculture/wp2-no-till-farming` — No-till farming — https://en.wikipedia.org/w/index.php?title=No-till_farming&oldid=1383964903
+  - `agriculture/wp2-noria` — Noria — https://en.wikipedia.org/w/index.php?title=Noria&oldid=1368228833
+  - `agriculture/wp2-oat` — Oat — https://en.wikipedia.org/w/index.php?title=Oat&oldid=1385199432
+  - `agriculture/wp2-okra` — Okra — https://en.wikipedia.org/w/index.php?title=Okra&oldid=1384480256
+  - `agriculture/wp2-onion` — Onion — https://en.wikipedia.org/w/index.php?title=Onion&oldid=1383660076
+  - `agriculture/wp2-open-pollination` — Open pollination — https://en.wikipedia.org/w/index.php?title=Open_pollination&oldid=1314357797
+  - `agriculture/wp2-orchard` — Orchard — https://en.wikipedia.org/w/index.php?title=Orchard&oldid=1385186971
+  - `agriculture/wp2-ox` — Ox — https://en.wikipedia.org/w/index.php?title=Ox&oldid=1374692492
+  - `agriculture/wp2-parsnip` — Parsnip — https://en.wikipedia.org/w/index.php?title=Parsnip&oldid=1382816400
+  - `agriculture/wp2-pasture` — Pasture — https://en.wikipedia.org/w/index.php?title=Pasture&oldid=1365637704
+  - `agriculture/wp2-pea` — Pea — https://en.wikipedia.org/w/index.php?title=Pea&oldid=1383660270
+  - `agriculture/wp2-peanut` — Peanut — https://en.wikipedia.org/w/index.php?title=Peanut&oldid=1384400974
+  - `agriculture/wp2-pearl-millet` — Pearl millet — https://en.wikipedia.org/w/index.php?title=Pearl_millet&oldid=1383401951
+  - `agriculture/wp2-permaculture` — Permaculture — https://en.wikipedia.org/w/index.php?title=Permaculture&oldid=1372441098
+  - `agriculture/wp2-phaseolus-vulgaris` — Phaseolus vulgaris — https://en.wikipedia.org/w/index.php?title=Phaseolus_vulgaris&oldid=1381249768
+  - `agriculture/wp2-phytophthora-infestans` — Phytophthora infestans — https://en.wikipedia.org/w/index.php?title=Phytophthora_infestans&oldid=1384949797
+  - `agriculture/wp2-pig` — Pig — https://en.wikipedia.org/w/index.php?title=Pig&oldid=1385361235
+  - `agriculture/wp2-pigeon-pea` — Pigeon pea — https://en.wikipedia.org/w/index.php?title=Pigeon_pea&oldid=1383661353
+  - `agriculture/wp2-plant-propagation` — Plant propagation — https://en.wikipedia.org/w/index.php?title=Plant_propagation&oldid=1326311675
+  - `agriculture/wp2-plough` — Plough — https://en.wikipedia.org/w/index.php?title=Plough&oldid=1378409125
+  - `agriculture/wp2-polytunnel` — Polytunnel — https://en.wikipedia.org/w/index.php?title=Polytunnel&oldid=1381469215
+  - `agriculture/wp2-potash` — Potash — https://en.wikipedia.org/w/index.php?title=Potash&oldid=1385549092
+  - `agriculture/wp2-potato` — Potato — https://en.wikipedia.org/w/index.php?title=Potato&oldid=1383735624
+  - `agriculture/wp2-pruning` — Pruning — https://en.wikipedia.org/w/index.php?title=Pruning&oldid=1374208553
+  - `agriculture/wp2-pumpkin` — Pumpkin — https://en.wikipedia.org/w/index.php?title=Pumpkin&oldid=1384591730
+  - `agriculture/wp2-pyrethrin` — Pyrethrin — https://en.wikipedia.org/w/index.php?title=Pyrethrin&oldid=1380701531
+  - `agriculture/wp2-quinoa` — Quinoa — https://en.wikipedia.org/w/index.php?title=Quinoa&oldid=1384413071
+  - `agriculture/wp2-reindeer-herding` — Reindeer herding — https://en.wikipedia.org/w/index.php?title=Reindeer_herding&oldid=1383426399
+  - `agriculture/wp2-rhizobia` — Rhizobia — https://en.wikipedia.org/w/index.php?title=Rhizobia&oldid=1355405576
+  - `agriculture/wp2-rice` — Rice — https://en.wikipedia.org/w/index.php?title=Rice&oldid=1384744435
+  - `agriculture/wp2-ricefish-system` — Rice–fish system — https://en.wikipedia.org/w/index.php?title=Rice%E2%80%93fish_system&oldid=1369113740
+  - `agriculture/wp2-rootstock` — Rootstock — https://en.wikipedia.org/w/index.php?title=Rootstock&oldid=1385513923
+  - `agriculture/wp2-rotational-grazing` — Rotational grazing — https://en.wikipedia.org/w/index.php?title=Rotational_grazing&oldid=1378453283
+  - `agriculture/wp2-row-cover` — Row cover — https://en.wikipedia.org/w/index.php?title=Row_cover&oldid=1297900311
+  - `agriculture/wp2-ruminal-tympany` — Ruminal tympany — https://en.wikipedia.org/w/index.php?title=Ruminal_tympany&oldid=1366392464
+  - `agriculture/wp2-rutabaga` — Rutabaga — https://en.wikipedia.org/w/index.php?title=Rutabaga&oldid=1382502534
+  - `agriculture/wp2-rye` — Rye — https://en.wikipedia.org/w/index.php?title=Rye&oldid=1383735922
+  - `agriculture/wp2-scythe` — Scythe — https://en.wikipedia.org/w/index.php?title=Scythe&oldid=1383239642
+  - `agriculture/wp2-season-extension` — Season extension — https://en.wikipedia.org/w/index.php?title=Season_extension&oldid=1382282531
+  - `agriculture/wp2-seed-drill` — Seed drill — https://en.wikipedia.org/w/index.php?title=Seed_drill&oldid=1347973365
+  - `agriculture/wp2-seedling` — Seedling — https://en.wikipedia.org/w/index.php?title=Seedling&oldid=1359600608
+  - `agriculture/wp2-shadoof` — Shadoof — https://en.wikipedia.org/w/index.php?title=Shadoof&oldid=1381243097
+  - `agriculture/wp2-sheep-shearing` — Sheep shearing — https://en.wikipedia.org/w/index.php?title=Sheep_shearing&oldid=1340758668
+  - `agriculture/wp2-sheep` — Sheep — https://en.wikipedia.org/w/index.php?title=Sheep&oldid=1383775824
+  - `agriculture/wp2-sickle` — Sickle — https://en.wikipedia.org/w/index.php?title=Sickle&oldid=1345050343
+  - `agriculture/wp2-silage` — Silage — https://en.wikipedia.org/w/index.php?title=Silage&oldid=1381546141
+  - `agriculture/wp2-slug` — Slug — https://en.wikipedia.org/w/index.php?title=Slug&oldid=1383680269
+  - `agriculture/wp2-soil-erosion` — Soil erosion — https://en.wikipedia.org/w/index.php?title=Soil_erosion&oldid=1381896013
+  - `agriculture/wp2-soil-fertility` — Soil fertility — https://en.wikipedia.org/w/index.php?title=Soil_fertility&oldid=1374806131
+  - `agriculture/wp2-soil-ph` — Soil pH — https://en.wikipedia.org/w/index.php?title=Soil_pH&oldid=1377219732
+  - `agriculture/wp2-soil-test` — Soil test — https://en.wikipedia.org/w/index.php?title=Soil_test&oldid=1374115784
+  - `agriculture/wp2-soil` — Soil — https://en.wikipedia.org/w/index.php?title=Soil&oldid=1385366388
+  - `agriculture/wp2-sorghum` — Sorghum — https://en.wikipedia.org/w/index.php?title=Sorghum&oldid=1383739350
+  - `agriculture/wp2-sowing` — Sowing — https://en.wikipedia.org/w/index.php?title=Sowing&oldid=1364804020
+  - `agriculture/wp2-soybean` — Soybean — https://en.wikipedia.org/w/index.php?title=Soybean&oldid=1384861380
+  - `agriculture/wp2-spade` — Spade — https://en.wikipedia.org/w/index.php?title=Spade&oldid=1371526350
+  - `agriculture/wp2-square-foot-gardening` — Square foot gardening — https://en.wikipedia.org/w/index.php?title=Square_foot_gardening&oldid=1331913679
+  - `agriculture/wp2-surface-irrigation` — Surface irrigation — https://en.wikipedia.org/w/index.php?title=Surface_irrigation&oldid=1297901839
+  - `agriculture/wp2-swale-landform` — Swale (landform) — https://en.wikipedia.org/w/index.php?title=Swale_(landform)&oldid=1385528360
+  - `agriculture/wp2-swarming-honey-bee` — Swarming (honey bee) — https://en.wikipedia.org/w/index.php?title=Swarming_(honey_bee)&oldid=1385106590
+  - `agriculture/wp2-sweet-potato` — Sweet potato — https://en.wikipedia.org/w/index.php?title=Sweet_potato&oldid=1384588876
+  - `agriculture/wp2-system-of-rice-intensification` — System of Rice Intensification — https://en.wikipedia.org/w/index.php?title=System_of_Rice_Intensification&oldid=1380707162
+  - `agriculture/wp2-terra-preta` — Terra preta — https://en.wikipedia.org/w/index.php?title=Terra_preta&oldid=1383151067
+  - `agriculture/wp2-terrace-earthworks` — Terrace (earthworks) — https://en.wikipedia.org/w/index.php?title=Terrace_(earthworks)&oldid=1382411239
+  - `agriculture/wp2-three-field-system` — Three-field system — https://en.wikipedia.org/w/index.php?title=Three-field_system&oldid=1347626094
+  - `agriculture/wp2-threshing` — Threshing — https://en.wikipedia.org/w/index.php?title=Threshing&oldid=1377570741
+  - `agriculture/wp2-tilapia` — Tilapia — https://en.wikipedia.org/w/index.php?title=Tilapia&oldid=1372345427
+  - `agriculture/wp2-tillage` — Tillage — https://en.wikipedia.org/w/index.php?title=Tillage&oldid=1385615690
+  - `agriculture/wp2-tomato` — Tomato — https://en.wikipedia.org/w/index.php?title=Tomato&oldid=1384241377
+  - `agriculture/wp2-transplanting` — Transplanting — https://en.wikipedia.org/w/index.php?title=Transplanting&oldid=1384724625
+  - `agriculture/wp2-trap-crop` — Trap crop — https://en.wikipedia.org/w/index.php?title=Trap_crop&oldid=1336441798
+  - `agriculture/wp2-treadle-pump` — Treadle pump — https://en.wikipedia.org/w/index.php?title=Treadle_pump&oldid=1355501372
+  - `agriculture/wp2-turnip` — Turnip — https://en.wikipedia.org/w/index.php?title=Turnip&oldid=1382940895
+  - `agriculture/wp2-varroa-destructor` — Varroa destructor — https://en.wikipedia.org/w/index.php?title=Varroa_destructor&oldid=1382847920
+  - `agriculture/wp2-vicia-faba` — Vicia faba — https://en.wikipedia.org/w/index.php?title=Vicia_faba&oldid=1382938587
+  - `agriculture/wp2-vicia-sativa` — Vicia sativa — https://en.wikipedia.org/w/index.php?title=Vicia_sativa&oldid=1374338114
+  - `agriculture/wp2-virulent-newcastle-disease` — Virulent Newcastle disease — https://en.wikipedia.org/w/index.php?title=Virulent_Newcastle_disease&oldid=1379849877
+  - `agriculture/wp2-water-buffalo` — Water buffalo — https://en.wikipedia.org/w/index.php?title=Water_buffalo&oldid=1381331254
+  - `agriculture/wp2-weed-control` — Weed control — https://en.wikipedia.org/w/index.php?title=Weed_control&oldid=1378427171
+  - `agriculture/wp2-western-honey-bee` — Western honey bee — https://en.wikipedia.org/w/index.php?title=Western_honey_bee&oldid=1378342627
+  - `agriculture/wp2-wheat` — Wheat — https://en.wikipedia.org/w/index.php?title=Wheat&oldid=1383635584
+  - `agriculture/wp2-windbreak` — Windbreak — https://en.wikipedia.org/w/index.php?title=Windbreak&oldid=1380322637
+  - `agriculture/wp2-winnowing` — Winnowing — https://en.wikipedia.org/w/index.php?title=Winnowing&oldid=1337582030
+  - `agriculture/wp2-wood-ash` — Wood ash — https://en.wikipedia.org/w/index.php?title=Wood_ash&oldid=1379373761
+  - `agriculture/wp2-yoke` — Yoke — https://en.wikipedia.org/w/index.php?title=Yoke&oldid=1375996908

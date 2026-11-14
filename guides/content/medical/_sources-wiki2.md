@@ -1,0 +1,308 @@
+# Sources added by the wiki2 sweep for the `medical` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `medical/wb2-emergency-medicine-altered-mental-status` — Emergency Medicine: Altered mental status — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Altered_mental_status&oldid=3552105
+  - `medical/wb2-emergency-medicine-arterial` — Emergency Medicine: Arterial — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Arterial&oldid=4469304
+  - `medical/wb2-emergency-medicine-blood-and-fluids` — Emergency Medicine: Blood and Fluids — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Blood_and_Fluids&oldid=4678721
+  - `medical/wb2-emergency-medicine-blood-transfusion` — Emergency Medicine: Blood Transfusion — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Blood_Transfusion&oldid=3254447
+  - `medical/wb2-emergency-medicine-cardiopulmonary-arrest` — Emergency Medicine: Cardiopulmonary Arrest — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Cardiopulmonary_Arrest&oldid=3255186
+  - `medical/wb2-emergency-medicine-chest-pain` — Emergency Medicine: Chest pain — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Chest_pain&oldid=3255167
+  - `medical/wb2-emergency-medicine-dehydration` — Emergency Medicine: Dehydration — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Dehydration&oldid=3255152
+  - `medical/wb2-emergency-medicine-diarrhea` — Emergency Medicine: Diarrhea — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Diarrhea&oldid=3255306
+  - `medical/wb2-emergency-medicine-dysbarism` — Emergency Medicine: Dysbarism — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Dysbarism&oldid=3255305
+  - `medical/wb2-emergency-medicine-hemoptysis` — Emergency Medicine: Hemoptysis — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Hemoptysis&oldid=3255301
+  - `medical/wb2-emergency-medicine-hypertensive-emergencies` — Emergency Medicine: Hypertensive Emergencies — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Hypertensive_Emergencies&oldid=4673049
+  - `medical/wb2-emergency-medicine-pediatric-airway-emergencies` — Emergency Medicine: Pediatric Airway Emergencies — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Pediatric_Airway_Emergencies&oldid=4216806
+  - `medical/wb2-emergency-medicine-pediatric-rehydration` — Emergency Medicine: Pediatric Rehydration — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Pediatric_Rehydration&oldid=3255293
+  - `medical/wb2-emergency-medicine-sepsis` — Emergency Medicine: Sepsis — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Sepsis&oldid=4384781
+  - `medical/wb2-emergency-medicine-the-dirty-bomb` — Emergency Medicine: The Dirty Bomb — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/The_Dirty_Bomb&oldid=3255336
+  - `medical/wb2-emergency-medicine-wheezing` — Emergency Medicine: Wheezing — https://en.wikibooks.org/w/index.php?title=Emergency_Medicine/Wheezing&oldid=3255345
+  - `medical/wb2-horticulture-urushiol-dermatitis` — Poison Ivy, Oak and Sumac Rash (Wikibooks Horticulture) — https://en.wikibooks.org/w/index.php?title=Horticulture/Urushiol-induced_contact_dermatitis&oldid=3235561
+  - `medical/wb2-nursing-study-guide-part1` — Nursing Study Guide (Wikibooks): Nursing Care by Body System (part 1 of 4: Care of Cardiovascular Needs, Care of Endocrine Needs, Care of Gastrointestinal Needs…) — https://en.wikibooks.org/w/index.php?title=Nursing_Study_Guide/Care_of_Cardiovascular_Needs&oldid=4109788 — pages: Nursing Study Guide/Care of Cardiovascular Needs (rev 4109788); Nursing Study Guide/Care of Endocrine Needs (rev 2507029); Nursing Study Guide/Care of Gastrointestinal Needs (rev 3831501); Nursing Study Guide/Care of Haematological Needs (rev 2504343); Nursing Study Guide/Care of Immuno-Lymphatic Needs (rev 4672067); Nursing Study Guide/Care of Mental Health Needs (rev 3141500); Nursing Study Guide/Care of Musculoskeletal Needs (rev 4495264); Nursing Study Guide/Care of Neurosensory Needs (rev 3459463)
+  - `medical/wb2-nursing-study-guide-part2` — Nursing Study Guide (Wikibooks): Nursing Care by Body System (part 2 of 4: Care of Skin Needs, Care of Uro-Renal Needs) — https://en.wikibooks.org/w/index.php?title=Nursing_Study_Guide/Care_of_Skin_Needs&oldid=4538142 — pages: Nursing Study Guide/Care of Skin Needs (rev 4538142); Nursing Study Guide/Care of Uro-Renal Needs (rev 4196568)
+  - `medical/wb2-nursing-study-guide-part3` — Nursing Study Guide (Wikibooks): Nursing Care by Body System (part 3 of 4: Causes of disease) — https://en.wikibooks.org/w/index.php?title=Nursing_Study_Guide/Causes_of_disease&oldid=4288266
+  - `medical/wb2-nursing-study-guide-part4` — Nursing Study Guide (Wikibooks): Nursing Care by Body System (part 4 of 4: Nutritional Issues) — https://en.wikibooks.org/w/index.php?title=Nursing_Study_Guide/Nutritional_Issues&oldid=3835217
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `medical/wp2-abrasion-medicine` — Abrasion (medicine) — https://en.wikipedia.org/w/index.php?title=Abrasion_(medicine)&oldid=1338570539
+  - `medical/wp2-abscess` — Abscess — https://en.wikipedia.org/w/index.php?title=Abscess&oldid=1384964100
+  - `medical/wp2-activated-carbon` — Activated carbon — https://en.wikipedia.org/w/index.php?title=Activated_carbon&oldid=1384338766
+  - `medical/wp2-african-trypanosomiasis` — African trypanosomiasis — https://en.wikipedia.org/w/index.php?title=African_trypanosomiasis&oldid=1384412785
+  - `medical/wp2-albendazole` — Albendazole — https://en.wikipedia.org/w/index.php?title=Albendazole&oldid=1335702995
+  - `medical/wp2-alcohol-intoxication` — Alcohol intoxication — https://en.wikipedia.org/w/index.php?title=Alcohol_intoxication&oldid=1383598749
+  - `medical/wp2-alcohol-withdrawal-syndrome` — Alcohol withdrawal syndrome — https://en.wikipedia.org/w/index.php?title=Alcohol_withdrawal_syndrome&oldid=1384521994
+  - `medical/wp2-amoebiasis` — Amoebiasis — https://en.wikipedia.org/w/index.php?title=Amoebiasis&oldid=1379014656
+  - `medical/wp2-amoxicillin` — Amoxicillin — https://en.wikipedia.org/w/index.php?title=Amoxicillin&oldid=1384634285
+  - `medical/wp2-amputation` — Amputation — https://en.wikipedia.org/w/index.php?title=Amputation&oldid=1385277455
+  - `medical/wp2-analgesic` — Analgesic — https://en.wikipedia.org/w/index.php?title=Analgesic&oldid=1385355650
+  - `medical/wp2-anemia` — Anemia — https://en.wikipedia.org/w/index.php?title=Anemia&oldid=1383503676
+  - `medical/wp2-angina` — Angina — https://en.wikipedia.org/w/index.php?title=Angina&oldid=1382805029
+  - `medical/wp2-anthrax` — Anthrax — https://en.wikipedia.org/w/index.php?title=Anthrax&oldid=1383853476
+  - `medical/wp2-antihistamine` — Antihistamine — https://en.wikipedia.org/w/index.php?title=Antihistamine&oldid=1378285567
+  - `medical/wp2-antiseptic` — Antiseptic — https://en.wikipedia.org/w/index.php?title=Antiseptic&oldid=1371544045
+  - `medical/wp2-anxiety-disorder` — Anxiety disorder — https://en.wikipedia.org/w/index.php?title=Anxiety_disorder&oldid=1383391545
+  - `medical/wp2-appendicitis` — Appendicitis — https://en.wikipedia.org/w/index.php?title=Appendicitis&oldid=1380212287
+  - `medical/wp2-arsenic-poisoning` — Arsenic poisoning — https://en.wikipedia.org/w/index.php?title=Arsenic_poisoning&oldid=1382188298
+  - `medical/wp2-artemether-lumefantrine` — Artemether/lumefantrine — https://en.wikipedia.org/w/index.php?title=Artemether/lumefantrine&oldid=1369227849
+  - `medical/wp2-artemisinin` — Artemisinin — https://en.wikipedia.org/w/index.php?title=Artemisinin&oldid=1378911221
+  - `medical/wp2-artificial-ventilation` — Artificial ventilation — https://en.wikipedia.org/w/index.php?title=Artificial_ventilation&oldid=1372256186
+  - `medical/wp2-ascariasis` — Ascariasis — https://en.wikipedia.org/w/index.php?title=Ascariasis&oldid=1367018367
+  - `medical/wp2-asepsis` — Asepsis — https://en.wikipedia.org/w/index.php?title=Asepsis&oldid=1337709363
+  - `medical/wp2-aspirin` — Aspirin — https://en.wikipedia.org/w/index.php?title=Aspirin&oldid=1384762736
+  - `medical/wp2-athletes-foot` — Athlete's foot — https://en.wikipedia.org/w/index.php?title=Athlete%27s_foot&oldid=1378812472
+  - `medical/wp2-autoclave` — Autoclave — https://en.wikipedia.org/w/index.php?title=Autoclave&oldid=1376546807
+  - `medical/wp2-automated-external-defibrillator` — Automated external defibrillator — https://en.wikipedia.org/w/index.php?title=Automated_external_defibrillator&oldid=1361137609
+  - `medical/wp2-azithromycin` — Azithromycin — https://en.wikipedia.org/w/index.php?title=Azithromycin&oldid=1367373742
+  - `medical/wp2-bag-valve-mask` — Bag valve mask — https://en.wikipedia.org/w/index.php?title=Bag_valve_mask&oldid=1372837547
+  - `medical/wp2-bandage` — Bandage — https://en.wikipedia.org/w/index.php?title=Bandage&oldid=1381761366
+  - `medical/wp2-benzodiazepine-withdrawal-syndrome` — Benzodiazepine withdrawal syndrome — https://en.wikipedia.org/w/index.php?title=Benzodiazepine_withdrawal_syndrome&oldid=1373095815
+  - `medical/wp2-birth-control` — Birth control — https://en.wikipedia.org/w/index.php?title=Birth_control&oldid=1384125286
+  - `medical/wp2-blister` — Blister — https://en.wikipedia.org/w/index.php?title=Blister&oldid=1384861659
+  - `medical/wp2-blood-pressure` — Blood pressure — https://en.wikipedia.org/w/index.php?title=Blood_pressure&oldid=1382714302
+  - `medical/wp2-botulism` — Botulism — https://en.wikipedia.org/w/index.php?title=Botulism&oldid=1384617869
+  - `medical/wp2-breastfeeding` — Breastfeeding — https://en.wikipedia.org/w/index.php?title=Breastfeeding&oldid=1384703950
+  - `medical/wp2-breech-birth` — Breech birth — https://en.wikipedia.org/w/index.php?title=Breech_birth&oldid=1366023139
+  - `medical/wp2-bronchitis` — Bronchitis — https://en.wikipedia.org/w/index.php?title=Bronchitis&oldid=1384955313
+  - `medical/wp2-brucellosis` — Brucellosis — https://en.wikipedia.org/w/index.php?title=Brucellosis&oldid=1381611371
+  - `medical/wp2-bruise` — Bruise — https://en.wikipedia.org/w/index.php?title=Bruise&oldid=1383509644
+  - `medical/wp2-bubonic-plague` — Bubonic plague — https://en.wikipedia.org/w/index.php?title=Bubonic_plague&oldid=1379625177
+  - `medical/wp2-campylobacteriosis` — Campylobacteriosis — https://en.wikipedia.org/w/index.php?title=Campylobacteriosis&oldid=1385250975
+  - `medical/wp2-candidiasis` — Candidiasis — https://en.wikipedia.org/w/index.php?title=Candidiasis&oldid=1384253413
+  - `medical/wp2-cefalexin` — Cefalexin — https://en.wikipedia.org/w/index.php?title=Cefalexin&oldid=1383980377
+  - `medical/wp2-cervical-collar` — Cervical collar — https://en.wikipedia.org/w/index.php?title=Cervical_collar&oldid=1372396646
+  - `medical/wp2-chagas-disease` — Chagas disease — https://en.wikipedia.org/w/index.php?title=Chagas_disease&oldid=1383603471
+  - `medical/wp2-chickenpox` — Chickenpox — https://en.wikipedia.org/w/index.php?title=Chickenpox&oldid=1383515406
+  - `medical/wp2-chikungunya` — Chikungunya — https://en.wikipedia.org/w/index.php?title=Chikungunya&oldid=1385077877
+  - `medical/wp2-chilblains` — Chilblains — https://en.wikipedia.org/w/index.php?title=Chilblains&oldid=1378437455
+  - `medical/wp2-chlamydia` — Chlamydia — https://en.wikipedia.org/w/index.php?title=Chlamydia&oldid=1384333426
+  - `medical/wp2-chlorhexidine` — Chlorhexidine — https://en.wikipedia.org/w/index.php?title=Chlorhexidine&oldid=1382997840
+  - `medical/wp2-chloroquine` — Chloroquine — https://en.wikipedia.org/w/index.php?title=Chloroquine&oldid=1368924934
+  - `medical/wp2-ciprofloxacin` — Ciprofloxacin — https://en.wikipedia.org/w/index.php?title=Ciprofloxacin&oldid=1358476040
+  - `medical/wp2-common-cold` — Common cold — https://en.wikipedia.org/w/index.php?title=Common_cold&oldid=1384914999
+  - `medical/wp2-compartment-syndrome` — Compartment syndrome — https://en.wikipedia.org/w/index.php?title=Compartment_syndrome&oldid=1360632526
+  - `medical/wp2-conjunctivitis` — Conjunctivitis — https://en.wikipedia.org/w/index.php?title=Conjunctivitis&oldid=1384598133
+  - `medical/wp2-contact-tracing` — Contact tracing — https://en.wikipedia.org/w/index.php?title=Contact_tracing&oldid=1382015517
+  - `medical/wp2-cricothyrotomy` — Cricothyrotomy — https://en.wikipedia.org/w/index.php?title=Cricothyrotomy&oldid=1373841541
+  - `medical/wp2-crush-syndrome` — Crush syndrome — https://en.wikipedia.org/w/index.php?title=Crush_syndrome&oldid=1383486925
+  - `medical/wp2-cryptosporidiosis` — Cryptosporidiosis — https://en.wikipedia.org/w/index.php?title=Cryptosporidiosis&oldid=1357435405
+  - `medical/wp2-crystal-violet` — Crystal violet — https://en.wikipedia.org/w/index.php?title=Crystal_violet&oldid=1385287882
+  - `medical/wp2-cysticercosis` — Cysticercosis — https://en.wikipedia.org/w/index.php?title=Cysticercosis&oldid=1382279504
+  - `medical/wp2-dakins-solution` — Dakin's solution — https://en.wikipedia.org/w/index.php?title=Dakin%27s_solution&oldid=1305296806
+  - `medical/wp2-debridement` — Debridement — https://en.wikipedia.org/w/index.php?title=Debridement&oldid=1371459697
+  - `medical/wp2-deet` — DEET — https://en.wikipedia.org/w/index.php?title=DEET&oldid=1381389212
+  - `medical/wp2-delirium` — Delirium — https://en.wikipedia.org/w/index.php?title=Delirium&oldid=1383853737
+  - `medical/wp2-dengue-fever` — Dengue fever — https://en.wikipedia.org/w/index.php?title=Dengue_fever&oldid=1385273796
+  - `medical/wp2-dental-extraction` — Dental extraction — https://en.wikipedia.org/w/index.php?title=Dental_extraction&oldid=1384671827
+  - `medical/wp2-dermatophytosis` — Dermatophytosis — https://en.wikipedia.org/w/index.php?title=Dermatophytosis&oldid=1384593892
+  - `medical/wp2-diabetes` — Diabetes — https://en.wikipedia.org/w/index.php?title=Diabetes&oldid=1385164149
+  - `medical/wp2-diphenhydramine` — Diphenhydramine — https://en.wikipedia.org/w/index.php?title=Diphenhydramine&oldid=1384710294
+  - `medical/wp2-diphtheria` — Diphtheria — https://en.wikipedia.org/w/index.php?title=Diphtheria&oldid=1379151211
+  - `medical/wp2-dislocated-shoulder` — Dislocated shoulder — https://en.wikipedia.org/w/index.php?title=Dislocated_shoulder&oldid=1379862329
+  - `medical/wp2-doxycycline` — Doxycycline — https://en.wikipedia.org/w/index.php?title=Doxycycline&oldid=1377571488
+  - `medical/wp2-dracunculiasis` — Dracunculiasis — https://en.wikipedia.org/w/index.php?title=Dracunculiasis&oldid=1383908176
+  - `medical/wp2-dressing-medicine` — Dressing (medicine) — https://en.wikipedia.org/w/index.php?title=Dressing_(medicine)&oldid=1373620149
+  - `medical/wp2-eclampsia` — Eclampsia — https://en.wikipedia.org/w/index.php?title=Eclampsia&oldid=1385317168
+  - `medical/wp2-ectopic-pregnancy` — Ectopic pregnancy — https://en.wikipedia.org/w/index.php?title=Ectopic_pregnancy&oldid=1380134701
+  - `medical/wp2-epidemic-typhus` — Epidemic typhus — https://en.wikipedia.org/w/index.php?title=Epidemic_typhus&oldid=1377186057
+  - `medical/wp2-epilepsy` — Epilepsy — https://en.wikipedia.org/w/index.php?title=Epilepsy&oldid=1385404158
+  - `medical/wp2-epinephrine-autoinjector` — Epinephrine autoinjector — https://en.wikipedia.org/w/index.php?title=Epinephrine_autoinjector&oldid=1372025025
+  - `medical/wp2-ergotism` — Ergotism — https://en.wikipedia.org/w/index.php?title=Ergotism&oldid=1380965001
+  - `medical/wp2-febrile-seizure` — Febrile seizure — https://en.wikipedia.org/w/index.php?title=Febrile_seizure&oldid=1379846083
+  - `medical/wp2-flail-chest` — Flail chest — https://en.wikipedia.org/w/index.php?title=Flail_chest&oldid=1374833111
+  - `medical/wp2-folate-deficiency` — Folate deficiency — https://en.wikipedia.org/w/index.php?title=Folate_deficiency&oldid=1380898816
+  - `medical/wp2-foodborne-illness` — Foodborne illness — https://en.wikipedia.org/w/index.php?title=Foodborne_illness&oldid=1383368301
+  - `medical/wp2-gangrene` — Gangrene — https://en.wikipedia.org/w/index.php?title=Gangrene&oldid=1373560588
+  - `medical/wp2-gas-gangrene` — Gas gangrene — https://en.wikipedia.org/w/index.php?title=Gas_gangrene&oldid=1381176000
+  - `medical/wp2-gastroenteritis` — Gastroenteritis — https://en.wikipedia.org/w/index.php?title=Gastroenteritis&oldid=1378815233
+  - `medical/wp2-glasgow-coma-scale` — Glasgow Coma Scale — https://en.wikipedia.org/w/index.php?title=Glasgow_Coma_Scale&oldid=1381313431
+  - `medical/wp2-goitre` — Goitre — https://en.wikipedia.org/w/index.php?title=Goitre&oldid=1382510192
+  - `medical/wp2-gonorrhea` — Gonorrhea — https://en.wikipedia.org/w/index.php?title=Gonorrhea&oldid=1381617786
+  - `medical/wp2-gunshot-wound` — Gunshot wound — https://en.wikipedia.org/w/index.php?title=Gunshot_wound&oldid=1381823557
+  - `medical/wp2-hantavirus-pulmonary-syndrome` — Hantavirus pulmonary syndrome — https://en.wikipedia.org/w/index.php?title=Hantavirus_pulmonary_syndrome&oldid=1364318176
+  - `medical/wp2-head-louse` — Head louse — https://en.wikipedia.org/w/index.php?title=Head_louse&oldid=1361830401
+  - `medical/wp2-heart-failure` — Heart failure — https://en.wikipedia.org/w/index.php?title=Heart_failure&oldid=1380650795
+  - `medical/wp2-heimlich-maneuver` — Heimlich maneuver — https://en.wikipedia.org/w/index.php?title=Heimlich_maneuver&oldid=1378898776
+  - `medical/wp2-helminthiasis` — Helminthiasis — https://en.wikipedia.org/w/index.php?title=Helminthiasis&oldid=1384143061
+  - `medical/wp2-hemostasis` — Hemostasis — https://en.wikipedia.org/w/index.php?title=Hemostasis&oldid=1371226531
+  - `medical/wp2-hemothorax` — Hemothorax — https://en.wikipedia.org/w/index.php?title=Hemothorax&oldid=1373904863
+  - `medical/wp2-hepatitis-b` — Hepatitis B — https://en.wikipedia.org/w/index.php?title=Hepatitis_B&oldid=1380236775
+  - `medical/wp2-hepatitis-e` — Hepatitis E — https://en.wikipedia.org/w/index.php?title=Hepatitis_E&oldid=1377426262
+  - `medical/wp2-herd-immunity` — Herd immunity — https://en.wikipedia.org/w/index.php?title=Herd_immunity&oldid=1360683633
+  - `medical/wp2-hiv-aids` — HIV/AIDS — https://en.wikipedia.org/w/index.php?title=HIV/AIDS&oldid=1381619041
+  - `medical/wp2-honey` — Honey — https://en.wikipedia.org/w/index.php?title=Honey&oldid=1384928704
+  - `medical/wp2-hookworm-infection` — Hookworm infection — https://en.wikipedia.org/w/index.php?title=Hookworm_infection&oldid=1385496805
+  - `medical/wp2-hydrogen-peroxide` — Hydrogen peroxide — https://en.wikipedia.org/w/index.php?title=Hydrogen_peroxide&oldid=1379993848
+  - `medical/wp2-hypertension` — Hypertension — https://en.wikipedia.org/w/index.php?title=Hypertension&oldid=1385093939
+  - `medical/wp2-hyponatremia` — Hyponatremia — https://en.wikipedia.org/w/index.php?title=Hyponatremia&oldid=1383730606
+  - `medical/wp2-ibuprofen` — Ibuprofen — https://en.wikipedia.org/w/index.php?title=Ibuprofen&oldid=1380458618
+  - `medical/wp2-immersion-foot-syndromes` — Immersion foot syndromes — https://en.wikipedia.org/w/index.php?title=Immersion_foot_syndromes&oldid=1292294986
+  - `medical/wp2-impetigo` — Impetigo — https://en.wikipedia.org/w/index.php?title=Impetigo&oldid=1378616842
+  - `medical/wp2-influenza` — Influenza — https://en.wikipedia.org/w/index.php?title=Influenza&oldid=1385080582
+  - `medical/wp2-ingrown-nail` — Ingrown nail — https://en.wikipedia.org/w/index.php?title=Ingrown_nail&oldid=1384701223
+  - `medical/wp2-inguinal-hernia` — Inguinal hernia — https://en.wikipedia.org/w/index.php?title=Inguinal_hernia&oldid=1382441004
+  - `medical/wp2-insect-repellent` — Insect repellent — https://en.wikipedia.org/w/index.php?title=Insect_repellent&oldid=1383855778
+  - `medical/wp2-insulin-medication` — Insulin (medication) — https://en.wikipedia.org/w/index.php?title=Insulin_(medication)&oldid=1385111008
+  - `medical/wp2-intraosseous-infusion` — Intraosseous infusion — https://en.wikipedia.org/w/index.php?title=Intraosseous_infusion&oldid=1372681607
+  - `medical/wp2-intravenous-therapy` — Intravenous therapy — https://en.wikipedia.org/w/index.php?title=Intravenous_therapy&oldid=1375257858
+  - `medical/wp2-iodine-deficiency` — Iodine deficiency — https://en.wikipedia.org/w/index.php?title=Iodine_deficiency&oldid=1379673955
+  - `medical/wp2-iron-deficiency-anemia` — Iron-deficiency anemia — https://en.wikipedia.org/w/index.php?title=Iron-deficiency_anemia&oldid=1382736267
+  - `medical/wp2-isolation-health-care` — Isolation (health care) — https://en.wikipedia.org/w/index.php?title=Isolation_(health_care)&oldid=1385499750
+  - `medical/wp2-ivermectin` — Ivermectin — https://en.wikipedia.org/w/index.php?title=Ivermectin&oldid=1385332113
+  - `medical/wp2-japanese-encephalitis` — Japanese encephalitis — https://en.wikipedia.org/w/index.php?title=Japanese_encephalitis&oldid=1376533036
+  - `medical/wp2-joint-dislocation` — Joint dislocation — https://en.wikipedia.org/w/index.php?title=Joint_dislocation&oldid=1381540205
+  - `medical/wp2-kangaroo-care` — Kangaroo care — https://en.wikipedia.org/w/index.php?title=Kangaroo_care&oldid=1380989716
+  - `medical/wp2-kidney-stone-disease` — Kidney stone disease — https://en.wikipedia.org/w/index.php?title=Kidney_stone_disease&oldid=1384857746
+  - `medical/wp2-kwashiorkor` — Kwashiorkor — https://en.wikipedia.org/w/index.php?title=Kwashiorkor&oldid=1383206999
+  - `medical/wp2-lead-poisoning` — Lead poisoning — https://en.wikipedia.org/w/index.php?title=Lead_poisoning&oldid=1384524335
+  - `medical/wp2-leishmaniasis` — Leishmaniasis — https://en.wikipedia.org/w/index.php?title=Leishmaniasis&oldid=1381619920
+  - `medical/wp2-leprosy` — Leprosy — https://en.wikipedia.org/w/index.php?title=Leprosy&oldid=1383948702
+  - `medical/wp2-lightning-injury` — Lightning injury — https://en.wikipedia.org/w/index.php?title=Lightning_injury&oldid=1375572459
+  - `medical/wp2-listeriosis` — Listeriosis — https://en.wikipedia.org/w/index.php?title=Listeriosis&oldid=1379849010
+  - `medical/wp2-loperamide` — Loperamide — https://en.wikipedia.org/w/index.php?title=Loperamide&oldid=1381980652
+  - `medical/wp2-lymphatic-filariasis` — Lymphatic filariasis — https://en.wikipedia.org/w/index.php?title=Lymphatic_filariasis&oldid=1383938119
+  - `medical/wp2-maggot-therapy` — Maggot therapy — https://en.wikipedia.org/w/index.php?title=Maggot_therapy&oldid=1376257906
+  - `medical/wp2-major-depressive-disorder` — Major depressive disorder — https://en.wikipedia.org/w/index.php?title=Major_depressive_disorder&oldid=1385464110
+  - `medical/wp2-malnutrition` — Malnutrition — https://en.wikipedia.org/w/index.php?title=Malnutrition&oldid=1385102236
+  - `medical/wp2-marasmus` — Marasmus — https://en.wikipedia.org/w/index.php?title=Marasmus&oldid=1381984441
+  - `medical/wp2-mebendazole` — Mebendazole — https://en.wikipedia.org/w/index.php?title=Mebendazole&oldid=1378455190
+  - `medical/wp2-medical-glove` — Medical glove — https://en.wikipedia.org/w/index.php?title=Medical_glove&oldid=1374644527
+  - `medical/wp2-medical-thermometer` — Medical thermometer — https://en.wikipedia.org/w/index.php?title=Medical_thermometer&oldid=1383251814
+  - `medical/wp2-meningitis` — Meningitis — https://en.wikipedia.org/w/index.php?title=Meningitis&oldid=1384638649
+  - `medical/wp2-meningococcal-disease` — Meningococcal disease — https://en.wikipedia.org/w/index.php?title=Meningococcal_disease&oldid=1384685872
+  - `medical/wp2-menstrual-cup` — Menstrual cup — https://en.wikipedia.org/w/index.php?title=Menstrual_cup&oldid=1384981303
+  - `medical/wp2-mercury-poisoning` — Mercury poisoning — https://en.wikipedia.org/w/index.php?title=Mercury_poisoning&oldid=1381083587
+  - `medical/wp2-methanol-toxicity` — Methanol toxicity — https://en.wikipedia.org/w/index.php?title=Methanol_toxicity&oldid=1353457504
+  - `medical/wp2-metronidazole` — Metronidazole — https://en.wikipedia.org/w/index.php?title=Metronidazole&oldid=1384732420
+  - `medical/wp2-midwifery` — Midwifery — https://en.wikipedia.org/w/index.php?title=Midwifery&oldid=1372138016
+  - `medical/wp2-miscarriage` — Miscarriage — https://en.wikipedia.org/w/index.php?title=Miscarriage&oldid=1380562669
+  - `medical/wp2-mosquito-net` — Mosquito net — https://en.wikipedia.org/w/index.php?title=Mosquito_net&oldid=1372173435
+  - `medical/wp2-mpox` — Mpox — https://en.wikipedia.org/w/index.php?title=Mpox&oldid=1384359140
+  - `medical/wp2-mumps` — Mumps — https://en.wikipedia.org/w/index.php?title=Mumps&oldid=1383403600
+  - `medical/wp2-murine-typhus` — Murine typhus — https://en.wikipedia.org/w/index.php?title=Murine_typhus&oldid=1376742635
+  - `medical/wp2-mushroom-poisoning` — Mushroom poisoning — https://en.wikipedia.org/w/index.php?title=Mushroom_poisoning&oldid=1384875532
+  - `medical/wp2-n95-respirator` — N95 respirator — https://en.wikipedia.org/w/index.php?title=N95_respirator&oldid=1377010161
+  - `medical/wp2-nasopharyngeal-airway` — Nasopharyngeal airway — https://en.wikipedia.org/w/index.php?title=Nasopharyngeal_airway&oldid=1371463983
+  - `medical/wp2-necrotizing-fasciitis` — Necrotizing fasciitis — https://en.wikipedia.org/w/index.php?title=Necrotizing_fasciitis&oldid=1381338531
+  - `medical/wp2-neonatal-jaundice` — Neonatal jaundice — https://en.wikipedia.org/w/index.php?title=Neonatal_jaundice&oldid=1378610789
+  - `medical/wp2-norovirus` — Norovirus — https://en.wikipedia.org/w/index.php?title=Norovirus&oldid=1382322410
+  - `medical/wp2-nosebleed` — Nosebleed — https://en.wikipedia.org/w/index.php?title=Nosebleed&oldid=1384978743
+  - `medical/wp2-nyctalopia` — Nyctalopia — https://en.wikipedia.org/w/index.php?title=Nyctalopia&oldid=1381369580
+  - `medical/wp2-onchocerciasis` — Onchocerciasis — https://en.wikipedia.org/w/index.php?title=Onchocerciasis&oldid=1383939084
+  - `medical/wp2-opioid-overdose` — Opioid overdose — https://en.wikipedia.org/w/index.php?title=Opioid_overdose&oldid=1384939227
+  - `medical/wp2-organophosphate-poisoning` — Organophosphate poisoning — https://en.wikipedia.org/w/index.php?title=Organophosphate_poisoning&oldid=1384398116
+  - `medical/wp2-oropharyngeal-airway` — Oropharyngeal airway — https://en.wikipedia.org/w/index.php?title=Oropharyngeal_airway&oldid=1377881353
+  - `medical/wp2-otitis-externa` — Otitis externa — https://en.wikipedia.org/w/index.php?title=Otitis_externa&oldid=1384814943
+  - `medical/wp2-otitis-media` — Otitis media — https://en.wikipedia.org/w/index.php?title=Otitis_media&oldid=1384815084
+  - `medical/wp2-paracetamol-poisoning` — Paracetamol poisoning — https://en.wikipedia.org/w/index.php?title=Paracetamol_poisoning&oldid=1347045139
+  - `medical/wp2-paracetamol` — Paracetamol — https://en.wikipedia.org/w/index.php?title=Paracetamol&oldid=1380457998
+  - `medical/wp2-paratyphoid-fever` — Paratyphoid fever — https://en.wikipedia.org/w/index.php?title=Paratyphoid_fever&oldid=1378438313
+  - `medical/wp2-pediculosis` — Pediculosis — https://en.wikipedia.org/w/index.php?title=Pediculosis&oldid=1379580996
+  - `medical/wp2-pellagra` — Pellagra — https://en.wikipedia.org/w/index.php?title=Pellagra&oldid=1385232376
+  - `medical/wp2-penetrating-trauma` — Penetrating trauma — https://en.wikipedia.org/w/index.php?title=Penetrating_trauma&oldid=1382689420
+  - `medical/wp2-penicillin` — Penicillin — https://en.wikipedia.org/w/index.php?title=Penicillin&oldid=1383921405
+  - `medical/wp2-periodontal-disease` — Periodontal disease — https://en.wikipedia.org/w/index.php?title=Periodontal_disease&oldid=1364645378
+  - `medical/wp2-permethrin` — Permethrin — https://en.wikipedia.org/w/index.php?title=Permethrin&oldid=1380028185
+  - `medical/wp2-personal-protective-equipment` — Personal protective equipment — https://en.wikipedia.org/w/index.php?title=Personal_protective_equipment&oldid=1384143902
+  - `medical/wp2-photokeratitis` — Photokeratitis — https://en.wikipedia.org/w/index.php?title=Photokeratitis&oldid=1384405633
+  - `medical/wp2-picaridin` — Picaridin — https://en.wikipedia.org/w/index.php?title=Picaridin&oldid=1383855949
+  - `medical/wp2-pinworm-infection` — Pinworm infection — https://en.wikipedia.org/w/index.php?title=Pinworm_infection&oldid=1365766771
+  - `medical/wp2-pneumonic-plague` — Pneumonic plague — https://en.wikipedia.org/w/index.php?title=Pneumonic_plague&oldid=1384650606
+  - `medical/wp2-pneumothorax` — Pneumothorax — https://en.wikipedia.org/w/index.php?title=Pneumothorax&oldid=1385522009
+  - `medical/wp2-polio` — Polio — https://en.wikipedia.org/w/index.php?title=Polio&oldid=1385111049
+  - `medical/wp2-postpartum-infections` — Postpartum infections — https://en.wikipedia.org/w/index.php?title=Postpartum_infections&oldid=1384485010
+  - `medical/wp2-potassium-permanganate` — Potassium permanganate — https://en.wikipedia.org/w/index.php?title=Potassium_permanganate&oldid=1384688286
+  - `medical/wp2-povidone-iodine` — Povidone-iodine — https://en.wikipedia.org/w/index.php?title=Povidone-iodine&oldid=1380937716
+  - `medical/wp2-praziquantel` — Praziquantel — https://en.wikipedia.org/w/index.php?title=Praziquantel&oldid=1384292684
+  - `medical/wp2-pre-eclampsia` — Pre-eclampsia — https://en.wikipedia.org/w/index.php?title=Pre-eclampsia&oldid=1385541168
+  - `medical/wp2-prednisone` — Prednisone — https://en.wikipedia.org/w/index.php?title=Prednisone&oldid=1379160529
+  - `medical/wp2-prenatal-care` — Prenatal care — https://en.wikipedia.org/w/index.php?title=Prenatal_care&oldid=1382194341
+  - `medical/wp2-pressure-ulcer` — Pressure ulcer — https://en.wikipedia.org/w/index.php?title=Pressure_ulcer&oldid=1376891653
+  - `medical/wp2-pulse` — Pulse — https://en.wikipedia.org/w/index.php?title=Pulse&oldid=1353760383
+  - `medical/wp2-q-fever` — Q fever — https://en.wikipedia.org/w/index.php?title=Q_fever&oldid=1382156481
+  - `medical/wp2-quinine` — Quinine — https://en.wikipedia.org/w/index.php?title=Quinine&oldid=1384638728
+  - `medical/wp2-refeeding-syndrome` — Refeeding syndrome — https://en.wikipedia.org/w/index.php?title=Refeeding_syndrome&oldid=1384899183
+  - `medical/wp2-rickets` — Rickets — https://en.wikipedia.org/w/index.php?title=Rickets&oldid=1383342108
+  - `medical/wp2-rocky-mountain-spotted-fever` — Rocky Mountain spotted fever — https://en.wikipedia.org/w/index.php?title=Rocky_Mountain_spotted_fever&oldid=1381623815
+  - `medical/wp2-rotavirus` — Rotavirus — https://en.wikipedia.org/w/index.php?title=Rotavirus&oldid=1378622070
+  - `medical/wp2-rubbing-alcohol` — Rubbing alcohol — https://en.wikipedia.org/w/index.php?title=Rubbing_alcohol&oldid=1320216383
+  - `medical/wp2-rubella` — Rubella — https://en.wikipedia.org/w/index.php?title=Rubella&oldid=1385582600
+  - `medical/wp2-salmonellosis` — Salmonellosis — https://en.wikipedia.org/w/index.php?title=Salmonellosis&oldid=1379872307
+  - `medical/wp2-schistosomiasis` — Schistosomiasis — https://en.wikipedia.org/w/index.php?title=Schistosomiasis&oldid=1383381532
+  - `medical/wp2-scrub-typhus` — Scrub typhus — https://en.wikipedia.org/w/index.php?title=Scrub_typhus&oldid=1362744842
+  - `medical/wp2-scurvy` — Scurvy — https://en.wikipedia.org/w/index.php?title=Scurvy&oldid=1384093397
+  - `medical/wp2-shingles` — Shingles — https://en.wikipedia.org/w/index.php?title=Shingles&oldid=1379623747
+  - `medical/wp2-shoulder-dystocia` — Shoulder dystocia — https://en.wikipedia.org/w/index.php?title=Shoulder_dystocia&oldid=1365857301
+  - `medical/wp2-sinusitis` — Sinusitis — https://en.wikipedia.org/w/index.php?title=Sinusitis&oldid=1384815236
+  - `medical/wp2-smallpox` — Smallpox — https://en.wikipedia.org/w/index.php?title=Smallpox&oldid=1384376471
+  - `medical/wp2-splint-medicine` — Splint (medicine) — https://en.wikipedia.org/w/index.php?title=Splint_(medicine)&oldid=1372683285
+  - `medical/wp2-splinter` — Splinter — https://en.wikipedia.org/w/index.php?title=Splinter&oldid=1358246005
+  - `medical/wp2-starvation` — Starvation — https://en.wikipedia.org/w/index.php?title=Starvation&oldid=1381408120
+  - `medical/wp2-status-epilepticus` — Status epilepticus — https://en.wikipedia.org/w/index.php?title=Status_epilepticus&oldid=1385417984
+  - `medical/wp2-sterilization-microbiology` — Sterilization (microbiology) — https://en.wikipedia.org/w/index.php?title=Sterilization_(microbiology)&oldid=1379436961
+  - `medical/wp2-streptococcal-pharyngitis` — Streptococcal pharyngitis — https://en.wikipedia.org/w/index.php?title=Streptococcal_pharyngitis&oldid=1368528917
+  - `medical/wp2-stretcher` — Stretcher — https://en.wikipedia.org/w/index.php?title=Stretcher&oldid=1367717842
+  - `medical/wp2-subcutaneous-administration` — Subcutaneous administration — https://en.wikipedia.org/w/index.php?title=Subcutaneous_administration&oldid=1366895048
+  - `medical/wp2-sunburn` — Sunburn — https://en.wikipedia.org/w/index.php?title=Sunburn&oldid=1384560775
+  - `medical/wp2-surgical-mask` — Surgical mask — https://en.wikipedia.org/w/index.php?title=Surgical_mask&oldid=1373228519
+  - `medical/wp2-surgical-suture` — Surgical suture — https://en.wikipedia.org/w/index.php?title=Surgical_suture&oldid=1378367022
+  - `medical/wp2-syncope-medicine` — Syncope (medicine) — https://en.wikipedia.org/w/index.php?title=Syncope_(medicine)&oldid=1382887710
+  - `medical/wp2-syphilis` — Syphilis — https://en.wikipedia.org/w/index.php?title=Syphilis&oldid=1385545898
+  - `medical/wp2-taeniasis` — Taeniasis — https://en.wikipedia.org/w/index.php?title=Taeniasis&oldid=1326505506
+  - `medical/wp2-therapeutic-food` — Therapeutic food — https://en.wikipedia.org/w/index.php?title=Therapeutic_food&oldid=1359537145
+  - `medical/wp2-thiamine-deficiency` — Thiamine deficiency — https://en.wikipedia.org/w/index.php?title=Thiamine_deficiency&oldid=1383710415
+  - `medical/wp2-tick-borne-encephalitis` — Tick-borne encephalitis — https://en.wikipedia.org/w/index.php?title=Tick-borne_encephalitis&oldid=1385405815
+  - `medical/wp2-tonsillitis` — Tonsillitis — https://en.wikipedia.org/w/index.php?title=Tonsillitis&oldid=1352659356
+  - `medical/wp2-tooth-decay` — Tooth decay — https://en.wikipedia.org/w/index.php?title=Tooth_decay&oldid=1378929444
+  - `medical/wp2-toxoplasmosis` — Toxoplasmosis — https://en.wikipedia.org/w/index.php?title=Toxoplasmosis&oldid=1385072233
+  - `medical/wp2-trachoma` — Trachoma — https://en.wikipedia.org/w/index.php?title=Trachoma&oldid=1384627326
+  - `medical/wp2-traction-splint` — Traction splint — https://en.wikipedia.org/w/index.php?title=Traction_splint&oldid=1372807685
+  - `medical/wp2-travelers-diarrhea` — Travelers' diarrhea — https://en.wikipedia.org/w/index.php?title=Travelers%27_diarrhea&oldid=1381695402
+  - `medical/wp2-trichinosis` — Trichinosis — https://en.wikipedia.org/w/index.php?title=Trichinosis&oldid=1369699905
+  - `medical/wp2-trichuriasis` — Trichuriasis — https://en.wikipedia.org/w/index.php?title=Trichuriasis&oldid=1385406811
+  - `medical/wp2-trimethoprim-sulfamethoxazole` — Trimethoprim/sulfamethoxazole — https://en.wikipedia.org/w/index.php?title=Trimethoprim/sulfamethoxazole&oldid=1383912083
+  - `medical/wp2-tularemia` — Tularemia — https://en.wikipedia.org/w/index.php?title=Tularemia&oldid=1384912834
+  - `medical/wp2-umbilical-cord` — Umbilical cord — https://en.wikipedia.org/w/index.php?title=Umbilical_cord&oldid=1361249974
+  - `medical/wp2-vaccination` — Vaccination — https://en.wikipedia.org/w/index.php?title=Vaccination&oldid=1380558930
+  - `medical/wp2-vaccine` — Vaccine — https://en.wikipedia.org/w/index.php?title=Vaccine&oldid=1383325771
+  - `medical/wp2-vector-control` — Vector control — https://en.wikipedia.org/w/index.php?title=Vector_control&oldid=1331782950
+  - `medical/wp2-vital-signs` — Vital signs — https://en.wikipedia.org/w/index.php?title=Vital_signs&oldid=1380715447
+  - `medical/wp2-vitamin-a-deficiency` — Vitamin A deficiency — https://en.wikipedia.org/w/index.php?title=Vitamin_A_deficiency&oldid=1348335034
+  - `medical/wp2-vitamin-b12-deficiency` — Vitamin B12 deficiency — https://en.wikipedia.org/w/index.php?title=Vitamin_B12_deficiency&oldid=1385493100
+  - `medical/wp2-weaning` — Weaning — https://en.wikipedia.org/w/index.php?title=Weaning&oldid=1380877072
+  - `medical/wp2-west-nile-fever` — West Nile fever — https://en.wikipedia.org/w/index.php?title=West_Nile_fever&oldid=1383019583
+  - `medical/wp2-whooping-cough` — Whooping cough — https://en.wikipedia.org/w/index.php?title=Whooping_cough&oldid=1381622643
+  - `medical/wp2-wound-healing` — Wound healing — https://en.wikipedia.org/w/index.php?title=Wound_healing&oldid=1379381560
+  - `medical/wp2-yaws` — Yaws — https://en.wikipedia.org/w/index.php?title=Yaws&oldid=1383949742
+  - `medical/wp2-yellow-fever` — Yellow fever — https://en.wikipedia.org/w/index.php?title=Yellow_fever&oldid=1385360322
+  - `medical/wp2-zika-fever` — Zika fever — https://en.wikipedia.org/w/index.php?title=Zika_fever&oldid=1384305617
+  - `medical/wp2-zinc-deficiency` — Zinc deficiency — https://en.wikipedia.org/w/index.php?title=Zinc_deficiency&oldid=1376245305
+  - `medical/wp2-zinc-gluconate` — Zinc gluconate — https://en.wikipedia.org/w/index.php?title=Zinc_gluconate&oldid=1374829569
+
+## Wikivoyage (en.wikivoyage.org)
+
+- Credit: Wikivoyage contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `medical/wv2-altitude-sickness` — Altitude sickness (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Altitude_sickness&oldid=5428606
+  - `medical/wv2-dangerous-snakes` — Dangerous snakes (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Dangerous_snakes&oldid=5387915
+  - `medical/wv2-infectious-diseases` — Infectious diseases (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Infectious_diseases&oldid=5415451
+  - `medical/wv2-malaria` — Malaria (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Malaria&oldid=5399435
+  - `medical/wv2-motion-sickness` — Motion sickness (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Motion_sickness&oldid=5387912
+  - `medical/wv2-pests` — Pests (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Pests&oldid=5337490
+  - `medical/wv2-stay-healthy` — Stay healthy (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Stay_healthy&oldid=5383323
+  - `medical/wv2-sunburn-and-sun-protection` — Sunburn and sun protection (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Sunburn_and_sun_protection&oldid=5388230
+  - `medical/wv2-travel-health-kit` — Travel health kit (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Travel_health_kit&oldid=5399400
+  - `medical/wv2-travellers-diarrhea` — Travellers' diarrhea (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Travellers%27_diarrhea&oldid=5343279

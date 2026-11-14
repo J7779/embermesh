@@ -1,0 +1,94 @@
+---
+id: food/wholesale-curer-curing-potting-08-preserved-fruits
+title: "Curing, Preserving and Potting Meats 8: Preserved Fruits"
+category: food
+tags: ["cure meat", "cure bacon", "cure ham", "smoking fish", "potted meat", "pickling", "canning", "jams and jellies", "leather", "tomatoes"]
+summary: "Preserved Fruits, from Curing, Preserving and Potting Meats (Comestibles, 1864). The best refined sugar, which will require no clarifying, should invariably be used for this process; but when inferior qualities are chosen they must be…"
+source: "A Wholesale Curer of Comestibles, The Art and Mystery of Curing, Preserving, and Potting All Kinds of Meats, Game, and Fish (Chapman and Hall, London, 1864); public-domain transcription"
+source_title: "The Art and Mystery of Curing, Preserving, and Potting All Kinds of Meats, Game, and Fish"
+license: Public Domain
+attribution: "A Wholesale Curer of Comestibles, The Art and Mystery of Curing, Preserving, and Potting All Kinds of Meats, Game, and Fish (Chapman and Hall, London, 1864). Public domain in the United States (published before 1930)."
+retrieved: 2026-11-13
+part_of: food/wholesale-curer-curing-potting
+order: 8
+---
+
+# Curing, Preserving and Potting Meats 8: Preserved Fruits
+
+*From The Art and Mystery of Curing, Preserving, and Potting All Kinds of Meats, Game, and Fish by A Wholesale Curer of Comestibles (Chapman and Hall, London, 1864).*
+
+> **Editor's note:** Curing agents (saltpetre/nitrate, nitrite) are poisonous in excess. Use commercial curing salt (Prague powder) at the dose on its label, keep meat cold (below 4 °C / 40 °F) while curing, and do not rely on the trade preservatives this old text advertises.
+
+TO PREPARE SYRUP FOR PRESERVING FRUIT.
+
+The best refined sugar, which will require no clarifying, should invariably be used for this process; but when inferior qualities are chosen they must be prepared in the following manner: To clarify six pounds of sugar, break it into large lumps, put it into a preserving pan, and pour upon it five pints of cold spring water; in another pint of water beat up lightly the white of one small egg, but not frothing it very much, add it to the sugar, and stir it to mix it well with the whole. Set the pan over a gentle fire, when the sugar is nearly dissolved, and let the scum rise without being disturbed; when the syrup has boiled five minutes, take it off the fire, let it stand two minutes, and then skim it very clean, let it boil again, then throw in half a cupful of cold water, which will bring the remainder of the scum to the surface; skim it until it is perfectly clear, strain it through a thin cloth, and it will be ready for use, or for further boiling.
+
+All *unripe* fruit must be rendered perfectly tender by gentle scalding, before it is put into syrup, or it will not imbibe the sugar; and the syrup must be *thin* when it is first added to it, and be thickened afterwards by frequent boiling, or with sugar added, or the fruit will shrivel instead of becoming plump and clear. A pound of sugar boiled for ten minutes in a pint of water will make a very light syrup, but it will gradually thicken if rapidly boiled in an uncovered pan. Two pounds of sugar to the pint of water will become thick with little more than half an hour’s boiling, or with three or four separate boilings of eight or ten minutes each; if too much reduced it will candy, instead of remaining liquid.
+
+WEST INDIA PRESERVED GREEN GINGER.
+
+Take half a dozen middle-sized cucumbers, cut them open lengthwise, take out the seeds, cut off the pulpy part, and soak them three days in strong salt and water, and weighted down so as to be completely submerged. Next, take them out and wash them in cold water, and put them, with plenty of cold water, into a pan on the fire, and when it comes to the boiling point, take them off, pour off the water, and add more cold water with a quarter of an ounce of bicarbonate of potash to each quart of water. Now boil them half an hour, and set by in the water they were boiled in till next day. Then take out, and set them to drain on a sieve, covered with a cloth. Then take
+
+| Best ginger, bruised | 10 | oz. |
+|---|---|---|
+| Best cloves, bruised | 1 | oz. |
+| Cinnamon, bruised | ½ | oz. |
+| Rain or soft water | 5 | pints |
+
+which boil five minutes, then simmer for half an hour, in a closely covered pan, strain the liquor through a flannel bag, and add to each pint of it one and a quarter pounds of sifted loaf-sugar, making a syrup, which must be clarified with the white of egg. Boil this, and skim with care till no scum rises. Peel the cucumbers, and cut them in pieces the size and shape of a pigeon’s egg. Simmer two ounces more of bruised ginger, tied in a piece of muslin, in a pint of water, till reduced to a moderate sized teacupful, and add it to the syrup. Take the ginger you first used, put it with the syrup and cucumbers into a clean pan, and boil for ten minutes. Empty all into a clean earthenware jar, and let stand two days and nights. Next pour off the syrup, boil it five minutes, taking off the scum if any arises; then add the cucumbers, boil five minutes longer, and put all back again into the jar, and let stand three days. Return the syrup and the whole of the ginger tied in muslin into the pan, and boil until the syrup adheres to the spoon. Then put in the cucumbers, and boil, a quarter of an hour, when return all into the jar, and let remain twenty-four hours uncovered. Then tie wet bladder well over, and in a month it may be removed into small wide-mouthed glass jars and covered with bladder, and green paper over that. This, as dessert, is an excellent stomachic, assisting digestion in weak habits.
+
+CURRANTS FOR TARTS.
+
+The fruit for these purposes should be gathered on fine days, and only the best used for preserves. Press the juice from the rejected currants, and strain it clear. To each pound of fruit you must allow a pound of the best refined sugar, and make a fine clear syrup of the currant juice and sugar. When it is cold put in your fruit and let it boil until beautifully clear, when you may put it into pots and glass jars, covering with brandy paper and wetted bladder.
+
+TOMATOES.
+
+The fruit here must be taken before it is quite ripe, and if not having lost its green hue quite may be preferable; and for three pounds of fruit take off the thin yellow rinds of two large lemons, and, squeezing out the juice, strain it and put it aside for awhile. Put the juice with the thin rinds into a clean saucepan, with two or three blades of mace, a few peach leaves and a dessert-spoonful of ginger sliced thinly; cover the tomatoes with water barely, and set the pan on a clear fire to simmer half an hour. Then take out the fruit carefully with a spoon and set them on a sieve to cool. Add to the water they were simmered in sugar sufficient to make a thin syrup, which must be poured over the fruit, when placed in a deep dish, boiling hot, and so leave them for four or five days. Then pour out the syrup into a pan, and add sugar to make a strong syrup, into which you may put the tomatoes and simmer them gently until the syrup has entered fully into them. Remove them now from the fire and let them remain unmolested for four or five days longer. If the syrup has now not attained a proper consistence, you may add sugar, and boil until you have got the desired end. Pour now on the fruit while it is hot, and if when cold you are satisfied, make all safe with bladder and leather, and keep in a cool and airy room.
+
+CUCUMBERS.
+
+This is an elegant preserve if well managed. Take two dozen of the finest, largest, and most clear cucumbers, and without seeds. Cut them into pieces, take out the very soft part of the insides, put them into a jar with strong salt and water to cover them, and set them in a warm situation until they become yellow. Now wash them well, and set them in a pan of water, with plenty of fresh cabbage leaves, on the fire, close the lid of the pan, so that no steam can escape, and simmer them until of a fine green colour. If you have not yet attained your object, change the water and leaves, and simmer them again. Then take out the fruit, set it on a sieve to cool, and then into pure cold water for three or four days, changing the water daily. Put into a clean pan four pounds of the best refined sugar, with one quart of pure spring water, boil and skim it well. Then add the rinds of four large lemons pared very thin, and three ounces of the best ginger sliced, and boil all together ten minutes. Take it then off the fire, and when cool put in the cucumbers, and boil them until they are perfectly clear. If their appearance does not fully satisfy you, set them aside for forty-eight hours, and then repeat the boiling, and putting your cucumbers into your pots and glasses, pour the syrup over them, and secure them from the air with bladder and leather, or with paper over the glasses.
+
+GREEN-GAGE PLUMS.
+
+From a peck of this rich fruit, pick out all the largest and most clear. Put a handful of vine leaves into a pan, then a layer of the fruit, and so on, in alternate layers, to the end; fill the vessel up with water, put them over a moderate fire, and let them get thoroughly hot through, skim them well, pour off the water, and put the plums on a sieve to cool. Now take off the peels carefully, and, as you proceed, put them into the water they were heated in, with fresh leaves, and let them boil three minutes, preventing the escape of the steam as much as you possibly can. Let them remain at a moderate distance from the fire seven or eight hours, or until they become green; then put them on a sieve to drain, and then boil them up in a good clear syrup once a day, for three successive days. Then take them up, and place in clean dry glasses and jars; skim the syrup thoroughly over the fire, and, when nearly cold, pour it over the plums, put brandy paper upon them, and cover with bladder. You will have an elegant and very rich preserve.
+
+PEACHES AND NECTARINES.
+
+Before they are ripe, take the choicest of these fruit, rub off the down from them with soft old linen, and divide the skin at the seam with a sharp pointed knife. Put them into a clean jar, cover them with French brandy, and let them remain so for ten days; then take them out, and having ready a fine clear syrup, put the fruit into a pan with it, and boil them until they are beautifully bright and clear. When cold, take out the fruit, place it in glasses and jars, and fill up with the syrup nearly cold. Lay brandy paper over and cover with bladder.
+
+LEMONS PRESERVED.
+
+Take two dozen fine lemons, wipe them well, and pare off the yellow rind very thin. Cut out a piece of the rind at the blossom end, and take out the whole of the pulp and seeds. Rub the lemons over with fine bay salt, and lay them in cold water, so let them lie for a week, quite covered, and then boil them in fresh salt and water twenty minutes. Now prepare a syrup of one pound of the best loaf sugar to a quart of water, and well skimmed, and into which put the lemons, and boil them five or six minutes for four days successively, then place them in a jar and let them stand six weeks, and all the time well covered with the syrup. Now make a clear, thick, fine syrup of the best refined sugar and water, put the lemons into it, and boil them gently for ten minutes; then put them away, and in twenty-four hours boil them again at short intervals, until they look plump and clear. Now lay them in jars and glasses, and pour the syrup over them cold; cover with brandy-paper and tie bladder over them.
+
+APRICOTS.
+
+Take two dozen of the largest and soundest apricots when they are just fully ripe, wipe them clear from gum and other filth; push the stones out through the stalk ends with a blunted piece of wood; weigh the fruit now, and for each pound of apricots, allow one pound of the best refined sugar, the half of which, when reduced to a powder and sifted, you must strew over the fruit, and let them remain so for twenty-four hours. Boil them up gently, and when they have been cold repeat the boiling four or five times, at intervals of three hours, by which means they will have become clear and bright. Now take them up and lay them on a sieve, and when you have prepared a good clear thick syrup, boil the fruit up in it for five minutes, and skimming it well. Then put the apricots into clear glass jars, and pour the syrup over them. When cold make all safe with writing paper steeped in brandy, and tie wetted bladder over. They must be stored in a dry, airy room.
+
+DAMSONS.
+
+Choose the finest, large prune damsons for this purpose, pick them over carefully, throwing out the stalks, and all that are the least crushed, cut them open lengthwise, and take out the stones, put them into a pan with water sufficient to cover them, and boil them ten minutes; turn them out upon a sieve, and when cold, or nearly so, wipe each separately with some old soft linen or flannel. To each pound of the fruit allow one pound of the best refined sugar, the half of which, after being sifted finely, you must scatter equally over the damsons, on large dishes; put the other half of the sugar to the water in which the fruit was scalded, set it in a pan on a clear fire, and let it boil up; skim it thoroughly, and then simmer only, for ten or twelve minutes; put in the fruit and bring it to a boil; then take it off the fire, and let it stand, closely covered, half an hour; then put it again to simmer for half an hour longer, and then put it aside until the next day. Now boil up the fruit until it is tender, put the damsons into a sieve while warm, and boil the jelly alone full half an hour, and taking off any scum that may yet have arisen. Put the fruit into your pots, jars, &c., and pour your jelly over them, well heated. When cold, put brandy-paper upon the fruit, and melted mutton suet above that. Make all safe with bladder and leather, and store them in a dry, airy, cool room.
+
+MORELLO CHERRIES.
+
+Pick thoroughly ripe and sound fruit from the stalks and wipe them separately; prick them with a needle in three or four places. To each pound of fruit allow one pound and a half of the best sugar, and strew one half of it when finely sifted over the cherries upon clean large dishes, and let them remain so for twenty-four hours. Take now as much strained red-currant juice as will effectually dissolve the other half of the sugar, and put it into a pan over a moderate fire, and let it boil twelve or fifteen minutes, skim it well, add to it the fruit with their sugar, and let all simmer five minutes, being careful to not allow them to boil. Then remove the cherries into glasses, boil the syrup until it is thick and pour it cool over them. When cold guard them with brandy paper, and paste writing paper neatly cut over the glasses.
+
+BARBERRIES IN SPRIGS AND BUNCHES.
+
+Pick out the finest bunches and sprigs of fine ripe clear berries—reject all faulty ones—lay them in as much water as will be requisite for making their syrup, and boil them until they are tender. Now strain them upon a sieve, and to every pint of their juice add a pound and half of best refined sugar, boil and skim this thoroughly, and to each pint of the syrup put half a pound of the fruit in bunches and boil them very gently until they become quite bright and clear. When cold put them into clear glasses and pour the syrup to them. Use brandy paper, and paste writing paper over the glasses.
+
+HAMBURGH GRAPES PRESERVED WHOLE.
+
+Pick out some handsome little bunches, wipe them very carefully with soft old linen moistened with spirits and water, place them in a wide jar, and allow one ounce of white sugar-candy beaten small to each pound of the grapes, which, as the fruit is placed, must be scattered equally amongst it. Fill the jar up with French brandy, the best, and seeing in two days afterwards that the fruit is properly covered, make up safely with bladder and leather, and store away in a cool airy room.
+
+GOLDEN PIPPINS
+
+Pare two dozen fine pippins nicely, cut them into quarters and take out the cores. Boil the rinds of two fine large oranges in a pan of cold water until perfectly tender and lay them in pure spring water for three days. Put these into a pan, just cover them with water and let them boil twenty minutes, and strain the juice through a jelly-bag; then pare two dozen more pippins, take out the cores at the stalk ends neatly. Make now a fine clear syrup of two pounds of the best refined sugar and one pint of water, to which add the apple juice, and when it is cold put in the pippins, adding the orange peel cut into thin chips. Boil it very gently ten minutes, then take out the pippins, and when cool put them into jars and pour the syrup over them. Apply brandy paper, and tie bladder over the jars, and leather over that. Some adopt the mutton suet melted, with one-eighth of its weight of sweet lard added, which corrects the brittleness of the suet and causes it to adhere better to the sides of the jars.
+
+RASPBERRY MARMALADE.
+
+Pick fresh ripe raspberries from the stalks and simmer them gently about ten minutes, keeping them stirred all the time. Pour them and their juice into a clean hair sieve and rub them through it with a wooden spoon, leaving only the seeds behind. Weigh the fruit and boil it quickly for eight or ten minutes, then take the pan from the fire and stir gradually into it three quarters of a pound of sugar to the pound of pulp. When this is quite dissolved continue the boiling for another ten minutes—less time will occasionally be sufficient, but the thickness of the preserve and the manner in which it jellies on the skimmer will show when it is boiled enough. The raspberries may be rubbed through a sieve without the previous simmering, then mixed with their weight of sugar and boiled quickly for twenty minutes. Rich strawberry jam or marmalade is made in precisely the same manner.
+
+JAM OF MORELLO CHERRIES.
+
+This is a delicious preserve when made with fine ripe morellos. Stone the fruit, weigh it, heat it rather slowly to draw out the juice, then boil it quickly for twenty minutes over a very clear fire, add thirteen ounces of sugar for each pound of the cherries, and boil the jam from fifteen to twenty minutes longer, being careful to clear off all the scum. The sugar should be of good quality; it must be beaten to powder and added gradually to the fruit, and stirred with it off the fire until it is dissolved. A larger portion may be used when the morellos are very acid. An equal weight with the cherries will not be too much for some tastes, but their flavour will be better preserved with less. A few of the kernels blanched and wiped quite dry may be added a couple of minutes before the jam is poured out.

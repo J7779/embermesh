@@ -1,0 +1,152 @@
+---
+id: medical/wp2-iron-deficiency-anemia
+title: Iron-deficiency anemia
+category: medical
+tags: [iron-deficiency anemia, medicine]
+summary: Iron-deficiency anemia is anemia caused by a lack of iron.
+source: https://en.wikipedia.org/w/index.php?title=Iron-deficiency_anemia&oldid=1382736267
+source_title: Wikipedia: Iron-deficiency anemia
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Iron-deficiency anemia", Wikipedia, The Free Encyclopedia (revision 1382736267), https://en.wikipedia.org/w/index.php?title=Iron-deficiency_anemia&oldid=1382736267 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Iron-deficiency anemia
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed. Background reading, not a substitute for trained medical care; drug doses and treatments differ by person and situation._
+
+**Iron-deficiency anemia** is anemia caused by a lack of iron. Anemia is defined as a decrease in the number of red blood cells or the amount of hemoglobin in the blood. When onset is slow, symptoms are often vague, such as feeling tired, weak, short of breath, or having decreased ability to exercise. Anemia that comes on quickly often has more severe symptoms, including confusion, feeling like one is going to pass out or increased thirst. Anemia is typically significant before a person becomes noticeably pale. Children with iron deficiency anemia may have problems with growth and development. There may be additional symptoms depending on the underlying cause.
+
+Iron-deficiency anemia is caused by blood loss, insufficient dietary intake, or poor absorption of iron from food. Sources of blood loss can include heavy periods, childbirth, uterine fibroids, stomach ulcers, colon cancer, and urinary tract bleeding. Poor absorption of iron from food may occur as a result of an intestinal disorder such as inflammatory bowel disease or celiac disease, or surgery such as a gastric bypass. In the developing world, parasitic worms, malaria, and HIV/AIDS increase the risk of iron deficiency anemia. Diagnosis is confirmed by blood tests.
+
+Iron deficiency anemia can be prevented by eating a diet containing sufficient amounts of iron or by iron supplementation. Foods high in iron include meat, nuts, and foods made with iron-fortified flour. Treatment may include dietary changes, iron supplements, and dealing with underlying causes, for example, medical treatment for parasites or surgery for ulcers. Supplementation with vitamin C may be recommended due to its potential to aid iron absorption. Severe cases may be treated with blood transfusions or iron infusions.
+
+Iron-deficiency anemia affected about 1.48 billion people in 2015. A lack of dietary iron is estimated to cause approximately half of all anemia cases globally. Women and young children are most commonly affected. In 2015, anemia due to iron deficiency resulted in about 54,000 deaths – down from 213,000 deaths in 1990.
+
+## Signs and symptoms
+
+People with mild or moderate iron-deficiency anemia may not have any symptoms. It tends to develop slowly; therefore, the body has time to adapt, and the disease often goes unrecognized for some time. More serious iron-deficiency anemia may cause common symptoms of anemia, such as feeling tired, shortness of breath, headaches, or chest pain.
+
+Other symptoms include:
+
+- dizziness or lightheadedness
+- weakness
+- pale skin
+- palpitations (feeling that the heart is skipping beats or fluttering)
+- cold intolerance
+- cold hands and feet
+
+Other possible symptoms and signs of iron-deficiency anemia include, decreased ability to concentrate, irritability, numbness or burning sensations, glossitis, angular cheilitis, koilonychia (spoon-shaped nails) or brittle nails, poor appetite, difficulty swallowing, periorbital hyperpigmentation (may related to the iron-deficiency induced worse blood oxygenation and vitamin B₁₂), and restless legs syndrome. Pica may also develop; of which consumption of ice, known as pagophagia, has been suggested to be the most specific for iron deficiency anemia. None of these symptoms (or any of the others above) are sensitive or specific.
+
+### Child development
+
+Iron-deficiency anemia is associated with poor neurological development, including decreased learning ability and altered motor functions. This is because iron deficiency impacts the development of the cells of the brain called neurons. When the body is low on iron, the red blood cells get priority on iron, and it is shifted away from the neurons of the brain. Exact causation has not been established, but there is a possible long-term impact from these neurological issues.
+
+## Cause
+
+A diagnosis of iron-deficiency anemia requires further investigation into its cause. It can be caused by increased iron demand, increased iron loss, or decreased iron intake. Increased iron demand often occurs during periods of growth, such as in children and pregnant women. For example, during stages of rapid growth, babies and adolescents may outpace their dietary intake of iron, which can result in deficiency in the absence of disease or a grossly abnormal diet. Iron loss is typically from blood loss. One example of blood loss is by chronic gastrointestinal blood loss, which could be linked to a possible cancer. In people who have periods, heavy menstrual periods can be a source of blood loss, causing iron-deficiency anemia. People who do not consume much iron in their diet, such as vegans or vegetarians, are also at increased risk of developing iron deficiency anemia.
+
+### Parasitic disease
+
+The leading cause of iron-deficiency anemia worldwide is a parasitic disease known as a helminthiasis caused by infestation with parasitic worms (helminths); specifically, hookworms. The hookworms most commonly responsible for causing iron-deficiency anemia include *Ancylostoma duodenale*, *Ancylostoma ceylanicum*, and *Necator americanus*. The World Health Organization estimates that approximately two billion people are infected with soil-transmitted helminths worldwide. Parasitic worms cause both inflammation and chronic blood loss by binding to a human's small-intestinal mucosa, and through their means of feeding and degradation, they can ultimately cause iron-deficiency anemia.
+
+### Blood loss
+
+Red blood cells contain iron, so blood loss also leads to iron loss. There are several causes of blood loss, including menstrual bleeding, gastrointestinal bleeding, stomach ulcers, and bleeding disorders. The bleeding may occur quickly or slowly. Slow, chronic blood loss within the body – such as from a peptic ulcer, angiodysplasia, inflammatory bowel disease, a colon polyp or gastrointestinal cancer (e.g., colon cancer) – can cause iron-deficiency anemia.
+
+#### Menstrual bleeding
+
+Menstrual bleeding is a common cause of iron deficiency anemia in people who are capable of having periods. People with menorrhagia (heavy menstrual periods) are at risk of iron deficiency anemia because they are at a higher than normal risk of losing more iron during menstruation than is replaced in their diet. Most women lose about 40 mL of blood per cycle. Some birth control methods, such as pills and IUDs, may decrease the amount of blood and therefore iron lost during a menstrual cycle. Intermittent iron supplementation may be as effective a treatment in these cases as daily supplements and reduce some of the adverse effects of long-term daily supplements.
+
+#### Gastrointestinal bleeding
+
+The most common cause of iron deficiency anemia in men and post-menopausal women is gastrointestinal bleeding. There are many sources of gastrointestinal tract bleeding, including the stomach, esophagus, small intestine, and the large intestine (colon). Gastrointestinal bleeding can result from regular use of some medications, such as non-steroidal anti-inflammatory drugs (e.g. aspirin), as well as antiplatelets such as clopidogrel and anticoagulants such as warfarin; however, these are required in some patients, especially those with states causing a tendency to form blood clots. Colon cancer, which typically occurs in older individuals, is another potential cause of gastrointestinal bleeding. In addition, some bleeding disorders, such as von Willebrand disease and polycythemia vera, can cause gastrointestinal bleeding.
+
+#### Blood donation
+
+Frequent blood donors are also at risk for developing iron deficiency anemia. When whole blood is donated, approximately 200 mg of iron is lost from the body. The blood bank screens people for anemia before drawing blood for donation. If the patient has anemia, blood is not drawn. Less iron is lost if the person is donating platelets or white blood cells.
+
+### Diet
+
+The body normally gets the iron it requires from food. If a person consumes too little iron, or iron that is poorly absorbed (non-heme iron), they can become iron-deficient over time. Examples of iron-rich foods include meat, eggs, leafy green vegetables and iron-fortified foods. For proper growth and development, infants and children need dietary iron. For children, a high intake of cow's milk is associated with an increased risk of iron-deficiency anemia. Other risk factors (at least in toddlers) include low meat intake and low intake of iron-fortified products.
+
+The National Academy of Medicine updated Estimated Average Requirements (EAR) and Recommended Dietary Allowances (RDA) in 2001. The current EAR for iron for women ages 14–18 is 7.9 mg/day, 8.1 for ages 19–50, and 5.0 thereafter (post menopause). For men, the EAR is 6.0 mg/day for ages 19 and up. The RDA is 15.0 mg/day for women ages 15–18, 18.0 for 19–50, and 8.0 thereafter; for men, 8.0 mg/day for ages 19 and up. (Recommended Dietary Allowances are higher than Estimated Average Requirements so as to cover people with higher than average requirements.) The RDA for pregnancy is 27 mg/day, and during lactation, 9 mg/day. For children ages 1–3 years, it is 7 mg/day, 10 for ages 4–8, and 8 for ages 9–13. The European Food Safety Authority refers to the collective set of information as Dietary Reference Values, with Population Reference Intakes instead of RDAs, and Average Requirements instead of EARs. For women, the Population Reference Intake is 13 mg/day for ages 15–17 years, 16 mg/day for women ages 18 and up who are premenopausal, and 11 mg/day postmenopausal; for pregnancy and lactation, 16 mg/day. For men, the Population Reference Intake is 11 mg/day for ages 15 and older. For children ages 1 to 14, the Population Reference Intake increases from 7 to 11 mg/day. The Population Reference Intakes are higher than the US RDAs, with the exception of pregnancy.
+
+### Iron malabsorption
+
+Iron from food is absorbed into the bloodstream in the small intestine, primarily in the duodenum. Iron malabsorption is a less common cause of iron-deficiency anemia, but many gastrointestinal disorders can reduce the body's ability to absorb iron. Different mechanisms may be present.
+
+In celiac disease, abnormal structural changes in the duodenum can decrease iron absorption. Abnormalities or surgical removal of the stomach can also lead to malabsorption by altering the acidic environment needed for iron to be converted into its absorbable form. If there is insufficient production of hydrochloric acid in the stomach, hypochlorhydria/achlorhydria can occur (often due to chronic H. pylori infections or long-term proton-pump inhibitor therapy), inhibiting the conversion of ferric iron to the absorbable ferrous iron.
+
+Bariatric surgery is associated with an increased risk of iron deficiency anemia due to malabsorption of iron. During a Roux-en-Y anastamosis, which is commonly performed for weight management and diabetes control, the stomach is made into a small pouch and this is connected directly to the small intestines further downstream (bypassing the duodenum as a site of digestion). About 17–45% of people develop iron deficiency after a Roux-en-Y gastric bypass.
+
+### Pregnant people
+
+Without iron supplementation, iron-deficiency anemia occurs in many pregnant people because their iron stores need to serve their own increased blood volume and be a source of hemoglobin for the growing baby and placental development. Other less common causes are intravascular hemolysis and hemoglobinuria. Iron deficiency in pregnancy appears to cause long-term and irreversible cognitive problems in the baby.
+
+Iron deficiency affects maternal well-being by increasing the risk of infections and complications during pregnancy. Some of these complications include pre-eclampsia, bleeding problems, and perinatal infections. Iron deficiency can lead to improper development of fetal tissues. Oral iron supplementation during the early stages of pregnancy, specifically the first trimester, is suggested to decrease the adverse effects of iron-deficiency anemia throughout pregnancy and to decrease the negative impact that iron deficiency has on fetal growth. Iron supplements may lead to a risk for gestational diabetes, so pregnant women with adequate hemoglobin levels are recommended not to take iron supplements. Iron deficiency can lead to premature labor and to problems with neural functioning, including delays in language and motor development in the infant.
+
+Some studies show that people pregnant during their teenage years can be at greater risk of iron-deficiency anemia due to an already increased need for iron and other nutrients during adolescent growth spurts.
+
+### Children
+
+Babies are at increased risk of developing iron deficiency anemia due to their rapid growth. Their need for iron is greater than they are getting in their diet. Babies are born with iron stores; however, these iron stores typically run out by 4–6 months of age. In addition, infants who are given cow's milk too early can develop anemia due to gastrointestinal blood loss.
+
+Children who are at risk for iron-deficiency anemia include:
+
+- Preterm infants
+- Low birth weight infants
+- Infants fed with cow's milk under 12 months of age
+- Breastfed infants who have not received iron supplementation after age 6 months, or those receiving non-iron-fortified formulas
+- Children between the ages of 1 and 5 years old who receive more than 24 ounces (700 mL) of cow milk per day
+- Children with low socioeconomic status
+- Children with special health care needs
+- Children of Hispanic ethnicity
+- Children who are overweight
+
+### Hepcidin
+
+Decreased serum and urine hepcidin levels are early indicators of iron deficiency. Hepcidin concentrations are also connected to the complex relationship between malaria and iron deficiency.
+
+## Mechanism
+
+Anemia can result from significant iron deficiency. When the body has sufficient iron to meet its needs (functional iron), the remainder is stored for later use in cells, mostly in the bone marrow and liver. These stores are called ferritin complexes and are part of the human (and other animals) iron metabolism systems. Men store about 3.5 g of iron in their bodies, and women store about 2.5 g.
+
+Hepcidin is a peptide hormone produced in the liver that is responsible for regulating iron levels in the body. Hepcidin decreases the amount of iron available for erythropoiesis (red blood cell production). Hepcidin binds to and induces the degradation of ferroportin, which is responsible for exporting iron from cells and mobilizing it to the bloodstream. Conditions such as high levels of erythropoesis, iron deficiency and tissue hypoxia inhibit hepcidin expression. Whereas systemic infection or inflammation (especially involving the cytokine IL-6) or increased circulating iron levels stimulate hepcidin expression.
+
+Iron is a mineral that is important in the formation of red blood cells in the body, particularly as a critical component of hemoglobin. About 70% of the iron found in the body is bound to hemoglobin. Iron is primarily absorbed in the small intestine, in particular the duodenum and jejunum. Certain factors increase or decrease iron absorption. For example, taking Vitamin C with a source of iron is known to increase absorption. Some medications such as tetracyclines and antacids can decrease absorption of iron. After being absorbed in the small intestine, iron travels through blood, bound to transferrin, and eventually ends up in the bone marrow, where it is involved in red blood cell formation. When red blood cells are degraded, the iron is recycled by the body and stored.
+
+When the amount of iron needed by the body exceeds the amount of iron that is readily available, the body can use iron stores (ferritin) for a period of time, and red blood cell formation continues normally. However, as these stores continue to be used, iron is eventually depleted to the point that red blood cell formation is abnormal. Ultimately, anemia ensues, which by definition is a hemoglobin lab value below normal limits.
+
+## Diagnosis
+
+Conventionally, a definitive diagnosis requires a demonstration of depleted body iron stores obtained by bone marrow aspiration, with the marrow stained for iron. However, with the availability of reliable blood tests that can be more readily collected for iron-deficiency anemia diagnosis, a bone marrow aspiration is usually not obtained. Furthermore, a study published in April 2009 questions the value of stainable bone marrow iron following parenteral iron therapy. Once iron deficiency anemia is confirmed, gastrointestinal blood loss is presumed to be the cause until proven otherwise since it can be caused by an otherwise asymptomatic colon cancer. The initial evaluation must include esophagogastroduodenoscopy and colonoscopy to evaluate for cancer or bleeding of the gastrointestinal tract.
+
+A thorough medical history is important to diagnose iron-deficiency anemia. The history can help to differentiate common causes of the condition, such as menstruation in women or blood in the stool. A travel history to areas in which hookworms and whipworms are endemic may also help guide certain stool tests for parasites or their eggs. Although symptoms can play a role in identifying iron-deficiency anemia, they are often vague, which may limit their contribution to determining the diagnosis.
+
+### Blood tests
+
+**Change in lab values in iron deficiency anemia**
+
+| Change | Parameter |
+|---|---|
+| ↓ | ferritin, hemoglobin, mean corpuscular volume, mean corpuscular hemoglobin |
+| ↑ | total iron-binding capacity, transferrin, red blood cell distribution width |
+
+Routine blood tests often discover anemia. A sufficiently low hemoglobin by definition makes the diagnosis of anemia, and a low hematocrit value is also characteristic of anemia. Further studies will be undertaken to determine the cause of anemia. If the anemia is due to iron deficiency, one of the first abnormal values to be noted on a complete blood count, as the body's iron stores begin to be depleted, will be a high red blood cell distribution width, reflecting an increased variability in the size of red blood cells.
+
+A low mean corpuscular volume also appears during the course of body iron depletion. It indicates a high number of abnormally small red blood cells. A low mean corpuscular volume, a low mean corpuscular hemoglobin or mean corpuscular hemoglobin concentration, and the corresponding appearance of red blood cells on visual examination of a peripheral blood smear narrows the problem to a microcytic anemia (literally, a small red blood cell anemia).
+
+The blood smear of a person with iron-deficiency anemia shows many hypochromic (pale, relatively colorless) and small red blood cells. It may also show poikilocytosis (variation in shape) and anisocytosis (variation in size). With more severe iron-deficiency anemia, the peripheral blood smear may show hypochromic, pencil-shaped cells and, occasionally, small numbers of nucleated red blood cells. The platelet count may be slightly above the high limit of normal in iron-deficiency anemia (termed a mild thrombocytosis), but severe cases can present with thrombocytopenia (low platelet count).
+
+Iron-deficiency anemia is confirmed by tests that include serum ferritin, serum iron level, serum transferrin, and total iron binding capacity. A low serum ferritin is most commonly found. However, serum ferritin can be elevated by any chronic inflammation and thus is not consistently decreased in iron-deficiency anemia. Serum iron levels may be measured, but serum iron concentration is not as reliable as the measurement of both serum iron and serum iron-binding protein levels. The percentage of iron saturation (or transferrin saturation index or percent) can be measured by dividing the level of serum iron by total iron binding capacity and is a value that can help to confirm the diagnosis of iron-deficiency anemia; however, other conditions must also be considered, including other types of anemia.
+
+Another finding that can be used is the level of red blood cell distribution width. During haemoglobin synthesis, trace amounts of zinc will be incorporated into protoporphyrin in the place of iron which is lacking. Protoporphyrin can be separated from its zinc moiety and measured as free erythrocyte protoporphyrin, providing an indirect measurement of the zinc-protoporphyrin complex. The level of free erythrocyte protoporphyrin is expressed in either μg/dl of whole blood or μg/dl of red blood cells. An iron insufficiency in the bone marrow can be detected very early by a rise in free erythrocyte protoporphyrin.
+
+Further testing may be necessary to differentiate iron-deficiency anemia from other disorders, such as thalassemia minor. It is very important not to treat people with thalassemia with an iron supplement, as this can lead to hemochromatosis. A hemoglobin electrophoresis provides useful evidence for distinguishing these two conditions, along with iron studies.
+
+### Screening
+
+It is unclear if screening pregnant women for iron-deficiency anemia during pregnancy improves outcomes in the United States. The same holds for screening children who are 6 to 24 months old. Even so, screening is a Level B recommendation suggested by the US Preventive Services Task Force in pregnant women without symptoms and in infants considered high risk. Screening is done with either a hemoglobin or hematocrit lab test.
+
+_(Later sections of the original article were left out of this offline copy for length: Treatment.)_

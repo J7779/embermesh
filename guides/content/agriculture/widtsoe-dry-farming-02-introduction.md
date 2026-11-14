@@ -1,0 +1,44 @@
+---
+id: agriculture/widtsoe-dry-farming-02-introduction
+title: "Dry-Farming 2: Introduction"
+category: agriculture
+tags: ["dry farming", "drought", "conserve soil moisture", "fallow", "low rainfall crops", "soil", "rain", "irrigation", "drying food"]
+summary: "Introduction, from Dry-Farming (Widtsoe, 1911). Dry-farming, as at present understood, is the profitable production of useful crops, without irrigation, on lands that receive annually a rainfall of 20 inches or less."
+source: "John A. Widtsoe, Dry-Farming: A System of Agriculture for Countries under a Low Rainfall (The Macmillan Company, New York, 1911); public-domain transcription"
+source_title: "Dry-Farming: A System of Agriculture for Countries under a Low Rainfall"
+license: Public Domain
+attribution: "John A. Widtsoe, Dry-Farming: A System of Agriculture for Countries under a Low Rainfall (The Macmillan Company, New York, 1911). Public domain in the United States (published before 1930)."
+retrieved: 2026-11-13
+part_of: agriculture/widtsoe-dry-farming
+order: 2
+---
+
+# Dry-Farming 2: Introduction
+
+*From Dry-Farming: A System of Agriculture for Countries under a Low Rainfall by John A. Widtsoe (The Macmillan Company, New York, 1911).*
+
+Dry-farming, as at present understood, is the profitable production of useful crops, without irrigation, on lands that receive annually a rainfall of 20 inches or less. In districts of torrential rains, high winds, unfavorable distribution of the rainfall, or other water-dissipating factors, the term "dry-farming" is also properly applied to farming without irrigation under an annual precipitation of 25 or even 30 inches. There is no sharp demarcation between dry-and humid-farming.
+
+When the annual precipitation is under 20 inches, the methods of dry-farming are usually indispensable. When it is over 30 inches, the methods of humid-farming are employed; in places where the annual precipitation is between 20 and 30 inches, the methods to be used depend chiefly on local conditions affecting the conservation of soil moisture. Dry-farming, however, always implies farming under a comparatively small annual rainfall.
+
+The term "dry-farming" is, of course, a misnomer. In reality it is farming under drier conditions than those prevailing in the countries in which scientific agriculture originated. Many suggestions for a better name have been made. "Scientific agriculture" has-been proposed, but all agriculture should be scientific, and agriculture without irrigation in an arid country has no right to lay sole claim to so general a title. "Dry-land agriculture," which has also been suggested, is no improvement over "dry-farming," as it is longer and also carries with it the idea of dryness. Instead of the name "dry-farming" it would, perhaps, be better to use the names, "arid-farming." "semiarid-farming," "humid-farming," and "irrigation-farming," according to the climatic conditions prevailing in various parts of the world. However, at the present time the name "dry-farming" is in such general use that it would seem unwise to suggest any change. It should be used with the distinct understanding that as far as the word "dry" is concerned it is a misnomer. When the two words are hyphenated, however, a compound technical term—"dry-farming"—is secured which has a meaning of its own, such as we have just defined it to be; and "dry-farming," therefore, becomes an addition to the lexicon.
+
+Dry-versus humid-farming
+
+Dry-farming, as a distinct branch of agriculture, has for its purpose the reclamation, for the use of man, of the vast unirrigable "desert" or "semi-desert" areas of the world, which until recently were considered hopelessly barren. The great underlying principles of agriculture are the same the world over, yet the emphasis to be placed on the different agricultural theories and practices must be shifted in accordance with regional conditions. The agricultural problem of first importance in humid regions is the maintenance of soil fertility; and since modern agriculture was developed almost wholly under humid conditions, the system of scientific agriculture has for its central idea the maintenance of soil fertility. In arid regions, on the other hand, the conservation of the natural water precipitation for crop production is the important problem; and a new system of agriculture must therefore be constructed, on the basis of the old principles, but with the conservation of the natural precipitation as the central idea. The system of dry-farming must marshal and organize all the established facts of science for the better utilization, in plant growth, of a limited rainfall. The excellent teachings of humid agriculture respecting the maintenance of soil fertility will be of high value in the development of dry-farming, and the firm establishment of right methods of conserving and using the natural precipitation will undoubtedly have a beneficial effect upon the practice of humid agriculture.
+
+The problems of dry-farming
+
+The dry-farmer, at the outset, should know with comparative accuracy the annual rainfall over the area that he intends to cultivate. He must also have a good acquaintance with the nature of the soil, not only as regards its plant-food content, but as to its power to receive and retain the water from rain and snow. In fact, a knowledge of the soil is indispensable in successful dry-farming. Only by such knowledge of the rainfall and the soil is he able to adapt the principles outlined in this volume to his special needs.
+
+Since, under dry-farm conditions, water is the limiting factor of production, the primary problem of dry-farming is the most effective storage in the soil of the natural precipitation. Only the water, safely stored in the soil within reach of the roots, can be used in crop production. Of nearly equal importance is the problem of keeping the water in the soil until it is needed by plants. During the growing season, water may be lost from the soil by downward drainage or by evaporation from the surface. It becomes necessary, therefore, to determine under what conditions the natural precipitation stored in the soil moves downward and by what means surface evaporation may be prevented or regulated. The soil-water, of real use to plants, is that taken up by the roots and finally evaporated from the leaves. A large part of the water stored in the soil is thus used. The methods whereby this direct draft of plants on the soil-moisture may be regulated are, naturally, of the utmost importance to the dry-farmer, and they constitute another vital problem of the science of dry-farming.
+
+The relation of crops to the prevailing conditions of arid lands offers another group of important dry-farm problems. Some plants use much less water than others. Some attain maturity quickly, and in that way become desirable for dry-farming. Still other crops, grown under humid conditions, may easily be adapted to dry-farming conditions, if the correct methods are employed, and in a few seasons may be made valuable dry-farm crops. The individual characteristics of each crop should be known as they relate themselves to a low rainfall and arid soils.
+
+After a crop has been chosen, skill and knowledge are needed in the proper seeding, tillage, and harvesting of the crop. Failures frequently result from the want of adapting the crop treatment to arid conditions.
+
+After the crop has been gathered and stored, its proper use is another problem for the dry-farmer. The composition of dry-farm crops is different from that of crops grown with an abundance of water. Usually, dry-farm crops are much more nutritious and therefore should command a higher price in the markets, or should be fed to stock in corresponding proportions and combinations.
+
+The fundamental problems of dry-farming are, then, the storage in the soil of a small annual rainfall; the retention in the soil of the moisture until it is needed by plants; the prevention of the direct evaporation of soil-moisture during; the growing season; the regulation of the amount of water drawn from the soil by plants; the choice of crops suitable for growth under arid conditions; the application of suitable crop treatments, and the disposal of dry-farm products, based upon the superior composition of plants grown with small amounts of water. Around these fundamental problems cluster a host of minor, though also important, problems. When the methods of dry-farming are understood and practiced, the practice is always successful; but it requires more intelligence, more implicit obedience to nature's laws, and greater vigilance, than farming in countries of abundant rainfall.
+
+The chapters that follow will deal almost wholly with the problems above outlined as they present themselves in the construction of a rational system of farming without irrigation in countries of limited rainfall.

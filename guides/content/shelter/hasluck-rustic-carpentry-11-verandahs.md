@@ -1,0 +1,53 @@
+---
+id: shelter/hasluck-rustic-carpentry-11-verandahs
+title: "Rustic Carpentry 11: Verandahs"
+category: shelter
+tags: ["rustic carpentry", "garden shelter", "rustic furniture", "poles", "summer house", "bridges", "framing", "roofing", "pottery kiln", "painting", "thatching"]
+summary: "Verandahs, from Rustic Carpentry ((editor), 1907). The front elevation of a rustic verandah is presented by Fig."
+source: "Paul N. Hasluck (editor), Rustic Carpentry (Cassell and Company, London, 1907); public-domain transcription"
+source_title: "Rustic Carpentry"
+license: Public Domain
+attribution: "Paul N. Hasluck (editor), Rustic Carpentry (Cassell and Company, London, 1907). Public domain in the United States (published before 1930)."
+retrieved: 2026-11-13
+part_of: shelter/hasluck-rustic-carpentry
+order: 11
+---
+
+# Rustic Carpentry 11: Verandahs
+
+*From Rustic Carpentry by Paul N. Hasluck (editor) (Cassell and Company, London, 1907).*
+
+The front elevation of a rustic verandah is presented by Fig. 133, which shows a part only, which may be extended to any required length at either end. As to the width, that indicated is 3½ ft. from the wall to the middle of the collar-posts, the eaves having a further projection of 6 in. For a cottage verandah the width given is a satisfactory one. It gives sufficient room for seats on a hot day, or for a promenade on a wet one. The width, as also the height, can easily be increased to suit a larger house. The verandah is supposed to be built on a raised platform of brick or stone.
+
+All parts of the actual framework are of straight natural wood, preferably larch; whilst the mere filling-in of rustic open-work is of small crooked stuff—probably oak or apple tree. The roof, as illustrated, is of tiles.
+
+It will be seen that the posts which support the verandah are arranged in pairs, so that 3 in. or 3½ in. poles will suffice for them. Their bases are supposed to be dowelled to the masonry of the platform on which they stand; they are 6 ft. 6 in. high. Except at the entrances, a sill of half-stuff runs from post to post on the platform. At a height of 3 ft. 3 in. they are connected by a round bar of smaller material, and, again, by a second cross-bar of similar size to the last, at 6 in. from their upper ends. On the tops of the posts rests a lintel of half-stuff of larger diameter—say 5 in. The upper and lower cross-bars come opposite to the middles of the posts, but need not be mortised into them, for if their ends are cut V-shaped, so as to clip the posts, they can be nailed quite firmly.
+
+*[Illustration: Fig. 133.—Front Elevation of Verandah.]*
+
+The lower cross-rail is placed at a convenient height for leaning upon. At a height of 5 ft. 6 in. caps are formed by simply nailing four pieces of quartered stuff round each post. The diagonal braces which start from above the capitals pass in front of the upper cross-bars, to which and to the lintel they are nailed. Fig. 133 sufficiently shows how the panels between the pairs of posts and the frieze between the upper cross-bar and lintel are filled with open-work of small crooked branches, which contrasts in a pleasing manner with the straight pieces of the framework. This open-work may be made available for, and will be found useful as, a support for climbing plants.
+
+In so narrow a structure the rafters alone will suffice to keep all in place, without anything of the nature of a tie-beam being called for. These rafters will be of half-stuff, and for the given width a length of 5 ft. will be enough; this will allow of such a projection beyond the lintel as will give the eaves a width of 6 in.; the pitch will be rather less than a true pitch, but amply steep for the purpose. A piece of half-stuff nailed to the wall will support the upper ends of the rafters.
+
+In forming the roof it is proposed to board over the whole space upon the rafters, and to nail the tiles or other covering upon the boards. The inside may be lined beneath the boarding with rush matting. This is an inexpensive material; its brownish-green hue is pleasing to the eye, and it is so inartificial in appearance as to harmonise well with the natural wood. After fixing the rafters, the matting is to be stretched tightly across them before the boards are nailed down. It is probable that the rafters will be arranged with intervals of about a foot between them, and to hold the matting more closely to the boards a strip of split rod may be nailed up the middle of each space, or strips may be nailed so as to form a simple ornamental pattern; an intricate one will not be desirable, as fixing it will be overhead work.
+
+*[Illustration: Fig. 134.—Front Elevation of Glazed Verandah for Grape Culture.]*
+
+A neat, but less characteristic, ceiling may be formed by painting the boards a suitable colour and slightly ornamenting them with split strips of rod. In this case the boards should be planed. None will be better for this purpose than ¾ in. flooring boards, and these are commonly sold planed on one side. Other ways of lining the roofs of rustic buildings are discussed in Chapter XIII. For summer-houses thatch makes a good-looking roof, but a thatched verandah would scarcely be desirable unless attached to a thatched cottage. Practically the choice lies between shingles, metal, and tile or slate. A metal roof is, undoubtedly, that most easily fixed by the beginner; black sheet iron looks better than galvanised, and must be kept painted. As a matter of taste, metal looks thin and poor, but it becomes less objectionable when painted; a deep, dull red would be the colour to be preferred. Perhaps, of all available coverings, nothing will look better than tiles, as drawn. Red or buff tiles will in themselves look best, but the choice must, to an extent, be influenced by the general covering of the house. It may be, if that is of slate, that small slates will come in most appropriately; but whichever of these coverings is used, the best finish against the wall will be with a "flashing" of metal, as shown.
+
+It has been asserted by some who consider themselves authorities in matters of taste that nothing of the nature of a greenhouse ever harmonises with natural surroundings, or is otherwise than an eyesore in a garden in other respects beautiful. The hard, straight lines of wood or metal, and wide surfaces of shining glass, are not pleasing, and are too suggestive of the shop and factory to accord well with natural objects. It has been suggested that the difficulty might be overcome by combining rustic work with glass. This, at the first glance, looks fairly easy; but, on consideration, it will be seen to be otherwise. Rustic carpentry is in its nature irregular, and cannot be brought to those level planes and straight lines essential to glass-work; whilst for interiors, and especially those of houses intended for vines, rough bark-coloured surfaces afford too much shelter to insect pests—so that, in reality, rustic-work can only be made applicable to a very limited extent. In the grape-growing verandah shown by Fig. 134, therefore, only a limited amount of rustic-work has been introduced, and that on the outside.
+
+| [Illustration: Fig. 135.—Side View of Bottom of Post for Glazed Verandah.] Fig. 135.—Side View of Bottom of Post for Glazed Verandah. | [Illustration: Fig. 136.—Side View of Top of Post for Glazed Verandah.] Fig. 136.—Side View of Top of Post for Glazed Verandah. |
+|---|---|
+
+Such of the materials as are of a rustic kind are, for the parapet and uprights, some rather small larch poles or other tolerably straight, round stuff, and for the panels, some of those "slabs," or rough outside planks. As to the posts, and such parts as are not rustic, they are supposed to be of good deal. The sash-bars, which carry the glass both in roof and walls, are to be bought struck by steam at a lower price than they can be worked by hand, or sashes may be bought ready glazed. For glazing work of this kind, 16-oz., or sometimes 20-oz., glass is used.
+
+As in the design for an open rustic verandah (see Fig. 133) it is intended that the collar-posts should be set upon and dowelled into a raised platform of masonry. The present structure is, of course, intended for the warmer sides of a house, south or west. The width, to meet particular cases, can be varied, but is, according to the drawings, 4½ ft. The posts are 6 ft. high and 3½ in. square. They are set with spaces between them alternately of 3 ft. and 4½ ft. On their tops rests a wall-plate of the same width as themselves, and 2½ in. deep. The rafters, which are sash-bars rebated to carry the glass, rest on this wall-plate, and against a second vertical one fixed to the house wall.
+
+Fig. 134 is a front elevation of a portion of the verandah, whilst Fig. 135 gives a side view of the lower half of one of the collar-posts. At *a*, in Fig. 135, is seen the section of the upper cross-rail, which has its top 2½ ft. from the ground; at *b* is the lower cross-rail, or sill. Both are of quartered rough stuff, and are mortised to the post ¾ in. from its inner edge, so that when the ¾ in. boarding, *c*, is nailed against them, it will come flush with the inner side of the post. At *d* is indicated the sash-frame, with its rebate for glass, which occupies the upper part of the opening; and at *e* is a metal flashing between rail and sash to throw off rain. It is proposed that the sashes in the narrower openings only should be made to push outwards at bottom for ventilation. At *f* is a piece of halved rough stuff nailed to the front of the post.
+
+The panels, which occupy the lower part of the space between the collar-posts, are filled with pieces of rough plank or "slab," as shown in Fig. 134. These pieces should wear their natural bark as far as possible; they are nailed to the inner boarding.
+
+In Fig. 136 the upper part of a post is in like manner shown in profile: *g* is the wall-plate in section, and *h* is the lower end of a rafter. At *i* will be observed a strip of quartered stuff nailed across the post (with a fir-cone bradded beneath it), which gives a starting-point to the upright *k*, by which the openwork rustic parapet is supported. These uprights are of small round stuff, slightly flattened on the side towards the post. The openwork parapet is too plainly figured to need description; it is intended to break to a certain extent the straight lines, and partially to conceal the glass-work of the roof, without seriously interfering with sunshine.
+
+So much of the planed wood-work as shows outside should be painted of a good brown, to assimilate with the rustic-work.

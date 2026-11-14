@@ -1,0 +1,72 @@
+---
+id: food/wp2-bakers-yeast
+title: Baker's yeast
+category: food
+tags: [baker's yeast, food]
+summary: Baker's yeast is the common name for the strains of yeast commonly used in baking bread and other bakery products, serving as a leavening agent which causes the bread to rise (expand and become lighter and softer) by converting the fermentable sugars present in the dough into carbon…
+source: https://en.wikipedia.org/w/index.php?title=Baker%27s_yeast&oldid=1377064438
+source_title: Wikipedia: Baker's yeast
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Baker's yeast", Wikipedia, The Free Encyclopedia (revision 1377064438), https://en.wikipedia.org/w/index.php?title=Baker%27s_yeast&oldid=1377064438 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Baker's yeast
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Baker's yeast** is the common name for the strains of yeast commonly used in baking bread and other bakery products, serving as a leavening agent which causes the bread to rise (expand and become lighter and softer) by converting the fermentable sugars present in the dough into carbon dioxide and ethanol. Baker's yeast is of the species *Saccharomyces cerevisiae*, and is the same species (but a different strain) as the kind commonly used in alcoholic fermentation, which is called brewer's yeast or the deactivated form nutritional yeast. Baker's yeast is also a single-cell microorganism found on and around the human body.
+
+The use of steamed or boiled potatoes, water from potato boiling, or sugar in a bread dough provides food for the growth of yeasts; however, too much sugar will dehydrate them. Yeast growth is inhibited by both salt and sugar, but more so by salt than sugar. Some sources say fats, such as butter and eggs, slow yeast growth; others say the effect of fat on dough remains unclear, presenting evidence that small amounts of fat are beneficial for baked bread volume.
+
+*Kazachstania exigua* (formerly known as *Saccharomyces exiguus*), is a wild yeast found on plants, grains, and fruits that is occasionally used for baking; however, in general, it is not used in a pure form but comes from being propagated in a sourdough starter.
+
+## Types of baker's yeast
+
+Baker's yeast is available in a number of different forms, the main differences being the moisture contents. Though each version has certain advantages over the others, the choice of which form to use is largely a question of the requirements of the recipe at hand and the training of the cook preparing it. Dry yeast forms are good choices for longer-term storage, often lasting more than a year at room temperatures without significant loss of viability. In general, with occasional allowances for liquid content and temperature, the different forms of commercial yeast are considered interchangeable.
+
+- **Cream yeast** is the closest form to the yeast slurries of the 19th century, in essence being a suspension of yeast cells in liquid, siphoned off from the growth medium. Its primary use is in industrial bakeries with special high-volume dispensing and mixing equipment, and it is not readily available to small bakeries or home cooks.
+- **Compressed yeast** is, in essence, cream yeast with most of the liquid removed. It is a soft solid, beige in color, and best known in the consumer form as small, foil-wrapped cubes of **cake yeast**. It is also available in a larger-block form for bulk usage. It is highly perishable; though formerly widely available for the consumer market, it has become less common in supermarkets in some countries due to its poor keeping properties, having been superseded in some such markets by active dry and instant yeast. It is still widely available for commercial use, and is somewhat more tolerant of low temperatures than other forms of commercial yeast; however, even there, instant yeast has made significant market inroads.
+- **Active dry yeast** is the form of yeast most commonly available to non-commercial bakers in the United States. It consists of coarse oblong granules of yeast, with live yeast cells encapsulated in a thick jacket of dry, dead cells with some growth medium. Under most conditions, active dry yeast must first be proofed or rehydrated. It can be stored at room temperature for a year, or frozen for more than a decade, which means that it has better keeping qualities than other forms, but it is generally considered more sensitive than other forms to thermal shock when actually used in recipes.
+
+- **Instant yeast** appears similar to active dry yeast, but has smaller granules with substantially higher percentages of live cells per comparable unit volumes. It is more perishable than active dry yeast but also does not require rehydration, and can usually be added directly to all but the driest doughs. In general, instant yeast has a small amount of ascorbic acid added as a preservative. Some producers provide specific variants for doughs with high sugar contents, and such yeasts are more generally known as **osmotolerant yeasts**.
+- **Rapid-rise yeast** is a variety/type of dried yeast (usually a form of instant yeast) that is of a smaller granular size, thus it dissolves faster in dough, and it provides greater carbon dioxide output to allow faster rising. There is considerable debate as to the value of such a product; while most baking experts believe it reduces the flavor potential of the finished product, *Cook's Illustrated* magazine, among others, feels that, at least for direct-rise recipes, it makes little difference. Rapid-rise yeast is often marketed specifically for use in bread machines.
+- **Deactivated yeast** is dead yeast which has no leavening value and is not interchangeable with other yeast types. Typically used for pizza and pan bread doughs, it is used at a rate of 0.1% of the flour weight, though manufacturer specifications may vary. It is a powerful reducing agent used to increase the extensibility of a dough.
+
+### Difference between instant and active dry yeast
+
+Instant and active dry yeast are essentially the same ingredient, just in slightly different forms and applications. Consumers should keep sealed packets of both yeast types at room temperature and store partially used packets in an airtight container in the refrigerator. The main differences between the two are:
+
+- Active yeast needs rehydration. Instant yeast can be mixed directly into dry ingredients, whereas active dry yeast must first be dissolved and rehydrated in warm water.
+- Instant yeast needs less time to rise. Since instant yeast has a finer texture than active dry yeast, it is possible to skip the initial rise time and shape loaves immediately after kneading. Loaves made with active dry yeast require longer rising times for the yeast to work its way through the dough.
+
+## Use in research
+
+### Model organism
+
+Because it is readily available and easy to culture, baker's yeast has long been used in chemical, biological, and genetic research as a model organism. *Saccharomyces cerevisiae* is a facultative anaerobe and undergoes aerobic fermentation in the presences of oxygen and sugars. In 1996, after six years of work, *S. cerevisiae* became the first eukaryote to have its entire genome sequenced. It has over 12 million base pairs and around 6000 genes. Since then, it has remained in the forefront of genetic research. For example, most of our knowledge of the cell division cycle was worked out from experiments with yeast.
+
+### Organic synthesis
+
+Baker's yeast contains enzymes that can reduce a carbonyl group into a hydroxyl group in fairly high yield, thus making it useful for biotransformations in organic syntheses. It is known to reduce organometallic carbonyl compounds in very high yield.
+
+#### Psychoactive drugs
+
+- Baker's yeast can also be used to produce ethanol via fermentation for use in chemical synthesis, although doing so in some places requires permits.
+- A GMO strain of baker's yeast, DLAM33B, has been developed to produce the precursor for LSD, lysergic acid.
+
+## Industrial production
+
+The baking industry relies on industrial production of its ingredients, including baking yeasts. Much effort has been put into developing and marketing yeasts that will perform reliably in mass production. Since the end of the nineteenth century, baker's yeast has been produced by companies that specialize in its production.
+
+The main ingredients for industrial production are yeast cultures, sugar from cane and sugar beet; but a number of minerals, nitrogen and vitamins are also needed.
+
+Fermentation happens in several phases, which vary depending on the manufacturer:
+
+- pure cultures in a laboratory flask for 2 to 4 days, then batch fermentations for 13 to 24 hours (anaerobic);
+- intermediate and stock fermentation with gradual feeding and constant aeration;
+- pitch and trade fermentation with large air supplies for up to 15 hours;
+- filtration, blending, extrusion, and cutting, drying.
+The yeast grows from hundreds of kilograms in the intermediate and stock fermentor to tens of thousands of kilograms in the trade fermentor, where most yeast is produced. The earlier stages produce more ethanol and other alcohols, while in the final stages ethanol production is suppressed up to 95% by controlling the amount of oxygen and sugar, in order to increase the yeast production instead.
+
+The industry is highly concentrated, with five companies holding up to 80% of the worldwide market for dry yeast as of 2006. While dry yeast is exported over long distances and mostly sold in the developing countries, industrial customers often prefer to supply fresh yeast from local facilities, with a single wholesaler having up to 90% of the liquid yeast market in the UK in 2006. In the US companies like Lesaffre Group, AB Vista, GB Plange and AB Mauri produced hundreds of thousands of metric tons of yeast in 2012.

@@ -1,0 +1,57 @@
+---
+id: repair/wp2-lost-wax-casting
+title: Lost-wax casting
+category: repair
+tags: [lost-wax casting, precision casting, lost-wax fusion, cire perdue, tools]
+summary: Lost-wax casting – also called precision casting, lost-wax fusion, or cire perdue (borrowed from French) – is the process by which a duplicate sculpture (often a metal, such as silver, gold, brass, or bronze) is cast from an original sculpture.
+source: https://en.wikipedia.org/w/index.php?title=Lost-wax_casting&oldid=1385559706
+source_title: Wikipedia: Lost-wax casting
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Lost-wax casting", Wikipedia, The Free Encyclopedia (revision 1385559706), https://en.wikipedia.org/w/index.php?title=Lost-wax_casting&oldid=1385559706 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Lost-wax casting
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Lost-wax casting** – also called **precision casting**, **lost-wax fusion**, or ***cire perdue*** (borrowed from French) – is the process by which a duplicate sculpture (often a metal, such as silver, gold, brass, or bronze) is cast from an original sculpture. Intricate works can be achieved by this method. Investment casting is an industrial process based on lost-wax casting.
+
+The oldest known examples of this technique are approximately 6,500 years old (4550–4450 BC) and attributed to gold artefacts found at Bulgaria's Varna Necropolis. A copper amulet from Mehrgarh, Indus Valley Civilization, in present-day Pakistan, is dated to circa 4000 BC. Cast copper objects, found in the Nahal Mishmar hoard in southern Israel, which belong to the Chalcolithic period (4500–3500 BC), are estimated, from carbon-14 dating, to date to circa 3500 BC. Other examples from somewhat later periods are from Mesopotamia in the third millennium BC. Lost-wax casting was widespread in Europe until the 18th century, when a piece-moulding process came to predominate.
+
+The steps used in casting small bronze sculptures are fairly standardized, though the process today varies from foundry to foundry (in modern industrial use, the process is called investment casting). Variations of the process include: "lost mould", which recognizes that materials other than wax can be used (such as tallow, resin, tar, and textile).
+
+## Process
+
+Casts can be made of the wax model itself, the direct method, or of a wax copy of a model that need not be of wax, the indirect method. These are the steps for the indirect process (the direct method starts at step 7):
+
+1. **Model-making.** An artist or mould-maker creates an original model from wax, clay, or another material. Wax and oil-based clay are often preferred because these materials retain their softness.
+1. **Mouldmaking.** A mould is made of the original model or sculpture. The rigid outer moulds contain the softer inner mould, which is the exact negative of the original model. Inner moulds are usually made of latex, polyurethane rubber or silicone, which is supported by the outer mould. The outer mould can be made from plaster, but can also be made of fiberglass or other materials. Most moulds are made of at least two pieces, and a shim with keys is placed between the parts during construction so that the mould can be put back together accurately. If there are long, thin pieces extending out of the model, they are often cut off of the original and moulded separately. Sometimes many moulds are needed to recreate the original model, especially for large models.
+1. **Wax.** Once the mould is finished, molten wax is poured into it and swished around until an even coating, usually about 3 mm (1/8 inch) thick, covers the inner surface of the mould. This is repeated until the desired thickness is reached. Another method is to fill the entire mould with molten wax and let it cool until a desired thickness has set on the surface of the mould. After this the rest of the wax is poured out again, the mould is turned upside down and the wax layer is left to cool and harden. With this method it is more difficult to control the overall thickness of the wax layer.
+1. **Removal of wax**. This hollow wax copy of the original model is removed from the mould. The model-maker may reuse the mould to make multiple copies, limited only by the durability of the mould.
+1. **Chasing**. Each hollow wax copy is then "chased": a heated metal tool is used to rub out the marks that show the parting line or flashing where the pieces of the mould came together. The wax is dressed to hide any imperfections. The wax now looks like the finished piece. Wax pieces that were moulded separately can now be heated and attached; foundries often use registration marks to indicate exactly where they go.
+1. **Spruing.** The wax copy is sprued with a treelike structure of wax that will eventually provide paths for the molten casting material to flow and for air to escape. The carefully planned spruing usually begins at the top with a wax "cup," which is attached by wax cylinders to various points on the wax copy. The spruing does not have to be hollow, as it will be melted out later in the process.
+1. **Slurry.** A sprued wax copy is dipped into a slurry of silica, then into a sand-like stucco, or dry crystalline silica of a controlled grain size. The slurry and grit combination is called ceramic shell mould material, although it is not literally made of ceramic. This shell is allowed to dry, and the process is repeated until at least a half-inch coating covers the entire piece. The bigger the piece, the thicker the shell needs to be. Only the inside of the cup is not coated, and the cup's flat top serves as the base upon which the piece stands during this process. The core is also filled with fire-proof material.
+1. **Burnout.** The ceramic shell-coated piece is placed cup-down in a kiln, whose heat hardens the silica coatings into a shell, and the wax melts and runs out. The melted wax can be recovered and reused, although it is often simply burned up. Now all that remains of the original artwork is the negative space formerly occupied by the wax, inside the hardened ceramic shell. The feeder, vent tubes and cup are also now hollow.
+1. **Testing.** The ceramic shell is allowed to cool, then is tested to see if water will flow freely through the feeder and vent tubes. Cracks or leaks can be patched with thick refractory paste. To test the thickness, holes can be drilled into the shell, then patched.
+1. **Pouring.** The shell is reheated in the kiln to harden the patches and remove all traces of moisture, then placed cup-upward into a tub filled with sand. Metal is melted in a crucible in a furnace, then poured carefully into the shell. The shell has to be hot because otherwise the temperature difference would shatter it. The filled shells are then allowed to cool.
+1. **Release.** The shell is hammered or sand-blasted away, releasing the rough casting. The sprues, which are also faithfully recreated in metal, are cut off, the material to be reused in another casting.
+1. **Metal-chasing.** Just as the wax copies were chased, the casting is worked until the telltale signs of the casting process are removed, so that the casting now looks like the original model. Pits left by air bubbles in the casting and the stubs of the spruing are filed down and polished.
+
+Prior to silica-based casting moulds, these moulds were made of a variety of other fire-proof materials, the most common being plaster based, with added grout, and clay based. Prior to rubber moulds gelatine was used.
+
+## Jewellery and small parts
+
+The methods used for small parts and jewellery vary somewhat from those used for sculpture. A wax model is obtained either from injection into a rubber mould or by being custom-made by carving. The wax or waxes are sprued and fused onto a rubber base, called a "sprue base". Then a metal flask, which resembles a short length of steel pipe that ranges roughly from 3.5 to 15 cm tall and wide, is put over the sprue base and the waxes. Most sprue bases have a circular rim which grips the standard-sized flask, holding it in place. Investment (refractory plaster) is mixed and poured into the flask, filling it. It hardens, then is burned out as outlined above. Casting is usually done straight from the kiln either by centrifugal casting or vacuum casting.
+
+The lost-wax process can be used with any material that can burn, melt, or evaporate to leave a mould cavity. Some automobile manufacturers use a lost-foam technique to make engine blocks. The model is made of polystyrene foam, which is placed into a casting flask, consisting of a cope and drag, which is then filled with casting sand. The foam supports the sand, allowing shapes that would be impossible if the process had to rely on the sand alone. The metal is poured in, vaporizing the foam with its heat.
+
+In dentistry, gold crowns, inlays and onlays are made by the lost-wax technique. Application of Lost Wax technique for the fabrication of cast inlay was first reported by Taggart. A typical gold alloy is about 60% gold and 28% silver with copper and other metals making up the rest. Careful attention to tooth preparation, impression taking and laboratory technique are required to make this type of restoration a success. Dental laboratories make other items this way as well.
+
+## Textiles
+
+In this process, the wax and the textile are both replaced by the metal during the casting process, whereby the fabric reinforcement allows for a thinner model, and thus reduces the amount of metal expended in the mould. Evidence of this process is seen by the textile relief on the reverse side of objects and is sometimes referred to as "lost-wax, lost textile". This textile relief is visible on gold ornaments from burial mounds in southern Siberia of the ancient horse riding tribes, such as the distinctive group of openwork gold plaques housed in the Hermitage Museum, Saint Petersburg. The technique may have its origins in the Far East, as indicated by the few Han examples, and the bronze buckle and gold plaques found at the cemetery at Xigou. Such a technique may also have been used to manufacture some Viking Age oval brooches, indicated by numerous examples with fabric imprints such as those of Castletown (Scotland).
+
+## Glass sculptures
+
+The lost-wax casting process may also be used in the production of cast glass sculptures. The original sculpture is made from wax. The sculpture is then covered with mold material (e.g., plaster), except for the bottom of the mold which must remain open. When the mold has hardened, the encased sculpture is removed by applying heat to the bottom of the mold. This melts out the wax (the wax is 'lost') and destroys the original sculpture. The mold is then placed in a kiln upside down with a funnel-like cup on top that holds small chunks of glass. When the kiln is brought up to temperature (1450-1530 °F), the glass chunks melt and flow down into the mold. Annealing time is usually 3–5 days, and total kiln time is 5 or more days. After the mold is removed from the kiln, the mold material is removed to reveal the sculpture inside.

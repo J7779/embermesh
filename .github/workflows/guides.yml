@@ -1,0 +1,109 @@
+name: Guides
+
+# The offline guide library: validate the whole corpus (front matter, licences, sizes, ids),
+# build guides.pack, check it verifies and is reproducible, run the search-quality checks (the
+# core's guides doctest suite, which includes the ranking tests, and the search smoke queries in
+# tools/ci/guides-search-checks.tsv) and report the totals.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: guides-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  guides:
+    name: Validate, pack, search checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build guidepack and guides.pack (build.sh)
+        run: |
+          mkdir -p build/ci-logs
+          set -o pipefail
+          ./build.sh guides 2>&1 | tee build/ci-logs/guides-build.log
+
+      - name: Validate, inspect and search-check the library
+        id: report
+        run: |
+          set -o pipefail
+          tools/ci/guides-report.sh build/host/tools/guidepack build/guides.pack > build/ci-logs/guides-report.md 2> >(tee build/ci-logs/guides-diagnostics.txt >&2)
+
+      - name: Reproducible pack (second build must be byte-identical)
+        if: ${{ !cancelled() }}
+        run: |
+          build/host/tools/guidepack build guides/content -o build/guides-again.pack > /dev/null
+          cmp build/guides.pack build/guides-again.pack
+          sha256sum build/guides.pack | tee build/ci-logs/guides-pack.sha256
+
+      - name: Search quality (core guides test suite)
+        if: ${{ !cancelled() }}
+        run: |
+          cmake --build build/host --target ember_tests --parallel 4 > /dev/null
+          set -o pipefail
+          build/host/core/ember_tests -ts=guides --no-colors 2>&1 | tee build/ci-logs/guides-tests.log
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            cat build/ci-logs/guides-report.md 2>/dev/null || echo "guide report not produced"
+            echo
+            echo "#### Tests"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests doctest "core guides suite (-ts=guides)" build/ci-logs/guides-tests.log
+            echo
+            echo "Artifact \`guides-pack\`:"
+            echo
+            python3 tools/ci/report.py files build/guides.pack
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload guides.pack
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: guides-pack
+          path: build/guides.pack
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: guides-reports
+          path: build/ci-logs/
+          retention-days: 14
+
+  summary:
+    name: Guides summary
+    if: always()
+    needs: [guides]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/ci
+      - name: Required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 tools/ci/needs-summary.py "Guides"

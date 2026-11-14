@@ -1,0 +1,68 @@
+# Sources added by the wiki2 sweep for the `power` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `power/wp2-alcohol-fuel` — Alcohol fuel — https://en.wikipedia.org/w/index.php?title=Alcohol_fuel&oldid=1369284131
+  - `power/wp2-alkaline-battery` — Alkaline battery — https://en.wikipedia.org/w/index.php?title=Alkaline_battery&oldid=1379153667
+  - `power/wp2-alternator` — Alternator — https://en.wikipedia.org/w/index.php?title=Alternator&oldid=1382742931
+  - `power/wp2-ampere-hour` — Ampere-hour — https://en.wikipedia.org/w/index.php?title=Ampere-hour&oldid=1373923453
+  - `power/wp2-anaerobic-digester-types` — Anaerobic digester types — https://en.wikipedia.org/w/index.php?title=Anaerobic_digester_types&oldid=1358644598
+  - `power/wp2-anaerobic-digestion` — Anaerobic digestion — https://en.wikipedia.org/w/index.php?title=Anaerobic_digestion&oldid=1384669079
+  - `power/wp2-battery-charger` — Battery charger — https://en.wikipedia.org/w/index.php?title=Battery_charger&oldid=1383601128
+  - `power/wp2-battery-management-system` — Battery management system — https://en.wikipedia.org/w/index.php?title=Battery_management_system&oldid=1377978044
+  - `power/wp2-bearing-mechanical` — Bearing (mechanical) — https://en.wikipedia.org/w/index.php?title=Bearing_(mechanical)&oldid=1382043357
+  - `power/wp2-belt-mechanical` — Belt (mechanical) — https://en.wikipedia.org/w/index.php?title=Belt_(mechanical)&oldid=1384833754
+  - `power/wp2-biodiesel` — Biodiesel — https://en.wikipedia.org/w/index.php?title=Biodiesel&oldid=1383593060
+  - `power/wp2-bottle-dynamo` — Bottle dynamo — https://en.wikipedia.org/w/index.php?title=Bottle_dynamo&oldid=1324640234
+  - `power/wp2-briquette` — Briquette — https://en.wikipedia.org/w/index.php?title=Briquette&oldid=1380132295
+  - `power/wp2-chain-drive` — Chain drive — https://en.wikipedia.org/w/index.php?title=Chain_drive&oldid=1371783870
+  - `power/wp2-circuit-breaker` — Circuit breaker — https://en.wikipedia.org/w/index.php?title=Circuit_breaker&oldid=1381589912
+  - `power/wp2-cross-flow-turbine` — Cross-flow turbine — https://en.wikipedia.org/w/index.php?title=Cross-flow_turbine&oldid=1221050606
+  - `power/wp2-deep-cycle-battery` — Deep-cycle battery — https://en.wikipedia.org/w/index.php?title=Deep-cycle_battery&oldid=1364852762
+  - `power/wp2-dynamo` — Dynamo — https://en.wikipedia.org/w/index.php?title=Dynamo&oldid=1372970338
+  - `power/wp2-earthing-system` — Earthing system — https://en.wikipedia.org/w/index.php?title=Earthing_system&oldid=1361707333
+  - `power/wp2-electric-generator` — Electric generator — https://en.wikipedia.org/w/index.php?title=Electric_generator&oldid=1381436191
+  - `power/wp2-electric-motor` — Electric motor — https://en.wikipedia.org/w/index.php?title=Electric_motor&oldid=1384899412
+  - `power/wp2-electrical-wiring` — Electrical wiring — https://en.wikipedia.org/w/index.php?title=Electrical_wiring&oldid=1380213788
+  - `power/wp2-ethanol-fuel` — Ethanol fuel — https://en.wikipedia.org/w/index.php?title=Ethanol_fuel&oldid=1383855616
+  - `power/wp2-flywheel` — Flywheel — https://en.wikipedia.org/w/index.php?title=Flywheel&oldid=1382741972
+  - `power/wp2-gear` — Gear — https://en.wikipedia.org/w/index.php?title=Gear&oldid=1380681664
+  - `power/wp2-heat-pump` — Heat pump — https://en.wikipedia.org/w/index.php?title=Heat_pump&oldid=1385478898
+  - `power/wp2-horse-mill` — Horse mill — https://en.wikipedia.org/w/index.php?title=Horse_mill&oldid=1345667913
+  - `power/wp2-hub-dynamo` — Hub dynamo — https://en.wikipedia.org/w/index.php?title=Hub_dynamo&oldid=1385078232
+  - `power/wp2-induction-motor` — Induction motor — https://en.wikipedia.org/w/index.php?title=Induction_motor&oldid=1384577803
+  - `power/wp2-kilowatt-hour` — Kilowatt-hour — https://en.wikipedia.org/w/index.php?title=Kilowatt-hour&oldid=1378875631
+  - `power/wp2-mains-electricity` — Mains electricity — https://en.wikipedia.org/w/index.php?title=Mains_electricity&oldid=1382186828
+  - `power/wp2-microgrid` — Microgrid — https://en.wikipedia.org/w/index.php?title=Microgrid&oldid=1384014039
+  - `power/wp2-nickelcadmium-battery` — Nickel–cadmium battery — https://en.wikipedia.org/w/index.php?title=Nickel%E2%80%93cadmium_battery&oldid=1375349778
+  - `power/wp2-nickeliron-battery` — Nickel–iron battery — https://en.wikipedia.org/w/index.php?title=Nickel%E2%80%93iron_battery&oldid=1378556507
+  - `power/wp2-off-the-grid` — Off-the-grid — https://en.wikipedia.org/w/index.php?title=Off-the-grid&oldid=1367543172
+  - `power/wp2-pellet-fuel` — Pellet fuel — https://en.wikipedia.org/w/index.php?title=Pellet_fuel&oldid=1380699759
+  - `power/wp2-pelton-wheel` — Pelton wheel — https://en.wikipedia.org/w/index.php?title=Pelton_wheel&oldid=1381369237
+  - `power/wp2-producer-gas` — Producer gas — https://en.wikipedia.org/w/index.php?title=Producer_gas&oldid=1385408626
+  - `power/wp2-pulley` — Pulley — https://en.wikipedia.org/w/index.php?title=Pulley&oldid=1382050747
+  - `power/wp2-rechargeable-battery` — Rechargeable battery — https://en.wikipedia.org/w/index.php?title=Rechargeable_battery&oldid=1366726083
+  - `power/wp2-solar-air-heat` — Solar air heat — https://en.wikipedia.org/w/index.php?title=Solar_air_heat&oldid=1383614161
+  - `power/wp2-solar-irradiance` — Solar irradiance — https://en.wikipedia.org/w/index.php?title=Solar_irradiance&oldid=1383338006
+  - `power/wp2-solar-thermal-collector` — Solar thermal collector — https://en.wikipedia.org/w/index.php?title=Solar_thermal_collector&oldid=1365079785
+  - `power/wp2-solar-water-heating` — Solar water heating — https://en.wikipedia.org/w/index.php?title=Solar_water_heating&oldid=1380705597
+  - `power/wp2-state-of-charge` — State of charge — https://en.wikipedia.org/w/index.php?title=State_of_charge&oldid=1372932895
+  - `power/wp2-steam-engine` — Steam engine — https://en.wikipedia.org/w/index.php?title=Steam_engine&oldid=1384187452
+  - `power/wp2-stirling-engine` — Stirling engine — https://en.wikipedia.org/w/index.php?title=Stirling_engine&oldid=1381710725
+  - `power/wp2-thermoelectric-generator` — Thermoelectric generator — https://en.wikipedia.org/w/index.php?title=Thermoelectric_generator&oldid=1385574100
+  - `power/wp2-three-phase-electric-power` — Three-phase electric power — https://en.wikipedia.org/w/index.php?title=Three-phase_electric_power&oldid=1380825683
+  - `power/wp2-turgo-turbine` — Turgo turbine — https://en.wikipedia.org/w/index.php?title=Turgo_turbine&oldid=1363747036
+  - `power/wp2-vegetable-oil-fuel` — Vegetable oil fuel — https://en.wikipedia.org/w/index.php?title=Vegetable_oil_fuel&oldid=1366081390
+  - `power/wp2-water-turbine` — Water turbine — https://en.wikipedia.org/w/index.php?title=Water_turbine&oldid=1368675331
+  - `power/wp2-water-wheel` — Water wheel — https://en.wikipedia.org/w/index.php?title=Water_wheel&oldid=1385065013
+  - `power/wp2-watermill` — Watermill — https://en.wikipedia.org/w/index.php?title=Watermill&oldid=1376990395
+  - `power/wp2-wind-turbine` — Wind turbine — https://en.wikipedia.org/w/index.php?title=Wind_turbine&oldid=1380552281
+  - `power/wp2-windmill` — Windmill — https://en.wikipedia.org/w/index.php?title=Windmill&oldid=1381332220
+  - `power/wp2-windpump` — Windpump — https://en.wikipedia.org/w/index.php?title=Windpump&oldid=1377027217
+  - `power/wp2-zinccarbon-battery` — Zinc–carbon battery — https://en.wikipedia.org/w/index.php?title=Zinc%E2%80%93carbon_battery&oldid=1384604561

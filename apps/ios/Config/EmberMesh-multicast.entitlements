@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- OPTIONAL. Only for teams that Apple has granted the multicast networking entitlement
+     (developer.apple.com/contact/request/networking-multicast). Set CODE_SIGN_ENTITLEMENTS to this
+     file for device builds to enable the `udp` endpoint (239.83.77.69:47474). Without the grant,
+     signing with this file fails, which is why it is not referenced by default. -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.networking.multicast</key>
+	<true/>
+</dict>
+</plist>

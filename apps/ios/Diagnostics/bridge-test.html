@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>EmberMesh bridge test</title>
+<style>
+  :root { --bg:#0b0d10; --fg:#e8e6e3; --muted:#9aa0a6; --card:#15191e; --line:#262c33; --accent:#ff8a3d; --ok:#5fd38d; --bad:#ff6b6b; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.4 -apple-system, system-ui, sans-serif; }
+  body { padding: 12px 16px 32px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 4px 0 2px; } h1 span { color: var(--accent); }
+  p.sub { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  button, select, input { font: inherit; color: var(--fg); background: #1f252c; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; min-height: 40px; }
+  button { cursor: pointer; } button:active { background: #2a323b; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; }
+  .kv b { color: var(--muted); font-weight: 500; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 12px/1.35 ui-monospace, Menlo, monospace; max-height: 45vh; overflow: auto; }
+</style>
+</head>
+<body>
+<h1><span>EmberMesh</span> bridge test</h1>
+<p class="sub">Diagnostic page shipped with the iOS app. It is shown when the shared UI (ui/index.html) is not bundled, or when the app is started with <code>-EmberDiagnostics</code>.</p>
+
+<div class="card">
+  <h2>Environment</h2>
+  <div class="kv" id="env"></div>
+</div>
+
+<div class="card">
+  <h2>Core</h2>
+  <div class="grid">
+    <button data-call="node.info">node.info</button>
+    <button data-call="links.types">links.types</button>
+    <button data-call="links.list">links.list</button>
+    <button data-call="guides.categories">guides.categories</button>
+    <button id="selftest">Run self-test</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Host</h2>
+  <div class="grid">
+    <button data-call="host.info">host.info</button>
+    <button data-call="host.location.get">location.get</button>
+    <button data-call="host.qr.scan">qr.scan</button>
+    <button data-call="host.notify" data-params='{"title":"EmberMesh","body":"Bridge test notification"}'>notify</button>
+    <button data-call="host.signal.flash" data-params='{"pattern_ms":[200,200,200,200,600,200,600,200,600,200,200,200,200,200,200]}'>flash SOS</button>
+    <button data-call="host.signal.tone" data-params='{"pattern_ms":[100,100,100,100,300,100,300,100,300,100,100,100,100],"freq_hz":700}'>tone SOS</button>
+    <button data-call="host.keep_awake" data-params='{"enabled":true}'>keep awake</button>
+    <button data-call="host.file.save" data-params='{"name":"hello.txt","mime":"text/plain","data_b64":"aGVsbG8gZnJvbSBFbWJlck1lc2gK"}'>file.save</button>
+    <button data-call="host.file.pick" data-params='{}'>file.pick</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <select id="scanKind"></select>
+    <button id="scan">Scan</button>
+    <button id="mkLoop">Create loopback link</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Log</h2>
+  <div class="row"><button id="clear">Clear</button></div>
+  <pre id="log"></pre>
+</div>
+
+<script>
+// Minimal native backend (RPC_API §5): the real one is ui/js/backends/native.js.
+(function () {
+  const pending = new Map();
+  let nextId = 1;
+  const listeners = [];
+  window.__emberBridge = {
+    onReply(m) {
+      const p = pending.get(m.id);
+      if (!p) return;
+      pending.delete(m.id);
+      if (m.ok) p.resolve(m.result); else p.reject(Object.assign(new Error((m.error && m.error.message) || 'error'), { code: m.error && m.error.code }));
+    },
+    onEvent(m) { listeners.forEach(fn => { try { fn(m.event, m.data); } catch (e) { console.error(e); } }); }
+  };
+  const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.ember;
+  window.emberDiag = {
+    events: [],
+    hasBridge: !!handler,
+    call(method, params) {
+      if (!handler) return Promise.reject(Object.assign(new Error('no native bridge'), { code: 'unsupported' }));
+      const id = nextId++;
+      return new Promise((resolve, reject) => {
+        pending.set(id, { resolve, reject });
+        handler.postMessage(JSON.stringify({ id, method, params: params || {} }));
+      });
+    },
+    on(fn) { listeners.push(fn); },
+  };
+  emberDiag.on((ev, data) => { emberDiag.events.push(ev); });
+})();
+
+const logEl = document.getElementById('log');
+function log(title, obj, cls) {
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = `${new Date().toLocaleTimeString()}  ${title}` + (obj === undefined ? '' : '\n' + JSON.stringify(obj, null, 2));
+  logEl.prepend(line);
+}
+emberDiag.on((ev, data) => log('event ' + ev, data));
+
+async function call(method, params) {
+  try { const r = await emberDiag.call(method, params); log('✓ ' + method, r, 'ok'); return r; }
+  catch (e) { log('✗ ' + method + ' → ' + (e.code || '') + ': ' + e.message, undefined, 'bad'); throw e; }
+}
+
+document.querySelectorAll('[data-call]').forEach(b => b.addEventListener('click', () => {
+  call(b.dataset.call, b.dataset.params ? JSON.parse(b.dataset.params) : {}).catch(() => {});
+}));
+document.getElementById('clear').onclick = () => { logEl.textContent = ''; };
+document.getElementById('scan').onclick = () => call('host.endpoints.scan', { kind: document.getElementById('scanKind').value, timeout_ms: 4000 }).catch(() => {});
+document.getElementById('mkLoop').onclick = () => call('host.link.create', { name: 'Loopback test', endpoint: { kind: 'loopback', config: {} }, link: { type: 'raw', config: {} } }).catch(() => {});
+
+// ES module + fetch over the custom scheme (both must work offline).
+async function moduleTest() {
+  try { const m = await import('./diag-module.js'); return m.answer() === 42; } catch (e) { return 'error: ' + e.message; }
+}
+async function packTest() {
+  try { const r = await fetch('/guides.pack', { method: 'HEAD' }); return r.ok ? ('bundled, ' + r.headers.get('Content-Length') + ' bytes') : ('not bundled (' + r.status + ')'); }
+  catch (e) { return 'error: ' + e.message; }
+}
+async function remoteBlocked() {
+  try { await fetch('https://example.com/', { mode: 'no-cors' }); return false; } catch (e) { return true; }
+}
+
+emberDiag.selfTest = async function () {
+  const out = { bridge: emberDiag.hasBridge, secure_context: window.isSecureContext, origin: location.origin,
+                host_global: !!window.__emberHost };
+  out.module_import = await moduleTest();
+  out.guides_pack = await packTest();
+  out.remote_blocked = await remoteBlocked();
+  try { out.node_info = await emberDiag.call('node.info'); } catch (e) { out.node_info_error = e.code; }
+  try { out.host_info = await emberDiag.call('host.info'); } catch (e) { out.host_info_error = e.code; }
+  try { await emberDiag.call('no.such.method'); out.unknown_method = 'resolved?!'; } catch (e) { out.unknown_method = e.code; }
+  try { await emberDiag.call('host.no_such'); out.unknown_host_method = 'resolved?!'; } catch (e) { out.unknown_host_method = e.code; }
+  out.events_seen = emberDiag.events.slice(0, 20);
+  return out;
+};
+
+document.getElementById('selftest').onclick = async () => log('self-test', await emberDiag.selfTest());
+
+(async function init() {
+  const env = document.getElementById('env');
+  const add = (k, v, ok) => { const b = document.createElement('b'); b.textContent = k; const s = document.createElement('span'); s.textContent = String(v); if (ok !== undefined) s.className = ok ? 'ok' : 'bad'; env.append(b, s); };
+  add('Bridge', emberDiag.hasBridge ? 'messageHandlers.ember present' : 'missing', emberDiag.hasBridge);
+  add('Origin', location.origin);
+  add('Secure context', window.isSecureContext, window.isSecureContext);
+  const mod = await moduleTest();
+  add('ES modules', mod === true ? 'ok' : mod, mod === true);
+  add('guides.pack', await packTest());
+  try {
+    const ni = await emberDiag.call('node.info');
+    add('Core', `${ni.version || '?'}  node ${ni.node_id || '?'}${ni.stub ? '  (stub core)' : ''}`, true);
+  } catch (e) { add('Core', e.code + ': ' + e.message, false); }
+  try {
+    const hi = await emberDiag.call('host.info');
+    add('Host', `${hi.platform} ${hi.app_version}, backend ${hi.backend}`, true);
+    add('Features', hi.features.join(', '));
+    add('Endpoints', hi.endpoint_kinds.map(k => k.kind + (k.available ? '' : ' ✗')).join(', '));
+    const sel = document.getElementById('scanKind');
+    hi.endpoint_kinds.filter(k => k.scannable).forEach(k => { const o = document.createElement('option'); o.value = k.kind; o.textContent = k.title; sel.append(o); });
+  } catch (e) { add('Host', e.code + ': ' + e.message, false); }
+})();
+</script>
+</body>
+</html>

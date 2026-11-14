@@ -1,0 +1,60 @@
+---
+id: repair/wp2-calcium-oxide
+title: Calcium oxide
+category: repair
+tags: [calcium oxide, quicklime, burnt lime, free lime, tools]
+summary: Calcium oxide (formula: CaO), commonly known as quicklime or burnt lime, is a widely used chemical compound.
+source: https://en.wikipedia.org/w/index.php?title=Calcium_oxide&oldid=1380027747
+source_title: Wikipedia: Calcium oxide
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Calcium oxide", Wikipedia, The Free Encyclopedia (revision 1380027747), https://en.wikipedia.org/w/index.php?title=Calcium_oxide&oldid=1380027747 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Calcium oxide
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Calcium oxide** (formula: CaO), commonly known as **quicklime** or **burnt lime**, is a widely used chemical compound. It is a white, caustic, alkaline, crystalline solid at room temperature. The broadly used term *lime* connotes calcium-containing inorganic compounds, in which carbonates, oxides, and hydroxides of calcium, silicon, magnesium, aluminium, and iron predominate. By contrast, *quicklime* specifically applies to the single compound calcium oxide. Calcium oxide that survives processing without reacting in building products, such as cement, is called **free lime**.
+
+Quicklime is relatively inexpensive. Both it and the chemical derivative calcium hydroxide (of which quicklime is the base anhydride) are important commodity chemicals.
+
+## Preparation
+
+Calcium oxide is usually made by the thermal decomposition of materials, such as limestone or seashells, that contain calcium carbonate (CaCO3; mineral calcite) in a lime kiln. This is accomplished by heating the material to above 825 °C, a process called calcination or *lime-burning*, to liberate a molecule of carbon dioxide, leaving quicklime behind. This is also one of the few chemical reactions known in prehistoric times.
+CaCO3(s) → CaO(s) + CO2(g)
+
+The quicklime is not stable and, when cooled, will spontaneously react with from the air until, after enough time, it will be completely converted back to calcium carbonate unless slaked with water to set as lime plaster or lime mortar.
+
+Annual worldwide production of quicklime is around 283 million tonnes. China is by far the world's largest producer, with a total of around 170 million tonnes per year. The United States is the next largest, with around 20 million tonnes per year.
+
+## Uses
+
+- Heat: Quicklime releases thermal energy by the formation of the hydrate, calcium hydroxide, by the following equation:
+ CaO (s) + H2O (l) Ca(OH)2 (aq) (ΔH_r = −63.7 kJ/mol of CaO)
+As it hydrates, an exothermic reaction results and the solid puffs up. The hydrate can be reconverted to quicklime by removing the water by heating it to redness to reverse the hydration reaction. One litre of water combines with approximately 3.1 kg of quicklime to give calcium hydroxide plus 3.54 MJ of energy. This process can be used to provide a convenient portable source of heat, as for on-the-spot food warming in a self-heating can, cooking, and heating water without open flames. Several companies sell cooking kits using this heating method.
+
+- It is a food additive used as an acidity regulator, a flour treatment agent and a leavener. It has E number **E529**.
+- Light: When quicklime is heated to 2400 °C, it emits an intense glow. This form of illumination is known as a limelight, and was used broadly in theatrical productions before the invention of electric lighting.
+- Cement: Calcium oxide is a key ingredient for the process of making cement.
+- As a cheap and widely available alkali.
+- Petroleum industry: Water detection pastes contain a mix of calcium oxide and phenolphthalein. Should this paste come into contact with water in a fuel storage tank, the CaO reacts with the water to form calcium hydroxide. Calcium hydroxide has a high enough pH to turn the phenolphthalein a vivid purplish-pink color, thus indicating the presence of water.
+- Chemical pulping: Calcium oxide is used to make calcium hydroxide, which is used to regenerate sodium hydroxide from sodium carbonate in the chemical recovery at kraft pulp mills.
+- Plaster: There is archeological evidence that Pre-Pottery Neolithic B humans used limestone-based plaster for flooring and other uses. Such Lime-ash floor remained in use until the late nineteenth century.
+- Chemical or power production: Solid sprays or slurries of calcium oxide can be used to remove sulfur dioxide from exhaust streams in a process called flue-gas desulfurization.
+- Carbon capture and storage: Calcium oxide can be used to capture carbon dioxide from flue gases in a process called calcium looping.
+- Mining: *Compressed lime cartridges* exploit the exothermic properties of quicklime to break rock. A shot hole is drilled into the rock in the usual way and a sealed cartridge of quicklime is placed within and tamped. A quantity of water is then injected into the cartridge and the resulting release of steam, together with the greater volume of the residual hydrated solid, breaks the rock apart. The method does not work if the rock is particularly hard.
+- Disposal of corpses: Historically, it was mistakenly thought that quicklime was efficacious in accelerating the decomposition of corpses. The application of quicklime can, in fact, promote preservation. Quicklime can aid in eradicating the stench of decomposition, which may have led people to the erroneous conclusion.
+- It has been determined that the durability of ancient Roman concrete is attributed in part to the use of quicklime as an ingredient. Combined with hot mixing, the quicklime creates macro-sized lime clasts with a characteristically brittle nano-particle architecture. As cracks form in the concrete, they preferentially pass through the structurally weaker lime clasts, fracturing them. When water enters these cracks it creates a calcium-saturated solution which can recrystallize as calcium carbonate, quickly filling the crack.
+
+### Substitutes
+
+Limestone is a substitute for lime in many applications, which include agriculture, fluxing, and sulfur removal. Limestone, which contains less reactive material, is slower to react and may have other disadvantages compared with lime, depending on the application; however, limestone is considerably less expensive than lime. Calcined gypsum is an alternative material in industrial plasters and mortars. Cement, cement kiln dust, fly ash, and lime kiln dust are potential substitutes for some construction uses of lime. Magnesium hydroxide is a substitute for lime in pH control, and magnesium oxide is a substitute for dolomitic lime as a flux in steelmaking.
+
+## Safety
+
+Because of vigorous reaction of quicklime with water, quicklime causes severe irritation when inhaled or placed in contact with moist skin or eyes. Inhalation may cause coughing, sneezing, and labored breathing. It may then evolve into burns with perforation of the nasal septum, abdominal pain, nausea and vomiting. Although quicklime is not considered a fire hazard, its reaction with water can release enough heat to ignite combustible materials.
+
+## Mineral
+
+Calcium oxide is also a separate mineral species (with the unit formula CaO), named 'Lime'. It has an isometric crystal system, and can form a solid solution series with monteponite. The crystal is brittle, pyrometamorphic, and is unstable in moist air, quickly turning into portlandite (Ca(OH)2).

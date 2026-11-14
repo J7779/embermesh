@@ -1,0 +1,103 @@
+# Allow-list for tools/check-publishable.sh
+#
+# One entry per line:   <rule> <kind> <value>        # why it is allowed (required by convention)
+#   rule   a rule name printed by the checker (email, uuid, mac, ip, callsign, coord, credential,
+#          home-path, temp-path, residue, imei, filename, binary, large, image-meta), or * for all
+#   kind   path   <glob>  the rule does not apply to files matching this shell glob (* crosses /)
+#          match  <ERE>   a finding whose matched text matches this extended regex is accepted
+#                         (case-insensitive; anchor it with ^...$ to accept one exact value;
+#                         no {n} intervals: they are evaluated by awk, which may not support them)
+# The value ends at the first space; everything after " #" is the comment. Adding a legitimate
+# third-party e-mail address is one line:   email match ^someone@project\.org$   # vendored X author
+# Never list the machine identifiers here (user, host, e-mail, tokens): those are discovered at
+# run time and cannot be allow-listed. The one exception is the owner-approved public identity:
+#   identity path <glob>  in these files a copyright statement ("Copyright (c) <years> <name>",
+#                         "© <year> <name>") may carry the git user.name (display name only; never
+#                         the e-mail, its local part, a GitHub handle, the OS user, host or paths)
+#                         when the line holds no other identifier of this machine.
+
+# --- Owner-approved public identity (copyright lines only) --------------------------------------------
+identity path LICENSE                                       # owner-approved copyright line (MIT)
+identity path README.md                                     # owner-approved copyright line (licence section)
+identity path THIRD_PARTY_LICENSES.md                       # owner-approved copyright line
+identity path CONTRIBUTING.md                               # owner-approved copyright line
+identity path ui/js/lib/about.js                            # owner-approved copyright line (UI About text, APP_LICENCE)
+
+# --- e-mail addresses ------------------------------------------------------------------------------
+email match @example\.(com|org|net)$                      # RFC 2606 documentation domains
+email match @[a-z0-9.-]+\.(example|test|invalid|localhost)$ # RFC 2606 reserved TLDs
+email match ^(noreply|no-reply)@                           # generic no-reply senders (NOT *@users.noreply.github.com)
+email match ^git@github\.com$                              # SSH clone URL syntax
+email match ^mackron@gmail\.com$                           # miniaudio author (host/third_party/miniaudio/miniaudio.h, licence header)
+email match ^MPHotline@usda\.gov$                          # USDA Meat & Poultry Hotline, public (guide source text)
+email match ^fr\.inspection@nara\.gov$                     # Federal Register public contact (FCC rule text)
+email match ^prcz@naic\.edu$                               # Arecibo coordination zone, public (FCC rule text)
+email match ^info@lightning-strike\.org$                   # NWS lightning guide, public contact
+email match ^pubstaft@niosdt1\.em\.cdc\.gov$               # CDC/NIOSH publications, public (guide source text)
+email match ^uroc@usace\.army(\.smil)?\.mil$               # USACE reachback, public (Army publication text)
+email match @([a-z0-9-]+\.)*(gov|mil)$                     # US Government / military public contact addresses inside guide source texts
+
+# --- UUIDs: protocol and platform constants ----------------------------------------------------------
+uuid match ^8e3b000[0-9a-f]-5d1f-4c6a-9b7e-0d2a6f1c4e10$  # EmberMesh BLE peer service + characteristics (docs/ARCHITECTURE.md section 6)
+uuid match ^6e40000[0-9a-f]-b5a3-f393-e0a9-e50e24dcca9e$  # Nordic UART service (BLE TNCs)
+uuid match -0000-1000-8000-00805f9b34fb$                  # Bluetooth SIG base UUID (16-bit assigned numbers, SPP)
+uuid match ^6e400001-0000-1000-8000-00805f9b34fb$          # test value built on the SIG base
+uuid match ^0000000[0-9a-f]-ba2a-46c9-ae49-01b0961f68bb$  # Mobilinkd / KISS-over-BLE TNC service
+uuid match ^6ba1b218-15a8-461f-9fa8-5dcae273eafd$          # Meshtastic service
+uuid match ^(f75c76d2-129e-4dad-a1dd-7866124401e7|ed9da18c-a800-4f66-a670-aa7547e34453|2c55e69e-4993-11ed-b878-0242ac120002)$ # Meshtastic characteristics
+uuid match ^258eafa5-e914-47da-95ca-c5ab0dc85b11$          # RFC 6455 WebSocket accept GUID
+uuid match ^0d8e5c36-9b2f-4c4a-8f1e-1a2b3c4d5e6f$          # invented mDNS host name in a WebRTC SDP test
+uuid path host/third_party/*                               # Windows COM interface GUIDs in vendored miniaudio
+
+# --- MAC addresses: placeholders (documentation range 00:00:5E:00:53:xx is always accepted) ----------
+mac match ^aa[:-]bb[:-]cc[:-]dd[:-]ee[:-][0-9a-f][0-9a-f]$       # obvious placeholder
+mac match ^(00[:-]11[:-]22[:-]33[:-]44[:-]55|01[:-]23[:-]45[:-]67[:-]89[:-]ab|ff[:-]ff[:-]ff[:-]ff[:-]ff[:-]ff|00[:-]00[:-]00[:-]00[:-]00[:-]00)$ # placeholders / broadcast / zero
+mac match ^02[:-]00[:-]00[:-]00[:-]00[:-][0-9a-f][0-9a-f]$                    # locally administered placeholder (Android reports 02:00:00:00:00:00)
+mac path guides/content/*                                   # guide texts (key fingerprints, examples)
+
+# --- IPv4: public addresses that are well known ---------------------------------------------------------
+ip match ^1\.2\.3\.4$                                   # conventional placeholder address in tests
+ip match ^(1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|9\.9\.9\.9)$  # public DNS resolvers in examples
+ip path guides/content/*                                    # guide texts (section numbers look like addresses)
+ip path host/third_party/*                                  # vendored code
+ip path core/third_party/*                                  # vendored code
+
+# --- Callsign-shaped literals (warning). Samples must be N0CALL-n or Q-prefixed (QX0ABC) ---------------
+callsign match ^W1AW(-[0-9]+)?$                             # ARRL headquarters station, public
+callsign match ^(WU2Z|KB2ICI)(-[0-9]+)?$                    # examples from the APRS specification
+callsign match ^(WB2HOL|G3RUH|G3PLX|W4RNL|AC6LA)$           # credited designers (antennas, modems, tools)
+callsign match ^F8HP$                                       # radio model name (BF-F8HP)
+callsign match ^APZ[A-Z][A-Z][A-Z]$                                # APRS TOCALL destinations (APZEMB = experimental)
+callsign match ^(A2DP|D8PSK|F2FS)$                         # technical terms (Bluetooth profile, modulation, file system)
+callsign match ^G5RV$                                       # published name of an antenna design (search-quality query set, tools/guidepack/eval/queries.tsv)
+callsign match ^SL2UVT$                                    # APRS Mic-E encoded destination in a parser test
+callsign match ^KD2OLD$                                     # frozen v1 encrypted-store fixture (core/tests/data/node/v1-encrypted-store); the v1 writer no longer exists, so it cannot be regenerated; arbitrary test value, see the fixture README
+callsign path host/third_party/*                            # vendored code
+callsign path core/third_party/*                            # vendored code
+
+# --- Coordinates (warning). Public landmarks are listed in tools/publishable-landmarks.txt -------------
+coord path guides/content/*                                 # guide texts cite real places
+
+# --- Credentials --------------------------------------------------------------------------------------
+credential match (ice-pwd|ice_pwd)                          # WebRTC ICE passwords in synthetic SDP test data
+
+# --- Residue words in the guide library (they are ordinary words there) --------------------------------
+residue path guides/content/*                               # ordinary words there (job titles, first names)
+residue path tools/check-publishable.sh                     # the checker's own word list
+residue path .gitignore                                     # ignores editor/assistant state directories
+
+# --- Approved binary files (each one reviewed for metadata; see CONTRIBUTING.md "The publishing gate") --
+binary path apps/android/gradle/wrapper/gradle-wrapper.jar  # Gradle wrapper, upstream, entries dated 1980 (reproducible)
+binary path apps/android/app/libs/zxing-core-3.5.3.jar      # ZXing core 3.5.3, upstream Maven Central (checksum in .sha1)
+binary path apps/ios/EmberMesh/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png # iOS app icon, generated from docs/assets/logo.svg by apps/ios/tools/make-logo-assets.py (RGB, IHDR/IDAT/IEND only)
+binary path apps/ios/EmberMesh/Assets.xcassets/AppIcon.appiconset/AppIcon-1024-dark.png # iOS dark app icon, same generator, no metadata chunks
+binary path apps/ios/EmberMesh/Assets.xcassets/AppIcon.appiconset/AppIcon-1024-tinted.png # iOS tinted (grayscale) app icon, same generator, no metadata chunks
+binary path core/tests/data/node/v1-encrypted-store/data-2.ekv # encrypted test store, contents documented in README.txt
+binary path docs/assets/screenshots/*.png                   # README screenshots of the UI demo backend (fictional sample data); PNG, palette only, no text/time/EXIF chunks (image-meta rule still applies)
+binary path apps/android/app/src/main/res/mipmap-*dpi/ic_launcher.png # Android legacy launcher icons rendered from docs/assets/logo.svg by apps/android/tools/gen_icons.py; PNG, no text/time/EXIF chunks (image-meta rule still applies)
+binary path apps/web/pwa/icons/*.png                         # PWA / favicon / Apple touch icons rendered from docs/assets/logo.svg by apps/web/tools/make-icons.mjs; PNG with IHDR/IDAT/IEND only (no text/time/EXIF/colour-profile chunks; image-meta rule still applies)
+binary path models/potion-base-4M/potion-base-4M-q4.emodel # static embedding model for semantic guide search: integer tables converted from the MIT-licensed upstream model by tools/embedding/convert.py (deterministic; SHA-256 and source in models/README.md)
+
+# --- Large files -----------------------------------------------------------------------------------------
+large path host/third_party/miniaudio/miniaudio.h           # vendored single-header library (about 4 MB)
+large path models/potion-base-4M/potion-base-4M-q4.emodel  # the same model file, about 2.3 MB (models/README.md)

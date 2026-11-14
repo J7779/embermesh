@@ -1,0 +1,133 @@
+---
+id: water/wp2-drinking-water
+title: Drinking water
+category: water
+tags: [drinking water, potable water, water]
+summary: Drinking water or potable water is water safe for ingestion, either when drunk directly in liquid form or consumed indirectly through food preparation.
+source: https://en.wikipedia.org/w/index.php?title=Drinking_water&oldid=1385125411
+source_title: Wikipedia: Drinking water
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Drinking water", Wikipedia, The Free Encyclopedia (revision 1385125411), https://en.wikipedia.org/w/index.php?title=Drinking_water&oldid=1385125411 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Drinking water
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Drinking water** or **potable water** is water safe for ingestion, either when drunk directly in liquid form or consumed indirectly through food preparation. For most terrestrial animals (including humans), drinkable water is fresh water, either surface or underground, whose quality does not cause immediate poisoning or significant short-term physiological detriment to the health of the ingesting individual. In modern human society, drinking water is typically supplied to the consumer households via water distribution system that ends in taps, in which case it is commonly called tap water.
+
+The amount of drinking water required to maintain good health varies, and depends on physical activity, age, health-related issues, and environmental conditions. For those who work in a hot climate, up to 16 L a day may be required.
+
+The availability of drinking water is a key determining factor in the patterns of both terrestrial ecosystems and human settlements, and water supply can be impacted by climatic, limnological, ecological, infrastructural, demographic and even political changes. Today, as many as two billion people lack safe drinking water, with developing countries being the most affected. Unsafe water, typically due to water pollution and the lack of water treatment, can carry disease and is a major cause of preventable death and illness worldwide. The lack of water security, particularly when compounded by uncontrolled population growth and irresponsible overuse, is also a major cause of famine (due to water scarcity-induced failure in local agricultural food production), mass migration and even violent wars over control of water supplies.
+
+## Supply
+
+The most efficient and convenient way to transport potable water is through pipes. Plumbing can require significant capital investment. Some systems suffer high operating costs. The cost to replace the deteriorating water and sanitation infrastructure of industrialized countries may be as high as $200 billion a year. Leakage of untreated and treated water from pipes reduces access to water. Leakage rates of 50% are not uncommon in urban systems.
+
+Tap water, delivered by domestic water systems refers to water piped to homes and delivered to a tap or spigot.
+
+## Quantity
+
+### Usage for general household use
+
+In the United States, the typical water consumption per capita, at home, is 69.3 US gal of water per day. Of this, only 1% of the water provided by public water suppliers is for drinking and cooking. Uses include (in decreasing order) toilets, washing machines, showers, baths, faucets, and leaks.
+
+### Usage for drinking
+
+The recommended daily amount of drinking water for humans varies. It depends on activity, age, health, and environment. In the United States, the Adequate Intake for total water, based on median intakes, is 4.0 L per day for males older than 18, and 3.0 L per day for females over 18; it assumes about 80% from drink and 20% from food. The European Food Safety Authority recommends 2.0 L of total water per day for women and 2.5 L per day for men.
+
+The common advice to drink 8 glasses (64 USoz) of plain water per day is not scientific; thirst is a better guide for how much water to drink than is a specific, fixed amount. Americans aged 21 and older, on average, drink 1,043 mL of drinking water a day, and 95% drink less than 2,958 mL per day. Exercise and heat exposure cause loss of water and therefore may induce thirst and greater water intake. Active people in hot climates may need 6.0 L of water, or more, per day.
+
+How much drinking water contributes to the intake of mineral nutrients is unclear. Inorganic minerals generally enter surface water and groundwater via stormwater runoff and through the ground. Water treatment also adds some minerals, such as calcium, zinc, manganese, phosphate, fluoride, and sodium compounds. Water generated by the biochemical metabolism of nutrients provides a significant part of the daily water needs for some arthropods and desert animals, but provides only a small fraction of a human's necessary intake. There are trace elements in almost all potable water; some of these affect metabolism, such as sodium, potassium, and chloride, which are common in small amounts in most water. Other elements, such as fluoride, while beneficial in low concentrations, can cause dental and other problems at high levels.
+
+Fluid balance is important to health. Profuse sweating can increase the need to replace electrolytes (salts). Water intoxication (the consumption of too much water too quickly) causes hyponatremia, which can cause death in minutes or hours. Water makes up about 60% of the body weight in men and 55% of weight in women. A baby is about 70% to 80%; old people are about 45% water.
+
+### Animals
+
+The qualitative and quantitative aspects of drinking water requirements on domesticated animals are examined within the context of animal husbandry. For example, a farmer might plan for 35 gal per day for a dairy cow, a third of that for a horse, and a tenth of that for a hog.
+
+However, relatively few studies have been focused on the drinking behavior of wild animals.
+
+## Quality
+
+According to a 2017 World Health Organization report, *safe* *drinking water* is water that "does not represent any significant risk to health over a lifetime of consumption, including different sensitivities that may occur between life stages".
+
+According to a report by UNICEF and UNESCO, Finland has the best drinking water quality in the world.
+
+### Parameters to monitor quality
+
+Parameters for drinking water quality typically fall within three categories: microbiological, chemical and physical.
+
+Microbiological parameters include coliform bacteria, *E. coli*, and specific pathogenic species of bacteria (such as cholera-causing *Vibrio cholerae*), viruses and protozoan parasites. Originally, fecal contamination was determined with the presence of coliform bacteria, a convenient marker for a class of harmful fecal pathogens. The presence of fecal coliforms (like *E. Coli*) serves as an indication of contamination by sewage. Additional contaminants include protozoan oocysts such as *Cryptosporidium sp.*, *Giardia lamblia*, *Legionella*, and viruses (enteric). Microbial pathogenic parameters are typically of greatest concern because of their immediate health risk.
+
+Physical and chemical parameters include heavy metals, trace organic compounds, total suspended solids and turbidity. Chemical parameters tend to pose more of a chronic health risk through buildup of heavy metals although some components like nitrates/nitrites and arsenic can have a more immediate impact. Physical parameters affect the aesthetics and taste of the drinking water and may complicate the removal of microbial pathogens.
+
+Pesticides are also potential drinking water contaminants of the category *chemical contaminants*. Pesticides may be present in drinking water in low concentrations, but the toxicity of the chemical and the extent of human exposure are factors that are used to determine the specific health risk.
+
+Perfluorinated alkylated substances (PFAS) are a group of synthetic compounds used in a large variety of consumer products, such as food packaging, waterproof fabrics, carpeting and cookware. PFAS are known to persist in the environment and are commonly described as persistent organic pollutants. PFAS chemicals have been detected in blood, both humans and animals, worldwide, as well as in food products, water, air and soil. Animal testing studies with PFAS have shown effects on growth and development, and possibly effects on reproduction, thyroid, the immune system and liver. As of 2022 the health impacts of many PFAS compounds are not understood. Scientists are conducting research to determine the extent and severity of impacts from PFAS on human health. PFAS have been widely detected in drinking water worldwide and regulations have been developed, or are under development, in many countries. The U.S. Environmental Protection Agency (EPA) has published laboratory test methods for PFAS compounds.
+
+## Health issues due to low quality
+
+The World Health Organization considers access to safe drinking-water a basic human right.
+Contaminated water is estimated to result in more than half a million deaths per year. More people die from unsafe water than from war, then-U.N. secretary-general Ban Ki-moon said in 2010. Contaminated water together with the lack of sanitation was estimated to cause about one percent of disability adjusted life years worldwide in 2010. According to the WHO, the most common diseases linked with poor water quality are cholera, diarrhea, dysentery, hepatitis A, typhoid, and polio.
+
+One of the main causes for contaminated drinking water in developing countries is lack of sanitation and poor hygiene. For this reason, the quantification of the burden of disease from consuming contaminated drinking water usually looks at water, sanitation and hygiene aspects together. The acronym for this is WASH – standing for *water, sanitation and hygiene*.
+
+### Consumption of contaminated groundwater
+
+Sixty million people are estimated to have been poisoned by well water contaminated by excessive fluoride, which dissolved from granite rocks. The effects are particularly evident in the bone deformations of children. Similar or larger problems are anticipated in other countries including China, Uzbekistan, and Ethiopia. Although helpful for dental health in low dosage, fluoride in large amounts interferes with bone formation.
+
+Long-term consumption of water with high fluoride concentration (> 1.5 ppm F) can have serious undesirable consequences such as dental fluorosis, enamel mottle and skeletal fluorosis, bone deformities in children. Fluorosis severity depends on how much fluoride is present in the water, as well as people's diet and physical activity. Defluoridation methods include membrane-based methods, precipitation, absorption, and electrocoagulation.
+
+Natural arsenic contamination of groundwater is a global threat with 140 million people affected in 70 countries globally.
+
+### Examples of poor drinking water quality incidents
+
+Some examples of water quality problems with drinking water supplies include:
+
+- In 1854, a cholera outbreak in London's Soho district was identified by John Snow as originating from contaminated water from the Broad Street pump. This was a founding event of the science of epidemiology.
+- Contamination of groundwater with arsenic in Bangladesh; the largest-scale mass poisoning of a population (began in the 1970s–1980s, officially recognized in 1993).
+- Hinkley groundwater contamination (Chromium-6 contamination of private groundwater wells in Hinkley, California, United States (settled in 1996).
+- Walkerton *E. coli* outbreak (*Escherichia coli* O157:H7 and *Campylobacter* contamination of water supply in Walkerton, Ontario, Canada in 2000). In 2000, an E. coli outbreak occurred in Walkerton, Ontario, Canada. Seven people died from drinking contaminated water. Hundreds suffered from the symptoms of the disease.
+- Flint water crisis (lead and *Legionella* contamination of water supply in Flint, Michigan, United States, started in 2014)
+- Jackson, Mississippi water crisis, United States (2022)
+- In 1987, a cryptosporidiosis outbreak in western Georgia
+- In 1993, Milwaukee Cryptosporidium outbreak
+- In 1998, an outbreak of typhoid fever in northern Israel, which was associated with the contaminated municipal water supply
+- In 1997, 369 cases of cryptosporidiosis occurred, caused by a contaminated fountain in the Minnesota zoo. Most of the sufferers were children
+- In 1998, a non-chlorinated municipal water supply was blamed for a campylobacteriosis outbreak in northern Finland
+- In 2000, a gastroenteritis outbreak that was brought by a non-chlorinated community water supply, in southern Finland
+- In 2004, contamination of the community water supply, serving the Bergen city centre of Norway, was later reported after the outbreak of waterborne giardiasis
+- In 2007, contaminated drinking water was pinpointed which had led to the outbreak of gastroenteritis with multiple aetiologies in Denmark
+
+Examples of chemical contamination include:
+
+- In 1988 many people were poisoned in Camelford, when a worker put 20 tonnes of aluminium sulphate coagulant in the wrong tank.
+- In 1993 a fluoride poisoning outbreak resulting from overfeeding of fluoride, in Mississippi.
+- In 2007 the water supply of Spencer, Massachusetts became contaminated with excess sodium hydroxide (lye) when its treatment equipment malfunctioned.
+- In 2019 electric transformer oil entered the water supply for the city of Uummannaq in Greenland. A cargo ship in harbour was able to maintain a minimum supply to the city for two days until the mains supply was restored and flushing of all the pipework was started.
+
+## Treatment
+
+Most water requires some treatment before use; even water from deep wells or springs. The extent of treatment depends on the source of the water. Appropriate technology options in water treatment include both community-scale and household-scale point-of-use (POU) designs. Only a few large urban areas such as Christchurch, New Zealand have access to sufficiently pure water of sufficient volume that no treatment of the raw water is required.
+
+In emergency situations when conventional treatment systems have been compromised, waterborne pathogens may be killed or inactivated by boiling but this requires abundant sources of fuel, and can be very onerous on consumers, especially where it is difficult to store boiled water in sterile conditions. Other techniques, such as filtration, chemical disinfection, and exposure to ultraviolet radiation (including solar UV) have been demonstrated in an array of randomized control trials to significantly reduce levels of water-borne disease among users in low-income countries, but these suffer from the same problems as boiling methods.
+
+Another type of water treatment is called desalination and is used mainly in dry areas with access to large bodies of saltwater.
+
+Publicly available treated water has historically been associated with major increases in life expectancy and improved public health. Water disinfection can greatly reduce the risks of waterborne diseases such as typhoid and cholera. Chlorination is currently the most widely used water disinfection method, although chlorine compounds can react with substances in water and produce disinfection by-products (DBP) that pose problems to human health. Local geological conditions affecting groundwater are determining factors for the presence of various metal ions, often rendering the water "soft" or "hard".
+
+In the event of contamination of drinking water, government officials typically issue an advisory regarding water consumption. In the case of biological contamination, residents are usually advised to boil their water before consumption or to use bottled water as an alternative. In the case of chemical contamination, residents may be advised to refrain from consuming tap water entirely until the matter is resolved.
+
+### Point of use methods
+
+The ability of point of use (POU) options to reduce disease is a function of both their ability to remove microbial pathogens if properly applied and such social factors as ease of use and cultural appropriateness. Technologies may generate more (or less) health benefit than their lab-based microbial removal performance would suggest.
+
+The current priority of the proponents of POU treatment is to reach large numbers of low-income households on a sustainable basis. Few POU measures have reached significant scale thus far, but efforts to promote and commercially distribute these products to the world's poor have only been under way for a few years.
+
+Solar water disinfection is a low-cost method of purifying water that can often be implemented with locally available materials. Unlike methods that rely on firewood, it has a low impact on the environment.
+
+### Addition of fluoride
+
+In many areas, low concentration of fluoride (< 1.0 ppm F) is intentionally added to tap water to improve dental health, although in some communities water fluoridation remains a controversial issue. (See water fluoridation controversy).

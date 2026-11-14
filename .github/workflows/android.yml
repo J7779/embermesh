@@ -1,0 +1,230 @@
+name: Android
+
+# JVM unit tests, the debug APK and a release APK for all ABIs (arm64-v8a, armeabi-v7a, x86_64),
+# and the instrumented tests against the real core on an emulator.
+#
+# Release signing: on pushes to main (and manual runs on main) in a repository that has the four
+# secrets ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD,
+# the release APK is signed with that key (embermesh-android-release.apk); the keystore is decoded
+# into the runner's temp directory for the Gradle step only and deleted afterwards. Otherwise (pull
+# requests, forks, a repository without the secrets) it is signed with the debug key the Android
+# tools generate on the runner, which is thrown away with it: embermesh-android-release-ci-debug-signed.apk.
+# The signing certificate is printed into the summary; a repository variable ANDROID_CERT_SHA256
+# makes a release-key build fail when the certificate differs.
+#
+# The emulator job is NON-BLOCKING: hosted emulators (KVM on shared runners, cold boots, camera
+# and audio emulation) are a common source of flaky failures, and several instrumented tests use
+# the emulated camera/microphone. It always runs and reports; the summary job does not fail on it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Unit tests + APKs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-android
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Guide library + debug APK (build.sh)
+        run: |
+          mkdir -p build/ci-logs
+          set -o pipefail
+          ./build.sh guides android 2>&1 | tee build/ci-logs/android-build.log
+
+      - name: JVM unit tests (build.sh)
+        id: unit
+        run: |
+          set -o pipefail
+          ./build.sh test --only android --strict 2>&1 | tee build/ci-logs/android-unit.log
+
+      - name: Release signing key (repository secrets, main only)
+        id: key
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: tools/ci/android-signing.sh prepare
+
+      - name: Release APK (minified)
+        working-directory: apps/android
+        env:
+          EMBER_ANDROID_KEYSTORE: ${{ steps.key.outputs.present == 'true' && steps.key.outputs.keystore || '' }}
+          EMBER_ANDROID_KEYSTORE_PASSWORD: ${{ steps.key.outputs.present == 'true' && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
+          EMBER_ANDROID_KEY_ALIAS: ${{ steps.key.outputs.present == 'true' && secrets.ANDROID_KEY_ALIAS || '' }}
+          EMBER_ANDROID_KEY_PASSWORD: ${{ steps.key.outputs.present == 'true' && secrets.ANDROID_KEY_PASSWORD || '' }}
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleRelease --console=plain -PemberGuidesPack="$GITHUB_WORKSPACE/build/guides.pack" 2>&1 \
+            | tee "$GITHUB_WORKSPACE/build/ci-logs/android-release.log"
+
+      - name: Remove the release signing key
+        if: always()
+        run: tools/ci/android-signing.sh cleanup
+
+      - name: Collect APKs
+        env:
+          RELEASE_KEY: ${{ steps.key.outputs.present == 'true' }}
+        run: |
+          mkdir -p build/apk
+          cp apps/android/app/build/outputs/apk/debug/app-debug.apk build/apk/embermesh-android-debug.apk
+          release=embermesh-android-release-ci-debug-signed.apk
+          [ "$RELEASE_KEY" = true ] && release=embermesh-android-release.apk
+          cp apps/android/app/build/outputs/apk/release/app-release.apk "build/apk/$release"
+          echo "RELEASE_APK=build/apk/$release" >> "$GITHUB_ENV"
+          for apk in build/apk/*.apk; do
+            echo "$apk: $(unzip -Z1 "$apk" | sed -n 's|^lib/\([^/]*\)/.*|\1|p' | sort -u | tr '\n' ' ')"
+          done | tee build/ci-logs/apk-abis.txt
+
+      - name: Verify the signing certificate
+        env:
+          RELEASE_KEY: ${{ steps.key.outputs.present == 'true' }}
+          EXPECTED_CERT: ${{ vars.ANDROID_CERT_SHA256 }}
+        run: |
+          expected=""
+          if [ "$RELEASE_KEY" = true ]; then
+            echo "Release APK signed with the **project release key** (repository secrets)." > build/ci-logs/signing.md
+            expected="$EXPECTED_CERT"
+          else
+            echo "Release APK signed with the runner's **throw-away debug key** (no release key in this run)." > build/ci-logs/signing.md
+          fi
+          tools/ci/android-signing.sh verify "$RELEASE_APK" "$expected" | tee -a build/ci-logs/signing.md
+          tools/ci/android-signing.sh verify build/apk/embermesh-android-debug.apk | tee -a build/ci-logs/signing.md
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Android"
+            echo
+            echo "JDK $(java -version 2>&1 | head -1); NDK 27.1.12297006; SDK platform 37; SDK CMake 3.22.1"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests junit "JVM unit tests (testDebugUnitTest)" apps/android/app/build/test-results/testDebugUnitTest
+            echo
+            echo "APKs (artifact \`android-apks\`; ABIs per APK below):"
+            echo
+            python3 tools/ci/report.py files build/apk
+            echo
+            sed 's/^/    /' build/ci-logs/apk-abis.txt 2>/dev/null || true
+            echo
+            cat build/ci-logs/signing.md 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-apks
+          path: build/apk/
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Upload test reports and logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-unit-test-reports
+          path: |
+            apps/android/app/build/test-results/
+            apps/android/app/build/reports/tests/
+            build/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn
+
+  emulator:
+    name: Instrumented tests (emulator, non-blocking)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: ./.github/actions/setup-android
+        with:
+          cache-read-only: 'true'
+
+      - name: Guide library (the instrumented tests map it from the APK)
+        run: ./build.sh guides
+
+      - name: connectedDebugAndroidTest on an API 35 x86_64 emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 4
+          ram-size: 4096M
+          disk-size: 6000M
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-boot-anim -camera-back emulated -camera-front emulated
+          disable-animations: true
+          working-directory: apps/android
+          script: ./gradlew :app:connectedDebugAndroidTest --console=plain
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Android instrumented tests (API 35 x86_64 emulator, non-blocking)"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests junit "connectedDebugAndroidTest" apps/android/app/build/outputs/androidTest-results/connected
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload instrumented test reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: android-instrumented-test-reports
+          path: |
+            apps/android/app/build/outputs/androidTest-results/
+            apps/android/app/build/reports/androidTests/
+          retention-days: 14
+          if-no-files-found: warn
+
+  summary:
+    name: Android summary
+    if: always()
+    needs: [build, emulator]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/ci
+      - name: Required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 tools/ci/needs-summary.py "Android" --optional emulator

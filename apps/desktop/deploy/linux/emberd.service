@@ -1,0 +1,43 @@
+# systemd unit for the EmberMesh desktop node / hub / radio gateway.
+# Install with deploy/linux/install.sh, or manually:
+#   sudo cp emberd.service /etc/systemd/system/ && sudo systemctl daemon-reload
+#   sudo systemctl enable --now emberd
+# Operator token:  sudo -u ember /usr/local/bin/emberd --data-dir /var/lib/embermesh --print-token
+# Logs:            journalctl -u emberd -f
+
+[Unit]
+Description=EmberMesh node, hub and radio gateway (emberd)
+Documentation=file:///usr/local/share/embermesh/README.md
+After=network.target sound.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=ember
+Group=ember
+SupplementaryGroups=dialout audio
+ExecStart=/usr/local/bin/emberd --data-dir /var/lib/embermesh --web-root /usr/local/share/embermesh/web
+# Add radio links here or (better) in /var/lib/embermesh/emberd.json, e.g.:
+#   ExecStart=/usr/local/bin/emberd --data-dir /var/lib/embermesh --kiss-tcp 127.0.0.1:8001
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+# Hardening that keeps serial ports and sound cards working (access via the groups above).
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/embermesh
+StateDirectory=embermesh
+StateDirectoryMode=0750
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+
+[Install]
+WantedBy=multi-user.target

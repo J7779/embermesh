@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  launchd user agent for emberd. Edit the binary/web-root paths (and replace USERNAME), then:
+    cp org.embermesh.emberd.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/org.embermesh.emberd.plist
+  Stop / remove:
+    launchctl bootout gui/$(id -u)/org.embermesh.emberd
+  Data dir: ~/Library/Application Support/EmberMesh (default).  Logs: ~/Library/Logs/emberd.log
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>org.embermesh.emberd</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/emberd</string>
+    <string>--web-root</string>
+    <string>/usr/local/share/embermesh/web</string>
+    <string>--log-file</string>
+    <string>/Users/USERNAME/Library/Logs/emberd.log</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+  <key>ProcessType</key>
+  <string>Interactive</string>
+  <key>StandardOutPath</key>
+  <string>/Users/USERNAME/Library/Logs/emberd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/USERNAME/Library/Logs/emberd.log</string>
+</dict>
+</plist>

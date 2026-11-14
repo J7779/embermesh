@@ -1,0 +1,40 @@
+---
+id: agriculture/comstock-how-to-keep-bees-19-bee-keepers-and-bee-keeping
+title: "How to Keep Bees 19: Bee-keepers and Bee-keeping"
+category: agriculture
+tags: ["beekeeping", "beginner beekeeping", "hive", "honey harvest", "swarms", "honey"]
+summary: "Bee-keepers and Bee-keeping, from How to Keep Bees (Comstock, 1905). Most business occupations lead to rivalry and all the selfish emotions incident to competition; not so is bee-keeping; quite the opposite, indeed, as there is…"
+source: "Anna Botsford Comstock, How to Keep Bees: A Handbook for the Use of Beginners (Doubleday, Page & Company, New York, 1905); public-domain transcription"
+source_title: "How to Keep Bees: A Handbook for the Use of Beginners"
+license: Public Domain
+attribution: "Anna Botsford Comstock, How to Keep Bees: A Handbook for the Use of Beginners (Doubleday, Page & Company, New York, 1905). Public domain in the United States (published before 1930)."
+retrieved: 2026-11-13
+part_of: agriculture/comstock-how-to-keep-bees
+order: 19
+---
+
+# How to Keep Bees 19: Bee-keepers and Bee-keeping
+
+*From How to Keep Bees: A Handbook for the Use of Beginners by Anna Botsford Comstock (Doubleday, Page & Company, New York, 1905).*
+
+> **Editor's note:** Disease control advice in old bee books predates modern Varroa mite and foulbrood management; check current beekeeping guidance before treating colonies.
+
+Most business occupations lead to rivalry and all the selfish emotions incident to competition; not so is bee-keeping; quite the opposite, indeed, as there is a freemasonry that holds bee-keepers together and renders their attitude toward each other friendly and helpful. Bee-keeping is everywhere a bond of brotherhood and a sign of congenial tastes. One night at a dinner-party the gentleman on my right was a stranger, known to me only by reputation as a lawyer of high standing and great erudition. He was reserved and silent, and evidently bored by the trivialities of table-talk. Some one incidentally spoke of our bees, when the face of my neighbour became illumined with interest, and he said, “I am sure that by becoming a lawyer I spoiled a good bee-keeper. I have never found anything else so interesting as bee-keeping;” and thus was swept away the curtain of cold conventionalism which had hung between us, and we began, from that moment, to be friends.
+
+I never take into my hands that delightful book, “A B C of Bee Culture,” without turning to the biographies of noted bee-keepers, and looking again at the faces there depicted, noting the noble forehead of Huber; the keen, scholarly face of Dzierzon; the judicial countenance of Friend Quinby and the beautiful expression of the venerable Langstroth. And thus on, page by page, and getting, by the way, a friendly greeting from the kindly eyes of Professor Cook, that most excellent of good teachers; and finally deriving sincere satisfaction from a long look at the keen, humorous face of Mr. A. I. Root himself. These leaders in apiculture are men with whom one is proud to be associated. And the fact that there are, in the United States, 300,000 persons engaged in bee-keeping, makes one hopeful that our republican institutions are to be guarded by intelligent citizenship.
+
+It is interesting to note that knowledge of bees has been given to the world by men who have attained the high peaks of scientific fame. Such knowledge began with Aristotle and Pliny in ancient times, and received no additions during the uncertain Dark Ages. It began anew with Swammerdam, in the seventeenth century, was augmented by Linnæus, De Geer, Réaumur, Bonnet, Lyonnet, Fabricius, Latreille, Lamarck, and finally reached a climax in the study of the habits of the bee by the blind Huber, who was born in Geneva in 1750. His observations made with his own brain, but with the eyes of his wife, niece and servant, form a classic in bee literature. In 1811 there were born, a continent apart, two great bee-keepers: Langstroth in Philadelphia, and Dzierzon in Silesia. Both were clergymen, but were also true scientists, and both invented means by which the combs could be moved and examined. Langstroth carried his invention farther, and in 1852 devised the movable frame which revolutionised bee-keeping.
+
+Up to this time the business of the bee-man was largely guess-work. He did not know anything about the condition of his bees in the hive, for he had no way of penetrating that dark chamber. The ways of reaping the honey-harvest were devious; at best the combs were torn from the hives with little regard for the rights and lives of the bees. Finally, there was devised the truly infernal plan of killing the bees with the fumes of burning brimstone, before taking their treasure; this method undoubtedly originating in the turgid theology of the times.
+
+However, about the time of Langstroth, someone, or perhaps many, had discovered that bees stored their honey in the upper part of the hive; and the old box-hive had a few auger-holes in the top, over which was inverted a box, which the bees usually filled, and thus saved themselves from the brimstone pit. We remember well the delight in our family when we used, for the first time, such boxes with glass sides; and as we saw they were being filled with combs, we rejoiced that we need not “take up” any more swarms, as the suffocation by sulphur fumes was termed.
+
+When, to the invention of the box super, was added the greater invention of Langstroth, and finally thereunto was added the invention of the honey-extractor, bee-keeping became a science, instead of a haphazard avocation.
+
+Bee-keeping in America has since then passed through many phases and survived many experiments. Our bee-keepers have been wide awake and willing to try all things and hold fast to the good. Once, having read of the floating apiaries of the Nile, which follow the flower bloom along the banks, an enthusiast tried the same scheme on the Mississippi River, starting at the southern part early in the season and coming north abreast of the spring; but too many bees were left behind to make this profitable. Another enterprising gentleman took his bees south winters, but the cost of transportation took away the profits. Now, however, another plan for gaining pasturage is proving most successful; *i. e.*, the establishment of out-apiaries. As seventy-five or a hundred colonies will usually take all the nectar of a given locality, the bee-keeper places his surplus colonies in other apiaries far enough distant, so there is good pasturage for all. Mr. A. L. Coggshall has about 3,000 colonies in out-apiaries in central New York.
+
+The up-to-date bee-keeper is not merely an operator in his apiary, but a co-operator with his bees, and we firmly believe that the bees are being educated by the partnership, as well as the bee-keeper. Bees certainly do learn by experience, as is well instanced by some Cyprians, which, in their native home, build columns of wax and propolis at the hive-entrance to keep out the large death’s-head moth which preys upon them. After living in this country for two years, the bees discovered that there were none of these moths about, and so ceased building these bars. The readiness with which our bees use the comb-foundation and fit their combs to the frames and follow the hint given by the starters in the sections, all point to their adaptability; and however others may regard the matter, we never take off a section filled with just one pound of pearly comb and amber honey that we do not pay tribute to the bee intelligence which placed it there, and regard the little artisans as true partners in our enterprise. And we never doubt that in the future this co-operation and co-education of bees and bee-keepers will result in a perfection of honey-production as yet undreamed.
+
+*[Illustration: Photograph by Ralph W. Curtis PLATE XXX. BOX-ELDER Staminate and pistillate flowers. This and the other maples and the willows give the bees pasturage in early Spring.]*
+
+*[Illustration: Photograph by Ralph W. Curtis PLATE XXXI. BLOSSOMS OF BLACK LOCUST The locusts often yield large crops of honey.]*

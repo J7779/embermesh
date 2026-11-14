@@ -1,0 +1,69 @@
+---
+id: community/wp2-conflict-resolution
+title: Conflict resolution
+category: community
+tags: [conflict resolution, community]
+summary: Conflict resolution is conceptualized as the methods and processes involved in facilitating the peaceful ending of conflict and retribution.
+source: https://en.wikipedia.org/w/index.php?title=Conflict_resolution&oldid=1383370137
+source_title: Wikipedia: Conflict resolution
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Conflict resolution", Wikipedia, The Free Encyclopedia (revision 1383370137), https://en.wikipedia.org/w/index.php?title=Conflict_resolution&oldid=1383370137 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Conflict resolution
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Conflict resolution** is conceptualized as the methods and processes involved in facilitating the peaceful ending of conflict and retribution.
+
+Committed group members attempt to resolve group conflicts by actively communicating information about their conflicting motives or ideologies to the rest of group (e.g., intentions; reasons for holding certain beliefs) and by engaging in collective negotiation. Dimensions of resolution typically parallel the dimensions of conflict in the way the conflict is processed.
+
+Cognitive resolution is the way disputants understand and view the conflict, with beliefs, perspectives, understandings and attitudes. Emotional resolution is in the way disputants feel about a conflict, the emotional energy. Behavioral resolution is reflective of how the disputants act, their behavior. Ultimately a wide range of methods and procedures for addressing conflict exist, including negotiation, mediation, mediation-arbitration, diplomacy, and creative peacebuilding.
+
+## Definition and characteristics
+
+Communication can be understood in a pragmatic or transactional way. There is a distinction between *paraconflict*, which is symbolic, and conflict, which is actions you can observe. Symbolic conflict is categorized as constructive or destructive, depending on the individual's emotional response to it. In contrast, action conflict is determined to be constructive or destructive based on how it functions within the system. Ruben viewed communication as continual and inevitable. Conflict refers to "the discrepancies between the demands and/or capabilities of the system and the demands and/or capacities of the environment." Conflict is a necessary process for a system to function, as adaptation in communication flows constantly; there is a strong correlation between adaptability and conflict.
+
+## Models
+
+### Modes
+
+Ruble and Thomas transposed the managerial grid model in terms of conflict resolution. They adapted the classification scheme to dimensions identified in conflict research that represent a range of behaviors beyond the dichotomy between cooperation and competition. The X-axis evaluates cooperativity, the extent by which mutual goals are achieved. The Y-axis evaluates assertiveness, how parties insist on carrying their own objectives.
+
+Thomas and Kilmann extended that grid with a rating system for five modes of behavior. When parties are assertive but their objectives lack compatibility, they become competitive; when parties are assertive toward compatible objectives, they can be collaborating; when no party prioritizes objectives that are mutually exclusive, they can display avoidance; parties can be accommodating when assertiveness is low but cooperativity is high; when there is no real bias toward assertiveness and cooperativity, compromising can obtain.
+
+However, not every style leads to an acceptable result in every situation. For example, a collaboration does not work if the goals of the two conflict parties are immutable and mutually exclusive. The different styles have different advantages and disadvantages. Depending on the situation, different conflict styles can be considered desirable to achieve the best results.
+
+### Dual concern
+
+The dual concern model of conflict resolution is a conceptual perspective that assumes individuals' preferred method of dealing with conflict is based on two underlying themes or dimensions: concern for self (assertiveness) and concern for others (empathy). According to the model, group members balance their concern for satisfying personal needs and interests with their concern for satisfying the needs and interests of others in different ways. The intersection of these two dimensions ultimately leads individuals towards exhibiting different styles of conflict resolution. The dual model identifies five group conflict resolution styles or strategies that individuals may use depending on their dispositions toward pro-self or pro-social goals.
+
+**Avoidance**
+Characterized by joking, changing or avoiding the topic, or even denying that a problem exists, the conflict avoidance style is used when an individual has withdrawn in dealing with the other party, when one is uncomfortable with conflict, or due to cultural contexts. During conflict, these avoiders adopt a "wait and see" attitude, often allowing conflict to phase out on its own without any personal involvement. By neglecting to address high-conflict situations, avoiders risk allowing problems to fester or spin out of control.
+
+**Accommodating**
+In contrast, yielding, "accommodating", smoothing or suppression conflict styles are characterized by a high level of concern for others and a low level of concern for oneself. This passive pro-social approach emerges when individuals derive personal satisfaction from meeting the needs of others and have a general concern for maintaining stable, positive social relationships. When faced with conflict, individuals with an accommodating conflict style tend to harmonize into others' demands out of respect for the social relationship. With this sense of yielding to the conflict, individuals fall back to others' input instead of finding solutions with their own intellectual resolution.
+
+**Competitive**
+The competitive, "fighting" or forcing conflict style maximizes individual assertiveness (i.e., concern for self) and minimizes empathy (i.e., concern for others). Groups consisting of competitive members generally enjoy seeking domination over others, and typically see conflict as a "win or lose" predicament. Fighters tend to force others to accept their personal views by employing competitive power tactics (arguments, insults, accusations or even violence) that foster intimidation.
+
+**Conciliation**
+The conciliation, "compromising", bargaining or negotiation conflict style is typical of individuals who possess an intermediate level of concern for both personal and others' outcomes. Compromisers value fairness and, in doing so, anticipate mutual give-and-take interactions. By accepting some demands put forth by others, compromisers believe this agreeableness will encourage others to meet them halfway, thus promoting conflict resolution. This conflict style can be considered an extension of both "yielding" and "cooperative" strategies.
+
+**Cooperation**
+Characterized by an active concern for both pro-social and pro-self behavior, the cooperation, integration, confrontation or problem-solving conflict style is typically used when an individual has elevated interests in their own outcomes as well as in the outcomes of others. During conflict, cooperators collaborate with others in an effort to find an amicable solution that satisfies all parties involved in the conflict. Individuals using this type of conflict style tend to be both highly assertive and highly empathetic. By seeing conflict as a creative opportunity, collaborators willingly invest time and resources into finding a "win-win" solution. According to the literature on conflict resolution, a cooperative conflict resolution style is recommended above all others. This resolution may be achieved by lowering the aggressor's guard while raising the ego.
+
+### Regret analysis
+
+The conflict resolution curve derived from an analytical model that offers a peaceful solution by motivating conflicting entities. Forced resolution of conflict might invoke another conflict in the future.
+
+Conflict resolution curve (CRC) separates conflict styles into two separate domains: domain of competing entities and domain of accommodating entities. There is a sort of agreement between targets and aggressors on this curve. Their judgements of badness compared to goodness of each other are analogous on CRC. So, arrival of conflicting entities to some negotiable points on CRC is important before peace building. CRC does not exist (i.e., singular) in reality if the aggression of the aggressor is certain. Under such circumstances it might lead to apocalypse with mutual destruction.
+
+The curve explains why nonviolent struggles ultimately toppled repressive regimes and sometimes forced leaders to change the nature of governance. Also, this methodology has been applied to capture conflict styles on the Korean Peninsula and dynamics of negotiation processes.
+
+### Four-sides
+
+_(This section is shortened.)_
+
+_(Later sections of the original article were left out of this offline copy for length: the rest of Models, Theories, Praxis, Between organizations, In animals, Further readings.)_

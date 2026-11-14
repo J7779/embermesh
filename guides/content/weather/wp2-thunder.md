@@ -1,0 +1,48 @@
+---
+id: weather/wp2-thunder
+title: Thunder
+category: weather
+tags: [thunder, weather]
+summary: Thunder is the sound caused by lightning. Depending upon the distance from and nature of the lightning, it can range from a long, low rumble to a sudden, loud crack.
+source: https://en.wikipedia.org/w/index.php?title=Thunder&oldid=1383909499
+source_title: Wikipedia: Thunder
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Thunder", Wikipedia, The Free Encyclopedia (revision 1383909499), https://en.wikipedia.org/w/index.php?title=Thunder&oldid=1383909499 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Thunder
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Thunder** is the sound caused by lightning. Depending upon the distance from and nature of the lightning, it can range from a long, low rumble to a sudden, loud crack. The sudden increase in temperature and hence pressure caused by the lightning produces rapid expansion of the air in the path of a lightning bolt. In turn, this expansion of air creates a sonic shock wave, often referred to as a "thunderclap" or "peal of thunder". The scientific study of thunder is known as *brontology* and the irrational fear (phobia) of thunder is called *brontophobia*.
+
+## Cause
+
+The cause of thunder has been the subject of centuries of speculation and scientific inquiry. Early thinking was that it was made by deities. Throughout the centuries, folklore has offered various fanciful explanations for what causes thunder, such as gnomes playing ninepins. Some of these were tongue-in-cheek humorous stories to tell young children so as to soothe their fear of the noise. The ancient Greek philosophers attributed it to natural causes, such as wind striking clouds (Anaximander, Aristotle) and movement of air within clouds (Democritus). The Roman philosopher Lucretius held it was from the sound of hail colliding within clouds. By the mid-19th century, the accepted theory was that lightning produced a vacuum and that the collapse of that vacuum produced what is known as thunder.
+
+Scientists have agreed since the 20th century that thunder must begin with a shock wave in the air due to the sudden thermal expansion of the plasma in the lightning channel. The temperature inside the lightning channel, measured by spectral analysis, varies during its 50 μs existence, rising sharply from an initial temperature of about 20,000 K to about 30,000 K, then dropping away gradually to about 10,000 K. The average is about 20400 K. This heating causes a rapid outward expansion, impacting the surrounding cooler air at a speed faster than sound would otherwise travel. The resultant outward-moving pulse is a shock wave, similar in principle to the shock wave formed by an explosion, or at the front of a supersonic aircraft. Near the source, the sound pressure level of thunder is usually 165 to 180 dB, but can exceed 200 dB in some cases.
+
+Experimental studies of simulated lightning have produced results largely consistent with this model, though there is continued debate about the precise physical mechanisms of the process. Other causes have also been proposed, relying on electrodynamic effects of the enormous current acting on the plasma in the bolt of lightning.
+
+## Consequences
+
+The shock wave in thunder is sufficient to cause property damage and injury, such as internal contusion, to individuals nearby. Thunder can rupture the eardrums of people nearby, leading to permanently impaired hearing. Even if not, it can lead to temporary deafness.
+
+## Types
+
+Vavrek et al. (n.d.) reported that the sounds of thunder fall into categories based on loudness, duration, and pitch. *Claps* are loud sounds lasting 0.2 to 2 seconds and containing higher pitches. *Peals* are sounds changing in loudness and pitch. *Rolls* are irregular mixtures of loudness and pitches. *Rumbles* are less loud, last for longer (up to more than 30 seconds), and are of low pitch.
+
+Inversion thunder results when lightning strikes occur between the cloud and ground during a temperature inversion. The resulting thunder sounds have significantly greater acoustic energy than those produced from the same distance in non-inversion conditions. In a temperature inversion, the air near the ground is cooler than the air higher up. Inversions often happen when warm, moist air passes above a cold front. Within a temperature inversion, sound energy is prevented from dispersing vertically as it would in non-inversion conditions, and is thus concentrated in the near-ground layer.
+
+Cloud-to-ground lightning (CG) typically consists of two or more return strokes, from ground to cloud. Later return strokes have greater acoustic energy than the first.
+
+## Perception
+
+The most noticeable aspect of lightning and thunder is that the lightning is seen before the thunder is heard. This is a consequence of the speed of light being much greater than the speed of sound. The speed of sound in dry air is approximately 343 m/s or 667 knot at 293 K.
+
+This translates to approximately 3 s/km; saying "one thousand and one... one thousand and two..." is a useful method of counting the seconds from the perception of a given lightning flash to the perception of its thunder (which can be used to gauge the proximity of lightning for the sake of safety). To estimate the distance from the lightning strike, divide the counted seconds by five for miles, or three for kilometers.
+
+A very bright flash of lightning and an almost simultaneous sharp "crack" of thunder, a *thundercrack*, therefore indicates that the lightning strike was very near.
+
+Close-in lightning has been described first as a clicking or cloth-tearing sound, then a cannon shot sound or loud crack/snap, followed by continuous rumbling. The early sounds are from the leader parts of lightning, then the near parts of the return stroke, then the distant parts of the return stroke.

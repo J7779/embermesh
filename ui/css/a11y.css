@@ -1,0 +1,264 @@
+/* EmberMesh accessibility layer. Everything here is switched by attributes on <html> that
+   js/lib/prefs.js maintains (docs/RPC_API.md §8):
+     data-simple="true|false"       Simple mode
+     data-motion="full|reduced|off" effective motion level (preference + platform + low power + Simple)
+     data-contrast="high|normal"    high contrast (preference or platform)
+     data-textsize="normal|large|xlarge"  derived from --text-scale (and Simple mode)
+     data-spacing="wide|normal"     reading spacing (WCAG 1.4.12 values)
+     data-transparency="reduced|normal"
+     data-route="<screen>"          current screen (js/lib/a11y.js), for scoped Simple-mode rules
+   and the custom property --text-scale (0.85–1.6).
+   Load it after app.css. No external assets. */
+
+:root { --a11y-css: 1; --text-scale: 1; --target: 48px; --focus-ring: 3px; }
+
+/* ------------------------------------------------------------------ text size */
+/* rem-based sizes follow --text-scale; the body's 17px base is restated in rem so it scales too. */
+html { font-size: calc(100% * var(--text-scale, 1)); }
+html body { font-size: 1.0625rem; }
+html[data-simple="true"] { font-size: calc(112.5% * var(--text-scale, 1)); }
+/* Large text: let one-line labels wrap instead of being cut off with an ellipsis. */
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) :is(.page-head h1, .item .title, .item .sub, .thread-head .title, .thread-head .sub, .reader-bar .grow, .tag, .chips .btn, .strip .s-item) {
+  white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: break-word; min-width: 0;
+}
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .strip { flex-wrap: wrap; row-gap: .1rem; }
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .item .meta { white-space: normal; }
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .chips { flex-wrap: wrap; overflow-x: visible; }
+/* A search field and its filter share one row at normal size; with large text they stack. */
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .page > .row.nowrap:has(> select) { flex-wrap: wrap; }
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .page > .row.nowrap:has(> select) > * { flex: 1 1 100%; min-width: 0; width: 100%; }
+html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .sos-banner span.txt { -webkit-line-clamp: 3; }
+html:is([data-textsize="large"], [data-textsize="xlarge"]) .page-head { flex-wrap: wrap; height: auto; }
+html:is([data-textsize="large"], [data-textsize="xlarge"]) .kv { grid-template-columns: minmax(0, max-content) minmax(0, 1fr); }
+html[data-textsize="xlarge"] .kv { grid-template-columns: minmax(0, 1fr); }
+html[data-textsize="xlarge"] .kv dd { margin-bottom: .4rem; }
+/* Phone tab bar: labels wrap and stay readable; never push the page sideways. */
+@media (max-width: 899px) {
+  html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .tabbar a > span:not(.badge) {
+    font-size: min(.75rem, 14px); line-height: 1.1; text-align: center; max-width: 100%; padding: 0 2px;
+    white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: normal; word-break: normal; hyphens: auto;
+  }
+  html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .tabbar a { min-width: 0; }
+}
+/* Desktop: the sidebar grows with the text. */
+@media (min-width: 900px) {
+  html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) #app { grid-template-columns: minmax(220px, 14rem) minmax(0, 1fr); }
+  html:is([data-textsize="large"], [data-textsize="xlarge"], [data-simple="true"]) .toasts { left: 14rem; }
+}
+
+/* ------------------------------------------------------------------ focus */
+:focus-visible { outline: var(--focus-ring) solid var(--focus); outline-offset: 2px; }
+/* A halo in the background colour keeps the ring visible on coloured buttons (SOS, primary). */
+:is(.btn, button, a, input, select, textarea, summary, [tabindex]):focus-visible { box-shadow: 0 0 0 calc(var(--focus-ring) + 4px) var(--bg); }
+:is(.btn.primary, .sos-hold, .btn.danger.solid, .sos-banner):focus-visible { outline-color: var(--focus); outline-offset: 3px; }
+/* Headings and the main region receive focus from script after navigation: no ring for pointer users. */
+:is(h1, h2, #main)[tabindex="-1"]:focus:not(:focus-visible) { outline: none; box-shadow: none; }
+:is(h1, h2)[tabindex="-1"]:focus-visible { outline-offset: 4px; border-radius: 4px; }
+input[type="range"]:focus-visible { outline-offset: 6px; }
+
+.skip-link {
+  position: fixed; left: .5rem; top: .5rem; z-index: 200; padding: .75rem 1rem; border-radius: 10px;
+  background: var(--accent); color: var(--accent-text); font-weight: 700; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus, .skip-link:focus-visible { transform: none; }
+.a11y-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* ------------------------------------------------------------------ high contrast */
+/* Dark (default) */
+html[data-contrast="high"] {
+  --bg: #000; --surface: #000; --surface2: #1a1a1a; --line: #a6a6a6;
+  --text: #fff; --muted: #d9d9d9; --accent: #ffad70; --accent-text: #000;
+  --ok: #7cf0b0; --warn: #ffe07a; --bad: #ff8f8f; --info: #a6d4ff;
+  --mine: #33200f; --theirs: #111; --interop: #0b2236; --sos: #b30000; --sos-text: #fff;
+  --mark: #ffe07a; --mark-text: #000; --focus: #ffff00; --focus-ring: 4px;
+}
+html[data-contrast="high"][data-theme="light"] {
+  --bg: #fff; --surface: #fff; --surface2: #ededed; --line: #4d4d4d;
+  --text: #000; --muted: #2e2e2e; --accent: #8f3700; --accent-text: #fff;
+  --ok: #0a5a2f; --warn: #5c3c00; --bad: #9e0012; --info: #00458a;
+  --mine: #ffe3cc; --theirs: #fff; --interop: #e3f0ff; --sos: #a30000; --sos-text: #fff;
+  --mark: #ffe066; --mark-text: #000; --focus: #0040c0;
+}
+/* Night stays red-only: brighter reds on black, no other hue. */
+html[data-contrast="high"][data-theme="night"] {
+  --bg: #000; --surface: #000; --surface2: #1f0000; --line: #c42a1c;
+  --text: #ff6a5e; --muted: #ff5447; --accent: #ff6a5e; --accent-text: #000;
+  --ok: #ff6a5e; --warn: #ff6a5e; --bad: #ff8a80; --info: #ff5447;
+  --mine: #2a0000; --theirs: #120000; --interop: #1a0000; --sos: #ff5447; --sos-text: #000;
+  --mark: #ff6a5e; --mark-text: #000; --focus: #ff8a80;
+}
+html[data-contrast="high"] :is(.btn, input, select, textarea, .card, .segmented, .chips .btn, .toast, .sheet, .meter) { border-width: 2px; border-color: var(--line); }
+html[data-contrast="high"] .btn.primary { border-color: var(--text); }
+html[data-contrast="high"] .btn.ghost { border-color: transparent; text-decoration: underline; text-underline-offset: 3px; }
+html[data-contrast="high"] .btn.ghost.icon-only { text-decoration: none; }
+html[data-contrast="high"] a:not(.btn):not(.item):not(.s-item):not(.manual-entry):not(.tabbar a) { text-decoration: underline; text-underline-offset: 3px; }
+html[data-contrast="high"] .tabbar a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+html[data-contrast="high"] ::placeholder { color: var(--muted); opacity: 1; }
+html[data-contrast="high"] .list > li + li { border-top-width: 2px; border-top-color: var(--line); }
+html[data-contrast="high"] .msg { border: 2px solid var(--line); }
+html[data-contrast="high"] .msg.out { border-color: var(--accent); }
+html[data-contrast="high"] .tag { border-width: 2px; color: var(--text); }
+html[data-contrast="high"] .sos-banner.incoming { background: #ffe07a; color: #000; }
+html[data-contrast="high"][data-theme="night"] .sos-banner.incoming { background: var(--surface2); color: var(--text); border: 2px solid var(--text); }
+html[data-contrast="high"] .btn:disabled { opacity: 1; border-style: dashed; color: var(--muted); }
+html[data-contrast="high"] .overlay { background: rgba(0, 0, 0, .9); }
+/* Status shown by colour also gets a shape (the dots become rings / filled). */
+html[data-contrast="high"] .dot { border: 2px solid var(--text); }
+html[data-contrast="high"] .dot.up { box-shadow: inset 0 0 0 3px var(--bg); }
+
+/* Windows / platform forced colours: use system colours for state that is otherwise colour-only. */
+@media (forced-colors: active) {
+  :focus-visible { outline: 3px solid Highlight; }
+  :is([aria-selected="true"], [aria-pressed="true"], [aria-current="page"], .btn.primary) { forced-color-adjust: none; background: Highlight; color: HighlightText; border-color: Highlight; }
+  .dot, .bar > i, .meter-bar > i, .morse-lamp.on, .badge { forced-color-adjust: none; background: CanvasText; }
+  .dot { border: 1px solid CanvasText; }
+  .icon { forced-color-adjust: auto; }
+  .sos-hold, .msg.sos, .sos-banner { border: 3px solid CanvasText; }
+}
+
+/* ------------------------------------------------------------------ motion */
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important;
+}
+html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { scroll-behavior: auto !important; }
+/* Decorative motion (opt-in class for the motion system): dropped unless motion is full. */
+html:not([data-motion="full"]) .motion-decorative, html:not([data-motion="full"]) .motion-decorative * { animation: none !important; transition: none !important; }
+html[data-motion="reduced"] :is(.spin) { animation-duration: 2s; }
+
+/* ------------------------------------------------------------------ transparency */
+html[data-transparency="reduced"] .overlay { background: rgba(0, 0, 0, .92); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-transparency="reduced"] :is(.toast, .sheet, .strip, .tabbar, .reader-bar) { -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+html[data-transparency="reduced"] .morse-cam-hint { background: #000; }
+html[data-transparency="reduced"] .muted-card { opacity: 1; }
+
+/* ------------------------------------------------------------------ reading spacing */
+html[data-spacing="wide"] body { letter-spacing: .12em; word-spacing: .16em; line-height: 1.6; }
+html[data-spacing="wide"] :is(p, li, .reader, .msg .text, .sub, .snippet, .field-help, .notice) { line-height: 1.7; }
+html[data-spacing="wide"] :is(p, .reader li) { margin-bottom: 1.2em; }
+html[data-spacing="wide"] :is(em, i) { font-style: normal; font-weight: 700; }
+html[data-spacing="wide"] :is(.reader, .msg .text) { text-align: left; }
+html[data-spacing="wide"] :is(code, pre, .mono, .copybox, pre.out, .morse-transcript) { letter-spacing: normal; word-spacing: normal; }
+
+/* ------------------------------------------------------------------ Simple mode */
+/* Bigger targets and calmer spacing everywhere. */
+html[data-simple="true"] { --target: 56px; }
+html[data-simple="true"] .btn { min-height: 56px; min-width: 56px; padding: .6rem 1.1rem; border-radius: 12px; font-size: 1.05rem; }
+html[data-simple="true"] .btn.small { min-height: 48px; min-width: 48px; font-size: 1rem; padding: .4rem .9rem; }
+html[data-simple="true"] .btn.icon-only { width: 56px; padding: 0; }
+html[data-simple="true"] .btn.small.icon-only { width: 48px; }
+html[data-simple="true"] :is(input[type="text"], input[type="password"], input[type="search"], input[type="number"], select, textarea) { min-height: 56px; font-size: 1.05rem; }
+html[data-simple="true"] :is(input[type="checkbox"], input[type="radio"]) { width: 32px; height: 32px; }
+html[data-simple="true"] label.check { min-height: 56px; gap: .9rem; }
+html[data-simple="true"] .item { min-height: 72px; padding: .85rem .6rem; gap: .9rem; }
+html[data-simple="true"] .segmented button { min-height: 56px; font-size: 1.05rem; }
+html[data-simple="true"] .chips .btn { min-height: 48px; }
+html[data-simple="true"] details summary { min-height: 56px; }
+html[data-simple="true"] .stack > * + * { margin-top: 1rem; }
+html[data-simple="true"] .row { gap: .75rem; }
+html[data-simple="true"] .card { padding: 1.1rem; border-radius: 16px; }
+html[data-simple="true"] .card + .card { margin-top: 1rem; }
+html[data-simple="true"] .page { padding: 1rem 1rem 3rem; }
+html[data-simple="true"] .section-title { font-size: .95rem; text-transform: none; letter-spacing: 0; color: var(--text); }
+html[data-simple="true"] :is(.small, .field-help, .snippet) { font-size: .95rem; }
+html[data-simple="true"] .msg { font-size: 1.1rem; }
+html[data-simple="true"] .msg .mmeta { font-size: .85rem; }
+
+/* The status strip's links are targets too. */
+html[data-simple="true"] .strip a.s-item { min-height: 48px; padding: 0 .35rem; }
+/* Navigation: five or six big destinations. Until app.js builds the bar from navItems(), hide
+   the destinations Simple mode moves to "More" and show "More" at every width. */
+html[data-simple="true"] .tabbar a:is([href="#/people"], [href="#/board"], [href="#/links"], [href="#/tools"], [href="#/extras"]) { display: none !important; }
+html[data-simple="true"] .tabbar a[href="#/more"] { display: flex !important; }
+html[data-simple="true"] .tabbar a { min-height: 68px; gap: 4px; }
+html[data-simple="true"] .tabbar a .icon { width: 28px; height: 28px; }
+html[data-simple="true"] .tabbar a.sos-tab { color: var(--bad); font-weight: 700; }
+@media (min-width: 900px) { html[data-simple="true"] .tabbar a { min-height: 60px; font-size: 1.1rem; } }
+
+/* Bigger, always-visible Back: icon + the word, and the head stays at the top while scrolling. */
+html[data-simple="true"] :is(a, button).btn.icon-only:is([aria-label^="Back"], .narrow-back, .simple-back) { width: auto; padding: 0 1rem 0 .6rem; border-color: var(--line); background: var(--surface2); }
+html[data-simple="true"] :is(a, button).btn.icon-only:is([aria-label^="Back"], .narrow-back, .simple-back)::after { content: "Back"; font-weight: 700; }
+html[data-simple="true"] .page-head:has(> a[aria-label^="Back"]) { position: sticky; top: 0; z-index: 3; background: var(--bg); padding: .3rem 0; }
+html[data-simple="true"] .simple-backbar { position: sticky; top: 0; z-index: 3; background: var(--bg); padding: .5rem 1rem 0; }
+
+/* "More options": secondary controls are tucked away until asked for (js/lib/simple.js adds the
+   toggle). Screens mark them with [data-secondary]; the route-scoped selectors below are the
+   interim list until every screen carries the attribute. Nothing is removed. */
+html[data-simple="true"] #main:not([data-show-secondary="true"]) [data-secondary] { display: none !important; }
+html[data-simple="true"] #main:not([data-show-secondary="true"]) :is(
+  .compose:not(.interop) .row.nowrap + .row.nowrap,
+  .compose:not(.interop) button[aria-label="Send a small file"],
+  .smart-switch,
+  select[aria-label="Search in category"],
+  .lib-overview,
+  section[aria-label="Mesh & relaying"], section[aria-label="Clock"], section[aria-label="Identity"],
+  section[aria-label="Sneakernet bundles"], section[aria-label="This device"], section[aria-label="About"],
+  section[aria-label="Position"], section[aria-label="Security"]
+) { display: none !important; }
+/* SOS: the roll call (last section) and its title are secondary. */
+html[data-simple="true"][data-route="sos"] #main:not([data-show-secondary="true"]) .page > :is(:nth-last-child(1), :nth-last-child(2)):not(.simple-more):not(.page-head) { display: none !important; }
+/* Links: sharing this device (hub, WebRTC) and the net plan are secondary. */
+html[data-simple="true"][data-route="links"] #main:not([data-show-secondary="true"]) .page > :is(.section-title, .section-title ~ *):not(.simple-more) { display: none !important; }
+.simple-more { margin: 1.2rem 0 .5rem; }
+.simple-more .btn { width: 100%; justify-content: center; }
+html:not([data-simple="true"]) :is(.simple-more, .simple-quick, .simple-sos-card, .simple-backbar) { display: none !important; }
+
+/* Chat: message + send, two quick buttons; the hint line and priority are under More options. */
+html[data-simple="true"] .compose { padding: .6rem; }
+html[data-simple="true"] .compose textarea { min-height: 56px; font-size: 1.1rem; }
+html[data-simple="true"] .compose .btn.primary.icon-only { width: auto; padding: 0 1rem; }
+html[data-simple="true"] .compose .btn.primary.icon-only[aria-label="Send"]::after { content: "Send"; font-weight: 700; }
+.simple-quick { display: flex; gap: .5rem; margin-top: .5rem; flex-wrap: wrap; }
+.simple-quick .btn { flex: 1 1 6.5rem; padding-left: .5rem; padding-right: .5rem; }
+
+/* Chat header: the avatar is decoration; the encryption line is a detail. */
+html[data-simple="true"] .thread-head .avatar { display: none; }
+html[data-simple="true"] #main:not([data-show-secondary="true"]) .thread-head .sub { display: none; }
+
+/* Guides: search and "Ask the library" first, then the emergency shortcuts, then browsing. */
+html[data-simple="true"][data-route="guides"] #main > .page { display: flex; flex-direction: column; }
+html[data-simple="true"][data-route="guides"] #main > .page > .page-head { order: -4; }
+html[data-simple="true"][data-route="guides"] #main > .page > .row:has(input[type="search"]) { order: -3; }
+html[data-simple="true"][data-route="guides"] #main > .page > :has(> .ask-box) { order: -2; margin-top: 1rem; }
+html[data-simple="true"][data-route="guides"] #main > .page > .simple-sos-card { order: -1; margin-top: 1rem; }
+.simple-sos-card .row .btn { flex: 1 1 7rem; }
+.simple-sos-card .row .btn.danger { flex-basis: 100%; }
+
+/* SOS: the hold button gets bigger, the explanation stays short. */
+html[data-simple="true"] .checkin-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); }
+html[data-simple="true"] .checkin-grid .btn { min-height: 72px; font-size: 1.1rem; }
+
+/* Settings: the Accessibility entry leads. */
+.a11y-entry { display: flex; align-items: center; gap: .75rem; text-decoration: none; color: inherit; border: 2px solid var(--accent); }
+.a11y-entry .title { font-weight: 700; }
+
+/* ------------------------------------------------------------------ Accessibility screen */
+fieldset.choice { border: 0; margin: 0; padding: 0; min-width: 0; }
+fieldset.choice legend { padding: 0; margin-bottom: .35rem; }
+.choice-row { display: flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.choice-opt { flex: 1 1 6.5rem; display: flex; align-items: center; justify-content: center; gap: .45rem; min-height: 48px; padding: .3rem .6rem; cursor: pointer; text-align: center; border-right: 1px solid var(--line); }
+.choice-opt:last-child { border-right: 0; }
+.choice-opt input { width: 20px; height: 20px; }
+.choice-opt:has(input:checked) { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.choice-opt:has(input:focus-visible) { outline: var(--focus-ring) solid var(--focus); outline-offset: -4px; }
+html[data-simple="true"] .choice-opt { min-height: 56px; }
+html[data-contrast="high"] .choice-row { border-width: 2px; }
+html[data-contrast="high"] .choice-opt { border-right-width: 2px; }
+.a11y-page .opt-row { display: flex; align-items: center; gap: .75rem; justify-content: space-between; flex-wrap: wrap; }
+.a11y-page .follow { font-size: .9rem; color: var(--muted); }
+.a11y-page .follow.on::before { content: "\2713\00a0"; }
+.a11y-page .preview { border: 1px dashed var(--line); border-radius: 10px; padding: .75rem; }
+.a11y-page .preview .pv-title { font-weight: 700; font-size: 1.2rem; }
+.a11y-page input[type="range"] { width: 100%; min-height: 48px; accent-color: var(--accent); }
+.a11y-page .scale-value { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 4ch; text-align: right; }
+.a11y-page .switch-row { display: flex; align-items: flex-start; gap: .8rem; min-height: 48px; cursor: pointer; }
+.a11y-page .switch-row input { margin-top: .15rem; }
+.a11y-page .simple-big { font-size: 1.15rem; }
+.kbd-list { display: grid; grid-template-columns: max-content 1fr; gap: .4rem 1rem; margin: 0; }
+.kbd-list dt { font-weight: 700; }
+kbd { font-family: ui-monospace, Menlo, Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; padding: 0 .35em; background: var(--surface2); font-size: .9em; }
+.simple-offer { border: 2px solid var(--accent); }
+.simple-offer .btn { width: 100%; justify-content: center; }
+.simple-offer-btn { border: 2px solid var(--accent); font-size: 1.1rem; min-height: 56px; }
+.simple-offer-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); }
+.setup .simple-offer { margin-top: 1rem; }

@@ -1,0 +1,215 @@
+# Sources added by the wiki2 sweep for the `food` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `food/wb2-cookbook-bean-sprout` — Cookbook: Bean Sprout — https://en.wikibooks.org/w/index.php?title=Cookbook:Bean_Sprout&oldid=4520291
+  - `food/wb2-cookbook-boiling` — Cookbook: Boiling — https://en.wikibooks.org/w/index.php?title=Cookbook:Boiling&oldid=4449148
+  - `food/wb2-cookbook-bread-making` — Cookbook: Bread Making — https://en.wikibooks.org/w/index.php?title=Cookbook:Bread_Making&oldid=4630570
+  - `food/wb2-cookbook-bread` — Cookbook: Bread — https://en.wikibooks.org/w/index.php?title=Cookbook:Bread&oldid=4526303
+  - `food/wb2-cookbook-butter` — Cookbook: Butter — https://en.wikibooks.org/w/index.php?title=Cookbook:Butter&oldid=4520324
+  - `food/wb2-cookbook-buttermilk` — Cookbook: Buttermilk — https://en.wikibooks.org/w/index.php?title=Cookbook:Buttermilk&oldid=4530339
+  - `food/wb2-cookbook-canning` — Cookbook: Canning — https://en.wikibooks.org/w/index.php?title=Cookbook:Canning&oldid=4628656
+  - `food/wb2-cookbook-cheese` — Cookbook: Cheese — https://en.wikibooks.org/w/index.php?title=Cookbook:Cheese&oldid=4524343
+  - `food/wb2-cookbook-cooking-techniques` — Cookbook: Cooking Techniques — https://en.wikibooks.org/w/index.php?title=Cookbook:Cooking_Techniques&oldid=4478195
+  - `food/wb2-cookbook-dryfish` — Cookbook: Dryfish — https://en.wikibooks.org/w/index.php?title=Cookbook:Dryfish&oldid=4520500
+  - `food/wb2-cookbook-egg` — Cookbook: Egg — https://en.wikibooks.org/w/index.php?title=Cookbook:Egg&oldid=4641757
+  - `food/wb2-cookbook-fermentation` — Cookbook: Fermentation — https://en.wikibooks.org/w/index.php?title=Cookbook:Fermentation&oldid=4461773
+  - `food/wb2-cookbook-fish-sauce` — Cookbook: Fish Sauce — https://en.wikibooks.org/w/index.php?title=Cookbook:Fish_Sauce&oldid=4520521
+  - `food/wb2-cookbook-fish` — Cookbook: Fish — https://en.wikibooks.org/w/index.php?title=Cookbook:Fish&oldid=4658424
+  - `food/wb2-cookbook-flatbread` — Cookbook: Flatbread — https://en.wikibooks.org/w/index.php?title=Cookbook:Flatbread&oldid=4585401
+  - `food/wb2-cookbook-food-safety-and-sanitation` — Cookbook: Food Safety and Sanitation — https://en.wikibooks.org/w/index.php?title=Cookbook:Food_Safety_and_Sanitation&oldid=4658419
+  - `food/wb2-cookbook-hominy` — Cookbook: Hominy — https://en.wikibooks.org/w/index.php?title=Cookbook:Hominy&oldid=4520571
+  - `food/wb2-cookbook-kimchi` — Cookbook: Kimchi — https://en.wikibooks.org/w/index.php?title=Cookbook:Kimchi&oldid=4601520
+  - `food/wb2-cookbook-lentil` — Cookbook: Lentil — https://en.wikibooks.org/w/index.php?title=Cookbook:Lentil&oldid=4520729
+  - `food/wb2-cookbook-meat` — Cookbook: Meat — https://en.wikibooks.org/w/index.php?title=Cookbook:Meat&oldid=4658406
+  - `food/wb2-cookbook-pressure-cooking` — Cookbook: Pressure Cooking — https://en.wikibooks.org/w/index.php?title=Cookbook:Pressure_Cooking&oldid=4539424
+  - `food/wb2-cookbook-rice` — Cookbook: Rice — https://en.wikibooks.org/w/index.php?title=Cookbook:Rice&oldid=4601058
+  - `food/wb2-cookbook-salt` — Cookbook: Salt — https://en.wikibooks.org/w/index.php?title=Cookbook:Salt&oldid=4442637
+  - `food/wb2-cookbook-sauerkraut-i` — Cookbook: Sauerkraut I — https://en.wikibooks.org/w/index.php?title=Cookbook:Sauerkraut_I&oldid=4525170
+  - `food/wb2-cookbook-smoking` — Cookbook: Smoking — https://en.wikibooks.org/w/index.php?title=Cookbook:Smoking&oldid=3795858
+  - `food/wb2-cookbook-sourdough-starter` — Cookbook: Sourdough Starter — https://en.wikibooks.org/w/index.php?title=Cookbook:Sourdough_Starter&oldid=4612546
+  - `food/wb2-cookbook-tortilla` — Cookbook: Tortilla — https://en.wikibooks.org/w/index.php?title=Cookbook:Tortilla&oldid=4342019
+  - `food/wb2-cookbook-vinegar` — Cookbook: Vinegar — https://en.wikibooks.org/w/index.php?title=Cookbook:Vinegar&oldid=4472305
+  - `food/wb2-cookbook-yogurt` — Cookbook: Yogurt — https://en.wikibooks.org/w/index.php?title=Cookbook:Yogurt&oldid=4533527
+  - `food/wb2-diy-canning` — Do-It-Yourself: Canning — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/Canning&oldid=4672941
+  - `food/wb2-diy-wine` — Do-It-Yourself: Wine — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/Wine&oldid=3951372
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `food/wp2-acorn` — Acorn — https://en.wikipedia.org/w/index.php?title=Acorn&oldid=1383894463
+  - `food/wp2-adansonia-digitata` — Adansonia digitata (African baobab) — https://en.wikipedia.org/w/index.php?title=Adansonia_digitata&oldid=1385526862
+  - `food/wp2-agaricus-campestris` — Agaricus campestris (field mushroom) — https://en.wikipedia.org/w/index.php?title=Agaricus_campestris&oldid=1382980832
+  - `food/wp2-allium-tricoccum` — Allium tricoccum (ramps) — https://en.wikipedia.org/w/index.php?title=Allium_tricoccum&oldid=1378694219
+  - `food/wp2-allium-ursinum` — Allium ursinum (wild garlic) — https://en.wikipedia.org/w/index.php?title=Allium_ursinum&oldid=1375036004
+  - `food/wp2-amaranth` — Amaranth — https://en.wikipedia.org/w/index.php?title=Amaranth&oldid=1384204576
+  - `food/wp2-arctium-lappa` — Arctium lappa (greater burdock) — https://en.wikipedia.org/w/index.php?title=Arctium_lappa&oldid=1375558472
+  - `food/wp2-armillaria-mellea` — Armillaria mellea — https://en.wikipedia.org/w/index.php?title=Armillaria_mellea&oldid=1379968578
+  - `food/wp2-asimina-triloba` — Asimina triloba (American papaw) — https://en.wikipedia.org/w/index.php?title=Asimina_triloba&oldid=1385543270
+  - `food/wp2-asparagus` — Asparagus — https://en.wikipedia.org/w/index.php?title=Asparagus&oldid=1385478838
+  - `food/wp2-auricularia-auricula-judae` — Auricularia auricula-judae (wood ear) — https://en.wikipedia.org/w/index.php?title=Auricularia_auricula-judae&oldid=1331010774
+  - `food/wp2-bakers-yeast` — Baker's yeast — https://en.wikipedia.org/w/index.php?title=Baker%27s_yeast&oldid=1377064438
+  - `food/wp2-bamboo-shoot` — Bamboo shoot — https://en.wikipedia.org/w/index.php?title=Bamboo_shoot&oldid=1341012766
+  - `food/wp2-beeswax` — Beeswax — https://en.wikipedia.org/w/index.php?title=Beeswax&oldid=1382937264
+  - `food/wp2-biltong` — Biltong — https://en.wikipedia.org/w/index.php?title=Biltong&oldid=1383595072
+  - `food/wp2-birch-sap` — Birch sap — https://en.wikipedia.org/w/index.php?title=Birch_sap&oldid=1360335476
+  - `food/wp2-boletus-edulis` — Boletus edulis (cep) — https://en.wikipedia.org/w/index.php?title=Boletus_edulis&oldid=1380972864
+  - `food/wp2-bread` — Bread — https://en.wikipedia.org/w/index.php?title=Bread&oldid=1385492909
+  - `food/wp2-breadfruit` — Breadfruit — https://en.wikipedia.org/w/index.php?title=Breadfruit&oldid=1384697044
+  - `food/wp2-brewing` — Brewing — https://en.wikipedia.org/w/index.php?title=Brewing&oldid=1384197994
+  - `food/wp2-butter` — Butter — https://en.wikipedia.org/w/index.php?title=Butter&oldid=1384583868
+  - `food/wp2-calvatia-gigantea` — Calvatia gigantea (giant puffball) — https://en.wikipedia.org/w/index.php?title=Calvatia_gigantea&oldid=1373873430
+  - `food/wp2-canning` — Canning — https://en.wikipedia.org/w/index.php?title=Canning&oldid=1379565642
+  - `food/wp2-cetraria-islandica` — Cetraria islandica (true Iceland lichen) — https://en.wikipedia.org/w/index.php?title=Cetraria_islandica&oldid=1330478753
+  - `food/wp2-cheese` — Cheese — https://en.wikipedia.org/w/index.php?title=Cheese&oldid=1384720212
+  - `food/wp2-cheesemaking` — Cheesemaking — https://en.wikipedia.org/w/index.php?title=Cheesemaking&oldid=1384008938
+  - `food/wp2-chenopodium-album` — Chenopodium album (lamb's quarters) — https://en.wikipedia.org/w/index.php?title=Chenopodium_album&oldid=1369230293
+  - `food/wp2-chicory` — Chicory — https://en.wikipedia.org/w/index.php?title=Chicory&oldid=1382165551
+  - `food/wp2-chondrus-crispus` — Chondrus crispus (Irish moss) — https://en.wikipedia.org/w/index.php?title=Chondrus_crispus&oldid=1384422369
+  - `food/wp2-cider` — Cider — https://en.wikipedia.org/w/index.php?title=Cider&oldid=1385180207
+  - `food/wp2-coconut` — Coconut — https://en.wikipedia.org/w/index.php?title=Coconut&oldid=1383275266
+  - `food/wp2-confit` — Confit — https://en.wikipedia.org/w/index.php?title=Confit&oldid=1381469978
+  - `food/wp2-coprinus-comatus` — Coprinus comatus (shaggy ink cap) — https://en.wikipedia.org/w/index.php?title=Coprinus_comatus&oldid=1371640794
+  - `food/wp2-corylus-avellana` — Corylus avellana (common hazel) — https://en.wikipedia.org/w/index.php?title=Corylus_avellana&oldid=1381169192
+  - `food/wp2-crataegus-monogyna` — Crataegus monogyna (common hawthorn) — https://en.wikipedia.org/w/index.php?title=Crataegus_monogyna&oldid=1379163565
+  - `food/wp2-craterellus-cornucopioides` — Craterellus cornucopioides (horn of plenty) — https://en.wikipedia.org/w/index.php?title=Craterellus_cornucopioides&oldid=1328034890
+  - `food/wp2-damper-food` — Damper (food) — https://en.wikipedia.org/w/index.php?title=Damper_(food)&oldid=1384598751
+  - `food/wp2-danger-zone-food-safety` — Danger zone (food safety) — https://en.wikipedia.org/w/index.php?title=Danger_zone_(food_safety)&oldid=1384873478
+  - `food/wp2-diospyros-virginiana` — Diospyros virginiana (American persimmon) — https://en.wikipedia.org/w/index.php?title=Diospyros_virginiana&oldid=1379002754
+  - `food/wp2-dried-and-salted-cod` — Dried and salted cod — https://en.wikipedia.org/w/index.php?title=Dried_and_salted_cod&oldid=1380772078
+  - `food/wp2-dried-fruit` — Dried fruit — https://en.wikipedia.org/w/index.php?title=Dried_fruit&oldid=1383775222
+  - `food/wp2-dutch-oven` — Dutch oven — https://en.wikipedia.org/w/index.php?title=Dutch_oven&oldid=1383929948
+  - `food/wp2-edible-mushroom` — Edible mushroom — https://en.wikipedia.org/w/index.php?title=Edible_mushroom&oldid=1385116629
+  - `food/wp2-edible-seaweed` — Edible seaweed — https://en.wikipedia.org/w/index.php?title=Edible_seaweed&oldid=1356985459
+  - `food/wp2-emergency-rations` — Emergency rations — https://en.wikipedia.org/w/index.php?title=Emergency_rations&oldid=1366998012
+  - `food/wp2-ensete-ventricosum` — Ensete ventricosum (enset) — https://en.wikipedia.org/w/index.php?title=Ensete_ventricosum&oldid=1384513626
+  - `food/wp2-essential-amino-acid` — Essential amino acid — https://en.wikipedia.org/w/index.php?title=Essential_amino_acid&oldid=1375107442
+  - `food/wp2-fagus-sylvatica` — Fagus sylvatica (European beech) — https://en.wikipedia.org/w/index.php?title=Fagus_sylvatica&oldid=1385287958
+  - `food/wp2-fermentation-in-food-processing` — Fermentation in food processing — https://en.wikipedia.org/w/index.php?title=Fermentation_in_food_processing&oldid=1382553476
+  - `food/wp2-fiddlehead` — Fiddlehead — https://en.wikipedia.org/w/index.php?title=Fiddlehead&oldid=1381064618
+  - `food/wp2-field-ration` — Field ration — https://en.wikipedia.org/w/index.php?title=Field_ration&oldid=1367786328
+  - `food/wp2-fig` — Fig — https://en.wikipedia.org/w/index.php?title=Fig&oldid=1384934984
+  - `food/wp2-fish-sauce` — Fish sauce — https://en.wikipedia.org/w/index.php?title=Fish_sauce&oldid=1382314707
+  - `food/wp2-fistulina-hepatica` — Fistulina hepatica (beefsteak fungus) — https://en.wikipedia.org/w/index.php?title=Fistulina_hepatica&oldid=1348091422
+  - `food/wp2-flatbread` — Flatbread — https://en.wikipedia.org/w/index.php?title=Flatbread&oldid=1379012337
+  - `food/wp2-flour` — Flour — https://en.wikipedia.org/w/index.php?title=Flour&oldid=1384658133
+  - `food/wp2-food-safety` — Food safety — https://en.wikipedia.org/w/index.php?title=Food_safety&oldid=1383530214
+  - `food/wp2-food-spoilage` — Food spoilage — https://en.wikipedia.org/w/index.php?title=Food_spoilage&oldid=1380656029
+  - `food/wp2-freeze-drying` — Freeze drying — https://en.wikipedia.org/w/index.php?title=Freeze_drying&oldid=1384863429
+  - `food/wp2-fruit-preserves` — Fruit preserves — https://en.wikipedia.org/w/index.php?title=Fruit_preserves&oldid=1384485158
+  - `food/wp2-fufu` — Fufu — https://en.wikipedia.org/w/index.php?title=Fufu&oldid=1384065249
+  - `food/wp2-galium-aparine` — Galium aparine (cleavers) — https://en.wikipedia.org/w/index.php?title=Galium_aparine&oldid=1380009081
+  - `food/wp2-garri` — Garri — https://en.wikipedia.org/w/index.php?title=Garri&oldid=1385481200
+  - `food/wp2-ghee` — Ghee — https://en.wikipedia.org/w/index.php?title=Ghee&oldid=1384658648
+  - `food/wp2-grifola-frondosa` — Grifola frondosa (hen-of-the-woods) — https://en.wikipedia.org/w/index.php?title=Grifola_frondosa&oldid=1379552763
+  - `food/wp2-gristmill` — Gristmill — https://en.wikipedia.org/w/index.php?title=Gristmill&oldid=1365627586
+  - `food/wp2-hangi` — Hāngī — https://en.wikipedia.org/w/index.php?title=H%C4%81ng%C4%AB&oldid=1374718069
+  - `food/wp2-hericium-erinaceus` — Hericium erinaceus (lion's mane) — https://en.wikipedia.org/w/index.php?title=Hericium_erinaceus&oldid=1384955733
+  - `food/wp2-hominy` — Hominy — https://en.wikipedia.org/w/index.php?title=Hominy&oldid=1381442747
+  - `food/wp2-hydnum-repandum` — Hydnum repandum (sweet tooth) — https://en.wikipedia.org/w/index.php?title=Hydnum_repandum&oldid=1369639988
+  - `food/wp2-icebox` — Icebox — https://en.wikipedia.org/w/index.php?title=Icebox&oldid=1376195768
+  - `food/wp2-injera` — Injera — https://en.wikipedia.org/w/index.php?title=Injera&oldid=1385163167
+  - `food/wp2-insects-as-food` — Insects as food — https://en.wikipedia.org/w/index.php?title=Insects_as_food&oldid=1377652015
+  - `food/wp2-juglans-nigra` — Juglans nigra (eastern American black walnut) — https://en.wikipedia.org/w/index.php?title=Juglans_nigra&oldid=1380689171
+  - `food/wp2-kefir` — Kefir — https://en.wikipedia.org/w/index.php?title=Kefir&oldid=1378980965
+  - `food/wp2-kelp` — Kelp — https://en.wikipedia.org/w/index.php?title=Kelp&oldid=1364674038
+  - `food/wp2-kimchi` — Kimchi — https://en.wikipedia.org/w/index.php?title=Kimchi&oldid=1385043618
+  - `food/wp2-kvass` — Kvass — https://en.wikipedia.org/w/index.php?title=Kvass&oldid=1385561671
+  - `food/wp2-lactarius-deliciosus` — Lactarius deliciosus (delicious milk cap) — https://en.wikipedia.org/w/index.php?title=Lactarius_deliciosus&oldid=1379422902
+  - `food/wp2-laetiporus` — Laetiporus — https://en.wikipedia.org/w/index.php?title=Laetiporus&oldid=1365630627
+  - `food/wp2-lard` — Lard — https://en.wikipedia.org/w/index.php?title=Lard&oldid=1384371826
+  - `food/wp2-leavening-agent` — Leavening agent — https://en.wikipedia.org/w/index.php?title=Leavening_agent&oldid=1382592416
+  - `food/wp2-macrolepiota-procera` — Macrolepiota procera (parasol mushroom) — https://en.wikipedia.org/w/index.php?title=Macrolepiota_procera&oldid=1383558497
+  - `food/wp2-malting` — Malting — https://en.wikipedia.org/w/index.php?title=Malting&oldid=1382840691
+  - `food/wp2-malva-sylvestris` — Malva sylvestris (common mallow) — https://en.wikipedia.org/w/index.php?title=Malva_sylvestris&oldid=1377982137
+  - `food/wp2-maple-syrup` — Maple syrup — https://en.wikipedia.org/w/index.php?title=Maple_syrup&oldid=1382926037
+  - `food/wp2-masonry-oven` — Masonry oven — https://en.wikipedia.org/w/index.php?title=Masonry_oven&oldid=1356498809
+  - `food/wp2-matteuccia` — Matteuccia — https://en.wikipedia.org/w/index.php?title=Matteuccia&oldid=1301128714
+  - `food/wp2-mead` — Mead — https://en.wikipedia.org/w/index.php?title=Mead&oldid=1384913673
+  - `food/wp2-metate` — Metate — https://en.wikipedia.org/w/index.php?title=Metate&oldid=1374629765
+  - `food/wp2-micronutrient-deficiency` — Micronutrient deficiency — https://en.wikipedia.org/w/index.php?title=Micronutrient_deficiency&oldid=1379555121
+  - `food/wp2-milk` — Milk — https://en.wikipedia.org/w/index.php?title=Milk&oldid=1384497798
+  - `food/wp2-morchella` — Morchella — https://en.wikipedia.org/w/index.php?title=Morchella&oldid=1381539565
+  - `food/wp2-moringa-oleifera` — Moringa oleifera (moringa) — https://en.wikipedia.org/w/index.php?title=Moringa_oleifera&oldid=1385307983
+  - `food/wp2-mortar-and-pestle` — Mortar and pestle — https://en.wikipedia.org/w/index.php?title=Mortar_and_pestle&oldid=1372265806
+  - `food/wp2-morus-plant` — Morus (plant) — https://en.wikipedia.org/w/index.php?title=Morus_(plant)&oldid=1384833126
+  - `food/wp2-neltuma-glandulosa` — Neltuma glandulosa (honey mesquite) — https://en.wikipedia.org/w/index.php?title=Neltuma_glandulosa&oldid=1314346440
+  - `food/wp2-nelumbo-nucifera` — Nelumbo nucifera (Kamala) — https://en.wikipedia.org/w/index.php?title=Nelumbo_nucifera&oldid=1384393823
+  - `food/wp2-nixtamalization` — Nixtamalization — https://en.wikipedia.org/w/index.php?title=Nixtamalization&oldid=1378439164
+  - `food/wp2-opuntia` — Opuntia — https://en.wikipedia.org/w/index.php?title=Opuntia&oldid=1379281821
+  - `food/wp2-oxalis-acetosella` — Oxalis acetosella (wood-sorrel) — https://en.wikipedia.org/w/index.php?title=Oxalis_acetosella&oldid=1382106436
+  - `food/wp2-palmaria-palmata` — Palmaria palmata (dulse) — https://en.wikipedia.org/w/index.php?title=Palmaria_palmata&oldid=1380999057
+  - `food/wp2-parboiled-rice` — Parboiled rice — https://en.wikipedia.org/w/index.php?title=Parboiled_rice&oldid=1381354330
+  - `food/wp2-pasteurization` — Pasteurization — https://en.wikipedia.org/w/index.php?title=Pasteurization&oldid=1384427524
+  - `food/wp2-physalis` — Physalis — https://en.wikipedia.org/w/index.php?title=Physalis&oldid=1375210110
+  - `food/wp2-pine-nut` — Pine nut — https://en.wikipedia.org/w/index.php?title=Pine_nut&oldid=1381314567
+  - `food/wp2-plantago-lanceolata` — Plantago lanceolata (ribwort plantain) — https://en.wikipedia.org/w/index.php?title=Plantago_lanceolata&oldid=1377190915
+  - `food/wp2-plantago-major` — Plantago major (greater plantain) — https://en.wikipedia.org/w/index.php?title=Plantago_major&oldid=1368202598
+  - `food/wp2-pleurotus-ostreatus` — Pleurotus ostreatus (oyster mushroom) — https://en.wikipedia.org/w/index.php?title=Pleurotus_ostreatus&oldid=1366763686
+  - `food/wp2-porridge` — Porridge — https://en.wikipedia.org/w/index.php?title=Porridge&oldid=1382901283
+  - `food/wp2-portulaca-oleracea` — Portulaca oleracea (common purslane) — https://en.wikipedia.org/w/index.php?title=Portulaca_oleracea&oldid=1384404501
+  - `food/wp2-pot-in-pot-refrigerator` — Pot-in-pot refrigerator — https://en.wikipedia.org/w/index.php?title=Pot-in-pot_refrigerator&oldid=1374642684
+  - `food/wp2-pressure-cooker` — Pressure cooker — https://en.wikipedia.org/w/index.php?title=Pressure_cooker&oldid=1383514456
+  - `food/wp2-protein-nutrient` — Protein (nutrient) — https://en.wikipedia.org/w/index.php?title=Protein_(nutrient)&oldid=1382075116
+  - `food/wp2-prunus-serotina` — Prunus serotina (black cherry) — https://en.wikipedia.org/w/index.php?title=Prunus_serotina&oldid=1380007771
+  - `food/wp2-prunus-spinosa` — Prunus spinosa (blackthorn) — https://en.wikipedia.org/w/index.php?title=Prunus_spinosa&oldid=1379849720
+  - `food/wp2-pueraria-montana-var-lobata` — Pueraria montana var. lobata — https://en.wikipedia.org/w/index.php?title=Pueraria_montana_var._lobata&oldid=1383415385
+  - `food/wp2-quern-stone` — Quern-stone — https://en.wikipedia.org/w/index.php?title=Quern-stone&oldid=1384661792
+  - `food/wp2-rendering-animal-products` — Rendering (animal products) — https://en.wikipedia.org/w/index.php?title=Rendering_(animal_products)&oldid=1359728600
+  - `food/wp2-rennet` — Rennet — https://en.wikipedia.org/w/index.php?title=Rennet&oldid=1383272587
+  - `food/wp2-rosa-canina` — Rosa canina (dog rose) — https://en.wikipedia.org/w/index.php?title=Rosa_canina&oldid=1381544124
+  - `food/wp2-rubus-idaeus` — Rubus idaeus (raspberry) — https://en.wikipedia.org/w/index.php?title=Rubus_idaeus&oldid=1383787151
+  - `food/wp2-rumex-crispus` — Rumex crispus (curly dock) — https://en.wikipedia.org/w/index.php?title=Rumex_crispus&oldid=1357646103
+  - `food/wp2-sagittaria-latifolia` — Sagittaria latifolia (broadleaf arrowhead) — https://en.wikipedia.org/w/index.php?title=Sagittaria_latifolia&oldid=1375928920
+  - `food/wp2-sago` — Sago — https://en.wikipedia.org/w/index.php?title=Sago&oldid=1383173599
+  - `food/wp2-salicornia` — Salicornia — https://en.wikipedia.org/w/index.php?title=Salicornia&oldid=1371681918
+  - `food/wp2-salt-pork` — Salt pork — https://en.wikipedia.org/w/index.php?title=Salt_pork&oldid=1352362516
+  - `food/wp2-sambucus-nigra` — Sambucus nigra (elder) — https://en.wikipedia.org/w/index.php?title=Sambucus_nigra&oldid=1380322926
+  - `food/wp2-sauerkraut` — Sauerkraut — https://en.wikipedia.org/w/index.php?title=Sauerkraut&oldid=1381538817
+  - `food/wp2-sausage` — Sausage — https://en.wikipedia.org/w/index.php?title=Sausage&oldid=1384391680
+  - `food/wp2-sclerocarya-birrea` — Sclerocarya birrea (marula) — https://en.wikipedia.org/w/index.php?title=Sclerocarya_birrea&oldid=1375160886
+  - `food/wp2-shiitake` — Shiitake — https://en.wikipedia.org/w/index.php?title=Shiitake&oldid=1375418776
+  - `food/wp2-sonchus-oleraceus` — Sonchus oleraceus (common sowthistle) — https://en.wikipedia.org/w/index.php?title=Sonchus_oleraceus&oldid=1385154653
+  - `food/wp2-sorrel` — Sorrel — https://en.wikipedia.org/w/index.php?title=Sorrel&oldid=1375079742
+  - `food/wp2-sourdough` — Sourdough — https://en.wikipedia.org/w/index.php?title=Sourdough&oldid=1385294211
+  - `food/wp2-soy-milk` — Soy milk — https://en.wikipedia.org/w/index.php?title=Soy_milk&oldid=1382757012
+  - `food/wp2-stellaria-media` — Stellaria media (chickweed) — https://en.wikipedia.org/w/index.php?title=Stellaria_media&oldid=1367518259
+  - `food/wp2-stockfish` — Stockfish — https://en.wikipedia.org/w/index.php?title=Stockfish&oldid=1379976325
+  - `food/wp2-sweet-chestnut` — Sweet chestnut — https://en.wikipedia.org/w/index.php?title=Sweet_chestnut&oldid=1379513300
+  - `food/wp2-tallow` — Tallow — https://en.wikipedia.org/w/index.php?title=Tallow&oldid=1373060164
+  - `food/wp2-tamarind` — Tamarind — https://en.wikipedia.org/w/index.php?title=Tamarind&oldid=1385611131
+  - `food/wp2-tandoor` — Tandoor — https://en.wikipedia.org/w/index.php?title=Tandoor&oldid=1378296995
+  - `food/wp2-taraxacum-officinale` — Taraxacum officinale (dandelion) — https://en.wikipedia.org/w/index.php?title=Taraxacum_officinale&oldid=1371025491
+  - `food/wp2-taro` — Taro — https://en.wikipedia.org/w/index.php?title=Taro&oldid=1384898108
+  - `food/wp2-tempeh` — Tempeh — https://en.wikipedia.org/w/index.php?title=Tempeh&oldid=1385361956
+  - `food/wp2-thermal-cooking` — Thermal cooking — https://en.wikipedia.org/w/index.php?title=Thermal_cooking&oldid=1371143626
+  - `food/wp2-tilia-cordata` — Tilia cordata (small-leaved lime) — https://en.wikipedia.org/w/index.php?title=Tilia_cordata&oldid=1382479294
+  - `food/wp2-tofu` — Tofu — https://en.wikipedia.org/w/index.php?title=Tofu&oldid=1383567298
+  - `food/wp2-tortilla` — Tortilla — https://en.wikipedia.org/w/index.php?title=Tortilla&oldid=1378641601
+  - `food/wp2-trifolium-repens` — Trifolium repens (white clover) — https://en.wikipedia.org/w/index.php?title=Trifolium_repens&oldid=1376551191
+  - `food/wp2-tsampa` — Tsampa — https://en.wikipedia.org/w/index.php?title=Tsampa&oldid=1380619319
+  - `food/wp2-typha-latifolia` — Typha latifolia (bulrush) — https://en.wikipedia.org/w/index.php?title=Typha_latifolia&oldid=1355949823
+  - `food/wp2-typha` — Typha — https://en.wikipedia.org/w/index.php?title=Typha&oldid=1380162592
+  - `food/wp2-ulva-lactuca` — Ulva lactuca (sea lettuce) — https://en.wikipedia.org/w/index.php?title=Ulva_lactuca&oldid=1370024828
+  - `food/wp2-umbilicaria` — Umbilicaria — https://en.wikipedia.org/w/index.php?title=Umbilicaria&oldid=1384657869
+  - `food/wp2-urtica-dioica` — Urtica dioica (common nettle) — https://en.wikipedia.org/w/index.php?title=Urtica_dioica&oldid=1384701588
+  - `food/wp2-vaccinium-corymbosum` — Vaccinium corymbosum (highbush blueberry) — https://en.wikipedia.org/w/index.php?title=Vaccinium_corymbosum&oldid=1371804153
+  - `food/wp2-vaccinium-myrtillus` — Vaccinium myrtillus (bilberry) — https://en.wikipedia.org/w/index.php?title=Vaccinium_myrtillus&oldid=1377480885
+  - `food/wp2-vinegar` — Vinegar — https://en.wikipedia.org/w/index.php?title=Vinegar&oldid=1383909103
+  - `food/wp2-vitamin` — Vitamin — https://en.wikipedia.org/w/index.php?title=Vitamin&oldid=1384878089
+  - `food/wp2-watercress` — Watercress — https://en.wikipedia.org/w/index.php?title=Watercress&oldid=1363358898
+  - `food/wp2-whey` — Whey — https://en.wikipedia.org/w/index.php?title=Whey&oldid=1383750852
+  - `food/wp2-wild-rice` — Wild rice — https://en.wikipedia.org/w/index.php?title=Wild_rice&oldid=1383397919
+  - `food/wp2-winemaking` — Winemaking — https://en.wikipedia.org/w/index.php?title=Winemaking&oldid=1375469478
+  - `food/wp2-witchetty-grub` — Witchetty grub — https://en.wikipedia.org/w/index.php?title=Witchetty_grub&oldid=1377956212
+  - `food/wp2-yam-vegetable` — Yam (vegetable) — https://en.wikipedia.org/w/index.php?title=Yam_(vegetable)&oldid=1384895147
+  - `food/wp2-yogurt` — Yogurt — https://en.wikipedia.org/w/index.php?title=Yogurt&oldid=1384679925

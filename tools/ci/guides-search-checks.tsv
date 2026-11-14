@@ -1,0 +1,15 @@
+# Search smoke checks for the guide library (tools/ci/guides-report.sh).
+# <query> TAB <extended regex an id among the top 5 results must match>
+# Keep these to broad, stable topics: a check states that a reader searching for this finds a
+# relevant guide at all, not a particular ranking. Ranking itself is unit-tested in
+# core/tests/guides/search_rank_test.cpp.
+tourniquet	^medical/
+dipole antenna	^radio/.*dipole
+hypothermia	hypothermia
+purify water	^water/
+solar battery	^(power|electronics)/
+splint broken bone	^medical/.*fractur
+morse code	^radio/.*morse
+tornado	tornado
+boil water	^water/
+start a fire	^(fire|survival)/

@@ -1,0 +1,387 @@
+# Sources for the `medical` category — contributor `openmed`
+
+Openly licensed clinical and nursing textbooks (CC BY 4.0 / CC BY-SA 4.0 only; nothing NonCommercial or NoDerivatives). Every file's front matter repeats its source, licence, attribution and a note of changes. This list is separate from `_sources.md`, which belongs to another contributor.
+
+270 files from 11 source(s).
+
+### Nursing Skills 2e — Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2023)
+
+- Source: https://wtcs.pressbooks.pub/nursingskills/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/nursingskills/open/download?type=xhtml) states "Nursing Skills 2e Copyright © 2023 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/openrn-skills-general-survey-vital-signs-1` — General Survey and Vital Signs: Temperature, Pulse, Breathing, Oxygen, Pain (Part 1 of 2)
+  - `medical/openrn-skills-general-survey-vital-signs-2` — General Survey and Vital Signs: Temperature, Pulse, Breathing, Oxygen, Pain (Part 2 of 2)
+  - `medical/openrn-skills-health-history-1` — Taking a Health History (Part 1 of 2)
+  - `medical/openrn-skills-health-history-2` — Taking a Health History (Part 2 of 2)
+  - `medical/openrn-skills-blood-pressure` — Measuring Blood Pressure by Hand (Manual Cuff and Stethoscope)
+  - `medical/openrn-skills-dosage-calculations-1` — Medication Dose Calculations: Tablets, Liquids, Weight-Based Doses and IV Drip Rates (Part 1 of 2)
+  - `medical/openrn-skills-dosage-calculations-2` — Medication Dose Calculations: Tablets, Liquids, Weight-Based Doses and IV Drip Rates (Part 2 of 2)
+  - `medical/openrn-skills-neurological-assessment-1` — Neurological Assessment: Consciousness, Mental Status, Nerves, Strength, Reflexes (Part 1 of 2)
+  - `medical/openrn-skills-neurological-assessment-2` — Neurological Assessment: Consciousness, Mental Status, Nerves, Strength, Reflexes (Part 2 of 2)
+  - `medical/openrn-skills-head-and-neck` — Head and Neck: Assessment and Common Problems
+  - `medical/openrn-skills-eye-and-ear` — Eye and Ear: Assessment and Common Problems
+  - `medical/openrn-skills-cardiovascular-assessment` — Heart and Circulation Assessment: Pulses, Heart Sounds, Swelling
+  - `medical/openrn-skills-respiratory-assessment` — Breathing and Lung Assessment
+  - `medical/openrn-skills-oxygen-therapy-1` — Oxygen Therapy: Equipment, Flow Rates, Positioning and Breathing Techniques (Part 1 of 2)
+  - `medical/openrn-skills-oxygen-therapy-2` — Oxygen Therapy: Equipment, Flow Rates, Positioning and Breathing Techniques (Part 2 of 2)
+  - `medical/openrn-skills-abdominal-assessment` — Abdominal Assessment
+  - `medical/openrn-skills-musculoskeletal-assessment` — Bones, Joints and Muscles: Assessment and Common Conditions
+  - `medical/openrn-skills-skin-assessment` — Skin Assessment and Common Skin Conditions
+  - `medical/openrn-skills-oral-and-rectal-medications-1` — Giving Medicines by Mouth, Rectum and Feeding Tube (Part 1 of 2)
+  - `medical/openrn-skills-oral-and-rectal-medications-2` — Giving Medicines by Mouth, Rectum and Feeding Tube (Part 2 of 2)
+  - `medical/openrn-skills-eye-ear-skin-inhaled-medications` — Giving Medicines to the Skin, Eyes, Ears, Nose, Lungs and Vagina
+  - `medical/openrn-skills-feeding-tubes` — Feeding Tubes: Nasogastric and Gastrostomy Tube Care, Feeding and Suction
+  - `medical/openrn-skills-injections-1` — Giving Injections: Intradermal, Subcutaneous and Intramuscular (Part 1 of 2)
+  - `medical/openrn-skills-injections-2` — Giving Injections: Intradermal, Subcutaneous and Intramuscular (Part 2 of 2)
+  - `medical/openrn-skills-specimen-collection-blood-glucose` — Blood Sugar Testing and Collecting Specimens (Swabs, Sputum, Stool)
+  - `medical/openrn-skills-wound-care-1` — Wound Care: Healing, Assessment, Dressings, Packing, Suture and Staple Removal (Part 1 of 2)
+  - `medical/openrn-skills-wound-care-2` — Wound Care: Healing, Assessment, Dressings, Packing, Suture and Staple Removal (Part 2 of 2)
+  - `medical/openrn-skills-urinary-catheters-ostomies-1` — Helping with Elimination: Bedpans, Urinary Catheters and Ostomy Care (Part 1 of 2)
+  - `medical/openrn-skills-urinary-catheters-ostomies-2` — Helping with Elimination: Bedpans, Urinary Catheters and Ostomy Care (Part 2 of 2)
+  - `medical/openrn-skills-suctioning-tracheostomy` — Airway Suctioning and Tracheostomy Care
+  - `medical/openrn-skills-iv-therapy-1` — IV Therapy: Fluids, Lines, Site Checks and Complications (Part 1 of 2)
+  - `medical/openrn-skills-iv-therapy-2` — IV Therapy: Fluids, Lines, Site Checks and Complications (Part 2 of 2)
+  - `medical/openrn-skills-checklists-hand-hygiene-vital-signs` — Checklists: Hand Hygiene and Vital Signs
+  - `medical/openrn-skills-wound-dressings-reference` — Wound Dressing Types: Which Dressing for Which Wound
+  - `medical/openrn-skills-head-to-toe-assessment` — Head-to-Toe Assessment Checklist
+
+### Nursing Fundamentals 2e — Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2024)
+
+- Source: https://wtcs.pressbooks.pub/nursingfundamentals/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/nursingfundamentals/open/download?type=xhtml) states "Nursing Fundamentals 2e Copyright © 2024 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/openrn-fund-communication-1` — Communication with Patients and Care Teams; Documentation (Part 1 of 3)
+  - `medical/openrn-fund-communication-2` — Communication with Patients and Care Teams; Documentation (Part 2 of 3)
+  - `medical/openrn-fund-communication-3` — Communication with Patients and Care Teams; Documentation (Part 3 of 3)
+  - `medical/openrn-fund-safety-1` — Patient Safety: Preventing Falls, Restraints, and Hazards Across Ages (Part 1 of 2)
+  - `medical/openrn-fund-safety-2` — Patient Safety: Preventing Falls, Restraints, and Hazards Across Ages (Part 2 of 2)
+  - `medical/openrn-fund-dementia-delirium-care-1` — Caring for People with Confusion: Dementia, Delirium and Depression (Part 1 of 2)
+  - `medical/openrn-fund-dementia-delirium-care-2` — Caring for People with Confusion: Dementia, Delirium and Depression (Part 2 of 2)
+  - `medical/openrn-fund-sensory-impairments` — Caring for People with Vision and Hearing Loss
+  - `medical/openrn-fund-oxygenation-1` — Oxygenation: Breathing Problems and Nursing Care (Part 1 of 2)
+  - `medical/openrn-fund-oxygenation-2` — Oxygenation: Breathing Problems and Nursing Care (Part 2 of 2)
+  - `medical/openrn-fund-infection-1` — Infection: How It Spreads, Signs of Sepsis, Treatment and Prevention (Part 1 of 3)
+  - `medical/openrn-fund-infection-2` — Infection: How It Spreads, Signs of Sepsis, Treatment and Prevention (Part 2 of 3)
+  - `medical/openrn-fund-infection-3` — Infection: How It Spreads, Signs of Sepsis, Treatment and Prevention (Part 3 of 3)
+  - `medical/openrn-fund-skin-wounds-pressure-injuries-1` — Skin Integrity, Wounds and Pressure Injuries (Bed Sores) (Part 1 of 2)
+  - `medical/openrn-fund-skin-wounds-pressure-injuries-2` — Skin Integrity, Wounds and Pressure Injuries (Bed Sores) (Part 2 of 2)
+  - `medical/openrn-fund-pain-comfort-1` — Pain and Comfort: Assessment and Management (Part 1 of 2)
+  - `medical/openrn-fund-pain-comfort-2` — Pain and Comfort: Assessment and Management (Part 2 of 2)
+  - `medical/openrn-fund-sleep-rest` — Sleep and Rest
+  - `medical/openrn-fund-mobility-1` — Mobility: Moving, Positioning and Preventing Complications of Bed Rest (Part 1 of 2)
+  - `medical/openrn-fund-mobility-2` — Mobility: Moving, Positioning and Preventing Complications of Bed Rest (Part 2 of 2)
+  - `medical/openrn-fund-nutrition-1` — Nutrition for the Sick: Assessment, Malnutrition and Feeding (Part 1 of 2)
+  - `medical/openrn-fund-nutrition-2` — Nutrition for the Sick: Assessment, Malnutrition and Feeding (Part 2 of 2)
+  - `medical/openrn-fund-fluids-electrolytes-1` — Fluids and Electrolytes: Dehydration, Fluid Overload, IV Solutions, Acid-Base (Part 1 of 3)
+  - `medical/openrn-fund-fluids-electrolytes-2` — Fluids and Electrolytes: Dehydration, Fluid Overload, IV Solutions, Acid-Base (Part 2 of 3)
+  - `medical/openrn-fund-fluids-electrolytes-3` — Fluids and Electrolytes: Dehydration, Fluid Overload, IV Solutions, Acid-Base (Part 3 of 3)
+  - `medical/openrn-fund-elimination-1` — Elimination: Urinary Infections, Incontinence, Retention, Constipation and Diarrhea (Part 1 of 2)
+  - `medical/openrn-fund-elimination-2` — Elimination: Urinary Infections, Incontinence, Retention, Constipation and Diarrhea (Part 2 of 2)
+  - `medical/openrn-fund-grief-end-of-life-1` — Grief, Palliative Care and Care of the Dying (Part 1 of 3)
+  - `medical/openrn-fund-grief-end-of-life-2` — Grief, Palliative Care and Care of the Dying (Part 2 of 3)
+  - `medical/openrn-fund-grief-end-of-life-3` — Grief, Palliative Care and Care of the Dying (Part 3 of 3)
+  - `medical/openrn-fund-older-adult-care` — Care of the Older Adult
+  - `medical/openrn-fund-sample-nursing-diagnoses` — Sample Nursing Diagnoses (NANDA-I)
+
+### Nursing Pharmacology 2e — Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2023)
+
+- Source: https://wtcs.pressbooks.pub/pharmacology2e/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/pharmacology2e/open/download?type=xhtml) states "Nursing Pharmacology 2e Copyright © 2023 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Sections omitted for licensing reasons (adapted from NC/ND material): 1.10 Therapeutic Levels; 1.11 Evaluating Effects; 1.3 Absorption; 1.6 Excretion; 10.2  Basic Concepts of Analgesics and the Musculoskeletal System; 2.5 Preventing Medication Errors; 3.5 Penicillin; 4.2 Basic Concepts of the Autonomic Nervous System; 5.10 Beta-2 Agonists; 5.11 Anticholinergics; 5.12 Corticosteroids; 5.13 Leukotriene Receptor Antagonists; 5.14 Xanthine Derivatives; 5.6 Antihistamines; 5.7 Decongestants; 5.8 Antitussives; 5.9 Expectorants; 7.4 Antidiarrheal Medications and Laxatives; 8.2 Basic Concepts of the Central Nervous System; 8.3 Disorders of the CNS System.
+- Files:
+  - `medical/openrn-pharm-pharmacology-basics` — Pharmacology Basics: How Drugs Move Through and Act on the Body
+  - `medical/openrn-pharm-medication-safety-legal-ethical-1` — Safe Medication Practice: Ethics, Laws and Guidelines (Part 1 of 2)
+  - `medical/openrn-pharm-medication-safety-legal-ethical-2` — Safe Medication Practice: Ethics, Laws and Guidelines (Part 2 of 2)
+  - `medical/openrn-pharm-antimicrobials-1` — Antibiotics, Antivirals, Antifungals and Antiparasitic Drugs (Part 1 of 2)
+  - `medical/openrn-pharm-antimicrobials-2` — Antibiotics, Antivirals, Antifungals and Antiparasitic Drugs (Part 2 of 2)
+  - `medical/openrn-pharm-autonomic-drugs` — Autonomic Nervous System Drugs (Adrenergic and Cholinergic)
+  - `medical/openrn-pharm-respiratory-drugs` — Respiratory Drugs: Disorders and Nursing Considerations
+  - `medical/openrn-pharm-cardiovascular-renal-drugs-1` — Heart, Blood Pressure, Kidney and Blood-Thinning Drugs (Part 1 of 4)
+  - `medical/openrn-pharm-cardiovascular-renal-drugs-2` — Heart, Blood Pressure, Kidney and Blood-Thinning Drugs (Part 2 of 4)
+  - `medical/openrn-pharm-cardiovascular-renal-drugs-3` — Heart, Blood Pressure, Kidney and Blood-Thinning Drugs (Part 3 of 4)
+  - `medical/openrn-pharm-cardiovascular-renal-drugs-4` — Heart, Blood Pressure, Kidney and Blood-Thinning Drugs (Part 4 of 4)
+  - `medical/openrn-pharm-gastrointestinal-drugs` — Stomach and Gut Drugs: Anti-Ulcer and Anti-Nausea
+  - `medical/openrn-pharm-nervous-system-drugs-1` — Central Nervous System Drugs: Sedatives, Antidepressants, Antipsychotics, Anticonvulsants (Part 1 of 2)
+  - `medical/openrn-pharm-nervous-system-drugs-2` — Central Nervous System Drugs: Sedatives, Antidepressants, Antipsychotics, Anticonvulsants (Part 2 of 2)
+  - `medical/openrn-pharm-endocrine-drugs-1` — Hormone Drugs: Corticosteroids, Diabetes Medicines, Thyroid Drugs and Contraceptives (Part 1 of 3)
+  - `medical/openrn-pharm-endocrine-drugs-2` — Hormone Drugs: Corticosteroids, Diabetes Medicines, Thyroid Drugs and Contraceptives (Part 2 of 3)
+  - `medical/openrn-pharm-endocrine-drugs-3` — Hormone Drugs: Corticosteroids, Diabetes Medicines, Thyroid Drugs and Contraceptives (Part 3 of 3)
+  - `medical/openrn-pharm-analgesics-1` — Pain Medicines: Non-Opioids, Opioids, Adjuvants, Gout Drugs and Anaesthetics (Part 1 of 2)
+  - `medical/openrn-pharm-analgesics-2` — Pain Medicines: Non-Opioids, Opioids, Adjuvants, Gout Drugs and Anaesthetics (Part 2 of 2)
+
+### Nursing Mental Health and Community Concepts 2e — Elizabeth Christman and Kimberly Ernstmeyer (Eds.); WisTech Open (2025)
+
+- Source: https://wtcs.pressbooks.pub/nursingmhcc/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/nursingmhcc/open/download?type=xhtml) states "Nursing Mental Health and Community Concepts 2e Copyright © 2025 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Sections omitted for licensing reasons (adapted from NC/ND material): 1.2 Mental Health and Mental Illness; 2.3 Therapeutic Communication; 3.2 Stress.
+- Files:
+  - `medical/openrn-mh-mental-health-foundations` — Mental Health Foundations: Trauma-Informed Care, Stigma, Boundaries, Safety
+  - `medical/openrn-mh-therapeutic-communication` — Talking with People in Distress: Communication and Motivational Interviewing
+  - `medical/openrn-mh-stress-coping-crisis` — Coping, Defense Mechanisms and Crisis Intervention
+  - `medical/openrn-mh-psychotropic-medications-1` — Psychiatric Medicines: Antidepressants, Lithium, Anti-Anxiety, Antipsychotics, Stimulants (Part 1 of 2)
+  - `medical/openrn-mh-psychotropic-medications-2` — Psychiatric Medicines: Antidepressants, Lithium, Anti-Anxiety, Antipsychotics, Stimulants (Part 2 of 2)
+  - `medical/openrn-mh-depression-1` — Depression and Suicide Risk: Recognition and Care (Part 1 of 3)
+  - `medical/openrn-mh-depression-2` — Depression and Suicide Risk: Recognition and Care (Part 2 of 3)
+  - `medical/openrn-mh-depression-3` — Depression and Suicide Risk: Recognition and Care (Part 3 of 3)
+  - `medical/openrn-mh-bipolar-disorder-1` — Bipolar Disorder: Mania and Depression (Part 1 of 2)
+  - `medical/openrn-mh-bipolar-disorder-2` — Bipolar Disorder: Mania and Depression (Part 2 of 2)
+  - `medical/openrn-mh-anxiety-ptsd-1` — Anxiety, Panic, OCD and PTSD (Part 1 of 2)
+  - `medical/openrn-mh-anxiety-ptsd-2` — Anxiety, Panic, OCD and PTSD (Part 2 of 2)
+  - `medical/openrn-mh-personality-disorders-1` — Personality Disorders (Part 1 of 2)
+  - `medical/openrn-mh-personality-disorders-2` — Personality Disorders (Part 2 of 2)
+  - `medical/openrn-mh-psychosis-schizophrenia-1` — Psychosis, Delirium and Schizophrenia (Part 1 of 3)
+  - `medical/openrn-mh-psychosis-schizophrenia-2` — Psychosis, Delirium and Schizophrenia (Part 2 of 3)
+  - `medical/openrn-mh-psychosis-schizophrenia-3` — Psychosis, Delirium and Schizophrenia (Part 3 of 3)
+  - `medical/openrn-mh-child-adolescent-mental-health-1` — Mental Health Problems in Children and Teenagers (Part 1 of 3)
+  - `medical/openrn-mh-child-adolescent-mental-health-2` — Mental Health Problems in Children and Teenagers (Part 2 of 3)
+  - `medical/openrn-mh-child-adolescent-mental-health-3` — Mental Health Problems in Children and Teenagers (Part 3 of 3)
+  - `medical/openrn-mh-eating-disorders-1` — Eating Disorders (Part 1 of 2)
+  - `medical/openrn-mh-eating-disorders-2` — Eating Disorders (Part 2 of 2)
+  - `medical/openrn-mh-substance-use-withdrawal-1` — Substance Use: Intoxication, Overdose, Withdrawal and Recovery (Part 1 of 4)
+  - `medical/openrn-mh-substance-use-withdrawal-2` — Substance Use: Intoxication, Overdose, Withdrawal and Recovery (Part 2 of 4)
+  - `medical/openrn-mh-substance-use-withdrawal-3` — Substance Use: Intoxication, Overdose, Withdrawal and Recovery (Part 3 of 4)
+  - `medical/openrn-mh-substance-use-withdrawal-4` — Substance Use: Intoxication, Overdose, Withdrawal and Recovery (Part 4 of 4)
+
+### Nursing Advanced Skills — Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2023)
+
+- Source: https://wtcs.pressbooks.pub/nursingadvancedskills/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/nursingadvancedskills/open/download?type=xhtml) states "Nursing Advanced Skills Copyright © 2023 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/openrn-adv-iv-insertion-blood-draw-1` — Starting an IV and Drawing Blood (Venipuncture) (Part 1 of 3)
+  - `medical/openrn-adv-iv-insertion-blood-draw-2` — Starting an IV and Drawing Blood (Venipuncture) (Part 2 of 3)
+  - `medical/openrn-adv-iv-insertion-blood-draw-3` — Starting an IV and Drawing Blood (Venipuncture) (Part 3 of 3)
+  - `medical/openrn-adv-iv-push-medications` — Giving IV Push Medications
+  - `medical/openrn-adv-blood-transfusion` — Blood Transfusion: Giving Blood Products and Recognising Reactions
+  - `medical/openrn-adv-central-lines-1` — Central Lines: Dressings, Blood Samples and Implanted Ports (Part 1 of 2)
+  - `medical/openrn-adv-central-lines-2` — Central Lines: Dressings, Blood Samples and Implanted Ports (Part 2 of 2)
+  - `medical/openrn-adv-nasogastric-tube-insertion` — Inserting and Removing a Nasogastric (NG) Tube
+  - `medical/openrn-adv-chest-tubes` — Chest Tubes and Drainage Systems
+  - `medical/openrn-adv-ecg-interpretation-1` — Reading a Basic ECG (Heart Rhythm Strip) and Defibrillation (Part 1 of 3)
+  - `medical/openrn-adv-ecg-interpretation-2` — Reading a Basic ECG (Heart Rhythm Strip) and Defibrillation (Part 2 of 3)
+  - `medical/openrn-adv-ecg-interpretation-3` — Reading a Basic ECG (Heart Rhythm Strip) and Defibrillation (Part 3 of 3)
+
+### Nursing Assistant — Myra Reuter-Sandquist; Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2023)
+
+- Source: https://wtcs.pressbooks.pub/nurseassist/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/nurseassist/open/download?type=xhtml) states "Nursing Assistant Copyright © 2023 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Sections omitted for licensing reasons (adapted from NC/ND material): 1.2 The Communication Process; 1.3 Communication Within the Health Care Team; 10.2 History of Care for Individuals With Mental Health Disorders and Developmental Disorders; 10.3 Caring for Clients With Developmental Disorders; 10.5 Caring for Clients With Dementia; 11.2 Cardiovascular System; 11.3 Digestive System; 11.4 Endocrine System; 11.6 Musculoskeletal System; 11.7 Urinary System; 11.8 Neurological System; 11.9 Immune System; 6.6 End-of-Life Care.
+- Files:
+  - `medical/openrn-na-communication-human-needs` — Nursing Assistant: Human Needs, Development and Reporting
+  - `medical/openrn-na-safe-environment-bed-making` — Safe Care Environment: Emergencies, Body Mechanics and Bed Making
+  - `medical/openrn-na-basic-care-pain-comfort` — Basic Care: Pain, Comfort Measures, Routine Medicines and Care After Death
+  - `medical/openrn-na-vital-signs-intake-output` — Measuring Vital Signs, Weight, Height, and Intake and Output
+  - `medical/openrn-na-mobility-positioning-transfers-1` — Moving, Positioning and Transferring People Safely (Part 1 of 2)
+  - `medical/openrn-na-mobility-positioning-transfers-2` — Moving, Positioning and Transferring People Safely (Part 2 of 2)
+  - `medical/openrn-na-rehabilitation-restorative-care-1` — Rehabilitation and Restorative Care: Regaining Independence (Part 1 of 2)
+  - `medical/openrn-na-rehabilitation-restorative-care-2` — Rehabilitation and Restorative Care: Regaining Independence (Part 2 of 2)
+  - `medical/openrn-na-chronic-conditions-caregiver-strain` — Caring for People with Mental Health Problems, Poor Appetite and Carer Strain
+  - `medical/openrn-na-body-systems-care` — Body Systems in Daily Care: Skin, Lungs and Reproductive System
+
+### Health Alterations — Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2025)
+
+- Source: https://wtcs.pressbooks.pub/healthalts/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/healthalts/open/download?type=xhtml) states "Health Alterations Copyright © 2025 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/openrn-ha-perioperative-care-1` — Surgery Care: Before, During and After an Operation (Part 1 of 3)
+  - `medical/openrn-ha-perioperative-care-2` — Surgery Care: Before, During and After an Operation (Part 2 of 3)
+  - `medical/openrn-ha-perioperative-care-3` — Surgery Care: Before, During and After an Operation (Part 3 of 3)
+  - `medical/openrn-ha-blood-disorders-1` — Blood Disorders: Anemia, Sickle Cell, Clotting Problems and Transfusion (Part 1 of 4)
+  - `medical/openrn-ha-blood-disorders-2` — Blood Disorders: Anemia, Sickle Cell, Clotting Problems and Transfusion (Part 2 of 4)
+  - `medical/openrn-ha-blood-disorders-3` — Blood Disorders: Anemia, Sickle Cell, Clotting Problems and Transfusion (Part 3 of 4)
+  - `medical/openrn-ha-blood-disorders-4` — Blood Disorders: Anemia, Sickle Cell, Clotting Problems and Transfusion (Part 4 of 4)
+  - `medical/openrn-ha-cancer-autoimmune-1` — Cancer, Autoimmune Disease and Allergic Reactions (Part 1 of 3)
+  - `medical/openrn-ha-cancer-autoimmune-2` — Cancer, Autoimmune Disease and Allergic Reactions (Part 2 of 3)
+  - `medical/openrn-ha-cancer-autoimmune-3` — Cancer, Autoimmune Disease and Allergic Reactions (Part 3 of 3)
+  - `medical/openrn-ha-heart-circulation-disorders-1` — Heart and Circulation Disorders: Hypertension, Heart Attack, Heart Failure, Clots (Part 1 of 5)
+  - `medical/openrn-ha-heart-circulation-disorders-2` — Heart and Circulation Disorders: Hypertension, Heart Attack, Heart Failure, Clots (Part 2 of 5)
+  - `medical/openrn-ha-heart-circulation-disorders-3` — Heart and Circulation Disorders: Hypertension, Heart Attack, Heart Failure, Clots (Part 3 of 5)
+  - `medical/openrn-ha-heart-circulation-disorders-4` — Heart and Circulation Disorders: Hypertension, Heart Attack, Heart Failure, Clots (Part 4 of 5)
+  - `medical/openrn-ha-heart-circulation-disorders-5` — Heart and Circulation Disorders: Hypertension, Heart Attack, Heart Failure, Clots (Part 5 of 5)
+  - `medical/openrn-ha-lung-disorders-1` — Lung Disorders: Asthma, COPD, Pneumonia, Tuberculosis, Flu and COVID-19 (Part 1 of 5)
+  - `medical/openrn-ha-lung-disorders-2` — Lung Disorders: Asthma, COPD, Pneumonia, Tuberculosis, Flu and COVID-19 (Part 2 of 5)
+  - `medical/openrn-ha-lung-disorders-3` — Lung Disorders: Asthma, COPD, Pneumonia, Tuberculosis, Flu and COVID-19 (Part 3 of 5)
+  - `medical/openrn-ha-lung-disorders-4` — Lung Disorders: Asthma, COPD, Pneumonia, Tuberculosis, Flu and COVID-19 (Part 4 of 5)
+  - `medical/openrn-ha-lung-disorders-5` — Lung Disorders: Asthma, COPD, Pneumonia, Tuberculosis, Flu and COVID-19 (Part 5 of 5)
+  - `medical/openrn-ha-diabetes-thyroid-adrenal-1` — Diabetes, Thyroid and Adrenal Disorders (Part 1 of 4)
+  - `medical/openrn-ha-diabetes-thyroid-adrenal-2` — Diabetes, Thyroid and Adrenal Disorders (Part 2 of 4)
+  - `medical/openrn-ha-diabetes-thyroid-adrenal-3` — Diabetes, Thyroid and Adrenal Disorders (Part 3 of 4)
+  - `medical/openrn-ha-diabetes-thyroid-adrenal-4` — Diabetes, Thyroid and Adrenal Disorders (Part 4 of 4)
+  - `medical/openrn-ha-kidney-urinary-disorders-1` — Kidney and Urinary Disorders: Kidney Failure, UTI, Stones, Incontinence (Part 1 of 4)
+  - `medical/openrn-ha-kidney-urinary-disorders-2` — Kidney and Urinary Disorders: Kidney Failure, UTI, Stones, Incontinence (Part 2 of 4)
+  - `medical/openrn-ha-kidney-urinary-disorders-3` — Kidney and Urinary Disorders: Kidney Failure, UTI, Stones, Incontinence (Part 3 of 4)
+  - `medical/openrn-ha-kidney-urinary-disorders-4` — Kidney and Urinary Disorders: Kidney Failure, UTI, Stones, Incontinence (Part 4 of 4)
+  - `medical/openrn-ha-neurological-disorders-1` — Nervous System Disorders: Stroke, Seizures, Meningitis, Head and Spinal Injury (Part 1 of 5)
+  - `medical/openrn-ha-neurological-disorders-2` — Nervous System Disorders: Stroke, Seizures, Meningitis, Head and Spinal Injury (Part 2 of 5)
+  - `medical/openrn-ha-neurological-disorders-3` — Nervous System Disorders: Stroke, Seizures, Meningitis, Head and Spinal Injury (Part 3 of 5)
+  - `medical/openrn-ha-neurological-disorders-4` — Nervous System Disorders: Stroke, Seizures, Meningitis, Head and Spinal Injury (Part 4 of 5)
+  - `medical/openrn-ha-neurological-disorders-5` — Nervous System Disorders: Stroke, Seizures, Meningitis, Head and Spinal Injury (Part 5 of 5)
+  - `medical/openrn-ha-bone-joint-disorders-1` — Bone and Joint Disorders: Fractures, Amputation, Arthritis, Osteoporosis (Part 1 of 4)
+  - `medical/openrn-ha-bone-joint-disorders-2` — Bone and Joint Disorders: Fractures, Amputation, Arthritis, Osteoporosis (Part 2 of 4)
+  - `medical/openrn-ha-bone-joint-disorders-3` — Bone and Joint Disorders: Fractures, Amputation, Arthritis, Osteoporosis (Part 3 of 4)
+  - `medical/openrn-ha-bone-joint-disorders-4` — Bone and Joint Disorders: Fractures, Amputation, Arthritis, Osteoporosis (Part 4 of 4)
+  - `medical/openrn-ha-digestive-disorders-1` — Digestive Disorders: Appendicitis, Gallbladder, Gastroenteritis, Bowel Obstruction, Liver Disease (Part 1 of 5)
+  - `medical/openrn-ha-digestive-disorders-2` — Digestive Disorders: Appendicitis, Gallbladder, Gastroenteritis, Bowel Obstruction, Liver Disease (Part 2 of 5)
+  - `medical/openrn-ha-digestive-disorders-3` — Digestive Disorders: Appendicitis, Gallbladder, Gastroenteritis, Bowel Obstruction, Liver Disease (Part 3 of 5)
+  - `medical/openrn-ha-digestive-disorders-4` — Digestive Disorders: Appendicitis, Gallbladder, Gastroenteritis, Bowel Obstruction, Liver Disease (Part 4 of 5)
+  - `medical/openrn-ha-digestive-disorders-5` — Digestive Disorders: Appendicitis, Gallbladder, Gastroenteritis, Bowel Obstruction, Liver Disease (Part 5 of 5)
+
+### Nursing Health Promotion — Kimberly Ernstmeyer and Elizabeth Christman (Eds.); WisTech Open (2025)
+
+- Source: https://wtcs.pressbooks.pub/healthpromo/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/healthpromo/open/download?type=xhtml) states "Nursing Health Promotion Copyright © 2025 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/openrn-hp-reproductive-health-1` — Reproductive Health: Anatomy, Fertility, Contraception and Sexually Transmitted Infections (Part 1 of 6)
+  - `medical/openrn-hp-reproductive-health-2` — Reproductive Health: Anatomy, Fertility, Contraception and Sexually Transmitted Infections (Part 2 of 6)
+  - `medical/openrn-hp-reproductive-health-3` — Reproductive Health: Anatomy, Fertility, Contraception and Sexually Transmitted Infections (Part 3 of 6)
+  - `medical/openrn-hp-reproductive-health-4` — Reproductive Health: Anatomy, Fertility, Contraception and Sexually Transmitted Infections (Part 4 of 6)
+  - `medical/openrn-hp-reproductive-health-5` — Reproductive Health: Anatomy, Fertility, Contraception and Sexually Transmitted Infections (Part 5 of 6)
+  - `medical/openrn-hp-reproductive-health-6` — Reproductive Health: Anatomy, Fertility, Contraception and Sexually Transmitted Infections (Part 6 of 6)
+  - `medical/openrn-hp-pregnancy-care-1` — Pregnancy Care: Diagnosis, Body Changes, Discomforts and Prenatal Checks (Part 1 of 6)
+  - `medical/openrn-hp-pregnancy-care-2` — Pregnancy Care: Diagnosis, Body Changes, Discomforts and Prenatal Checks (Part 2 of 6)
+  - `medical/openrn-hp-pregnancy-care-3` — Pregnancy Care: Diagnosis, Body Changes, Discomforts and Prenatal Checks (Part 3 of 6)
+  - `medical/openrn-hp-pregnancy-care-4` — Pregnancy Care: Diagnosis, Body Changes, Discomforts and Prenatal Checks (Part 4 of 6)
+  - `medical/openrn-hp-pregnancy-care-5` — Pregnancy Care: Diagnosis, Body Changes, Discomforts and Prenatal Checks (Part 5 of 6)
+  - `medical/openrn-hp-pregnancy-care-6` — Pregnancy Care: Diagnosis, Body Changes, Discomforts and Prenatal Checks (Part 6 of 6)
+  - `medical/openrn-hp-labor-delivery-1` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 1 of 7)
+  - `medical/openrn-hp-labor-delivery-2` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 2 of 7)
+  - `medical/openrn-hp-labor-delivery-3` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 3 of 7)
+  - `medical/openrn-hp-labor-delivery-4` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 4 of 7)
+  - `medical/openrn-hp-labor-delivery-5` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 5 of 7)
+  - `medical/openrn-hp-labor-delivery-6` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 6 of 7)
+  - `medical/openrn-hp-labor-delivery-7` — Labour and Childbirth: Stages, Monitoring, Pain Relief and Complications (Part 7 of 7)
+  - `medical/openrn-hp-postpartum-care-1` — After Childbirth: Postpartum Recovery and Complications (Part 1 of 4)
+  - `medical/openrn-hp-postpartum-care-2` — After Childbirth: Postpartum Recovery and Complications (Part 2 of 4)
+  - `medical/openrn-hp-postpartum-care-3` — After Childbirth: Postpartum Recovery and Complications (Part 3 of 4)
+  - `medical/openrn-hp-postpartum-care-4` — After Childbirth: Postpartum Recovery and Complications (Part 4 of 4)
+  - `medical/openrn-hp-newborn-care-1` — Newborn Baby Care: First Days, Feeding, Jaundice and Warning Signs (Part 1 of 4)
+  - `medical/openrn-hp-newborn-care-2` — Newborn Baby Care: First Days, Feeding, Jaundice and Warning Signs (Part 2 of 4)
+  - `medical/openrn-hp-newborn-care-3` — Newborn Baby Care: First Days, Feeding, Jaundice and Warning Signs (Part 3 of 4)
+  - `medical/openrn-hp-newborn-care-4` — Newborn Baby Care: First Days, Feeding, Jaundice and Warning Signs (Part 4 of 4)
+  - `medical/openrn-hp-child-development-care-1` — Child Development and Health Care from Infancy to Adolescence (Part 1 of 6)
+  - `medical/openrn-hp-child-development-care-2` — Child Development and Health Care from Infancy to Adolescence (Part 2 of 6)
+  - `medical/openrn-hp-child-development-care-3` — Child Development and Health Care from Infancy to Adolescence (Part 3 of 6)
+  - `medical/openrn-hp-child-development-care-4` — Child Development and Health Care from Infancy to Adolescence (Part 4 of 6)
+  - `medical/openrn-hp-child-development-care-5` — Child Development and Health Care from Infancy to Adolescence (Part 5 of 6)
+  - `medical/openrn-hp-child-development-care-6` — Child Development and Health Care from Infancy to Adolescence (Part 6 of 6)
+  - `medical/openrn-hp-ill-child-care-1` — Caring for a Sick Child (Part 1 of 2)
+  - `medical/openrn-hp-ill-child-care-2` — Caring for a Sick Child (Part 2 of 2)
+  - `medical/openrn-hp-child-respiratory-disorders-1` — Breathing Illnesses in Children: Colds, Croup, Bronchiolitis, Pneumonia, Asthma (Part 1 of 3)
+  - `medical/openrn-hp-child-respiratory-disorders-2` — Breathing Illnesses in Children: Colds, Croup, Bronchiolitis, Pneumonia, Asthma (Part 2 of 3)
+  - `medical/openrn-hp-child-respiratory-disorders-3` — Breathing Illnesses in Children: Colds, Croup, Bronchiolitis, Pneumonia, Asthma (Part 3 of 3)
+  - `medical/openrn-hp-childhood-disorders-1` — Common Childhood Illnesses: Fever, Diarrhea, Dehydration, Rashes, Seizures and More (Part 1 of 6)
+  - `medical/openrn-hp-childhood-disorders-2` — Common Childhood Illnesses: Fever, Diarrhea, Dehydration, Rashes, Seizures and More (Part 2 of 6)
+  - `medical/openrn-hp-childhood-disorders-3` — Common Childhood Illnesses: Fever, Diarrhea, Dehydration, Rashes, Seizures and More (Part 3 of 6)
+  - `medical/openrn-hp-childhood-disorders-4` — Common Childhood Illnesses: Fever, Diarrhea, Dehydration, Rashes, Seizures and More (Part 4 of 6)
+  - `medical/openrn-hp-childhood-disorders-5` — Common Childhood Illnesses: Fever, Diarrhea, Dehydration, Rashes, Seizures and More (Part 5 of 6)
+  - `medical/openrn-hp-childhood-disorders-6` — Common Childhood Illnesses: Fever, Diarrhea, Dehydration, Rashes, Seizures and More (Part 6 of 6)
+  - `medical/openrn-hp-congenital-heart-defects-1` — Congenital Heart Defects in Children (Part 1 of 2)
+  - `medical/openrn-hp-congenital-heart-defects-2` — Congenital Heart Defects in Children (Part 2 of 2)
+  - `medical/openrn-hp-gynecological-conditions-1` — Women's Reproductive Health Problems: Bleeding, Pain, Infections, Growths (Part 1 of 3)
+  - `medical/openrn-hp-gynecological-conditions-2` — Women's Reproductive Health Problems: Bleeding, Pain, Infections, Growths (Part 2 of 3)
+  - `medical/openrn-hp-gynecological-conditions-3` — Women's Reproductive Health Problems: Bleeding, Pain, Infections, Growths (Part 3 of 3)
+  - `medical/openrn-hp-high-risk-pregnancy-1` — High-Risk Pregnancy: Bleeding, Pre-eclampsia, Infection and Diabetes (Part 1 of 4)
+  - `medical/openrn-hp-high-risk-pregnancy-2` — High-Risk Pregnancy: Bleeding, Pre-eclampsia, Infection and Diabetes (Part 2 of 4)
+  - `medical/openrn-hp-high-risk-pregnancy-3` — High-Risk Pregnancy: Bleeding, Pre-eclampsia, Infection and Diabetes (Part 3 of 4)
+  - `medical/openrn-hp-high-risk-pregnancy-4` — High-Risk Pregnancy: Bleeding, Pre-eclampsia, Infection and Diabetes (Part 4 of 4)
+  - `medical/openrn-hp-high-risk-newborn-1` — High-Risk Newborns: Premature Babies, Sepsis and Newborn Resuscitation (Part 1 of 2)
+  - `medical/openrn-hp-high-risk-newborn-2` — High-Risk Newborns: Premature Babies, Sepsis and Newborn Resuscitation (Part 2 of 2)
+
+### Emergency Medical Responder — Suzanne Martens (Ed.); WisTech Open (2025)
+
+- Source: https://wtcs.pressbooks.pub/emergencymedtech/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/emergencymedtech/open/download?type=xhtml) states "Emergency Medical Responder Copyright © 2025 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/wistech-emr-ems-preparatory-1-1` — EMR Preparatory 1: EMS Systems, Responder Wellness, Safety and Infection Control (Part 1 of 3)
+  - `medical/wistech-emr-ems-preparatory-1-2` — EMR Preparatory 1: EMS Systems, Responder Wellness, Safety and Infection Control (Part 2 of 3)
+  - `medical/wistech-emr-ems-preparatory-1-3` — EMR Preparatory 1: EMS Systems, Responder Wellness, Safety and Infection Control (Part 3 of 3)
+  - `medical/wistech-emr-ems-preparatory-2-1` — EMR Preparatory 2: Lifting, Moving and Communicating (Part 1 of 2)
+  - `medical/wistech-emr-ems-preparatory-2-2` — EMR Preparatory 2: Lifting, Moving and Communicating (Part 2 of 2)
+  - `medical/wistech-emr-anatomy-physiology-1` — Anatomy and Physiology for Emergency Care (Part 1 of 2)
+  - `medical/wistech-emr-anatomy-physiology-2` — Anatomy and Physiology for Emergency Care (Part 2 of 2)
+  - `medical/wistech-emr-life-span-development` — Life Span Development: Normal Vital Signs and Changes from Infant to Elder
+  - `medical/wistech-emr-emergency-medications` — Emergency Medications for Responders: Oxygen, Glucose, Naloxone, Epinephrine, Aspirin
+  - `medical/wistech-emr-airway-breathing-1` — Airway, Breathing and Ventilation: Opening the Airway, Suction, Oral Airways and Rescue Breathing (Part 1 of 3)
+  - `medical/wistech-emr-airway-breathing-2` — Airway, Breathing and Ventilation: Opening the Airway, Suction, Oral Airways and Rescue Breathing (Part 2 of 3)
+  - `medical/wistech-emr-airway-breathing-3` — Airway, Breathing and Ventilation: Opening the Airway, Suction, Oral Airways and Rescue Breathing (Part 3 of 3)
+  - `medical/wistech-emr-patient-assessment-1` — Patient Assessment: Scene Size-Up, Primary and Secondary Survey, Vital Signs (Part 1 of 2)
+  - `medical/wistech-emr-patient-assessment-2` — Patient Assessment: Scene Size-Up, Primary and Secondary Survey, Vital Signs (Part 2 of 2)
+  - `medical/wistech-emr-medical-emergencies-1` — Medical Emergencies 1: Breathing, Heart, Stroke, Seizures and Altered Mental Status
+  - `medical/wistech-emr-medical-emergencies-2` — Medical Emergencies 2: Allergies, Poisoning, Overdose, Abdominal and Behavioural Emergencies
+  - `medical/wistech-emr-medical-emergencies-3` — Medical Emergencies 3: Environmental Emergencies, Bites, Drowning and Other Conditions
+  - `medical/wistech-emr-shock-cpr-1` — Shock and Resuscitation: Recognising Shock, CPR and AED (Part 1 of 2)
+  - `medical/wistech-emr-shock-cpr-2` — Shock and Resuscitation: Recognising Shock, CPR and AED (Part 2 of 2)
+  - `medical/wistech-emr-trauma-1` — Trauma 1: Bleeding Control, Soft-Tissue Injuries, Burns and Chest and Abdominal Wounds
+  - `medical/wistech-emr-trauma-2` — Trauma 2: Head, Spine, Bone and Joint Injuries and Splinting
+  - `medical/wistech-emr-special-populations-childbirth-1` — Special Patients: Emergency Childbirth, Newborns, Children and Older Adults (Part 1 of 2)
+  - `medical/wistech-emr-special-populations-childbirth-2` — Special Patients: Emergency Childbirth, Newborns, Children and Older Adults (Part 2 of 2)
+
+### Respiratory Therapy — Kirsten Holbrook (Ed.); WisTech Open (2025)
+
+- Source: https://wtcs.pressbooks.pub/respiratorysurvey/
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: the book's copyright page in the publisher's own XHTML export (https://wtcs.pressbooks.pub/respiratorysurvey/open/download?type=xhtml) states "Respiratory Therapy Copyright © 2025 by WisTech Open is licensed under a Creative Commons Attribution 4.0 International License, except where otherwise noted", the export metadata has pb-book-license "cc-by", and the WisTech Open Pressbooks catalogue API (https://wtcs.pressbooks.pub/wp-json/pressbooks/v2/books) lists the licence as https://creativecommons.org/licenses/by/4.0/. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: converted from the publisher's XHTML export (no scraping) to Markdown; images, videos, interactive H5P quizzes, learning objectives, learning activities, answer keys, footnoted reference lists and NCLEX-style case questions removed; each figure replaced by a one-line note built from its caption and alt text; LaTeX equations rewritten as plain text; long chapters split into parts; a short italic orientation note added at the top of each file. Clinical content not changed.
+- "Except where otherwise noted": every section whose footnotes say it is a derivative of (or cites as adapted source) a work under a NonCommercial or NoDerivatives licence was left out, and each affected file lists the omitted section titles in its opening note. Third-party images (many CC BY-NC) are not reproduced at all. Some sections were adapted by Open RN from StatPearls chapters while those were CC BY 4.0; they are used here under the book's CC BY 4.0 licence (current StatPearls is not used).
+- Files:
+  - `medical/wistech-rt-respiratory-survey-1` — Respiratory Care Basics: Infection Control, Safety, Assessment and Gas Exchange (Part 1 of 2)
+  - `medical/wistech-rt-respiratory-survey-2` — Respiratory Care Basics: Infection Control, Safety, Assessment and Gas Exchange (Part 2 of 2)
+  - `medical/wistech-rt-respiratory-therapeutics-1` — Respiratory Therapeutics: Gas Laws, Medical Oxygen, Inhalers and Nebulisers
+  - `medical/wistech-rt-respiratory-therapeutics-2` — Respiratory Therapeutics: Lung Expansion, Airway Clearance and Pulmonary Rehabilitation
+  - `medical/wistech-rt-airway-management` — Airway Management: Bag-Valve-Mask, Airway Adjuncts, Intubation and Suctioning
+
+### Clinical Procedures for Safer Patient Care — Glynda Rees Doyle and Jodie Anita McCutcheon (British Columbia Institute of Technology); BCcampus (2015)
+
+- Source: https://med.libretexts.org/Bookshelves/Nursing/Clinical_Procedures_for_Safer_Patient_Care_(Doyle_and_McCutcheon) (LibreTexts copy of https://opentextbc.ca/clinicalskills/)
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence evidence: Every page used carries the LibreTexts licence tag license:ccby (version 4.0) and the footer statement "shared under a CC BY 4.0 license and was authored, remixed, and/or curated by Glynda Rees Doyle and Jodie Anita McCutcheon (BCcampus)"; the book is also listed CC BY 4.0 by the original publisher at https://opentextbc.ca/clinicalskills/ . Pages were checked one by one; only CC BY pages were used. Checked 2026-11-13.
+- Retrieved: 2026-11-13
+- Changes: Converted from the LibreTexts HTML pages to Markdown; images removed and replaced by one-line notes from their captions and alt text; critical-thinking exercises and reference lists removed; chapters split into parts; a short orientation note added to each file. Clinical content not changed. The LibreTexts copy has an empty Wound Care chapter (not used), and its chapter 7, titled "Blood Glucose Monitoring", actually holds the parenteral medication sections, which is how it is labelled here.
+- Files:
+  - `medical/bcit-clinproc-patient-assessment` — Patient Assessment: Pain, Vital Signs, Health History, Head-to-Toe and Emergency Checks
+  - `medical/bcit-clinproc-patient-handling-transfers-1` — Safe Patient Handling: Positioning, Moving Up in Bed, Transfers and Walking (Part 1 of 2)
+  - `medical/bcit-clinproc-patient-handling-transfers-2` — Safe Patient Handling: Positioning, Moving Up in Bed, Transfers and Walking (Part 2 of 2)
+  - `medical/bcit-clinproc-oxygen-therapy-1` — Oxygen Therapy: Devices, Flow Rates, Pulse Oximetry and Airway Suctioning (Part 1 of 2)
+  - `medical/bcit-clinproc-oxygen-therapy-2` — Oxygen Therapy: Devices, Flow Rates, Pulse Oximetry and Airway Suctioning (Part 2 of 2)
+  - `medical/bcit-clinproc-non-parenteral-medications-1` — Giving Medicines Without Needles: Oral, Topical, Eye, Ear, Inhaled, Rectal and Vaginal (Part 1 of 2)
+  - `medical/bcit-clinproc-non-parenteral-medications-2` — Giving Medicines Without Needles: Oral, Topical, Eye, Ear, Inhaled, Rectal and Vaginal (Part 2 of 2)
+  - `medical/bcit-clinproc-parenteral-medications-1` — Injections and IV Medicines: Ampules, Vials, Subcutaneous, Intramuscular and IV (Part 1 of 4)
+  - `medical/bcit-clinproc-parenteral-medications-2` — Injections and IV Medicines: Ampules, Vials, Subcutaneous, Intramuscular and IV (Part 2 of 4)
+  - `medical/bcit-clinproc-parenteral-medications-3` — Injections and IV Medicines: Ampules, Vials, Subcutaneous, Intramuscular and IV (Part 3 of 4)
+  - `medical/bcit-clinproc-parenteral-medications-4` — Injections and IV Medicines: Ampules, Vials, Subcutaneous, Intramuscular and IV (Part 4 of 4)

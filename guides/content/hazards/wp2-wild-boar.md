@@ -1,0 +1,42 @@
+---
+id: hazards/wp2-wild-boar
+title: Wild boar
+category: hazards
+tags: [wild boar, sus scrofa, wild swine, common wild pig, eurasian wild pig, disaster]
+summary: The wild boar (Sus scrofa), also known as the wild swine, common wild pig, Eurasian wild pig, or simply wild pig, is a suid native to much of Eurasia and North Africa and has been introduced to the Americas and Oceania.
+source: https://en.wikipedia.org/w/index.php?title=Wild_boar&oldid=1384640042
+source_title: Wikipedia: Wild boar
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Wild boar", Wikipedia, The Free Encyclopedia (revision 1384640042), https://en.wikipedia.org/w/index.php?title=Wild_boar&oldid=1384640042 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-14
+---
+
+# Wild boar
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+The **wild boar** (***Sus scrofa***), also known as the **wild swine**, **common wild pig**, **Eurasian wild pig**, or simply **wild pig**, is a suid native to much of Eurasia and North Africa and has been introduced to the Americas and Oceania. The species is now one of the widest-ranging mammals in the world as well as the most widespread suiform. It has been assessed as least concern on the IUCN Red List due to its wide range, high numbers, and adaptability to a diversity of habitats. It has become an invasive species in part of its introduced range. Wild boars probably originated in Southeast Asia during the Early Pleistocene and outcompeted other suid species as they spread throughout the Old World. However, extensive interspecific introgression among suids has complicated the reconstruction of wild boar origins. A 2026 genomic study instead placed their origin in tropical continental Asia, with wild boars expanding from South Asia during the Middle Pleistocene and later spreading into Southeast Asian islands and across Eurasia.
+
+As of 2005, up to 16 subspecies are recognized, which are divided into four regional groupings based on skull height and lacrimal bone length. The species lives in matriarchal societies consisting of interrelated females and their young (both male and female). Fully grown males are usually solitary outside the breeding season. The wolf is the wild boar's main predator in most of its natural range except in the Far East and the Lesser Sunda Islands, where it is replaced by the tiger and Komodo dragon respectively. The wild boar has a long history of association with humans, having been the ancestor of most domestic pig breeds and a big-game animal for millennia. Boars have also re-hybridized in recent decades with feral pigs; these boar–pig hybrids have become a serious pest wild animal in the Americas and Australia.
+
+## Description
+
+The wild boar is a bulky, massively built suid with short and relatively thin legs. The trunk is short and robust, while the hindquarters are comparatively underdeveloped. The region behind the shoulder blades rises into a hump and the neck is short and thick to the point of being nearly immobile. The animal's head is very large, taking up to one-third of the body's entire length. The structure of the head is well suited for digging. The head acts as a plough, while the powerful neck muscles allow the animal to upturn considerable amounts of soil: it is capable of digging 8–10 cm into frozen ground and can upturn rocks weighing 40–50 kg. The eyes are small and deep-set and the ears long and broad. The species has well developed canine teeth, which protrude from the mouths of adult males. The medial hooves are larger and more elongated than the lateral ones and are capable of quick movements. The animal can run at a maximum speed of 40 km/h (25 mph) and jump at a height of 140–150 cm.
+
+Sexual dimorphism is very pronounced in the species, with males being typically 5–10% larger and 20–30% heavier than females. Males also sport a mane running down the back, which is particularly apparent during autumn and winter. The canine teeth are also much more prominent in males and grow throughout life. The upper canines are relatively short and grow sideways early in life, though they gradually curve upwards. The lower canines are much sharper and longer, with the exposed parts measuring 10–12 cm in length. In the breeding period, males develop a coating of subcutaneous tissue, which may be 2–3 cm thick, extending from the shoulder blades to the rump, thus protecting vital organs during fights. Males sport a roughly chicken egg–sized sac of unclear function near the opening of the penis that collects urine and emits a sharp odour.
+
+Adult size and weight is largely determined by environmental factors; boars living in arid areas with little productivity tend to attain smaller sizes than their counterparts inhabiting areas with abundant food and water. In most of Europe, males average 75–100 kg in weight, 75–80 cm in shoulder height and 150 cm in body length, whereas females average 60–80 kg in weight, 70 cm in shoulder height and 140 cm in body length. In Europe's Mediterranean regions, males may reach average weights as low as 50 kg and females 45 kg, with shoulder heights of 63–65 cm. In the more productive areas of Eastern Europe, males average 110–130 kg in weight, 95 cm in shoulder height and 160 cm in body length, while females weigh 95 kg, reach 85–90 cm in shoulder height, and reach 145 cm in body length. In Western and Central Europe, the largest males weigh 200 kg and females 120 kg. In Northeastern Asia, large males can reach brown bear-like sizes, weighing 270 kg and measuring 110–118 cm in shoulder height. Some adult males in Primorsky Krai and Manchuria have been recorded to weigh 300–350 kg and measure 125 cm in shoulder height. Adults of this size are generally immune from wolf predation. Such giants are rare in modern times, as past overhunting has prevented animals from attaining their full growth.
+
+The winter coat consists of long, coarse bristles underlaid with short brown downy fur. The length of these bristles varies along the body, with the shortest being around the face and limbs and the longest running along the back. These back bristles form the aforementioned mane prominent in males and stand erect when the animal is agitated. Colour is highly variable; specimens around Lake Balkhash are very lightly coloured, and can even be white, while some boars from Belarus and Ussuriland can be black. Some subspecies sport a light-coloured patch running backward from the corners of the mouth. Coat colour also varies with age, with piglets having light brown or rusty-brown fur with pale bands extending from the flanks and back.
+
+The wild boar produces a number of different sounds which are divided into three categories:
+
+- **Contact calls**: Grunting noises which differ in intensity according to the situation. Adult males are usually silent, while females frequently grunt and piglets whine. When feeding, boars express their contentment through purring. Studies have shown that piglets imitate the sounds of their mother, thus different litters may have unique vocalisations.
+- **Alarm calls**: Warning cries emitted in response to threats. When frightened, boars make loud huffing *ukh! ukh!* sounds or emit screeches transcribed as *gu-gu-gu*.
+- **Combat calls**: High-pitched, piercing cries.
+
+Its sense of smell is very well developed to the point that the animal is used for drug detection in Germany. Its hearing is also acute, though its eyesight is comparatively weak, lacking color vision and being unable to recognise a standing human 10–15 m away.
+
+Pigs are one of four known mammalian taxa which possess mutations in the nicotinic acetylcholine receptor that protect against snake venom. Mongooses, honey badgers, hedgehogs, and pigs all have modifications to the receptor pocket which prevents the snake venom α-neurotoxin from binding. These represent four separate, independent mutations.
+
+_(Later sections of the original article were left out of this offline copy for length: Social behaviour and life cycle, Behaviour and ecology, Distribution and habitat, Relationships with humans.)_

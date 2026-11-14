@@ -1,0 +1,205 @@
+# Search-quality query set for `guidepack eval` (see tools/guidepack/README.md, "Search quality").
+# Relevance: written by hand from the guide titles, then completed by pooling (the top 3 results of
+# keyword, meaning-only and hybrid ranking for every query were judged by hand, the same way for all
+# three, and the ones that answer the query were added).
+# One query per line, tab-separated:  split  type  query  relevant guide ids (space-separated)
+#   split  tune = used while choosing weights; test = held out (never used for tuning)
+#   type   lay (everyday wording) | para (paraphrase of the guide's topic) | typo | syn (synonym the
+#          guides do not use) | quest (a question) | exact (names, part numbers, document codes)
+# A query counts as answered at k when ANY listed guide is in the top k results. Queries are
+# written the way stressed people type: lower case, no punctuation, misspellings kept on purpose.
+tune	lay	stuff to stop infection in a cut	medical/cdc-emergency-wound-care-after-disaster medical/ews-infections medical/corpsman-emergency-care-4 medical/army-first-aid-pain-antibiotics-wounds medical/openrn-skills-wound-care-1 medical/openrn-skills-wound-care-2 medical/ships-medicine-chest-wound-care medical/moody-backwoods-surgery-medicine-02-caring-for-burns-cuts-drowning-and-minor survival/fm21-76-04-basic-survival-medicine
+tune	lay	my kid drank bleach	hazards/atsdr-toxfaq-hypochlorite-bleach medical/poisoning medical/corpsman-poisoning-1 medical/corpsman-poisoning-2 water/wp2-bleach water/wp2-sodium-hypochlorite hazards/fema-ready-household-chemical-emergencies
+test	lay	make water safe	water/cdc-making-water-safe-in-an-emergency water/epa-wells-emergency-disinfection-drinking-water water/appropedia-solar-water-disinfection water/cdc-disaster-drinking-water-advisories water/cdc-disaster-finding-clean-water water/wikibooks-outdoor-survival-water
+tune	lay	radio wont transmit	embermesh/troubleshooting embermesh/baofeng-uv5r embermesh/handheld-audio-modem embermesh/radio-gateway
+tune	lay	someone is choking and cant breathe	medical/choking medical/army-first-aid-airway-and-choking medical/wikibooks-first-aid-obstructed-airway medical/wp2-heimlich-maneuver medical/sfmh-airway-obstruction-and-cpr
+test	lay	his heart stopped and he is not breathing	medical/cardiopulmonary-resuscitation medical/wikibooks-first-aid-cpr-summary medical/wikibooks-first-aid-compressions medical/corpsman-emergency-care-2 medical/wb2-emergency-medicine-cardiopulmonary-arrest medical/wistech-emr-shock-cpr-1 medical/wistech-emr-shock-cpr-2 medical/sfmh-airway-obstruction-and-cpr medical/wikibooks-first-aid-breathing
+tune	lay	bleeding wont stop	medical/bleeding medical/army-first-aid-severe-bleeding medical/ews-hemorrhage-control medical/tourniquet medical/corpsman-emergency-care-4 medical/wikibooks-first-aid-deadly-bleeding medical/wikibooks-first-aid-external-bleeding medical/lawrence-accidents-emergencies-05-bleeding-from-the-nose-bleeding-from-cut-or
+tune	lay	broke my leg in the woods	medical/bone-fracture medical/army-first-aid-fractures-and-splinting medical/corpsman-emergency-care-6 medical/ews-extremity-fractures medical/wikibooks-first-aid-immobilization medical/sfmh-orthopedics medical/moody-backwoods-surgery-medicine-01-how-to-treat-fractures-sprains-and-dislocations
+test	lay	got bit by a snake	medical/army-first-aid-bites-and-stings medical/niosh-venomous-snakes hazards/wp2-venomous-snake hazards/wp2-snake-venom survival/fm21-76-appendix-e-venomous-snakes medical/corpsman-poisoning-2 hazards/wp2-antivenom medical/lawrence-accidents-emergencies-20-sea-sickness-snake-bites medical/snakebite medical/wv2-dangerous-snakes
+tune	lay	bee sting and her throat is swelling	medical/anaphylaxis medical/wikibooks-first-aid-anaphylaxis medical/insect-bites-and-stings medical/army-first-aid-bites-and-stings medical/bee-sting medical/niosh-insects-scorpions
+tune	lay	baby is hot and wont stop crying	medical/openrn-hp-childhood-disorders-1 medical/openrn-hp-childhood-disorders-2 medical/openrn-hp-child-development-care-1 medical/openrn-hp-high-risk-newborn-1
+test	lay	burned my hand on the stove	medical/burn medical/army-first-aid-burns medical/corpsman-emergency-care-7 medical/lawrence-accidents-emergencies-06-burns-and-scalds-catalepsy-trance medical/ews-burns
+tune	lay	too hot dizzy and headache	medical/heat-exhaustion medical/heat-stroke hazards/heat-illness medical/cdc-heat-related-illness medical/hyperthermia medical/wikibooks-first-aid-heat-related-illness weather/fema-ready-heat survival/wikivoyage-hot-weather
+tune	lay	shivering and cant get warm	medical/hypothermia hazards/hypothermia medical/cdc-hypothermia-frostbite medical/ews-cold-injuries medical/army-first-aid-hypothermia-in-the-injured survival/fm21-76-15-cold-weather-survival weather/cdc-disaster-winter-storms
+test	lay	fingers went white and numb in the cold	medical/frostbite medical/cdc-hypothermia-frostbite medical/ews-cold-injuries medical/harsh-env-cold-injury-prevention medical/sfmh-heat-and-cold-injuries weather/nws-cold-safety
+tune	lay	the runs wont stop and im weak	medical/diarrhea medical/dehydration hygiene/cdc-preventing-diarrhea-after-disaster medical/cholera medical/dysentery medical/wb2-emergency-medicine-dehydration
+tune	lay	wife is having the baby now	medical/childbirth medical/ocd-phs-emergency-childbirth medical/corpsman-emergency-care-8 medical/ews-gynecological-obstetric-emergencies medical/openrn-hp-labor-delivery-1
+test	lay	tooth got knocked out	medical/dental-avulsion medical/sfmh-dental-emergencies medical/ships-medicine-chest-dental-emergencies
+tune	lay	twisted my ankle	medical/sprain medical/corpsman-emergency-care-6 medical/wikibooks-first-aid-musculoskeletal-injuries medical/lawrence-accidents-emergencies-21-sprains-or-strains-stings-of-insects
+tune	lay	got chemicals in my eye	medical/eye-injury medical/army-first-aid-eye-injuries medical/ews-eye-injuries
+test	lay	diabetic shaking and sweaty	medical/hypoglycemia medical/diabetic-ketoacidosis medical/openrn-ha-diabetes-thyroid-adrenal-1 medical/openrn-ha-diabetes-thyroid-adrenal-2 medical/wikibooks-first-aid-diabetes
+tune	lay	shaking on the floor not responding	medical/epileptic-seizure medical/lawrence-accidents-emergencies-13-epilepsy-epileptic-fits medical/openrn-ha-neurological-disorders-1 medical/wistech-emr-medical-emergencies-1
+tune	lay	face drooping cant talk right	medical/stroke medical/wikibooks-first-aid-stroke medical/openrn-ha-neurological-disorders-1 medical/openrn-ha-neurological-disorders-2 medical/wistech-emr-medical-emergencies-1
+test	lay	crushing pain in chest and left arm	medical/myocardial-infarction medical/wikibooks-first-aid-heart-attack-and-angina medical/wb2-emergency-medicine-chest-pain medical/openrn-ha-heart-circulation-disorders-1
+tune	lay	it burns when i pee	medical/openrn-ha-kidney-urinary-disorders-1 medical/openrn-ha-kidney-urinary-disorders-2 medical/openrn-ha-kidney-urinary-disorders-3 medical/openrn-fund-elimination-1 medical/urinary-tract-infection
+tune	lay	bullseye rash after tick	medical/lyme-disease hygiene/cdc-ticks medical/niosh-tick-and-mosquito-borne-diseases hazards/wp2-ixodes-scapularis medical/tick-borne-disease
+test	lay	itchy rash from a plant in the woods	survival/usda-poison-ivy-oak-sumac-part-1 medical/niosh-poisonous-plants medical/wb2-horticulture-urushiol-dermatitis survival/wp2-toxicodendron-radicans
+tune	lay	bugs in my kids hair	hygiene/head-louse hygiene/cdc-head-lice medical/wp2-head-louse hygiene/wp2-treatment-of-human-lice hygiene/wp2-louse
+tune	lay	cant stop crying since the flood	community/cdc-coping-with-disaster community/nimh-coping-with-traumatic-events community/acute-stress-reaction community/psychological-first-aid community/army-psychological-first-aid-stress community/grief community/ready-coping-with-disaster
+test	lay	heart racing cant breathe scared for no reason	medical/openrn-mh-anxiety-ptsd-1 medical/wp2-anxiety-disorder community/acute-stress-reaction community/nimh-stress medical/wikibooks-first-aid-asthma-and-hyperventilation
+tune	lay	close a deep cut without a doctor	medical/corpsman-emergency-care-5 medical/wp2-surgical-suture medical/openrn-skills-wound-care-1 medical/ews-soft-tissue-open-joint-injuries medical/cdc-emergency-wound-care-after-disaster medical/ships-medicine-chest-wound-care medical/wound medical/moody-backwoods-surgery-medicine-02-caring-for-burns-cuts-drowning-and-minor
+tune	lay	dog bit my son	medical/dog-bite medical/cdc-rabies-after-animal-bite medical/army-first-aid-bites-and-stings
+test	lay	everyone has a headache when the generator runs	medical/carbon-monoxide-poisoning medical/cdc-carbon-monoxide-poisoning power/carbon-monoxide-poisoning power/cdc-disaster-carbon-monoxide-generators-furnaces power/epa-carbon-monoxide hazards/wp2-carbon-monoxide power/portable-generator
+tune	lay	smoke from the fires is making it hard to breathe	fire/cdc-disaster-wildfire-smoke-risk-groups fire/niosh-wildfire-cleanup-and-smoke hazards/wp2-smoke-inhalation fire/cdc-disaster-wildfires
+tune	lay	bomb went off what about the fallout	hazards/nuclear-fallout hazards/fallout-shelter hazards/nuclear-detonation-shelter-evacuation hazards/cdc-rad-get-inside-stay-inside-stay-tuned hazards/epa-fallout-and-background-radiation hazards/fema-ready-radiation hazards/ocd-fallout-protection-1961-1-basic-facts hazards/fema-ayr2004-4-5-nuclear-blast
+test	lay	ate a wild mushroom and feel sick	medical/wp2-mushroom-poisoning survival/wp2-amanita-phalloides medical/poisoning survival/bsa-boy-scouts-handbook-1911-14-mushrooms-fungi-or-toadstools
+tune	lay	power went out is the food in the fridge still ok	food/wp2-danger-zone-food-safety power/cdc-disaster-power-outage power/fema-ready-power-outages power/power-outage food/wp2-food-safety food/ready-gov-emergency-food food/cdc-disaster-food-safety-after-emergency food/usda-fsis-keep-food-safe-during-emergencies
+tune	lay	keep meat without a fridge	food/wholesale-curer-curing-potting-03-dried-and-smoked-meats food/wikipedia-salting-food food/fulton-home-pork-making-03-smoking-and-smokehouses food/wb2-cookbook-smoking food/wholesale-curer-curing-potting-02-introduction food/appropedia-zeer-pot-refrigerator food/wp2-pot-in-pot-refrigerator
+test	lay	start a fire with no matches	fire/wikipedia-fire-making fire/beard-camp-lore-01-fire-making-by-friction fire/beard-camp-lore-02-fire-making-by-percussion fire/wikipedia-bow-drill fire/wikipedia-ferrocerium fire/fm21-76-07-firecraft fire/wikipedia-fire-striker fire/wikipedia-burning-glass fire/wikipedia-fire-piston
+tune	lay	everything is wet how do i get a fire going	fire/fm21-76-07-firecraft fire/wikipedia-tinder fire/beard-camp-lore-03-how-to-build-a-fire fire/wikipedia-fire-making
+tune	lay	sleep in the snow overnight	shelter/wikipedia-snow-cave shelter/wikipedia-igloo survival/fm21-76-15-cold-weather-survival shelter/fm21-76-05-shelters shelter/fm31-70-03-small-unit-living-part-1 shelter/fm31-70-03-small-unit-living-part-2
+test	lay	which way is north no compass	navigation/fm21-76-18-direction-finding navigation/wp2-polaris navigation/fm3-25-26-06-direction navigation/wp2-sundial
+tune	lay	signal a helicopter to find us	signaling/tc3-21-60-signals-03-aircraft-and-ground-to-air-signals signaling/fm31-70-appendix-b-ground-air-emergency-code signaling/fm21-76-19-signaling-techniques signaling/wikipedia-signalling-mirror survival/uscg-seamanship-19-helicopter-operations
+tune	lay	how many drops of bleach in a gallon of water	water/cdc-making-water-safe-in-an-emergency water/epa-wells-emergency-disinfection-drinking-water water/wp2-bleach hygiene/cdc-disaster-cleaning-with-bleach community/fema-ayr2004-1-3-1-4-supplies-and-shelter
+test	lay	catch rain off the roof to drink	water/wikipedia-rainwater-harvesting water/wp2-rainwater-tank water/cdc-disaster-cisterns water/wp2-cistern
+tune	lay	where do we go to the bathroom in camp	hygiene/army-field-sanitation-latrines-and-waste hygiene/pit-latrine hygiene/ventilated-improved-pit-latrine hygiene/milprevmed-disaster-camp-environmental-health hygiene/wp2-bucket-toilet hygiene/composting-toilet
+tune	lay	make soap from fat and ashes	hygiene/thomssen-soap-making-manual-01-raw-materials-used-in-soap-making hygiene/wp2-soap hygiene/wp2-lye food/child-american-frugal-housewife-03-soap hygiene/thomssen-soap-making-manual-02-classification-of-soap-making-methods agriculture/wp2-wood-ash
+test	lay	hens stopped giving eggs	agriculture/piper-poultry-03-eggs agriculture/wb2-raising-chickens-part1 agriculture/wb2-raising-chickens-part2
+tune	lay	catch a rabbit with wire	food/deadfalls-and-snares-3-snares-box-coop-and-pit-traps food/wikipedia-trapping food/fm21-76-08-food-procurement food/deadfalls-and-snares-2-triggers-setting-and-bait survival/kreps-science-of-trapping-22-the-rabbit
+tune	lay	twister coming where do we hide	weather/nws-tornado-safety weather/fema-ready-tornadoes hazards/fema-ayr2004-2-02-tornadoes hazards/wv2-tornado-safety weather/cdc-disaster-tornadoes hazards/fema-cert-annex-tornado
+test	lay	ground is shaking what do i do	hazards/earthquake-preparedness hazards/fema-ayr2004-2-07-earthquakes hazards/cdc-disaster-earthquakes hazards/fema-cert-annex-earthquake hazards/fema-ready-earthquakes
+tune	lay	water rising around the car	hazards/fema-ready-floods hazards/fema-ayr2004-2-01-floods hazards/cdc-disaster-floods hazards/fema-cert-annex-floods
+tune	lay	caught outside in a thunderstorm	weather/nws-lightning-safety weather/fema-ready-thunderstorms-lightning hazards/fema-ayr2004-2-04-thunderstorms-lightning weather/lightning weather/nws-guide-thunderstorms-tornadoes-lightning hazards/fema-cert-annex-thunderstorms hazards/wv2-thunderstorms
+test	lay	get everyone out if the house catches fire	fire/fema-ready-home-fire-escape-plan fire/usfa-smoke-alarms-escape-plans-extinguishers fire/fema-ready-home-fires fire/wp2-fire-safety hazards/fema-cert-annex-fire
+tune	lay	car wont start battery dead	repair/jump-start repair/automotive-battery repair/wp2-starter-engine
+tune	lay	charge my phone when the power is out	power/solar-charge-controller power/wp2-battery-charger embermesh/power-and-field power/solar-panel power/power-outage power/fema-ready-power-outages
+test	lay	fix a flat on my bike	repair/wb2-bicycle-wheels-and-tires-fixing-a-flat repair/bicycle-wheels-and-tires repair/wp2-inner-tube repair/wp2-bicycle-tire
+tune	lay	pipe is leaking under the sink	repair/usda-plumbing-repairs-farmstead-03-repairing-leaks-in-pipes-and-tanks-water-hammer repair/tm3-34-70-plumbing-03-plumbing-repairs repair/tm3-34-70-plumbing-06-pipes-and-fittings repair/warren-simple-plumbing-repairs-05-leaks-in-pipes-and-tanks-cracked-laundry-tubs repair/tm3-34-70-plumbing-04-plumbing-fixtures
+tune	lay	knife is dull	repair/sharpening reference/wikipedia-sharpening repair/wp2-sharpening-stone repair/zerbe-carpentry-for-boys-03-how-to-grind-and-sharpen-tools
+test	lay	tell the weather from the sky	weather/cloud-part1 survival/fm21-76-appendix-h-clouds weather/list-of-cloud-types-part1 weather/fitzroy-barometer-weather-guide-02-how-to-foretell-weather weather/longstreth-reading-the-weather-07-the-barometer weather/longstreth-reading-the-weather-05-sky-signs-for-campers-part-1 weather/longstreth-reading-the-weather-06-sky-signs-for-campers-part-2 weather/weather-lore
+tune	lay	how far can my walkie talkie reach	radio/wp2-walkie-talkie radio/gmrs radio/fcc-part95-subpart-b-frs embermesh/what-you-need embermesh/antennas radio/fm24-18-ch4-practical-considerations
+tune	lay	talk to other phones with no internet	embermesh/phone-to-phone embermesh/quick-start embermesh/how-it-works embermesh/hub-setup
+test	lay	pass messages along from camp to camp	embermesh/relays-and-repeaters embermesh/sneakernet embermesh/how-it-works embermesh/running-a-net
+tune	para	treating a wound that is getting infected	medical/ews-infections medical/corpsman-emergency-care-4 medical/cdc-emergency-wound-care-after-disaster medical/army-first-aid-pain-antibiotics-wounds medical/ships-medicine-chest-wound-care survival/fm21-76-04-basic-survival-medicine
+tune	para	keeping drinking water clean in a disaster	water/cdc-making-water-safe-in-an-emergency water/epa-wells-emergency-disinfection-drinking-water water/cdc-disaster-drinking-water-advisories community/fema-ayr2004-1-3-1-4-supplies-and-shelter hazards/ocd-in-time-of-emergency-4-water-food-sanitation-fire
+test	para	sheltering from radioactive dust after a nuclear blast	hazards/fallout-shelter hazards/nuclear-detonation-shelter-evacuation hazards/cdc-rad-get-inside-stay-inside-stay-tuned hazards/fema-civdef-protection-nuclear-age-4-expedient-shelter-plans hazards/ocd-fallout-protection-1961-2-shelters hazards/nuclear-fallout hazards/cdc-rad-nuclear-blast-faq hazards/fema-ayr2004-4-5-nuclear-blast
+tune	para	growing vegetables in a small backyard	agriculture/rockwell-home-vegetable-gardening-01-introduction agriculture/rockwell-home-vegetable-gardening-02-the-planting-plan agriculture/free-war-gardens-04-iv-the-site-the-soil-and-its-preparation agriculture/wb2-horticulture-garden-methods-part1 agriculture/rexford-abc-vegetable-gardening-01-getting-the-garden-ready agriculture/rexford-abc-vegetable-gardening-09-small-gardens agriculture/free-war-gardens-01-preface-i-the-value-of-back-yard-and-vacant-lot agriculture/rockwell-home-vegetable-gardening-05-sowing-and-planting
+tune	para	saving seeds for next year	agriculture/wikipedia-seed-saving agriculture/free-war-gardens-08-viii-seeds-seed-sowing-and-transplanting community/wp2-seed-library agriculture/goodrich-first-book-of-farming-12-seeds
+test	para	keeping food cold without electricity	food/appropedia-zeer-pot-refrigerator food/wp2-pot-in-pot-refrigerator food/hiles-ice-crop-06-the-use-of-ice-in-refrigeration food/cdc-disaster-food-safety-after-emergency food/usda-fsis-keep-food-safe-during-emergencies
+tune	para	turning food scraps into garden soil	agriculture/wikipedia-compost agriculture/wikipedia-vermicompost agriculture/wb2-horticulture-garden-methods-part1 agriculture/wb2-horticulture-garden-methods-part2
+tune	para	cooking with very little fuel	fire/appropedia-rocket-stove food/wikipedia-rocket-stove food/appropedia-fireless-cookers food/appropedia-peacecorps-fireless-cookers fire/wp2-hobo-stove food/wp2-thermal-cooking
+test	para	getting rid of rats in the house	hygiene/lantz-destroying-rats-02-rat-proof-construction-natural-enemies-of-rats hygiene/silver-rat-proofing-buildings-01-introduction-general-principles-of-rat-proofing hygiene/lantz-destroying-rats-01-letter-of-transmittal-illustration hygiene/cdc-hantavirus-rodent-cleanup hygiene/cdc-rodent-control hygiene/lantz-house-rats-mice-03-destroying-rats-and-mice hygiene/lantz-house-rats-mice-04-organized-efforts-to-destroy-rats
+tune	para	cleaning up mold after the house flooded	hygiene/cdc-mold-after-disaster hygiene/cdc-disaster-you-can-control-mold hygiene/epa-mold-brief-guide-mold-moisture-home hazards/wp2-indoor-mold hazards/epa-floods-and-indoor-air shelter/epa-flooded-homes-returning-and-cleanup hazards/cdc-disaster-floods
+tune	para	what to pack in a bag in case we have to leave	community/fema-ayr2004-1-3-1-4-supplies-and-shelter survival/fm21-76-appendix-a-survival-kits community/fema-are-you-ready-3-make-a-plan hazards/emergency-evacuation community/fema-ayr2004-appendix-b-c-checklists-communications-plan survival/fema-ready-car
+test	para	crossing a fast river on foot	navigation/fm21-76-17-water-crossings survival/tc3-97-61-mountaineering-13-stream-crossing survival/tc3-21-98-jungle-10-boats-and-river-crossings navigation/wikipedia-stream-crossing navigation/fm90-5-appendix-c-jungle-obstacles
+tune	para	staying alive in the desert	survival/fm21-76-13-desert-survival survival/fm90-3-01-desert-environment-part-1 survival/wikivoyage-deserts water/wikibooks-outdoor-survival-water-in-the-desert
+tune	para	surviving at sea in a life raft	survival/fm21-76-16-sea-survival-part-1 survival/fm21-76-16-sea-survival-part-2 survival/uscg-seamanship-06-survival-equipment-and-pyrotechnics-part-1 survival/fm55-501-marine-crewman-10-marine-emergencies-part-1 survival/fm55-501-marine-crewman-10-marine-emergencies-part-2 survival/uscg-seamanship-06-survival-equipment-and-pyrotechnics-part-2
+test	para	bear came into camp	hazards/wp2-bear-attack hazards/wp2-american-black-bear hazards/wp2-grizzly-bear hazards/wp2-brown-bear survival/fm21-76-11-dangerous-animals security/wp2-bear-spray
+tune	para	protecting yourself from mosquitoes	hygiene/cdc-mosquito-bite-prevention hygiene/mosquito-control hygiene/cdc-mosquito-control medical/wp2-mosquito-net medical/milprevmed-arthropods-mosquitoes hygiene/army-field-sanitation-insects-and-pests
+tune	para	baking bread from scratch	food/wb2-cookbook-bread-making food/wb2-cookbook-bread food/cobbett-cottage-economy-03-making-bread food/child-american-frugal-housewife-13-bread-yeast-c food/wp2-bread
+test	para	pulling someone out of the water who is not breathing	medical/drowning medical/lawrence-accidents-emergencies-11-drowning medical/ships-medicine-chest-cold-water-and-drowning medical/wistech-emr-medical-emergencies-3 medical/cardiopulmonary-resuscitation survival/uscg-seamanship-16-person-in-the-water medical/wikibooks-first-aid-breathing
+tune	para	someone touched a live wire	medical/wikibooks-first-aid-electrocution
+tune	para	keeping a cow for milk	agriculture/orange-judd-keeping-one-cow-01-introduction agriculture/orange-judd-keeping-one-cow-02-the-cow-in-the-middle-states-by-w-l-battles agriculture/orange-judd-keeping-one-cow-04-the-village-cow-in-new-england-being-the agriculture/wp2-goat agriculture/orange-judd-keeping-one-cow-15-keeping-a-cow-in-a-village-stable-by-orange
+test	para	making a home warmer in winter	shelter/wb2-diy-house-insulation shelter/wp2-building-insulation shelter/wp2-wood-burning-stove shelter/wp2-russian-stove weather/cdc-disaster-winter-storms
+tune	para	light at night when the grid is down	fire/wp2-candle fire/wp2-carbide-lamp electronics/led-part1 power/power-outage
+tune	para	thin air sickness on a mountain	medical/ews-heat-and-altitude-injuries medical/altitude-sickness medical/wv2-altitude-sickness medical/army-first-aid-heat-cold-altitude survival/wp2-mountaineering medical/atp3-21-18-footmarch-appendix-f-march-injuries-and-illness
+test	para	what to do when the children are scared after a disaster	community/samhsa-helping-children-cope community/cdc-helping-teens-cope community/ready-coping-with-disaster community/cdc-disaster-teens community/samhsa-disaster-survivors
+tune	para	looking after animals in an emergency	agriculture/fema-is10-07-pet-care community/fema-ready-animals agriculture/fema-is10-08-livestock-and-horses hazards/cdc-chem-pets agriculture/fema-is10-02-why-animal-care-matters agriculture/fema-is10-03-four-phases agriculture/fema-is11-02-introduction
+tune	para	tying two ropes together	reference/verrill-knots-02-simple-knots-and-bends survival/wp2-bend-knot reference/fm21-76-appendix-g-ropes-and-knots survival/beard-on-the-trail-11-useful-knots-and-how-to-tie-them reference/fm5-125-02-knots-splices-ladders survival/tc3-97-61-mountaineering-08-knots-and-rope-part-1 survival/tc3-97-61-mountaineering-08-knots-and-rope-part-2 survival/wb2-knots-rope-and-care-part1
+test	para	joining wires with a hot iron	electronics/soldering electronics/wp2-soldering-iron electronics/wp2-solder repair/jones-soldering-brazing-welding-04-soft-soldering-with-the-copper-bit electronics/neets04-ch2-wiring-techniques-1 electronics/neets04-ch2-wiring-techniques-2
+tune	para	sending a message by flashing light	signaling/wikipedia-heliograph signaling/wikipedia-signalling-mirror radio/morse-code-part1 signaling/fm21-76-19-signaling-techniques signaling/wp2-signal-lamp signaling/fm55-501-marine-crewman-09-shipboard-communications embermesh/morse-reading signaling/army-visual-signaling-03-alphabets-or-systems-of-signals
+tune	para	the radio signal keeps cutting out over the hills	radio/neets10-ch1-wave-propagation-1 radio/fm24-18-ch4-practical-considerations embermesh/antennas embermesh/troubleshooting radio/maximum-usable-frequency embermesh/relays-and-repeaters radio/wp2-radio-repeater
+test	para	making a longer range antenna for a handheld	radio/j-pole-antenna embermesh/antennas radio/ground-plane-antenna radio/wp2-collinear-antenna-array radio/antenna radio/wp2-whip-antenna radio/wp2-monopole-antenna
+tune	para	reflected power too high on the antenna	radio/swr radio/antenna-tuner radio/feed-line embermesh/antennas
+tune	para	using a cheap handheld radio to send texts	embermesh/baofeng-uv5r embermesh/handheld-audio-modem embermesh/radio-gateway
+test	para	reading code sent by beeps	embermesh/morse-reading radio/morse-code-part1 radio/morse-code-part2 radio/prosigns-for-morse-code
+tune	typo	hypothermai treatment	medical/hypothermia hazards/hypothermia medical/cdc-hypothermia-frostbite medical/ews-cold-injuries medical/army-first-aid-hypothermia-in-the-injured
+tune	typo	diarhea in children	medical/diarrhea medical/openrn-hp-childhood-disorders-1 medical/openrn-hp-childhood-disorders-2 medical/openrn-hp-childhood-disorders-3 medical/dehydration hygiene/cdc-preventing-diarrhea-after-disaster medical/sfmh-pediatrics medical/wb2-emergency-medicine-diarrhea
+test	typo	how to use a tournequet	medical/tourniquet medical/army-first-aid-severe-bleeding medical/ews-hemorrhage-control medical/call-tccc-field-care-procedures medical/ews-tactical-combat-casualty-care
+tune	typo	anaphalaxis epipen	medical/anaphylaxis medical/wikibooks-first-aid-anaphylaxis medical/wp2-epinephrine-autoinjector medical/wistech-emr-emergency-medications
+tune	typo	purifiy water with iodine	water/cdc-making-water-safe-in-an-emergency water/epa-wells-emergency-disinfection-drinking-water water/fm21-76-06-water-procurement hazards/atsdr-toxfaq-iodine water/wikipedia-portable-water-purification
+test	typo	snake bight first aid	medical/army-first-aid-bites-and-stings medical/niosh-venomous-snakes survival/fm21-76-appendix-e-venomous-snakes hazards/wp2-venomous-snake medical/lawrence-accidents-emergencies-20-sea-sickness-snake-bites medical/wv2-dangerous-snakes medical/snakebite
+tune	typo	nucelar fallout shelter	hazards/fallout-shelter hazards/nuclear-fallout hazards/ocd-fallout-protection-1961-2-shelters hazards/fema-civdef-protection-nuclear-age-4-expedient-shelter-plans hazards/fema-ayr2004-4-5-nuclear-blast
+tune	typo	anntena for 2 meter	radio/j-pole-antenna radio/ground-plane-antenna embermesh/antennas radio/antenna radio/wp2-collinear-antenna-array radio/wp2-2-meter-band
+test	typo	consussion symptoms	medical/concussion medical/head-injury medical/traumatic-brain-injury medical/ews-head-injuries medical/army-first-aid-head-neck-face-injuries medical/wikibooks-first-aid-head-and-facial-injuries
+tune	typo	dehidration in babies	medical/dehydration medical/openrn-hp-childhood-disorders-1 medical/openrn-hp-childhood-disorders-2 medical/wb2-emergency-medicine-dehydration
+tune	typo	hemmorage control	medical/bleeding medical/ews-hemorrhage-control medical/army-first-aid-severe-bleeding medical/tourniquet
+test	typo	frostbit toes	medical/frostbite medical/cdc-hypothermia-frostbite medical/ews-cold-injuries medical/army-first-aid-heat-cold-altitude medical/wikibooks-first-aid-cold-related-illness weather/cdc-disaster-winter-storms
+tune	typo	seizur first aid	medical/epileptic-seizure medical/lawrence-accidents-emergencies-13-epilepsy-epileptic-fits medical/wikibooks-first-aid-seizures medical/wikibooks-first-aid-epilepsy
+tune	typo	hurricaine prep	weather/fema-ready-hurricanes weather/nws-hurricane-safety hazards/fema-ayr2004-2-03-hurricanes weather/cdc-disaster-hurricanes hazards/fema-cert-annex-hurricane weather/nws-guide-tropical-cyclones
+test	typo	carbon monoxcide from generator	medical/carbon-monoxide-poisoning power/cdc-disaster-carbon-monoxide-generators-furnaces power/carbon-monoxide-poisoning power/portable-generator medical/cdc-carbon-monoxide-poisoning hazards/wp2-carbon-monoxide power/epa-carbon-monoxide
+tune	typo	tornado saftey	weather/nws-tornado-safety weather/fema-ready-tornadoes hazards/wv2-tornado-safety hazards/fema-ayr2004-2-02-tornadoes
+tune	typo	pnemonia in elderly	medical/pneumonia medical/sfmh-respiratory-disorders
+test	typo	appendicitus signs	medical/wp2-appendicitis medical/openrn-ha-digestive-disorders-2 medical/openrn-ha-digestive-disorders-5
+tune	typo	splinting a broken arn	medical/army-first-aid-fractures-and-splinting medical/bone-fracture medical/wikibooks-first-aid-immobilization medical/corpsman-emergency-care-6 medical/ews-extremity-fractures medical/lawrence-accidents-emergencies-04-broken-bones-fractures-bruises medical/sfmh-orthopedics
+tune	typo	solder wires togther	electronics/soldering electronics/wp2-solder electronics/wp2-soldering-iron electronics/neets04-ch2-wiring-techniques-2 repair/jones-soldering-brazing-welding-02-soft-solders repair/jones-soldering-brazing-welding-05-soft-soldering-with-blowpipe-or-bunsen-burner
+test	typo	meshtastc setup	radio/meshtastic embermesh/lora radio/lora
+tune	syn	heart attack	medical/myocardial-infarction medical/wikibooks-first-aid-heart-attack-and-angina medical/wb2-emergency-medicine-chest-pain
+tune	syn	throwing up and cant keep water down	medical/dehydration medical/openrn-pharm-gastrointestinal-drugs medical/wb2-emergency-medicine-dehydration medical/diarrhea medical/openrn-fund-fluids-electrolytes-1
+test	syn	nappy rash	hygiene/wp2-cloth-diaper medical/openrn-hp-childhood-disorders-1 medical/openrn-hp-child-development-care-1 hygiene/wp2-diaper hygiene/cdc-disaster-period-and-diapering medical/openrn-hp-childhood-disorders-4
+tune	syn	tummy bug	medical/diarrhea medical/wp2-gastroenteritis hygiene/cdc-preventing-diarrhea-after-disaster medical/dysentery
+tune	syn	loo in the garden	hygiene/pit-latrine hygiene/composting-toilet hygiene/wp2-dry-toilet hygiene/ventilated-improved-pit-latrine hygiene/urine-diverting-dry-toilet hygiene/wp2-arborloo
+test	syn	torch with no batteries	electronics/led-part1 power/wp2-hub-dynamo fire/wp2-candle fire/wp2-carbide-lamp power/wp2-bottle-dynamo power/wp2-dynamo
+tune	syn	petrol generator safety	power/portable-generator power/cdc-disaster-carbon-monoxide-generators-furnaces power/carbon-monoxide-poisoning
+tune	syn	lockjaw from a rusty nail	medical/tetanus medical/cdc-tetanus medical/cdc-emergency-wound-care-after-disaster medical/lawrence-accidents-emergencies-17-hydrophobia-rabies-lockjaw
+test	syn	sugar water for the runs	medical/oral-rehydration-therapy medical/dehydration medical/diarrhea medical/wb2-emergency-medicine-pediatric-rehydration
+tune	syn	fizzy drink for low sugar	medical/hypoglycemia medical/openrn-ha-diabetes-thyroid-adrenal-1 medical/openrn-ha-diabetes-thyroid-adrenal-2
+tune	syn	cardiac arrest	medical/cardiopulmonary-resuscitation medical/wb2-emergency-medicine-cardiopulmonary-arrest medical/wistech-emr-shock-cpr-1 medical/corpsman-emergency-care-2 medical/wikibooks-first-aid-defibrillation medical/wistech-emr-shock-cpr-2
+test	syn	walkie talkie licence	radio/gmrs radio/fcc-part95-subpart-e-gmrs radio/fcc-part95-subpart-b-frs radio/amateur-radio-licensing-us radio/murs radio/fcc-part95-subpart-a-general radio/family-radio-service
+tune	syn	ham radio test	radio/amateur-radio-licensing-us radio/fcc-part97-subpart-f-exams
+tune	syn	jerky	food/wholesale-curer-curing-potting-03-dried-and-smoked-meats food/wikipedia-jerky food/appropedia-peacecorps-using-dried-foods
+test	syn	outhouse	hygiene/pit-latrine hygiene/rockey-sewage-garbage-farm-03-cesspools-privies hygiene/ventilated-improved-pit-latrine hygiene/army-field-sanitation-latrines-and-waste
+tune	syn	shell shock	community/nimh-post-traumatic-stress-disorder medical/openrn-mh-anxiety-ptsd-1 medical/openrn-mh-anxiety-ptsd-2 community/acute-stress-reaction
+tune	quest	how do i know if water is safe to drink	water/cdc-making-water-safe-in-an-emergency water/atp4-44-water-05-water-safety-and-quality water/cdc-disaster-drinking-water-advisories water/wp2-waterborne-disease water/epa-wells-emergency-disinfection-drinking-water water/cdc-disaster-finding-clean-water water/ready-gov-emergency-water
+test	quest	what should be in a first aid kit	medical/army-first-aid-kits medical/wikibooks-first-aid-first-aid-kits medical/call-tccc-first-aid-kits-and-medic-bag medical/moody-backwoods-surgery-medicine-05-the-campers-medicine-chest survival/fm21-76-appendix-a-survival-kits medical/ready-emergency-supply-kit
+tune	quest	how long can you go without water	medical/dehydration water/fm21-76-06-water-procurement water/wikibooks-outdoor-survival-water-in-the-desert survival/fm21-76-13-desert-survival
+tune	quest	how do i treat someone in shock	medical/shock-circulatory medical/sfmh-shock medical/wikibooks-first-aid-shock medical/army-first-aid-shock-and-circulation medical/corpsman-emergency-care-2 medical/wistech-emr-shock-cpr-1 medical/wistech-emr-shock-cpr-2 community/fema-cert-03-disaster-medical-operations-1
+test	quest	can you drink sea water	water/wp2-desalination survival/fm21-76-16-sea-survival-part-1 survival/fm21-76-16-sea-survival-part-2 water/fm21-76-06-water-procurement water/wikipedia-solar-still
+tune	quest	how can i tell if a mushroom is poisonous	medical/wp2-mushroom-poisoning survival/bsa-boy-scouts-handbook-1911-14-mushrooms-fungi-or-toadstools survival/bsa-boy-scouts-handbook-1911-15-wholesome-toadstools food/wp2-edible-mushroom survival/wp2-amanita-phalloides
+tune	quest	what do i do if i get lost in the forest	shelter/nessmuk-woodcraft-03-getting-lost survival/fm21-76-01-introduction survival/fm21-76-02-psychology navigation/fm21-76-18-direction-finding survival/wikibooks-outdoor-survival-first-aid
+test	quest	what plants are safe to eat in the wild	food/fm21-76-appendix-b-edible-plants-part-1 food/fm21-76-appendix-b-edible-plants-part-2 food/fm21-76-09-survival-use-of-plants food/wikipedia-foraging food/wikivoyage-foraging survival/beard-on-the-trail-07-wild-food-on-the-trail food/wikibooks-outdoor-survival-food
+tune	quest	how do you can vegetables safely	food/usda-canning-1-principles-part-1 food/usda-canning-0-introduction food/usda-home-canning-fruits-vegetables-06-directions-for-vegetables food/usda-canning-4-vegetables food/wikipedia-home-canning food/usda-canning-freezing-storing-07-home-canning-of-fruits-and-vegetables food/usda-home-canning-fruits-vegetables-01-right-canner-for-each-food-getting-your
+tune	quest	is it safe to eat food from a swollen can	medical/wp2-botulism medical/cdc-bio-botulism food/usda-home-canning-meat-poultry-04-spoilage food/usda-canning-1-principles-part-1
+test	quest	how do i dig a well by hand	water/wikipedia-well water/spon-sinking-boring-wells-07-american-tube-well water/spon-sinking-boring-wells-05-well-sinking
+tune	quest	how do i build a shelter in the woods	shelter/fm21-76-05-shelters shelter/beard-shelters-12-how-to-build-elevated-shacks-shanties-an shelter/wikibooks-outdoor-survival-shelter shelter/beard-shelters-02-the-half-cave-shelter shelter/beard-shelters-03-how-to-make-the-fallen-tree-shelter-and
+tune	quest	what is the distress frequency	radio/international-distress-frequency radio/fcc-part97-subpart-e-emergency radio/fcc-part95-subpart-k-plb signaling/fm55-501-marine-crewman-09-shipboard-communications
+test	quest	how do i use a map and compass together	navigation/fm3-25-26-06-direction navigation/wp2-compass navigation/fm3-25-26-02-maps navigation/fm21-76-18-direction-finding navigation/wp2-orienteering-map navigation/fm3-25-26-09-navigation-equipment-and-methods navigation/fm3-25-26-11-terrain-association
+tune	quest	what is the best way to wash hands in camp	hygiene/hand-washing hygiene/cdc-handwashing hygiene/army-field-hygiene-health-threats hygiene/milprevmed-disaster-camp-environmental-health hygiene/cdc-hand-sanitizer-and-hand-hygiene-faq
+tune	quest	how do i stop a nosebleed	medical/wp2-nosebleed medical/lawrence-accidents-emergencies-05-bleeding-from-the-nose-bleeding-from-cut-or
+test	quest	why do my batteries die in the cold	electronics/comparison-of-battery-types electronics/lithium-ion-battery-part1 electronics/lead-acid-battery embermesh/power-and-field electronics/electric-battery
+tune	quest	how do i set up a relay node	embermesh/relays-and-repeaters embermesh/hub-setup embermesh/radio-gateway
+tune	quest	how do i get messages over lora	embermesh/lora radio/lora radio/meshtastic
+test	quest	how much water does a person need each day	water/fm21-76-06-water-procurement medical/dehydration community/fema-ayr2004-1-3-1-4-supplies-and-shelter food/ready-gov-emergency-food water/atp4-44-water-05-water-safety-and-quality water/cdc-creating-and-storing-emergency-water-supply water/ready-gov-emergency-water
+tune	quest	when should i use a tourniquet	medical/tourniquet medical/army-first-aid-severe-bleeding medical/ews-hemorrhage-control medical/call-tccc-guidelines-all-combatants medical/call-tccc-field-care-procedures medical/ews-tactical-combat-casualty-care
+tune	exact	UV-5R	embermesh/baofeng-uv5r embermesh/handheld-audio-modem
+test	exact	FM 21-76	survival/fm-21-76-survival-manual survival/fm21-76-01-introduction survival/fm21-76-appendix-a-survival-kits reference/fm21-76-appendix-g-ropes-and-knots
+tune	exact	TCCC guidelines	medical/call-tccc-guidelines-all-combatants medical/call-tccc-guidelines-medical-provider medical/call-tccc-overview-march-paws medical/ews-tactical-combat-casualty-care
+tune	exact	CTCSS	radio/ctcss radio/squelch
+test	exact	acrolein	hazards/atsdr-toxfaq-acrolein
+tune	exact	GMRS	radio/gmrs radio/fcc-part95-subpart-e-gmrs
+tune	exact	MURS	radio/murs radio/fcc-part95-subpart-j-murs
+test	exact	part 97 emergency communications	radio/fcc-part97-subpart-e-emergency
+tune	exact	NiMH battery	electronics/nimh-battery
+tune	exact	zener diode	electronics/wp2-zener-diode
+test	exact	olivia mfsk	radio/wp2-olivia-mfsk
+tune	exact	albendazole	medical/wp2-albendazole
+tune	exact	metronidazole dose	medical/wp2-metronidazole
+test	exact	leptospirosis	hygiene/leptospirosis
+tune	exact	hantavirus	hygiene/hantavirus medical/wp2-hantavirus-pulmonary-syndrome hygiene/cdc-hantavirus-rodent-cleanup
+tune	exact	cricothyrotomy	medical/wp2-cricothyrotomy medical/corpsman-emergency-care-3 medical/ews-airway-breathing
+test	exact	IS-10 animals in disasters	agriculture/fema-is10-01-introduction agriculture/fema-is10-02-why-animal-care-matters agriculture/fema-is10-07-pet-care
+tune	exact	gaboon viper	hazards/wp2-gaboon-viper
+tune	exact	sydney funnel-web spider	hazards/wp2-sydney-funnel-web-spider
+test	exact	lactarius deliciosus	food/wp2-lactarius-deliciosus
+tune	exact	heracleum mantegazzianum	survival/wp2-heracleum-mantegazzianum
+tune	exact	ruminal tympany	agriculture/wp2-ruminal-tympany
+test	exact	NEETS module 10 wave propagation	radio/neets10-ch1-wave-propagation-1
+tune	exact	hub dynamo	power/wp2-hub-dynamo
+tune	exact	j-pole	radio/j-pole-antenna
+test	exact	APRS	radio/aprs
+tune	exact	KISS TNC	radio/kiss-tnc embermesh/kiss-tnc-packet
+tune	exact	LiFePO4	electronics/lifepo4-battery
+test	exact	sarin	hazards/cdc-chem-sarin hazards/wp2-sarin
+tune	exact	amanita phalloides	survival/wp2-amanita-phalloides
+tune	exact	TM 11-410 homing pigeon	signaling/army-homing-pigeon-01-general signaling/army-homing-pigeon-02-care signaling/army-homing-pigeon-03-loft-management-and-records signaling/army-homing-pigeon-05-diseases-and-medicines
+test	exact	FEMA P-320 safe room	shelter/fema-p320-4-consumer-guidance shelter/fema-p320-1-introduction shelter/fema-p320-3-planning-your-safe-room shelter/fema-p320-5-building-site-built-safe-room
+tune	exact	ToxFAQs chlorine	hazards/atsdr-toxfaq-chlorine
+tune	exact	9-line medevac request	medical/atp42513-casualty-evacuation-9-line-request
+test	exact	G5RV	radio/wp2-g5rv-antenna
+tune	exact	ferrocerium	fire/wikipedia-ferrocerium
+tune	exact	potassium iodide	hazards/potassium-iodide medical/cdc-rad-potassium-iodide medical/potassium-iodide medical/cdc-radiation-sickness-and-potassium-iodide hazards/cdc-rad-faq
+test	exact	MARCH PAWS	medical/call-tccc-overview-march-paws
+tune	exact	zeer pot	food/appropedia-zeer-pot-refrigerator food/wp2-pot-in-pot-refrigerator
+tune	exact	Ixodes scapularis	hazards/wp2-ixodes-scapularis
+test	exact	quinzee	shelter/wikipedia-snow-cave shelter/wikibooks-outdoor-survival-quinzhee shelter/wikipedia-quinzhee

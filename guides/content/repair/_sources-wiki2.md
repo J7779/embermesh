@@ -1,0 +1,256 @@
+# Sources added by the wiki2 sweep for the `repair` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `repair/wb2-bicycle-bottom-brackets-bottom-bracket-overhaul` — Bicycle Repair: Bottom Brackets: Bottom bracket overhaul — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Bottom_Brackets/Bottom_bracket_overhaul&oldid=4620639
+  - `repair/wb2-bicycle-brakes-adjusting-rim-brakes` — Bicycle Repair: Brakes: Adjusting Rim Brakes — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Brakes/Adjusting_Rim_Brakes&oldid=4522895
+  - `repair/wb2-bicycle-cables-and-housings` — Bicycle Repair: Cables and Housings — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Cables_and_Housings&oldid=3831498
+  - `repair/wb2-bicycle-chain-rings` — Bicycle Repair: Chain Rings — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Chain_Rings&oldid=3167658
+  - `repair/wb2-bicycle-chains-chain-sizes` — Bicycle Repair: Chains: Chain sizes — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Chains/Chain_sizes&oldid=3709769
+  - `repair/wb2-bicycle-chains-checking-chain-wear` — Bicycle Repair: Chains: Checking chain wear — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Chains/Checking_chain_wear&oldid=4045654
+  - `repair/wb2-bicycle-chains-mending-a-broken-chain` — Bicycle Repair: Chains: Mending a broken chain — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Chains/Mending_a_broken_chain&oldid=4469458
+  - `repair/wb2-bicycle-chains-removing-a-bicycle-chain` — Bicycle Repair: Chains: Removing a Bicycle Chain — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Chains/Removing_a_Bicycle_Chain&oldid=3167669
+  - `repair/wb2-bicycle-cleaning-parts` — Bicycle Repair: Cleaning parts — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Cleaning_parts&oldid=3167668
+  - `repair/wb2-bicycle-cranks` — Bicycle Repair: Cranks — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Cranks&oldid=3502639
+  - `repair/wb2-bicycle-derailleurs-front-derailleur-adjustment` — Bicycle Repair: Derailleurs: Front Derailleur Adjustment — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Derailleurs/Front_Derailleur_Adjustment&oldid=3167666
+  - `repair/wb2-bicycle-derailleurs-rear-derailleur-adjustment` — Bicycle Repair: Derailleurs: Rear Derailleur Adjustment — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Derailleurs/Rear_Derailleur_Adjustment&oldid=4659782
+  - `repair/wb2-bicycle-freewheels-and-cassettes` — Bicycle Repair: Freewheels and Cassettes — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Freewheels_and_Cassettes&oldid=4665440
+  - `repair/wb2-bicycle-headsets-headset-overhaul` — Bicycle Repair: Headsets: Headset Overhaul — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Headsets/Headset_Overhaul&oldid=3818519
+  - `repair/wb2-bicycle-hubs-cleaning-and-repacking-a-hub` — Bicycle Repair: Hubs: Cleaning and repacking a hub — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Hubs/Cleaning_and_repacking_a_hub&oldid=3478615
+  - `repair/wb2-bicycle-pedals-removing-pedals` — Bicycle Repair: Pedals: Removing pedals — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Pedals/Removing_pedals&oldid=3552754
+  - `repair/wb2-bicycle-pedals` — Bicycle Repair: Pedals — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Pedals&oldid=3167680
+  - `repair/wb2-bicycle-saddles-and-seatposts` — Bicycle Repair: Saddles and Seatposts — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Saddles_and_Seatposts&oldid=3538944
+  - `repair/wb2-bicycle-shifters-sram-gripshift-3.0-comp-cable-replacement` — Bicycle Repair: Shifters: SRAM Gripshift 3.0 'comp' Cable Replacement — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Shifters/SRAM_Gripshift_3.0_%27comp%27_Cable_Replacement&oldid=3444016
+  - `repair/wb2-bicycle-tools-and-supplies-pedal-wrench` — Bicycle Repair: Tools and Supplies: Pedal Wrench — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Tools_and_Supplies/Pedal_Wrench&oldid=4046628
+  - `repair/wb2-bicycle-wheels-and-tires-fitting-and-repair-for-tubeless-ready-tyre-on-to-tubeless-ready-rim` — Bicycle Repair: Wheels and Tires: Fitting and Repair for Tubeless Ready Tyre on to Tubeless Ready Rim — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Wheels_and_Tires/Fitting_and_Repair_for_Tubeless_Ready_Tyre_on_to_Tubeless_Ready_Rim&oldid=3475533
+  - `repair/wb2-bicycle-wheels-and-tires-fixing-a-flat` — Bicycle Repair: Wheels and Tires: Fixing a flat — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Wheels_and_Tires/Fixing_a_flat&oldid=3967821
+  - `repair/wb2-bicycle-wheels-and-tires-inflating-tires` — Bicycle Repair: Wheels and Tires: Inflating Tires — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Wheels_and_Tires/Inflating_Tires&oldid=4624566
+  - `repair/wb2-bicycle-wheels-and-tires-truing-a-bicycle-wheel` — Bicycle Repair: Wheels and Tires: Truing a bicycle wheel — https://en.wikibooks.org/w/index.php?title=Bicycles/Maintenance_and_Repair/Wheels_and_Tires/Truing_a_bicycle_wheel&oldid=4044875
+  - `repair/wb2-diy-unclogging-drains` — Do-It-Yourself: Unclogging drains — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/Unclogging_drains&oldid=3773132
+  - `repair/wb2-diy-wooden-boat` — Do-It-Yourself: Wooden boat — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/Wooden_boat&oldid=3229119
+  - `repair/wb2-horticulture-chainsaws` — Chainsaws (Wikibooks Horticulture) — https://en.wikibooks.org/w/index.php?title=Horticulture/Chainsaws&oldid=3336160
+  - `repair/wb2-sailing-extras` — Sailing (Wikibooks): Seamanship Extras — https://en.wikibooks.org/w/index.php?title=Sailing/Extras&oldid=3473389
+  - `repair/wb2-sewing` — Sewing (Wikibooks): Hand Sewing, Seams, Fabric and Embroidery — https://en.wikibooks.org/w/index.php?title=Sewing/Seams&oldid=3722909 — pages: Sewing/Seams (rev 3722909); Sewing/Fabric (rev 4601188); Sewing/Embroidery (rev 4104359); Sewing/Sewing utensils (rev 3957368); Sewing/Hand sewing (rev 4377330)
+  - `repair/wb2-welding` — Welding (Wikibooks): Techniques and Stick Welding — https://en.wikibooks.org/w/index.php?title=Welding/Overview_of_Techniques&oldid=2654036 — pages: Welding/Overview of Techniques (rev 2654036); Welding/SMAW (rev 4350348)
+  - `repair/wb2-woodworking-and-carpentry-part1` — Woodworking and Carpentry (Wikibooks) (part 1 of 2: Woodworking, Woodworking: Before you Begin, Woodworking: Essential Hand Tools…) — https://en.wikibooks.org/w/index.php?title=Woodworking&oldid=3999073 — pages: Woodworking (rev 3999073); Woodworking/Before you Begin (rev 3190618); Woodworking/Essential Hand Tools (rev 3391670); Woodworking/Sharpening (rev 4100807); Woodworking/Setting up a home workshop (rev 3269578); Woodworking/Tool and Workshop Maintenance (rev 2752504); Woodworking/Glossary (rev 2752508); Carpentry (rev 4298744)
+  - `repair/wb2-woodworking-and-carpentry-part2` — Woodworking and Carpentry (Wikibooks) (part 2 of 2: Carpentry: Hand Tools: Marking Tools, Carpentry: Hand Tools: Planes, Carpentry: Hand Tools: Saws…) — https://en.wikibooks.org/w/index.php?title=Carpentry/Hand_Tools/Marking_Tools&oldid=3284763 — pages: Carpentry/Hand Tools/Marking Tools (rev 3284763); Carpentry/Hand Tools/Planes (rev 4475786); Carpentry/Hand Tools/Saws (rev 3228909); Carpentry/Framing/Walls (rev 1682105); Carpentry/Workbench (rev 2551030); Woodturning/Cutting logs for bowl turning (rev 1582756)
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `repair/wp2-adhesive` — Adhesive — https://en.wikipedia.org/w/index.php?title=Adhesive&oldid=1381045015
+  - `repair/wp2-adze` — Adze — https://en.wikipedia.org/w/index.php?title=Adze&oldid=1385506463
+  - `repair/wp2-air-filter` — Air filter — https://en.wikipedia.org/w/index.php?title=Air_filter&oldid=1385535456
+  - `repair/wp2-anchor` — Anchor — https://en.wikipedia.org/w/index.php?title=Anchor&oldid=1373603214
+  - `repair/wp2-animal-glue` — Animal glue — https://en.wikipedia.org/w/index.php?title=Animal_glue&oldid=1384722660
+  - `repair/wp2-annealing-materials-science` — Annealing (materials science) — https://en.wikipedia.org/w/index.php?title=Annealing_(materials_science)&oldid=1351704356
+  - `repair/wp2-antifreeze` — Antifreeze — https://en.wikipedia.org/w/index.php?title=Antifreeze&oldid=1384239230
+  - `repair/wp2-anvil` — Anvil — https://en.wikipedia.org/w/index.php?title=Anvil&oldid=1381198177
+  - `repair/wp2-axe` — Axe — https://en.wikipedia.org/w/index.php?title=Axe&oldid=1378993827
+  - `repair/wp2-backstitch` — Backstitch — https://en.wikipedia.org/w/index.php?title=Backstitch&oldid=1342993908
+  - `repair/wp2-barrel` — Barrel — https://en.wikipedia.org/w/index.php?title=Barrel&oldid=1382425356
+  - `repair/wp2-basket-weaving` — Basket weaving — https://en.wikipedia.org/w/index.php?title=Basket_weaving&oldid=1377017691
+  - `repair/wp2-battery-terminal` — Battery terminal — https://en.wikipedia.org/w/index.php?title=Battery_terminal&oldid=1291521378
+  - `repair/wp2-bellows` — Bellows — https://en.wikipedia.org/w/index.php?title=Bellows&oldid=1362504594
+  - `repair/wp2-bicycle-brake` — Bicycle brake — https://en.wikipedia.org/w/index.php?title=Bicycle_brake&oldid=1378455895
+  - `repair/wp2-bicycle-chain` — Bicycle chain — https://en.wikipedia.org/w/index.php?title=Bicycle_chain&oldid=1361192445
+  - `repair/wp2-bicycle-frame` — Bicycle frame — https://en.wikipedia.org/w/index.php?title=Bicycle_frame&oldid=1384117175
+  - `repair/wp2-bicycle-gearing` — Bicycle gearing — https://en.wikipedia.org/w/index.php?title=Bicycle_gearing&oldid=1377025379
+  - `repair/wp2-bicycle-pump` — Bicycle pump — https://en.wikipedia.org/w/index.php?title=Bicycle_pump&oldid=1369364926
+  - `repair/wp2-bicycle-tire` — Bicycle tire — https://en.wikipedia.org/w/index.php?title=Bicycle_tire&oldid=1384071334
+  - `repair/wp2-bicycle-trailer` — Bicycle trailer — https://en.wikipedia.org/w/index.php?title=Bicycle_trailer&oldid=1378746095
+  - `repair/wp2-bicycle-wheel` — Bicycle wheel — https://en.wikipedia.org/w/index.php?title=Bicycle_wheel&oldid=1384434063
+  - `repair/wp2-bicycle` — Bicycle — https://en.wikipedia.org/w/index.php?title=Bicycle&oldid=1375091239
+  - `repair/wp2-birch-bark-tar` — Birch bark tar — https://en.wikipedia.org/w/index.php?title=Birch_bark_tar&oldid=1372144510
+  - `repair/wp2-blacksmith` — Blacksmith — https://en.wikipedia.org/w/index.php?title=Blacksmith&oldid=1362333286
+  - `repair/wp2-bloomery` — Bloomery — https://en.wikipedia.org/w/index.php?title=Bloomery&oldid=1381461517
+  - `repair/wp2-brace-tool` — Brace (tool) — https://en.wikipedia.org/w/index.php?title=Brace_(tool)&oldid=1314919681
+  - `repair/wp2-brake-fluid` — Brake fluid — https://en.wikipedia.org/w/index.php?title=Brake_fluid&oldid=1377148121
+  - `repair/wp2-brazing` — Brazing — https://en.wikipedia.org/w/index.php?title=Brazing&oldid=1384676879
+  - `repair/wp2-bucksaw` — Bucksaw — https://en.wikipedia.org/w/index.php?title=Bucksaw&oldid=1368989368
+  - `repair/wp2-calcium-oxide` — Calcium oxide — https://en.wikipedia.org/w/index.php?title=Calcium_oxide&oldid=1380027747
+  - `repair/wp2-canoe` — Canoe — https://en.wikipedia.org/w/index.php?title=Canoe&oldid=1379716433
+  - `repair/wp2-carbon-steel` — Carbon steel — https://en.wikipedia.org/w/index.php?title=Carbon_steel&oldid=1379067580
+  - `repair/wp2-carding` — Carding — https://en.wikipedia.org/w/index.php?title=Carding&oldid=1358376235
+  - `repair/wp2-carpentry` — Carpentry — https://en.wikipedia.org/w/index.php?title=Carpentry&oldid=1385592264
+  - `repair/wp2-cart` — Cart — https://en.wikipedia.org/w/index.php?title=Cart&oldid=1384716090
+  - `repair/wp2-cast-iron` — Cast iron — https://en.wikipedia.org/w/index.php?title=Cast_iron&oldid=1376469178
+  - `repair/wp2-ceramic-glaze` — Ceramic glaze — https://en.wikipedia.org/w/index.php?title=Ceramic_glaze&oldid=1378522403
+  - `repair/wp2-chainsaw` — Chainsaw — https://en.wikipedia.org/w/index.php?title=Chainsaw&oldid=1383410990
+  - `repair/wp2-chisel` — Chisel — https://en.wikipedia.org/w/index.php?title=Chisel&oldid=1373605262
+  - `repair/wp2-clamp-tool` — Clamp (tool) — https://en.wikipedia.org/w/index.php?title=Clamp_(tool)&oldid=1371638800
+  - `repair/wp2-coolant` — Coolant — https://en.wikipedia.org/w/index.php?title=Coolant&oldid=1382221217
+  - `repair/wp2-cooper-profession` — Cooper (profession) — https://en.wikipedia.org/w/index.php?title=Cooper_(profession)&oldid=1381485445
+  - `repair/wp2-coping-saw` — Coping saw — https://en.wikipedia.org/w/index.php?title=Coping_saw&oldid=1376247121
+  - `repair/wp2-coracle` — Coracle — https://en.wikipedia.org/w/index.php?title=Coracle&oldid=1347855288
+  - `repair/wp2-corrosion` — Corrosion — https://en.wikipedia.org/w/index.php?title=Corrosion&oldid=1381040387
+  - `repair/wp2-crochet` — Crochet — https://en.wikipedia.org/w/index.php?title=Crochet&oldid=1384336938
+  - `repair/wp2-crosscut-saw` — Crosscut saw — https://en.wikipedia.org/w/index.php?title=Crosscut_saw&oldid=1330769912
+  - `repair/wp2-crucible` — Crucible — https://en.wikipedia.org/w/index.php?title=Crucible&oldid=1369853700
+  - `repair/wp2-cyanoacrylate` — Cyanoacrylate — https://en.wikipedia.org/w/index.php?title=Cyanoacrylate&oldid=1384084921
+  - `repair/wp2-derailleur` — Derailleur — https://en.wikipedia.org/w/index.php?title=Derailleur&oldid=1358914301
+  - `repair/wp2-diesel-engine` — Diesel engine — https://en.wikipedia.org/w/index.php?title=Diesel_engine&oldid=1384620027
+  - `repair/wp2-dog-sled` — Dog sled — https://en.wikipedia.org/w/index.php?title=Dog_sled&oldid=1382333719
+  - `repair/wp2-dovetail-joint` — Dovetail joint — https://en.wikipedia.org/w/index.php?title=Dovetail_joint&oldid=1380663365
+  - `repair/wp2-dowel` — Dowel — https://en.wikipedia.org/w/index.php?title=Dowel&oldid=1368999684
+  - `repair/wp2-drawknife` — Drawknife — https://en.wikipedia.org/w/index.php?title=Drawknife&oldid=1368956502
+  - `repair/wp2-drill-bit` — Drill bit — https://en.wikipedia.org/w/index.php?title=Drill_bit&oldid=1377666233
+  - `repair/wp2-drill` — Drill — https://en.wikipedia.org/w/index.php?title=Drill&oldid=1380804620
+  - `repair/wp2-duct-tape` — Duct tape — https://en.wikipedia.org/w/index.php?title=Duct_tape&oldid=1356623046
+  - `repair/wp2-dugout-canoe` — Dugout canoe — https://en.wikipedia.org/w/index.php?title=Dugout_canoe&oldid=1382248579
+  - `repair/wp2-earthenware` — Earthenware — https://en.wikipedia.org/w/index.php?title=Earthenware&oldid=1383318536
+  - `repair/wp2-epoxy` — Epoxy — https://en.wikipedia.org/w/index.php?title=Epoxy&oldid=1383447179
+  - `repair/wp2-felling` — Felling — https://en.wikipedia.org/w/index.php?title=Felling&oldid=1300971224
+  - `repair/wp2-felt` — Felt — https://en.wikipedia.org/w/index.php?title=Felt&oldid=1385157940
+  - `repair/wp2-file-tool` — File (tool) — https://en.wikipedia.org/w/index.php?title=File_(tool)&oldid=1375403480
+  - `repair/wp2-forge-welding` — Forge welding — https://en.wikipedia.org/w/index.php?title=Forge_welding&oldid=1302140942
+  - `repair/wp2-forge` — Forge — https://en.wikipedia.org/w/index.php?title=Forge&oldid=1378496581
+  - `repair/wp2-four-stroke-engine` — Four-stroke engine — https://en.wikipedia.org/w/index.php?title=Four-stroke_engine&oldid=1377982089
+  - `repair/wp2-froe` — Froe — https://en.wikipedia.org/w/index.php?title=Froe&oldid=1383460100
+  - `repair/wp2-fuel-injection` — Fuel injection — https://en.wikipedia.org/w/index.php?title=Fuel_injection&oldid=1376400589
+  - `repair/wp2-fulling` — Fulling — https://en.wikipedia.org/w/index.php?title=Fulling&oldid=1384138290
+  - `repair/wp2-galvanization` — Galvanization — https://en.wikipedia.org/w/index.php?title=Galvanization&oldid=1383972127
+  - `repair/wp2-gasket` — Gasket — https://en.wikipedia.org/w/index.php?title=Gasket&oldid=1369589319
+  - `repair/wp2-grease-gun` — Grease gun — https://en.wikipedia.org/w/index.php?title=Grease_gun&oldid=1350923148
+  - `repair/wp2-grease-lubricant` — Grease (lubricant) — https://en.wikipedia.org/w/index.php?title=Grease_(lubricant)&oldid=1373836080
+  - `repair/wp2-grinding-wheel` — Grinding wheel — https://en.wikipedia.org/w/index.php?title=Grinding_wheel&oldid=1317679331
+  - `repair/wp2-hacksaw` — Hacksaw — https://en.wikipedia.org/w/index.php?title=Hacksaw&oldid=1300376518
+  - `repair/wp2-hammer` — Hammer — https://en.wikipedia.org/w/index.php?title=Hammer&oldid=1385087246
+  - `repair/wp2-hand-saw` — Hand saw — https://en.wikipedia.org/w/index.php?title=Hand_saw&oldid=1377514324
+  - `repair/wp2-hardening-metallurgy` — Hardening (metallurgy) — https://en.wikipedia.org/w/index.php?title=Hardening_(metallurgy)&oldid=1273924754
+  - `repair/wp2-hatchet` — Hatchet — https://en.wikipedia.org/w/index.php?title=Hatchet&oldid=1378784831
+  - `repair/wp2-hose-clamp` — Hose clamp — https://en.wikipedia.org/w/index.php?title=Hose_clamp&oldid=1365123349
+  - `repair/wp2-hub-gear` — Hub gear — https://en.wikipedia.org/w/index.php?title=Hub_gear&oldid=1340925423
+  - `repair/wp2-ignition-magneto` — Ignition magneto — https://en.wikipedia.org/w/index.php?title=Ignition_magneto&oldid=1376335120
+  - `repair/wp2-ignition-system` — Ignition system — https://en.wikipedia.org/w/index.php?title=Ignition_system&oldid=1376743073
+  - `repair/wp2-inclined-plane` — Inclined plane — https://en.wikipedia.org/w/index.php?title=Inclined_plane&oldid=1352121689
+  - `repair/wp2-indigo-dye` — Indigo dye — https://en.wikipedia.org/w/index.php?title=Indigo_dye&oldid=1383330462
+  - `repair/wp2-ink` — Ink — https://en.wikipedia.org/w/index.php?title=Ink&oldid=1384585116
+  - `repair/wp2-inner-tube` — Inner tube — https://en.wikipedia.org/w/index.php?title=Inner_tube&oldid=1367507511
+  - `repair/wp2-iron-gall-ink` — Iron gall ink — https://en.wikipedia.org/w/index.php?title=Iron_gall_ink&oldid=1381247222
+  - `repair/wp2-joinery` — Joinery — https://en.wikipedia.org/w/index.php?title=Joinery&oldid=1376254165
+  - `repair/wp2-kayak` — Kayak — https://en.wikipedia.org/w/index.php?title=Kayak&oldid=1381691901
+  - `repair/wp2-kiln` — Kiln — https://en.wikipedia.org/w/index.php?title=Kiln&oldid=1378483831
+  - `repair/wp2-knapping` — Knapping — https://en.wikipedia.org/w/index.php?title=Knapping&oldid=1377122105
+  - `repair/wp2-knife` — Knife — https://en.wikipedia.org/w/index.php?title=Knife&oldid=1381585327
+  - `repair/wp2-knitting` — Knitting — https://en.wikipedia.org/w/index.php?title=Knitting&oldid=1384695630
+  - `repair/wp2-lap-joint` — Lap joint — https://en.wikipedia.org/w/index.php?title=Lap_joint&oldid=1334311173
+  - `repair/wp2-lathe` — Lathe — https://en.wikipedia.org/w/index.php?title=Lathe&oldid=1381006126
+  - `repair/wp2-leather` — Leather — https://en.wikipedia.org/w/index.php?title=Leather&oldid=1384347750
+  - `repair/wp2-lever` — Lever — https://en.wikipedia.org/w/index.php?title=Lever&oldid=1383412856
+  - `repair/wp2-lime-kiln` — Lime kiln — https://en.wikipedia.org/w/index.php?title=Lime_kiln&oldid=1376287785
+  - `repair/wp2-lime-material` — Lime (material) — https://en.wikipedia.org/w/index.php?title=Lime_(material)&oldid=1385519724
+  - `repair/wp2-linen` — Linen — https://en.wikipedia.org/w/index.php?title=Linen&oldid=1370236994
+  - `repair/wp2-linseed-oil` — Linseed oil — https://en.wikipedia.org/w/index.php?title=Linseed_oil&oldid=1383452585
+  - `repair/wp2-loom` — Loom — https://en.wikipedia.org/w/index.php?title=Loom&oldid=1384505294
+  - `repair/wp2-lost-wax-casting` — Lost-wax casting — https://en.wikipedia.org/w/index.php?title=Lost-wax_casting&oldid=1385559706
+  - `repair/wp2-lubricant` — Lubricant — https://en.wikipedia.org/w/index.php?title=Lubricant&oldid=1384580912
+  - `repair/wp2-machete` — Machete — https://en.wikipedia.org/w/index.php?title=Machete&oldid=1370780794
+  - `repair/wp2-mallet` — Mallet — https://en.wikipedia.org/w/index.php?title=Mallet&oldid=1315046868
+  - `repair/wp2-metal-casting` — Metal casting — https://en.wikipedia.org/w/index.php?title=Metal_casting&oldid=1378931034
+  - `repair/wp2-metal-lathe` — Metal lathe — https://en.wikipedia.org/w/index.php?title=Metal_lathe&oldid=1371632563
+  - `repair/wp2-mitten` — Mitten — https://en.wikipedia.org/w/index.php?title=Mitten&oldid=1379002106
+  - `repair/wp2-moccasin` — Moccasin — https://en.wikipedia.org/w/index.php?title=Moccasin&oldid=1381920235
+  - `repair/wp2-mordant` — Mordant — https://en.wikipedia.org/w/index.php?title=Mordant&oldid=1381179514
+  - `repair/wp2-mortise-and-tenon` — Mortise and tenon — https://en.wikipedia.org/w/index.php?title=Mortise_and_tenon&oldid=1384653487
+  - `repair/wp2-motor-oil` — Motor oil — https://en.wikipedia.org/w/index.php?title=Motor_oil&oldid=1379950112
+  - `repair/wp2-mukluk` — Mukluk — https://en.wikipedia.org/w/index.php?title=Mukluk&oldid=1385504370
+  - `repair/wp2-multi-tool` — Multi-tool — https://en.wikipedia.org/w/index.php?title=Multi-tool&oldid=1380298077
+  - `repair/wp2-nail-fastener` — Nail (fastener) — https://en.wikipedia.org/w/index.php?title=Nail_(fastener)&oldid=1376060756
+  - `repair/wp2-nalebinding` — Nålebinding — https://en.wikipedia.org/w/index.php?title=N%C3%A5lebinding&oldid=1383369472
+  - `repair/wp2-natural-dye` — Natural dye — https://en.wikipedia.org/w/index.php?title=Natural_dye&oldid=1382422002
+  - `repair/wp2-o-ring` — O-ring — https://en.wikipedia.org/w/index.php?title=O-ring&oldid=1385041102
+  - `repair/wp2-oar` — Oar — https://en.wikipedia.org/w/index.php?title=Oar&oldid=1378240273
+  - `repair/wp2-oil-filter` — Oil filter — https://en.wikipedia.org/w/index.php?title=Oil_filter&oldid=1368999491
+  - `repair/wp2-outboard-motor` — Outboard motor — https://en.wikipedia.org/w/index.php?title=Outboard_motor&oldid=1372201713
+  - `repair/wp2-oxyfuel-welding-and-cutting` — Oxy–fuel welding and cutting — https://en.wikipedia.org/w/index.php?title=Oxy%E2%80%93fuel_welding_and_cutting&oldid=1353756163
+  - `repair/wp2-pack-animal` — Pack animal — https://en.wikipedia.org/w/index.php?title=Pack_animal&oldid=1348707090
+  - `repair/wp2-pack-saddle` — Pack saddle — https://en.wikipedia.org/w/index.php?title=Pack_saddle&oldid=1330497781
+  - `repair/wp2-paddle` — Paddle — https://en.wikipedia.org/w/index.php?title=Paddle&oldid=1385282607
+  - `repair/wp2-paint` — Paint — https://en.wikipedia.org/w/index.php?title=Paint&oldid=1384083442
+  - `repair/wp2-papermaking` — Papermaking — https://en.wikipedia.org/w/index.php?title=Papermaking&oldid=1385509448
+  - `repair/wp2-parachute-cord` — Parachute cord — https://en.wikipedia.org/w/index.php?title=Parachute_cord&oldid=1379067306
+  - `repair/wp2-parka` — Parka — https://en.wikipedia.org/w/index.php?title=Parka&oldid=1380191254
+  - `repair/wp2-personal-flotation-device` — Personal flotation device — https://en.wikipedia.org/w/index.php?title=Personal_flotation_device&oldid=1378815747
+  - `repair/wp2-petrol-engine` — Petrol engine — https://en.wikipedia.org/w/index.php?title=Petrol_engine&oldid=1383620116
+  - `repair/wp2-pine-tar` — Pine tar — https://en.wikipedia.org/w/index.php?title=Pine_tar&oldid=1379998687
+  - `repair/wp2-pit-fired-pottery` — Pit fired pottery — https://en.wikipedia.org/w/index.php?title=Pit_fired_pottery&oldid=1357852170
+  - `repair/wp2-pitch-resin` — Pitch (resin) — https://en.wikipedia.org/w/index.php?title=Pitch_(resin)&oldid=1362213166
+  - `repair/wp2-plane-tool` — Plane (tool) — https://en.wikipedia.org/w/index.php?title=Plane_(tool)&oldid=1378379297
+  - `repair/wp2-pliers` — Pliers — https://en.wikipedia.org/w/index.php?title=Pliers&oldid=1358451293
+  - `repair/wp2-point-of-sail` — Point of sail — https://en.wikipedia.org/w/index.php?title=Point_of_sail&oldid=1382261558
+  - `repair/wp2-pole-lathe` — Pole lathe — https://en.wikipedia.org/w/index.php?title=Pole_lathe&oldid=1375891071
+  - `repair/wp2-potters-wheel` — Potter's wheel — https://en.wikipedia.org/w/index.php?title=Potter%27s_wheel&oldid=1382909844
+  - `repair/wp2-pottery` — Pottery — https://en.wikipedia.org/w/index.php?title=Pottery&oldid=1382037376
+  - `repair/wp2-quenching` — Quenching — https://en.wikipedia.org/w/index.php?title=Quenching&oldid=1380241596
+  - `repair/wp2-radiator-engine-cooling` — Radiator (engine cooling) — https://en.wikipedia.org/w/index.php?title=Radiator_(engine_cooling)&oldid=1375606111
+  - `repair/wp2-raft` — Raft — https://en.wikipedia.org/w/index.php?title=Raft&oldid=1366452639
+  - `repair/wp2-retting` — Retting — https://en.wikipedia.org/w/index.php?title=Retting&oldid=1356011515
+  - `repair/wp2-rigging` — Rigging — https://en.wikipedia.org/w/index.php?title=Rigging&oldid=1378939435
+  - `repair/wp2-rivet` — Rivet — https://en.wikipedia.org/w/index.php?title=Rivet&oldid=1385108104
+  - `repair/wp2-rope` — Rope — https://en.wikipedia.org/w/index.php?title=Rope&oldid=1378647080
+  - `repair/wp2-ropewalk` — Ropewalk — https://en.wikipedia.org/w/index.php?title=Ropewalk&oldid=1369483770
+  - `repair/wp2-rust` — Rust — https://en.wikipedia.org/w/index.php?title=Rust&oldid=1383345029
+  - `repair/wp2-rustproofing` — Rustproofing — https://en.wikipedia.org/w/index.php?title=Rustproofing&oldid=1307124631
+  - `repair/wp2-sailing` — Sailing — https://en.wikipedia.org/w/index.php?title=Sailing&oldid=1378826638
+  - `repair/wp2-sand-casting` — Sand casting — https://en.wikipedia.org/w/index.php?title=Sand_casting&oldid=1382866725
+  - `repair/wp2-sandpaper` — Sandpaper — https://en.wikipedia.org/w/index.php?title=Sandpaper&oldid=1384583505
+  - `repair/wp2-saw` — Saw — https://en.wikipedia.org/w/index.php?title=Saw&oldid=1384415641
+  - `repair/wp2-screw` — Screw — https://en.wikipedia.org/w/index.php?title=Screw&oldid=1376739147
+  - `repair/wp2-screwdriver` — Screwdriver — https://en.wikipedia.org/w/index.php?title=Screwdriver&oldid=1373940398
+  - `repair/wp2-sewing-needle` — Sewing needle — https://en.wikipedia.org/w/index.php?title=Sewing_needle&oldid=1380019802
+  - `repair/wp2-sharpening-stone` — Sharpening stone — https://en.wikipedia.org/w/index.php?title=Sharpening_stone&oldid=1384410491
+  - `repair/wp2-shielded-metal-arc-welding` — Shielded metal arc welding — https://en.wikipedia.org/w/index.php?title=Shielded_metal_arc_welding&oldid=1338085787
+  - `repair/wp2-shoemaking` — Shoemaking — https://en.wikipedia.org/w/index.php?title=Shoemaking&oldid=1379931383
+  - `repair/wp2-simple-machine` — Simple machine — https://en.wikipedia.org/w/index.php?title=Simple_machine&oldid=1384560900
+  - `repair/wp2-sled` — Sled — https://en.wikipedia.org/w/index.php?title=Sled&oldid=1384108379
+  - `repair/wp2-snowshoe` — Snowshoe — https://en.wikipedia.org/w/index.php?title=Snowshoe&oldid=1385082473
+  - `repair/wp2-spindle-textiles` — Spindle (textiles) — https://en.wikipedia.org/w/index.php?title=Spindle_(textiles)&oldid=1353407504
+  - `repair/wp2-spinning-textiles` — Spinning (textiles) — https://en.wikipedia.org/w/index.php?title=Spinning_(textiles)&oldid=1381094845
+  - `repair/wp2-spinning-wheel` — Spinning wheel — https://en.wikipedia.org/w/index.php?title=Spinning_wheel&oldid=1374402721
+  - `repair/wp2-spoke` — Spoke — https://en.wikipedia.org/w/index.php?title=Spoke&oldid=1381559672
+  - `repair/wp2-spokeshave` — Spokeshave — https://en.wikipedia.org/w/index.php?title=Spokeshave&oldid=1361106176
+  - `repair/wp2-square-tool` — Square (tool) — https://en.wikipedia.org/w/index.php?title=Square_(tool)&oldid=1370033547
+  - `repair/wp2-starter-engine` — Starter (engine) — https://en.wikipedia.org/w/index.php?title=Starter_(engine)&oldid=1379114191
+  - `repair/wp2-stitch-textile-arts` — Stitch (textile arts) — https://en.wikipedia.org/w/index.php?title=Stitch_(textile_arts)&oldid=1205237265
+  - `repair/wp2-stone-tool` — Stone tool — https://en.wikipedia.org/w/index.php?title=Stone_tool&oldid=1380788985
+  - `repair/wp2-straight-stitch` — Straight stitch — https://en.wikipedia.org/w/index.php?title=Straight_stitch&oldid=1363858984
+  - `repair/wp2-tablet-weaving` — Tablet weaving — https://en.wikipedia.org/w/index.php?title=Tablet_weaving&oldid=1301491949
+  - `repair/wp2-tacking-sailing` — Tacking (sailing) — https://en.wikipedia.org/w/index.php?title=Tacking_(sailing)&oldid=1342328958
+  - `repair/wp2-tap-and-die` — Tap and die — https://en.wikipedia.org/w/index.php?title=Tap_and_die&oldid=1382708459
+  - `repair/wp2-tape-measure` — Tape measure — https://en.wikipedia.org/w/index.php?title=Tape_measure&oldid=1371885545
+  - `repair/wp2-tar` — Tar — https://en.wikipedia.org/w/index.php?title=Tar&oldid=1377931571
+  - `repair/wp2-tempering-metallurgy` — Tempering (metallurgy) — https://en.wikipedia.org/w/index.php?title=Tempering_(metallurgy)&oldid=1365633830
+  - `repair/wp2-thimble` — Thimble — https://en.wikipedia.org/w/index.php?title=Thimble&oldid=1382031971
+  - `repair/wp2-tire` — Tire — https://en.wikipedia.org/w/index.php?title=Tire&oldid=1384641192
+  - `repair/wp2-toboggan` — Toboggan — https://en.wikipedia.org/w/index.php?title=Toboggan&oldid=1384916035
+  - `repair/wp2-tongs` — Tongs — https://en.wikipedia.org/w/index.php?title=Tongs&oldid=1359131418
+  - `repair/wp2-travois` — Travois — https://en.wikipedia.org/w/index.php?title=Travois&oldid=1354357827
+  - `repair/wp2-twine` — Twine — https://en.wikipedia.org/w/index.php?title=Twine&oldid=1380903767
+  - `repair/wp2-two-wheel-tractor` — Two-wheel tractor — https://en.wikipedia.org/w/index.php?title=Two-wheel_tractor&oldid=1380156451
+  - `repair/wp2-valve-stem` — Valve stem — https://en.wikipedia.org/w/index.php?title=Valve_stem&oldid=1362488721
+  - `repair/wp2-varnish` — Varnish — https://en.wikipedia.org/w/index.php?title=Varnish&oldid=1370688873
+  - `repair/wp2-vise` — Vise — https://en.wikipedia.org/w/index.php?title=Vise&oldid=1367469649
+  - `repair/wp2-wagon` — Wagon — https://en.wikipedia.org/w/index.php?title=Wagon&oldid=1381375733
+  - `repair/wp2-weaving` — Weaving — https://en.wikipedia.org/w/index.php?title=Weaving&oldid=1384637452
+  - `repair/wp2-wedge` — Wedge — https://en.wikipedia.org/w/index.php?title=Wedge&oldid=1382179580
+  - `repair/wp2-welding` — Welding — https://en.wikipedia.org/w/index.php?title=Welding&oldid=1385137491
+  - `repair/wp2-wheel-and-axle` — Wheel and axle — https://en.wikipedia.org/w/index.php?title=Wheel_and_axle&oldid=1369006354
+  - `repair/wp2-wheelwright` — Wheelwright — https://en.wikipedia.org/w/index.php?title=Wheelwright&oldid=1373740291
+  - `repair/wp2-wicker` — Wicker — https://en.wikipedia.org/w/index.php?title=Wicker&oldid=1376267173
+  - `repair/wp2-winch` — Winch — https://en.wikipedia.org/w/index.php?title=Winch&oldid=1375272331
+  - `repair/wp2-wood-carving` — Wood carving — https://en.wikipedia.org/w/index.php?title=Wood_carving&oldid=1380735919
+  - `repair/wp2-wood-finishing` — Wood finishing — https://en.wikipedia.org/w/index.php?title=Wood_finishing&oldid=1378584821
+  - `repair/wp2-woodturning` — Woodturning — https://en.wikipedia.org/w/index.php?title=Woodturning&oldid=1380940666
+  - `repair/wp2-wool` — Wool — https://en.wikipedia.org/w/index.php?title=Wool&oldid=1383751340
+  - `repair/wp2-wrench` — Wrench — https://en.wikipedia.org/w/index.php?title=Wrench&oldid=1376504470
+  - `repair/wp2-wrought-iron` — Wrought iron — https://en.wikipedia.org/w/index.php?title=Wrought_iron&oldid=1358187836

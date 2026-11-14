@@ -1,0 +1,171 @@
+name: Web
+
+# The WebAssembly app: Emscripten build of the core, packaging (static site + PWA + single-file
+# embermesh.html), the shared UI's unit tests, the web test suite in real headless Chrome (with
+# EMBER_REQUIRE_BROWSER=1 a missing build or browser fails instead of skipping) and the UI smoke
+# walks (mock backend, then the real WASM core).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ui:
+    name: UI unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '26'
+      - name: node --test ui/tests/ (build.sh)
+        run: |
+          mkdir -p build/ci-logs
+          set -o pipefail
+          ./build.sh test --only js --strict 2>&1 | tee build/ci-logs/ui.log
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Shared UI unit tests (Node $(node --version))"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests node "ui/tests (node --test)" build/ci-logs/ui.log
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-ui-test-log
+          path: build/ci-logs/
+          retention-days: 14
+
+  web:
+    name: Build + browser tests (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Linux, id: linux, os: ubuntu-24.04, chrome: /usr/bin/google-chrome }
+          - { name: macOS, id: macos, os: macos-15, chrome: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome }
+    env:
+      CHROME: ${{ matrix.chrome }}
+      EMBER_E2E_WATCHDOG_MS: '900000'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '26'
+
+      - uses: ./.github/actions/setup-emsdk
+
+      - name: Chrome
+        run: |
+          mkdir -p build/ci-logs
+          [ -x "$CHROME" ] || { echo "::error::Chrome not found at $CHROME"; exit 1; }
+          if [ "$RUNNER_OS" = Linux ]; then
+            # Ubuntu 24.04 restricts unprivileged user namespaces, which Chrome's sandbox needs.
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          fi
+          "$CHROME" --version | tee build/ci-logs/chrome-version.txt
+
+      - name: Build emberd (hub tests) and the web app (build.sh)
+        id: build
+        run: |
+          set -o pipefail
+          ./build.sh desktop web 2>&1 | tee build/ci-logs/web-build.log
+
+      - name: Web test suite in headless Chrome
+        id: webtests
+        run: |
+          set -o pipefail
+          EMBER_REQUIRE_BROWSER=1 ./build.sh test --only web --strict 2>&1 | tee build/ci-logs/web-tests.log
+
+      - name: UI smoke walk (mock backend)
+        id: smoke_mock
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          node ui/tests/smoke_chrome.mjs --shots build/ci-logs/screens 2>&1 | tee build/ci-logs/smoke-mock.log
+
+      - name: UI smoke walk (real WASM core)
+        id: smoke_real
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -o pipefail
+          node ui/tests/smoke_chrome.mjs --real auto 2>&1 | tee build/ci-logs/smoke-real.log
+
+      - name: Summary
+        if: always()
+        env:
+          SMOKE_MOCK: ${{ steps.smoke_mock.outcome }}
+          SMOKE_REAL: ${{ steps.smoke_real.outcome }}
+        run: |
+          {
+            echo "### Web: ${{ matrix.name }}"
+            echo
+            echo "$(cat build/ci-logs/chrome-version.txt 2>/dev/null), Node $(node --version), Emscripten $(sed -n 's/.*"\(.*\)".*/\1/p' .toolchains/emsdk/upstream/emscripten/emscripten-version.txt 2>/dev/null)"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests node "apps/web/test (headless Chrome, EMBER_REQUIRE_BROWSER=1)" build/ci-logs/web-tests.log
+            echo
+            echo "UI smoke walk, mock backend: **${SMOKE_MOCK:-not run}**; real WASM core: **${SMOKE_REAL:-not run}**"
+            echo
+            echo "Built (artifact \`web-dist-${{ matrix.id }}\`):"
+            echo
+            python3 tools/ci/report.py files dist/web/embermesh.html dist/web/index.html dist/web/sw.js dist/web/wasm dist/web/data/guides.pack
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload web app
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-dist-${{ matrix.id }}
+          path: dist/web/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload logs and screenshots
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-test-logs-${{ matrix.id }}
+          path: build/ci-logs/
+          retention-days: 14
+
+  summary:
+    name: Web summary
+    if: always()
+    needs: [ui, web]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/ci
+      - name: Required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 tools/ci/needs-summary.py "Web"

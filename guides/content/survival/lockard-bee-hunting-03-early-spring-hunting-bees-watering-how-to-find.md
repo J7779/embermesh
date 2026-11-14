@@ -1,0 +1,32 @@
+---
+id: survival/lockard-bee-hunting-03-early-spring-hunting-bees-watering-how-to-find
+title: "Bee Hunting 3: Early Spring Hunting; Bees Watering. How to Find Them"
+category: survival
+tags: ["bee hunting", "find wild honey", "bee tree", "line bees", "beekeeping", "bait", "honey"]
+summary: "Early Spring Hunting; Bees Watering. How to Find Them, from Bee Hunting (Lockard, 1908): Chapter II. Early Spring Hunting; Chapter III. Bees Watering. How to Find Them."
+source: "John R. Lockard, Bee Hunting: A Book of Valuable Information for Bee Hunters (A. R. Harding, Columbus, Ohio, 1908); public-domain transcription"
+source_title: "Bee Hunting: A Book of Valuable Information for Bee Hunters"
+license: Public Domain
+attribution: "John R. Lockard, Bee Hunting: A Book of Valuable Information for Bee Hunters (A. R. Harding, Columbus, Ohio, 1908). Public domain in the United States (published before 1930)."
+retrieved: 2026-11-13
+part_of: survival/lockard-bee-hunting
+order: 3
+---
+
+# Bee Hunting 3: Early Spring Hunting; Bees Watering. How to Find Them
+
+*From Bee Hunting: A Book of Valuable Information for Bee Hunters by John R. Lockard (A. R. Harding, Columbus, Ohio, 1908).*
+
+## Chapter II. Early Spring Hunting
+
+Bees are very fond of salt in the early spring, and, in fact, in all parts of the season when brood rearing is in progress. Now we will start out some fine spring morning, take a hatchet or an ax and a polk of salt, and we will go up on the side of the mountain and chop out a little trough large enough to hold a quart or more, then sprinkle a little water, scented with oil of anise or bergamont, on the outside of this trough, then put a few corncobs and a handful of salt in the trough and place the trough in the fork of a small tree out of the way of any stock that may be pasturing in the woods. Our work is now done at this place. We can go on and put out several of these baits along the mountain. The first rain that comes will fill the trough, dissolve the salt, which will soak into the corncobs, and the scent which we placed on the outside of the trough will entice any bees that may be flying. After this we go home and a day or so after the first good rain that comes, we will go back and the chances are that we will have several good courses. Now we will cover the trough over with a bunch of leaves--green boughs--and sprinkle these freely with sweetened water. Take a pint bottle, fill it one-fourth full of granulated sugar and fill up with water. This is better than more sugar, for when the syrup is too thick it requires more time for the bees to load up and if too thick, in a short time the bushes become sticky.
+
+After several bees have loaded up and gone home, we will take a cloth and saturate it with the same scent used on the trough, then take the bait--bunch of bushes--with us on the course, hunt a place as free from timber as possible and lay out bait on the top of a bush, the cloth beside it, and in a short time we should have plenty of bees. After determining on the course the same tactics are pursued until we arrive at the tree, or, if we have good reason to believe the bee stands in any certain group of trees and we fail to find the tree, to make sure that our ideas are correct we will move our bait off to one side of the original course and thus get a cross course, and at the junction of the first line of flight and this second line, the bees must certainly have their home. We must look at every tree with the utmost care, for it is a very easy matter to overlook a bee tree, even experienced bee hunters have done this. But if we take time to examine a tree from all sides we should always be able to locate them.
+
+## Chapter III. Bees Watering. How to Find Them
+
+As soon as the bees begin to stir in the spring they go searching around for water, for this is one essential element in brood-rearing. Early in the season the ground is generally so full of water that bees are not confined to any certain place in order to get the amount needed. But later in the season, when the ground has dried off and wet weather springs have dried up, if we go into the woods along the mountain and visit the never-failing springs sure to be found in the hollows and low flat places, we will be pretty sure to find bees at some of these places.
+
+It is not often that bees are numerous enough at these springs to make what would be termed a strong course, but by following the plan which I here give, you can, in a short space of time, have all the bees necessary, with no danger of having bees from other trees or from our neighbors' stands, which would make a mix-up, and make it much harder for us to follow the bee that is watering. When we go on a trip of this kind first we will provide ourselves with a small glass tumbler; a cover, made of some dark heavy material, long enough so that when slipped over the glass it will come within one-fourth of an inch of the open end. Then we will take a few drops of honey in a small vial, the scent, cloth, and bait of sugar and water mentioned previously. When we find the bees watering we take the glass, without cover, and place it over the bee, which will immediately try to fly and finding himself a prisoner, will crawl around the upper part of the glass. Previous to this a few drops of the honey were placed on a piece of cardboard or large leaf. Then we lift the glass and place the hand under to prevent the bee escaping and place it on the cardboard or leaf. Now place the black hood over it and watch the result. There is but one place for light to enter and this is the narrow opening at lower end of cover. In a moment the bee can be seen crawling around the bottom, sometimes reaching down to the cardboard. Now he has found a drop of the honey and seemingly forgets his sad plight of a moment ago and proceeds to take a meal. The glass is lifted gently off, the dark thick cover preventing him from seeing our hand. As soon as he is loaded he starts and circles many times and then goes home, and in some manner that we can't explain, tells others of what delicious sweets he has found. No more water for that bee; he is bound to come back and search for more honey.
+
+We can go and catch as many bees as we think it necessary, but generally five or six would be ample. Then the scented cloth is placed on the ground, a bunch of green bushes laid on the spot where the cardboard had been sprinkled freely with sweetened water, and we are soon ready to start on the course, following the instructions given in previous chapter.

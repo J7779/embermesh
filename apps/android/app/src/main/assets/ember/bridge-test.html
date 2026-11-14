@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<title>EmberMesh bridge test</title>
+<style>
+  :root { color-scheme: dark; --bg:#101216; --panel:#1a1d23; --line:#2a2f38; --fg:#e8e6e3; --dim:#9aa0a6; --accent:#ff7a2f; --ok:#5fd38d; --err:#ff6b6b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.4 system-ui, sans-serif; }
+  header { padding:14px 16px 6px; }
+  h1 { font-size:18px; margin:0 0 4px; } h1 span { color:var(--accent); }
+  .sub { color:var(--dim); font-size:13px; }
+  section { margin:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+  h2 { font-size:14px; margin:0 0 8px; color:var(--dim); text-transform:uppercase; letter-spacing:.05em; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; }
+  button { background:#262a32; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:14px; }
+  button:active { background:#333944; }
+  button.primary { border-color:var(--accent); color:var(--accent); }
+  input, textarea, select { width:100%; background:#0c0e11; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:8px; font:13px ui-monospace, monospace; }
+  textarea { min-height:60px; }
+  pre { white-space:pre-wrap; word-break:break-word; margin:0; font:12px/1.35 ui-monospace, monospace; max-height:40vh; overflow:auto; }
+  .ok { color:var(--ok); } .err { color:var(--err); }
+  #status { font-weight:600; }
+  label { display:block; color:var(--dim); font-size:12px; margin:6px 0 3px; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>Ember</span>Mesh · bridge diagnostics</h1>
+  <div class="sub">Shown when the shared UI (ui/index.html) is not bundled. Bridge: <span id="status">checking…</span></div>
+</header>
+
+<section>
+  <h2>Core &amp; host</h2>
+  <div class="row">
+    <button class="primary" data-call="node.info">node.info</button>
+    <button data-call="host.info">host.info</button>
+    <button data-call="links.list">links.list</button>
+    <button data-call="links.types">links.types</button>
+    <button data-call="mesh.peers">mesh.peers</button>
+    <button data-call="host.link.status">host.link.status</button>
+    <button data-call="host.android.settings.get">android settings</button>
+  </div>
+</section>
+
+<section>
+  <h2>Links</h2>
+  <div class="row">
+    <button data-create="loopback">+ loopback</button>
+    <button data-create="udp">+ Wi-Fi LAN (UDP)</button>
+    <button data-create="ble_peer">+ BLE peers</button>
+    <button data-create="audio">+ audio modem</button>
+    <button data-scan="ble_peer">scan BLE peers</button>
+    <button data-scan="ble">scan BLE serial</button>
+    <button data-scan="serial">scan USB</button>
+    <button data-scan="bt_spp">scan BT SPP</button>
+    <button data-scan="tcp">scan DNS-SD</button>
+  </div>
+  <label for="linkid">Link id</label>
+  <div class="row"><input id="linkid" type="number" min="1" style="width:6em">
+    <button id="reconnect">reconnect</button><button id="remove">remove</button></div>
+</section>
+
+<section>
+  <h2>Device services</h2>
+  <div class="row">
+    <button data-call="host.location.get">location</button>
+    <button data-call="host.qr.scan">QR scan</button>
+    <button id="save">save file</button>
+    <button id="sharefile">share file</button>
+    <button data-call="host.file.pick">pick file</button>
+    <button id="flash">flash SOS</button>
+    <button id="tone">tone SOS</button>
+    <button id="notify">notify</button>
+    <button data-call="host.app.share">share this app</button>
+    <button data-call="host.android.battery_optimization">battery settings</button>
+    <button id="boot">toggle start on boot</button>
+  </div>
+</section>
+
+<section>
+  <h2>Custom call</h2>
+  <label for="method">Method</label><input id="method" value="node.info">
+  <label for="params">Params (JSON)</label><textarea id="params">{}</textarea>
+  <div class="row" style="margin-top:8px"><button class="primary" id="go">call</button><button id="clear">clear log</button></div>
+</section>
+
+<section>
+  <h2>Result</h2>
+  <pre id="out">—</pre>
+</section>
+<section>
+  <h2>Events</h2>
+  <pre id="events"></pre>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var pending = {}, nextId = 1, events = [], listeners = [];
+  // window.__emberBridge is what the native side calls (RPC_API §5). ui/js/backends/native.js
+  // implements the same contract; this page carries its own copy so it works without the UI.
+  window.__emberBridge = {
+    onReply: function (r) {
+      var p = pending[r.id];
+      if (!p) return;
+      delete pending[r.id];
+      if (r.ok) p.resolve(r.result); else { var e = new Error((r.error && r.error.message) || 'error'); e.code = r.error && r.error.code; p.reject(e); }
+    },
+    onEvent: function (e) {
+      events.push(e);
+      if (events.length > 200) events.shift();
+      listeners.forEach(function (l) { try { l(e); } catch (_) {} });
+      var el = document.getElementById('events');
+      el.textContent = new Date().toISOString().slice(11, 19) + ' ' + e.event + ' ' + JSON.stringify(e.data) + '\n' + el.textContent.slice(0, 20000);
+    },
+    onBack: function () { return false; }
+  };
+  function call(method, params) {
+    return new Promise(function (resolve, reject) {
+      if (!window.EmberNative) { var e = new Error('window.EmberNative missing'); e.code = 'unsupported'; reject(e); return; }
+      var id = nextId++;
+      pending[id] = { resolve: resolve, reject: reject };
+      window.EmberNative.postMessage(JSON.stringify({ id: id, method: method, params: params || {} }));
+    });
+  }
+  // Hooks for instrumented tests (BridgeInstrumentedTest).
+  window.__emberTest = { call: call, events: events, results: {},
+    run: function (key, method, params) {
+      window.__emberTest.results[key] = { done: false };
+      call(method, params).then(function (r) { window.__emberTest.results[key] = { done: true, ok: true, result: r }; },
+        function (e) { window.__emberTest.results[key] = { done: true, ok: false, code: e.code, message: e.message }; });
+    } };
+
+  var out = document.getElementById('out');
+  function show(method, p) {
+    out.className = '';
+    out.textContent = method + ' …';
+    var t0 = Date.now();
+    p.then(function (r) { out.className = 'ok'; out.textContent = method + ' ✓ (' + (Date.now() - t0) + ' ms)\n' + JSON.stringify(r, null, 2); },
+      function (e) { out.className = 'err'; out.textContent = method + ' ✗ ' + (e.code || '') + ': ' + e.message; });
+    return p;
+  }
+  function run(method, params) { return show(method, call(method, params)); }
+  function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
+  var SOS = [200,200,200,200,200,600, 600,200,600,200,600,600, 200,200,200,200,200,1400];
+
+  document.querySelectorAll('[data-call]').forEach(function (b) { b.onclick = function () { run(b.dataset.call, {}); }; });
+  document.querySelectorAll('[data-scan]').forEach(function (b) { b.onclick = function () { run('host.endpoints.scan', { kind: b.dataset.scan, timeout_ms: 6000 }); }; });
+  document.querySelectorAll('[data-create]').forEach(function (b) {
+    b.onclick = function () {
+      var kind = b.dataset.create;
+      call('host.info').then(function (info) {
+        var k = (info.endpoint_kinds || []).filter(function (x) { return x.kind === kind; })[0];
+        if (!k) throw Object.assign(new Error('kind not advertised'), { code: 'unsupported' });
+        return show('host.link.create', call('host.link.create', { name: k.title, endpoint: { kind: kind, config: {} }, link: { type: k.default_link_type, config: {} } }))
+          .then(function (r) { if (r && r.link) document.getElementById('linkid').value = r.link.id; });
+      }).catch(function (e) { out.className = 'err'; out.textContent = 'create ' + kind + ' ✗ ' + (e.code || '') + ': ' + e.message; });
+    };
+  });
+  function linkId() { return parseInt(document.getElementById('linkid').value, 10) || 0; }
+  document.getElementById('reconnect').onclick = function () { run('host.link.reconnect', { id: linkId() }); };
+  document.getElementById('remove').onclick = function () { run('host.link.remove', { id: linkId() }); };
+  document.getElementById('save').onclick = function () { run('host.file.save', { name: 'ember-test.txt', mime: 'text/plain', data_b64: b64('EmberMesh test file ' + new Date().toISOString()) }); };
+  document.getElementById('sharefile').onclick = function () { run('host.file.save', { name: 'ember-test.txt', mime: 'text/plain', mode: 'share', data_b64: b64('EmberMesh test file') }); };
+  document.getElementById('flash').onclick = function () { run('host.signal.flash', { pattern_ms: SOS }); };
+  document.getElementById('tone').onclick = function () { run('host.signal.tone', { pattern_ms: SOS, freq_hz: 700 }); };
+  document.getElementById('notify').onclick = function () { run('host.notify', { title: 'EmberMesh', body: 'Test notification from the bridge page' }); };
+  document.getElementById('boot').onclick = function () {
+    call('host.android.settings.get').then(function (r) { return run('host.android.settings.set', { settings: { start_on_boot: !r.settings.start_on_boot } }); });
+  };
+  document.getElementById('go').onclick = function () {
+    var p;
+    try { p = JSON.parse(document.getElementById('params').value || '{}'); } catch (e) { out.className = 'err'; out.textContent = 'params: ' + e.message; return; }
+    run(document.getElementById('method').value.trim(), p);
+  };
+  document.getElementById('clear').onclick = function () { document.getElementById('events').textContent = ''; out.textContent = '—'; };
+
+  var st = document.getElementById('status');
+  call('node.info').then(function (r) {
+    st.className = 'ok';
+    st.textContent = 'connected · core ' + r.version + (r.stub ? ' (stub)' : '') + ' · node ' + r.node_id;
+    show('node.info', Promise.resolve(r));
+  }, function (e) { st.className = 'err'; st.textContent = 'error: ' + e.message; });
+})();
+</script>
+</body>
+</html>

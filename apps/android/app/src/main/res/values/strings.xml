@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EmberMesh</string>
+    <string name="share_app_short">Share app</string>
+    <string name="share_app_long">Share EmberMesh with a nearby phone</string>
+    <string name="diagnostics_short">Diagnostics</string>
+</resources>

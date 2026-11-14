@@ -1,0 +1,105 @@
+# Sources added by the wiki2 sweep for the `electronics` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `electronics/wb2-practical-electronics-part1` — Practical Electronics (Wikibooks) (part 1 of 7: Overview, Need to Have, Basic Theory…) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics&oldid=4620925 — pages: Practical Electronics (rev 4620925); Practical Electronics/Need to Have (rev 3348584); Practical Electronics/Basic Theory (rev 4236124); Practical Electronics/Units and Quantities (rev 3657572); Practical Electronics/Basic Components (rev 4227866); Practical Electronics/Resistors (rev 3819776); Practical Electronics/Finding component information/Resistors (rev 4647861)
+  - `electronics/wb2-practical-electronics-part2` — Practical Electronics (Wikibooks) (part 2 of 7: Capacitors, Inductors, Transformers…) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics/Capacitors&oldid=4567418 — pages: Practical Electronics/Capacitors (rev 4567418); Practical Electronics/Inductors (rev 4486705); Practical Electronics/Transformers (rev 3806701); Practical Electronics/Diodes/Diode operation characteristics (rev 3808841); Practical Electronics/Bipolar Transistors (rev 3545468); Practical Electronics/Transistors (rev 4628311); Practical Electronics/Operational amplifiers (rev 3657044)
+  - `electronics/wb2-practical-electronics-part3` — Practical Electronics (Wikibooks) (part 3 of 7: Astables, Astables: 555, Crowbar circuit…) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics/Astables&oldid=4093979 — pages: Practical Electronics/Astables (rev 4093979); Practical Electronics/Astables/555 (rev 4093982); Practical Electronics/Crowbar circuit (rev 3354228); Practical Electronics/Parallel RC (rev 3559950); Practical Electronics/Soldering (rev 4034721)
+  - `electronics/wb2-practical-electronics-part4` — Practical Electronics (Wikibooks) (part 4 of 7: Desoldering, Oscilloscopes, PCB Manufacture) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics/Desoldering&oldid=3672274 — pages: Practical Electronics/Desoldering (rev 3672274); Practical Electronics/Oscilloscopes (rev 4374827); Practical Electronics/PCB Manufacture (rev 4528733)
+  - `electronics/wb2-practical-electronics-part5` — Practical Electronics (Wikibooks) (part 5 of 7: PCB Layout, Stepper Motors) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics/PCB_Layout&oldid=4640445 — pages: Practical Electronics/PCB Layout (rev 4640445); Practical Electronics/Stepper Motors (rev 2699278)
+  - `electronics/wb2-practical-electronics-part6` — Practical Electronics (Wikibooks) (part 6 of 7: Amplifiers) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics/Amplifiers&oldid=4661722
+  - `electronics/wb2-practical-electronics-part7` — Practical Electronics (Wikibooks) (part 7 of 7: Glossary) — https://en.wikibooks.org/w/index.php?title=Practical_Electronics/Glossary&oldid=3837169
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `electronics/wp2-555-timer-ic` — 555 timer IC — https://en.wikipedia.org/w/index.php?title=555_timer_IC&oldid=1384359247
+  - `electronics/wp2-amplifier` — Amplifier — https://en.wikipedia.org/w/index.php?title=Amplifier&oldid=1381035130
+  - `electronics/wp2-arduino` — Arduino — https://en.wikipedia.org/w/index.php?title=Arduino&oldid=1385507494
+  - `electronics/wp2-band-pass-filter` — Band-pass filter — https://en.wikipedia.org/w/index.php?title=Band-pass_filter&oldid=1364777061
+  - `electronics/wp2-bipolar-junction-transistor` — Bipolar junction transistor — https://en.wikipedia.org/w/index.php?title=Bipolar_junction_transistor&oldid=1385177807
+  - `electronics/wp2-boost-converter` — Boost converter — https://en.wikipedia.org/w/index.php?title=Boost_converter&oldid=1383724582
+  - `electronics/wp2-breadboard` — Breadboard — https://en.wikipedia.org/w/index.php?title=Breadboard&oldid=1383720465
+  - `electronics/wp2-buck-converter` — Buck converter — https://en.wikipedia.org/w/index.php?title=Buck_converter&oldid=1367033299
+  - `electronics/wp2-button-cell` — Button cell — https://en.wikipedia.org/w/index.php?title=Button_cell&oldid=1367277923
+  - `electronics/wp2-capacitor` — Capacitor — https://en.wikipedia.org/w/index.php?title=Capacitor&oldid=1384207244
+  - `electronics/wp2-choke-electronics` — Choke (electronics) — https://en.wikipedia.org/w/index.php?title=Choke_(electronics)&oldid=1362750033
+  - `electronics/wp2-circuit-diagram` — Circuit diagram — https://en.wikipedia.org/w/index.php?title=Circuit_diagram&oldid=1365256771
+  - `electronics/wp2-continuity-tester` — Continuity tester — https://en.wikipedia.org/w/index.php?title=Continuity_tester&oldid=996791750
+  - `electronics/wp2-crimp-joining` — Crimp (joining) — https://en.wikipedia.org/w/index.php?title=Crimp_(joining)&oldid=1380146082
+  - `electronics/wp2-crystal-oscillator` — Crystal oscillator — https://en.wikipedia.org/w/index.php?title=Crystal_oscillator&oldid=1384673722
+  - `electronics/wp2-current-clamp` — Current clamp — https://en.wikipedia.org/w/index.php?title=Current_clamp&oldid=1364702010
+  - `electronics/wp2-desoldering` — Desoldering — https://en.wikipedia.org/w/index.php?title=Desoldering&oldid=1378171373
+  - `electronics/wp2-diode-bridge` — Diode bridge — https://en.wikipedia.org/w/index.php?title=Diode_bridge&oldid=1373727385
+  - `electronics/wp2-direct-current` — Direct current — https://en.wikipedia.org/w/index.php?title=Direct_current&oldid=1376492576
+  - `electronics/wp2-electric-current` — Electric current — https://en.wikipedia.org/w/index.php?title=Electric_current&oldid=1382079247
+  - `electronics/wp2-electric-power` — Electric power — https://en.wikipedia.org/w/index.php?title=Electric_power&oldid=1380760318
+  - `electronics/wp2-electrical-connector` — Electrical connector — https://en.wikipedia.org/w/index.php?title=Electrical_connector&oldid=1380757240
+  - `electronics/wp2-electrical-impedance` — Electrical impedance — https://en.wikipedia.org/w/index.php?title=Electrical_impedance&oldid=1363009092
+  - `electronics/wp2-electrical-resistance-and-conductance` — Electrical resistance and conductance — https://en.wikipedia.org/w/index.php?title=Electrical_resistance_and_conductance&oldid=1381722547
+  - `electronics/wp2-electrolytic-capacitor` — Electrolytic capacitor — https://en.wikipedia.org/w/index.php?title=Electrolytic_capacitor&oldid=1381419580
+  - `electronics/wp2-electromagnet` — Electromagnet — https://en.wikipedia.org/w/index.php?title=Electromagnet&oldid=1382781306
+  - `electronics/wp2-electronic-circuit` — Electronic circuit — https://en.wikipedia.org/w/index.php?title=Electronic_circuit&oldid=1374406768
+  - `electronics/wp2-electronic-filter` — Electronic filter — https://en.wikipedia.org/w/index.php?title=Electronic_filter&oldid=1367750379
+  - `electronics/wp2-electronic-oscillator` — Electronic oscillator — https://en.wikipedia.org/w/index.php?title=Electronic_oscillator&oldid=1380780410
+  - `electronics/wp2-electronic-test-equipment` — Electronic test equipment — https://en.wikipedia.org/w/index.php?title=Electronic_test_equipment&oldid=1345183217
+  - `electronics/wp2-electrostatic-discharge` — Electrostatic discharge — https://en.wikipedia.org/w/index.php?title=Electrostatic_discharge&oldid=1375318895
+  - `electronics/wp2-esp32` — ESP32 — https://en.wikipedia.org/w/index.php?title=ESP32&oldid=1383570586
+  - `electronics/wp2-flux-metallurgy` — Flux (metallurgy) — https://en.wikipedia.org/w/index.php?title=Flux_(metallurgy)&oldid=1381042202
+  - `electronics/wp2-frequency-counter` — Frequency counter — https://en.wikipedia.org/w/index.php?title=Frequency_counter&oldid=1375057682
+  - `electronics/wp2-function-generator` — Function generator — https://en.wikipedia.org/w/index.php?title=Function_generator&oldid=1279162123
+  - `electronics/wp2-ground-loop-electricity` — Ground loop (electricity) — https://en.wikipedia.org/w/index.php?title=Ground_loop_(electricity)&oldid=1383945498
+  - `electronics/wp2-heat-shrink-tubing` — Heat-shrink tubing — https://en.wikipedia.org/w/index.php?title=Heat-shrink_tubing&oldid=1368485281
+  - `electronics/wp2-high-pass-filter` — High-pass filter — https://en.wikipedia.org/w/index.php?title=High-pass_filter&oldid=1369018426
+  - `electronics/wp2-inductor` — Inductor — https://en.wikipedia.org/w/index.php?title=Inductor&oldid=1384309284
+  - `electronics/wp2-kirchhoffs-circuit-laws` — Kirchhoff's circuit laws — https://en.wikipedia.org/w/index.php?title=Kirchhoff%27s_circuit_laws&oldid=1372152542
+  - `electronics/wp2-lc-circuit` — LC circuit — https://en.wikipedia.org/w/index.php?title=LC_circuit&oldid=1350658867
+  - `electronics/wp2-lcr-meter` — LCR meter — https://en.wikipedia.org/w/index.php?title=LCR_meter&oldid=1331414239
+  - `electronics/wp2-linear-regulator` — Linear regulator — https://en.wikipedia.org/w/index.php?title=Linear_regulator&oldid=1326322781
+  - `electronics/wp2-low-pass-filter` — Low-pass filter — https://en.wikipedia.org/w/index.php?title=Low-pass_filter&oldid=1384696058
+  - `electronics/wp2-microcontroller` — Microcontroller — https://en.wikipedia.org/w/index.php?title=Microcontroller&oldid=1381884829
+  - `electronics/wp2-mosfet` — MOSFET — https://en.wikipedia.org/w/index.php?title=MOSFET&oldid=1384578492
+  - `electronics/wp2-operational-amplifier` — Operational amplifier — https://en.wikipedia.org/w/index.php?title=Operational_amplifier&oldid=1378476597
+  - `electronics/wp2-oscilloscope` — Oscilloscope — https://en.wikipedia.org/w/index.php?title=Oscilloscope&oldid=1383578184
+  - `electronics/wp2-photoresistor` — Photoresistor — https://en.wikipedia.org/w/index.php?title=Photoresistor&oldid=1382072049
+  - `electronics/wp2-potentiometer` — Potentiometer — https://en.wikipedia.org/w/index.php?title=Potentiometer&oldid=1385148998
+  - `electronics/wp2-power-supply` — Power supply — https://en.wikipedia.org/w/index.php?title=Power_supply&oldid=1378650984
+  - `electronics/wp2-printed-circuit-board` — Printed circuit board — https://en.wikipedia.org/w/index.php?title=Printed_circuit_board&oldid=1383953788
+  - `electronics/wp2-pulse-width-modulation` — Pulse-width modulation — https://en.wikipedia.org/w/index.php?title=Pulse-width_modulation&oldid=1382026850
+  - `electronics/wp2-rc-circuit` — RC circuit — https://en.wikipedia.org/w/index.php?title=RC_circuit&oldid=1383276735
+  - `electronics/wp2-rectifier` — Rectifier — https://en.wikipedia.org/w/index.php?title=Rectifier&oldid=1367200865
+  - `electronics/wp2-regulated-power-supply` — Regulated power supply — https://en.wikipedia.org/w/index.php?title=Regulated_power_supply&oldid=1381495927
+  - `electronics/wp2-relay` — Relay — https://en.wikipedia.org/w/index.php?title=Relay&oldid=1382774038
+  - `electronics/wp2-resistor` — Resistor — https://en.wikipedia.org/w/index.php?title=Resistor&oldid=1384632088
+  - `electronics/wp2-schematic` — Schematic — https://en.wikipedia.org/w/index.php?title=Schematic&oldid=1383944015
+  - `electronics/wp2-schottky-diode` — Schottky diode — https://en.wikipedia.org/w/index.php?title=Schottky_diode&oldid=1378301622
+  - `electronics/wp2-screw-terminal` — Screw terminal — https://en.wikipedia.org/w/index.php?title=Screw_terminal&oldid=1382053623
+  - `electronics/wp2-short-circuit` — Short circuit — https://en.wikipedia.org/w/index.php?title=Short_circuit&oldid=1376308740
+  - `electronics/wp2-signal-generator` — Signal generator — https://en.wikipedia.org/w/index.php?title=Signal_generator&oldid=1378749236
+  - `electronics/wp2-solar-cell` — Solar cell — https://en.wikipedia.org/w/index.php?title=Solar_cell&oldid=1385301599
+  - `electronics/wp2-solder` — Solder — https://en.wikipedia.org/w/index.php?title=Solder&oldid=1382877703
+  - `electronics/wp2-soldering-iron` — Soldering iron — https://en.wikipedia.org/w/index.php?title=Soldering_iron&oldid=1351575468
+  - `electronics/wp2-stripboard` — Stripboard — https://en.wikipedia.org/w/index.php?title=Stripboard&oldid=1383413744
+  - `electronics/wp2-switch` — Switch — https://en.wikipedia.org/w/index.php?title=Switch&oldid=1372029988
+  - `electronics/wp2-switched-mode-power-supply` — Switched-mode power supply — https://en.wikipedia.org/w/index.php?title=Switched-mode_power_supply&oldid=1384564572
+  - `electronics/wp2-test-probe` — Test probe — https://en.wikipedia.org/w/index.php?title=Test_probe&oldid=1320537903
+  - `electronics/wp2-thermistor` — Thermistor — https://en.wikipedia.org/w/index.php?title=Thermistor&oldid=1380549254
+  - `electronics/wp2-toroidal-inductors-and-transformers` — Toroidal inductors and transformers — https://en.wikipedia.org/w/index.php?title=Toroidal_inductors_and_transformers&oldid=1378024397
+  - `electronics/wp2-transformer` — Transformer — https://en.wikipedia.org/w/index.php?title=Transformer&oldid=1384501652
+  - `electronics/wp2-transistor` — Transistor — https://en.wikipedia.org/w/index.php?title=Transistor&oldid=1383498898
+  - `electronics/wp2-variable-capacitor` — Variable capacitor — https://en.wikipedia.org/w/index.php?title=Variable_capacitor&oldid=1352331862
+  - `electronics/wp2-varistor` — Varistor — https://en.wikipedia.org/w/index.php?title=Varistor&oldid=1337405180
+  - `electronics/wp2-voltage-divider` — Voltage divider — https://en.wikipedia.org/w/index.php?title=Voltage_divider&oldid=1383599655
+  - `electronics/wp2-voltage-regulator` — Voltage regulator — https://en.wikipedia.org/w/index.php?title=Voltage_regulator&oldid=1385267568
+  - `electronics/wp2-voltage` — Voltage — https://en.wikipedia.org/w/index.php?title=Voltage&oldid=1370694066
+  - `electronics/wp2-wire` — Wire — https://en.wikipedia.org/w/index.php?title=Wire&oldid=1384672936
+  - `electronics/wp2-zener-diode` — Zener diode — https://en.wikipedia.org/w/index.php?title=Zener_diode&oldid=1373728185

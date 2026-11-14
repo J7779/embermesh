@@ -1,0 +1,46 @@
+---
+id: hazards/wp2-riot-control
+title: Riot control
+category: hazards
+tags: [riot control, disaster]
+summary: Riot control is a form of public order policing used by law enforcement, military, paramilitary or security forces to control, disperse, or arrest people who are involved in a riot, demonstration or protest.
+source: https://en.wikipedia.org/w/index.php?title=Riot_control&oldid=1382322581
+source_title: Wikipedia: Riot control
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Riot control", Wikipedia, The Free Encyclopedia (revision 1382322581), https://en.wikipedia.org/w/index.php?title=Riot_control&oldid=1382322581 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Riot control
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Riot control** is a form of public order policing used by law enforcement, military, paramilitary or security forces to control, disperse, or arrest people who are involved in a riot, demonstration or protest.
+
+If a riot is spontaneous, then actions which cause people to stop and think (e.g. loud noises or issuing instructions in a calm tone) can be enough to stop it. However, these methods usually fail when there is severe anger, or the riot was planned or organized. Riot control personnel have long used less lethal weapons such as batons and whips to disperse crowds and detain rioters. Since the 1980s, riot control officers have also used tear gas, pepper spray, rubber bullets, stun grenades, and electric tasers. In some cases, riot squads may also use Long Range Acoustic Devices, water cannons, armoured fighting vehicles, aerial surveillance, police dogs or mounted police on horses. Persons performing riot control typically wear protective equipment such as riot helmets, face visors, body armor (vests, neck protectors, knee pads, etc.), gas masks and riot shields. Even though riot tactics are effective in controlling crowds, they can also lead to significant psychological effects on both the rioters and the police. Exposure to intense fear, stress, and violence during these confrontations can result in long-term mental health issues, like anxiety, post-traumatic stress disorder (PTSD), and heightened aggression, which can impact the well-being of protesters and police officers.
+
+There have been cases where lethal weapons are used to violently suppress a protest or riot, as in the Nika Riots in the Roman Empire, The Boston Massacre, The Haymarket Massacre, Bloody Sunday (1905), Banana Massacre, Río Piedras massacre, Ponce massacre, Hungarian Revolution of 1956, Sharpeville massacre, Kent State Shootings, Bloody Sunday (1972), Soweto Uprising, Mendiola Massacre, Tbilisi Massacre, 1989 Tiananmen Square protests, 2017 Venezuelan protests, 2018–2019 Gaza border protests, 2022 Sri Lankan protests, 2022 Kazakh unrest, Mahsa Amini protests and 2025–2026 Iranian protests.
+
+## Modern examples
+
+### Black Lives Matter protests
+
+George Floyd was an African-American man who was murdered by a Minneapolis Police Officer on 25 May 2020 during an arrest. Subsequently, many Americans protested for *Black Lives Matter.* The summer of 2020 oversaw a large number of mass protests for Black Lives Matter to address systemic bias in police departments. Due to the high volume of protests, police departments and sparsely the National Guard were sent to control or end the long protests. Police departments often wore riot gear and used both projectiles and irritants to disperse or contain the protesters. These incidents were widely documented through the use of social media. Documentation and support for the protests further facilitated the movement. One study, recorded by the National Institute of Health, studied the usage of social media as well as its contributions to the movement's legitimacy. Counter-protesters as well as militias responded with violence against the protesters in addition to police departments. Instead of irritants or other standardized tools for riot control, these counter-protesters often used more violent techniques such as ramming into protesters with their cars. Data supports that Black Lives Matter protests in particular were faced with much more state intervention. Suppression techniques that were used by both the state and right wing counter-protesters resulted in injury and death. Both during and after the protests, there were many pieces of legislation that either were passed or were written to curb these protests. Law makers and members of the public questioned riot control and its violations of the First Amendment including the right to assembly and the right to free speech. 45 U.S. states had considered this legislation. Concerns were raised by both political parties on the distinction between riots and protests.
+
+### Peru protests
+
+Between 2022 and 2023, several protests in Peru erupted who were against the Congress and President Dina Bolurate. In December of 2022, the government suspended several constitutional rights. These included the right to prevent troops from entering and staying in one's home, the freedom of movement, and the freedom of assembly. The force used against the protesters resulted in at least six hundred injuries and sixty deaths. Spain had traditionally funded the government in past years and continued to do so to provide weaponry and funding to dismantle these protests. The NGO Amnesty International called on Spain to discontinue these exports citing it as "lethal repression." The security forces came in with assault weapons and in one incident opened fire on protesters. Amnesty International interpreted that the President should be held criminally responsible for the deaths and injuries that the protesters had sustained.
+
+## Equipment
+
+For protection, officers that are trained in police anti-riot schools performing riot control will often wear protective helmets and carry riot shields. These are designed to protect the wearer from those dangers that come from direct melee and hurled objects such as bottles and bricks. The gear frequently worn by riot control officers protects the entire body with no vulnerable spots to exploit. For example, the helmets worn by riot control officers have an additional outward-extending part that protects the back of the neck from assault. To provide even greater protection, the protective equipment often provides ballistic protection. If tear gas or other riot control agents are to be used, gas masks may also be worn. While the visual of police in full riot gear may be intimidating, today's riot suits are designed to minimize injuries and prevent fatalities for both officers and citizens. This evolution of riot gear signifies a move towards less-than-lethal tactics and de-escalation approaches. Contemporary riot gear incorporated innovations such as tear gas, rubber bullets, batons, pepper spray, and tasers, which contributes to minimizing injuries and casualties for all parties involved. These advancements have revolutionized crowd control by shifting from relying on lethal force to employing more less-than-lethal methods that prioritize public safety and safeguard the well-being of law enforcement officers.
+
+One of many additional concerns is to prevent people in the crowd from taking officers' side arms, which may be stolen or even used against the police. In a very heavy crowd, the officer may not be able to see who is responsible for taking a weapon, and may not even notice that it has happened. For this reason, riot police may have holsters with positive locking mechanisms or other extra means of retention, if their agencies can afford such tools. However, this can be a trade-off that increases the amount of time needed to draw the sidearm in an emergency. Alternatively, riot police may not carry sidearms at all.
+
+The initial choice of tactics determines the type of offensive equipment used. The base choice is between lethal (e.g. 12 gauge shotgun) and less-than-lethal weaponry (e.g. tear gas, pepper spray, plastic bullets, tasers, batons, and other incapacitants). The decision is based on the perceived level of threat and the existing laws; in many countries it is illegal to use lethal force to control riots in all but the most extreme circumstances.
+
+Special riot hand weapons include the wooden or rubber baton; the African sjambok, a heavy leather or plastic whip, and the Indian lathi, a 6 to 8 foot long cane with a blunt metal tip. Vehicle-mounted water cannons may serve to augment personal weapons. Some water cannons let police add dye to mark rioters or tear gas to help disperse the crowds.
+
+In major unrest, police in armoured vehicles may be sent in following an initial subduing with firepower. Occasionally, police dogs, fire hoses, or mounted police are deployed.
+
+_(Later sections of the original article were left out of this offline copy for length: Riot control agents (RCA), Tactics, Consequences, Psychological toll on protesters and Police officers.)_

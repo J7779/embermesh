@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="EmberMesh logo">
+  <title>EmberMesh</title>
+  <defs>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#e8471c"/>
+      <stop offset="0.6" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#ffc861"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ffd27a"/>
+      <stop offset="1" stop-color="#fff4d6"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="#17110f"/>
+  <g stroke="#ff8a3d" stroke-opacity="0.55" stroke-width="2.5" stroke-linecap="round" fill="none">
+    <path d="M64 14 L107 39 L107 89 L64 114 L21 89 L21 39 Z"/>
+    <path d="M64 14 L64 34 M107 39 L88 50 M107 89 L88 78 M64 114 L64 98 M21 89 L40 78 M21 39 L40 50"/>
+  </g>
+  <g fill="#ffb35c">
+    <circle cx="64" cy="14" r="5.5"/>
+    <circle cx="107" cy="39" r="5.5"/>
+    <circle cx="107" cy="89" r="5.5"/>
+    <circle cx="64" cy="114" r="5.5"/>
+    <circle cx="21" cy="89" r="5.5"/>
+    <circle cx="21" cy="39" r="5.5"/>
+  </g>
+  <path fill="url(#flame)" d="M64 30 C73 44 88 55 88 75 C88 90 77 100 64 100 C51 100 40 90 40 75 C40 63 47 55 52 46 C54 55 58 60 63 62 C60 52 60 40 64 30 Z"/>
+  <path fill="url(#core)" d="M64 62 C70 70 76 76 76 84 C76 92 70 97 64 97 C58 97 52 92 52 84 C52 78 56 74 59 70 C60 75 62 77 64 78 C63 72 62 67 64 62 Z"/>
+</svg>

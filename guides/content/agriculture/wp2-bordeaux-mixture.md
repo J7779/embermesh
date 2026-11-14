@@ -1,0 +1,42 @@
+---
+id: agriculture/wp2-bordeaux-mixture
+title: Bordeaux mixture
+category: agriculture
+tags: [bordeaux mixture, farming]
+summary: Bordeaux mixture (also called Bordo Mix) is a mixture of copper(II) sulfate (CuSO₄) and quicklime (CaO) used as a fungicide.
+source: https://en.wikipedia.org/w/index.php?title=Bordeaux_mixture&oldid=1378432885
+source_title: Wikipedia: Bordeaux mixture
+license: CC BY-SA 4.0
+attribution: Wikipedia contributors, "Bordeaux mixture", Wikipedia, The Free Encyclopedia (revision 1378432885), https://en.wikipedia.org/w/index.php?title=Bordeaux_mixture&oldid=1378432885 . Converted to Markdown for the EmberMesh offline library; references, images, infoboxes, navigation templates and non-practical sections (such as history, etymology and culture) omitted. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).
+retrieved: 2026-11-13
+---
+
+# Bordeaux mixture
+
+_Encyclopedia article (Wikipedia, CC BY-SA 4.0), converted to plain Markdown and excerpted: references, images, infoboxes, navigation boxes and non-practical sections were removed._
+
+**Bordeaux mixture** (also called *Bordo Mix*) is a mixture of copper(II) sulfate (CuSO₄) and quicklime (CaO) used as a fungicide. It is used in vineyards, fruit-farms, vegetable-farms and gardens to prevent infestations of downy mildew, powdery mildew and other fungi. It is sprayed on plants as a preventive treatment; its mode of action is ineffective after a fungus has become established. It was invented in the Bordeaux region of France in the late 19th century. If it is applied in large quantities annually for many years, the copper in the mixture eventually becomes a pollutant. As such its use is controlled, but not forbidden in most of the European Union. Despite this, some advocates of organic gardening consider it an 'organic' pesticide.
+
+## Main uses
+
+In addition to its use to control fungal infection on grape vines, the mixture is also widely used to control potato blight, peach leaf curl and apple scab. Although it may be bad for the environment, it's the only active substance approved in organic farming (AB) that has both a strong biocidal effect and a broad spectrum of action, which may explain its common use by organic gardeners in parts of the world.
+
+Because the copper ions build up in the soil, continuous use will cause heavy metal pollution. Copper also bioaccumulates in organisms. It is thus restricted to use under control in 18 of the 27 European Union countries, with the exception of Cyprus, Greece, Bulgaria, Hungary, Italy, Malta, Portugal, Romania and Slovenia.
+
+## Mode of action
+
+Bordeaux mixture achieves its effect by means of the copper ions (Cu²⁺) of the mixture. These ions affect enzymes in the fungal spores in such a way as to prevent germination. This means Bordeaux mixture must be used preventively, before the fungal disease has struck.
+
+Thorough coverage of the spray on the plants is necessary. The Bordeaux spray continues to adhere well to the plant during rain, though in the long term it is washed off by rain. Commonly in practice, it is applied just once a year, in the wintertime.
+
+## Preparation
+
+Bordeaux mixture can be prepared using differing proportions of the components. In preparing it, the CuSO₄ and the lime are dissolved separately in water and then mixed. Calcium oxide (burnt lime) and calcium hydroxide (slaked lime) give the same end result, since an excess of water is used in the preparation.
+
+The conventional method of describing the mixture's composition is to give the weight of CuSO₄, the weight of hydrated lime and the volume of water, in that order. The percentage of the weight of CuSO₄ to the weight of water employed determines the concentration of the mixture. Thus a 1% Bordeaux mixture, which is typical, would have the formula 1:1:100, with the first "1" representing 1 kg CuSO₄ (pentahydrated), the second representing 1 kg hydrated lime, and the 100 representing 100 litres (100 kg) water. As CuSO₄ contains 25% copper, the copper content of a 1% Bordeaux mixture would be 0.25%. The quantity of lime used can be lower than that of the CuSO₄. One kg of CuSO₄ actually requires only 0.225 kg of chemically pure hydrated lime to precipitate all the copper. Good proprietary brands of hydrated lime are now freely available, but, as even these deteriorate on storage (by absorbing carbon dioxide from the air), a ratio of less than 2:1 is seldom used, which corresponds to a 1:0.5:100 mixture.
+
+## Risks
+
+Bordeaux mixture has been found to be harmful to fish, livestock and earthworms, due to potential buildup of copper in the soil.
+
+The chemical was in use as a blight preventive in the potato country of northern Maine by 1921. It started to be used by the United Fruit Company throughout Latin America around 1922. The mixture was nicknamed *perico*, or "parakeet", because it would turn workers completely blue. Many workers got sick or died of copper poisoning.

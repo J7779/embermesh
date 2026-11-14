@@ -1,0 +1,64 @@
+---
+id: agriculture/howard-ducks-and-geese-04-management-of-geese
+title: "Ducks and Geese 4: Management of Geese"
+category: agriculture
+tags: ["ducks", "geese", "raise ducks", "poultry", "eggs", "chickens", "corn", "hatching eggs"]
+summary: "Management of Geese, from Ducks and Geese (Howard, 1897): Mating and Setting; Feeding and Dressing for Market; Cross Breeding; Farmers' Bulletins."
+source: "George E. Howard, Ducks and Geese: Standard Breeds and Management (Farmers' Bulletin 64) (U.S. Department of Agriculture, Washington, 1897); public-domain transcription"
+source_title: "Ducks and Geese: Standard Breeds and Management (Farmers' Bulletin 64)"
+license: "Public Domain (US Government work, 17 U.S.C. §105; published 1897, United States)"
+attribution: "George E. Howard, Ducks and Geese: Standard Breeds and Management (Farmers' Bulletin 64) (U.S. Department of Agriculture, Washington, 1897). Public domain in the United States (work of the United States Government)."
+retrieved: 2026-11-13
+part_of: agriculture/howard-ducks-and-geese
+order: 4
+---
+
+# Ducks and Geese 4: Management of Geese
+
+*From Ducks and Geese: Standard Breeds and Management (Farmers' Bulletin 64) by George E. Howard (U.S. Department of Agriculture, Washington, 1897).*
+
+Goose raising is not so extensively engaged in as duck raising, the conditions under which they can be successfully raised being almost entirely different from those necessary for successful duck raising. The duck, being smaller, can be raised in a more limited space than can the goose, the latter needing free range and water, while the former has been proved to do equally as well without water.
+
+While the goose can not profitably be raised in as large numbers as the duck, still it can not justly be termed unprofitable. There are many places on a farm that are worthless for cultivation that could be utilized with excellent results for goose raising. Fields that have streams, branches, or unused springs on them could be turned to good advantage by making them into goose pastures. Many farmers are profiting by this and adding to their incomes annually. The care and attention necessary for raising geese are very small when compared with the returns, and the cost of food is also proportionately small in comparison with the cost of food used for other birds bred for market. A goose on range will gather the largest portion of its food, consisting of grasses, insects, and other animal and vegetable matter to be found in the fields and brooks.
+
+The simplest kinds of houses are used for shelter; these should be built after the plans of those given for ducks, but should be proportionately of larger size to accommodate comfortably the number of birds to be kept. Geese are long-lived birds, some having been known to attain the age of 40 years, while birds of 15 and 20 years of age are not uncommon. They retain their laying and hatching qualities through life. Ganders should not be kept for breeding after 3 years of age; young ganders are more active and insure greater fertility of the eggs than old ones do; besides, ganders become more quarrelsome as age advances.
+
+The feathers of geese are an important source of revenue and find a ready sale in the markets. A goose will average about 1 pound of feathers a year. The feathers should be plucked when there is no blood in the ends of the quills; this can be readily ascertained, as they will then leave the flesh without hard pulling. Almost all breeds of geese are good sitters and attentive mothers, and if left to themselves will make their nests, much as when wild, and hatch a large percentage of their eggs. But hens are now more frequently used for hatching goose eggs; as by taking the eggs from the goose when laid and giving them to hens to hatch, the goose will lay a greater number of eggs than if she were permitted to sit.
+
+All breeds of geese, except perhaps the Egyptian, are to be recommended to farmers who keep a limited number in addition to other poultry and allow them the freedom of the farm, but when goose raising is to be more extensively engaged in, the African goose is to be especially commended. It is the quickest to mature, most prolific, and the easiest to handle of any of the varieties.
+
+## Mating and Setting
+
+In breeding African geese, mate two geese to one gander, and it will be still better if pairs are used to secure better fertility of the eggs. Those who contemplate raising geese should secure their stock in the fall, so that the birds may become accustomed to the place before the breeding season begins. The breeding stock should be at least 2 years old, and fully matured birds. When stock is purchased in the fall they should be turned out in a pasture, and no other food than what they gather themselves will be needed until the grass goes down. Their rations should then consist of equal parts by measure, bran, middlings, and corn meal, with 5 per cent of this bulk of beef scraps. They should be given a light feed of this ration in the morning, and at night they should be fed cracked corn. Ten per cent of the bulk of the daily ration should be green foods, steamed clover, and cooked vegetables.
+
+*[Illustration: Fig. 35.—Wild and African cross.]*
+
+*[Illustration: Fig. 36.—Embden and Toulouse cross.]*
+
+The breeding season begins about February 1, though some geese will begin laying as early as December, then stop, and begin again the first of February. They make their own nests from the straw and litter on the floor of their houses, and will lay from 12 to 20 eggs before becoming broody. As soon as the goose shows an inclination to sit, remove her and place her in a dark box or small coop, and keep her there for two or three days with water for drink, but no food. Then she may be placed back in the yards and she will begin another laying of eggs. The first and second layings of eggs should be set under hens. After the goose lays the second laying she should be confined again, when she will lay a third laying. When she has laid the third laying she should be permitted to sit on them, instead of giving them to hens. A goose will lay from 10 to 15 eggs in each of the second and third layings.
+
+It is recommended that after the eggs have been sat upon for twenty-five days, that they be taken from the nest and placed for about one minute in water heated to a temperature of 104°. Thirty days are required for incubation. After the eggs have hatched leave the hen and goslings in the nest for twenty-four hours; after the young have become thoroughly dry remove hen and brood and pen them in a large, roomy coop for four or five days. When the goslings have reached this age—four or five days—they are perfectly able to take care of themselves. The hen should then be taken from the goslings, which should be allowed freedom to roam at will, but they should always be cooped up at night.
+
+## Feeding and Dressing for Market
+
+*[Illustration: Fig. 37.—Embden and African cross.]*
+
+The first feed for goslings is grass, fed on sod; a small allowance of corn meal, slightly moistened, is also given them. Sand and charcoal are sometimes mixed with the corn meal. They are fed on the above food three times a day for a couple of days, when they are given a ration composed of equal parts by measure, bran, middlings, and steamed cut clover or cooked vegetables. This feed is given them morning, noon, and night, until they are 8 weeks old, when they are penned to be fattened for market at 10 weeks old.
+
+To fatten young geese, place them in a pen, not too large, so that they will not exercise too much, and feed three times a day all they will eat up clean of the following: Corn meal mixed to a dry crumbly state, and beef scraps amounting to 20 per cent of the bulk of the corn meal. While fattening young geese they should be kept as quiet as possible; no excitement whatever should disturb them. When feeding approach them quietly, and do not irritate them in the least or they will not fatten, but will "throw out" or grow another crop of feathers. At 10 weeks of age, or when the tips of the wings reach the tail, they are ready for market and should weigh between 8 and 10 pounds.
+
+When young goslings are to be dressed for market they are killed by cutting them in the roof of the mouth, severing the artery, or by stunning them by hitting them a sharp, quick blow on the head. The picker uses a box in front of him about the height of the knees, holding the bird with the left hand and clasping the feet and wings together; he places the head of the bird against the box and holds it in place with the knee. Pick the feathers from the body of the bird, then dampen the right hand and brush the body to remove the down. Leave about 2 inches of feathers on the neck, and also leave feathers on the wings at the first joint. Lay the wings against the body of the birds and tie a string around to hold in position. I lace the birds, when picked, in cold water for an hour or so to plump them; if they are in the water too long they are liable to bleach and become water-soaked. They are then iced up in barrels already to ship to market.
+
+Young geese should be marketed in October. It is best to market all possible before cold weather sets in. It is much harder to dress a gosling in cold weather. The feathers set tighter, and in picking them the flesh is torn.
+
+## Cross Breeding
+
+The most satisfactory results are to be had by breeding pure standard-bred stock without crossing. But to those who are partial to crosses the following are considered the best to make: (1) Wild gander on African goose (fig. 35); (2) Embden gander on Toulouse goose (fig. 36); (3) Embden gander on African goose (fig. 37), and (4) Embden gander on White China goose. These crosses will give good growth and the young birds will dress well for market. Crosses should only be made for market purposes, and should always be bred from original stock.
+
+## Farmers' Bulletins
+
+These bulletins are sent free of charge to any address upon application to the Secretary of Agriculture, Washington, D. C. Only the following are available:
+
+No. 15.—Some Destructive Potato Diseases: What They Are and How to Prevent Them. No. 16.—Leguminous Plants for Green Manuring and for Feeding. No. 18.—Forage Plants for the South. No. 19.—Important Insecticides: Directions for their Preparation and Use. No. 21.—Barnyard Manure. No. 22.—Feeding Farm Animals. No. 23.—Foods: Nutritive Value and Cost. No. 24.—Hog Cholera and Swine Plague. No. 25.—Peanuts: Culture and Uses. No. 26.—Sweet Potatoes: Culture and Uses. No. 27.—Flax for Seed and Fiber. No. 28.—Weeds; and How to Kill Them. No. 29.—Souring of Milk and Other Changes in Milk Products. No. 30.—Grape Diseases on the Pacific Coast. No. 31.—Alfalfa, or Lucern. No. 32.—Silos and Silage. No. 33.—Peach Growing for Market. No. 34.—Meats: Composition and Cooking. No. 35.—Potato Culture. No. 36.—Cotton Seed and Its Products. No. 37.—Kafir Corn: Characteristics, Culture, and Uses. No. 38.—Spraying for Fruit Diseases. No. 39.—Onion Culture. No. 40.—Farm Drainage. No. 41.—Fowls: Care and Feeding. No. 42.—Facts About Milk. No. 43.—Sewage Disposal on the Farm. No. 44.—Commercial Fertilizers. No. 45.—Some Insects Injurious to Stored Grain. No. 46.—Irrigation in Humid Climates. No. 47.—Insects Affecting the Cotton Plant. No. 48.—The Manuring of Cotton. No. 49.—Sheep Feeding. No. 50.—Sorghum as a Forage Crop. No. 51.—Standard Varieties of Chickens. No. 52.—The Sugar Beet. No. 53.—How to Grow Mushrooms. No. 54.—Some Common Birds in Their Relation to Agriculture. No. 55.—The Dairy Herd: Its Formation and Management. No. 56.—Experiment Station Work—I. No. 57.—Butter Making on the Farm. No. 58.—The Soy Bean as a Forage Crop. No. 59.—Bee Keeping. No. 60.—Methods of Curing Tobacco. No. 61.—Asparagus Culture. No. 62.—Marketing Farm Produce. No. 63.—Care of Milk on the Farm. No. 64.—Ducks and Geese. No. 65.—Experiment Station Work—II. No. 66.—Meadows and Pastures. No. 67.—Forestry for Farmers. No. 68.—The Black Rot of the Cabbage. No. 69.—Experiment Station Work—III. No. 70.—The Principal Insect Enemies of the Grape. No. 71.—Some Essentials of Beef Production. No. 72.—Cattle Ranges of the Southwest. No. 73.—Experiment Station Work—IV. No. 74.—Milk as Food. No. 75.—The Grain Smuts. No. 76.—Tomato Growing. No. 77.—The Liming of Soils. No. 78.—Experiment Station Work—V. No. 79.—Experiment Station Work—VI. No. 80.—The Peach Twig-borer—an Important Enemy of Stone Fruits. No. 81.—Corn Culture in the South. No. 82.—The Culture of Tobacco. No. 83.—Tobacco Soils. No. 84.—Experiment Station Work—VII. No. 85.—Fish as Food. No. 86.—Thirty Poisonous Plants. No. 87.—Experiment Station Work—VIII. No. 88.—Alkali Lands. No. 89.—Cowpeas.
+
+Minor typos may have been corrected. Illustrations were repositioned to avoid splitting paragraphs.

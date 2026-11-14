@@ -1,0 +1,108 @@
+# Sources added by the wiki2 sweep for the `radio` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `radio/wb2-amateur-radio-manual` — Amateur Radio Manual (Wikibooks) — https://en.wikibooks.org/w/index.php?title=Amateur_Radio_Manual&oldid=4671271 — pages: Amateur Radio Manual (rev 4671271); Amateur Radio Manual/Atoms (rev 4473723); Amateur Radio Manual/Conductors and Insulators (rev 3251415); Amateur Radio Manual/Sources of Current (rev 3251418); Amateur Radio Manual/What is Voltage (rev 3251422); Amateur Radio Manual/Ohm's Law and Resistors (rev 4657627); Amateur Radio Manual/Direct and Alternating Current (rev 3452652); Amateur Radio Manual/Sinusoidal Waveforms (rev 2485363); Amateur Radio Manual/Amateur Radio Bands (rev 4493005)
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13
+- Files:
+  - `radio/wp2-10-meter-band` — 10-meter band — https://en.wikipedia.org/w/index.php?title=10-meter_band&oldid=1368628373
+  - `radio/wp2-160-meter-band` — 160-meter band — https://en.wikipedia.org/w/index.php?title=160-meter_band&oldid=1304930419
+  - `radio/wp2-2-meter-band` — 2-meter band — https://en.wikipedia.org/w/index.php?title=2-meter_band&oldid=1379508317
+  - `radio/wp2-40-meter-band` — 40-meter band — https://en.wikipedia.org/w/index.php?title=40-meter_band&oldid=1382800314
+  - `radio/wp2-6-meter-band` — 6-meter band — https://en.wikipedia.org/w/index.php?title=6-meter_band&oldid=1341429151
+  - `radio/wp2-70-centimeter-band` — 70-centimeter band — https://en.wikipedia.org/w/index.php?title=70-centimeter_band&oldid=1328236552
+  - `radio/wp2-80-meter-band` — 80-meter band — https://en.wikipedia.org/w/index.php?title=80-meter_band&oldid=1374359289
+  - `radio/wp2-airband` — Airband — https://en.wikipedia.org/w/index.php?title=Airband&oldid=1385139235
+  - `radio/wp2-amateur-radio-net` — Amateur radio net — https://en.wikipedia.org/w/index.php?title=Amateur_radio_net&oldid=1382284174
+  - `radio/wp2-amateur-radio-operator` — Amateur radio operator — https://en.wikipedia.org/w/index.php?title=Amateur_radio_operator&oldid=1384977818
+  - `radio/wp2-amateur-radio-satellite` — Amateur radio satellite — https://en.wikipedia.org/w/index.php?title=Amateur_radio_satellite&oldid=1378695231
+  - `radio/wp2-atmospheric-noise` — Atmospheric noise — https://en.wikipedia.org/w/index.php?title=Atmospheric_noise&oldid=1364994476
+  - `radio/wp2-beverage-antenna` — Beverage antenna — https://en.wikipedia.org/w/index.php?title=Beverage_antenna&oldid=1362925405
+  - `radio/wp2-call-sign` — Call sign — https://en.wikipedia.org/w/index.php?title=Call_sign&oldid=1383231267
+  - `radio/wp2-collinear-antenna-array` — Collinear antenna array — https://en.wikipedia.org/w/index.php?title=Collinear_antenna_array&oldid=1332635242
+  - `radio/wp2-d-star` — D-STAR — https://en.wikipedia.org/w/index.php?title=D-STAR&oldid=1383931520
+  - `radio/wp2-digital-mobile-radio` — Digital mobile radio — https://en.wikipedia.org/w/index.php?title=Digital_mobile_radio&oldid=1380128959
+  - `radio/wp2-digital-selective-calling` — Digital selective calling — https://en.wikipedia.org/w/index.php?title=Digital_selective_calling&oldid=1368512122
+  - `radio/wp2-direct-conversion-receiver` — Direct-conversion receiver — https://en.wikipedia.org/w/index.php?title=Direct-conversion_receiver&oldid=1364262336
+  - `radio/wp2-discone-antenna` — Discone antenna — https://en.wikipedia.org/w/index.php?title=Discone_antenna&oldid=1343885540
+  - `radio/wp2-earthmoonearth-communication` — Earth–Moon–Earth communication — https://en.wikipedia.org/w/index.php?title=Earth%E2%80%93Moon%E2%80%93Earth_communication&oldid=1378191492
+  - `radio/wp2-effective-radiated-power` — Effective radiated power — https://en.wikipedia.org/w/index.php?title=Effective_radiated_power&oldid=1385588769
+  - `radio/wp2-electrical-telegraph` — Electrical telegraph — https://en.wikipedia.org/w/index.php?title=Electrical_telegraph&oldid=1384821368
+  - `radio/wp2-field-day-amateur-radio` — Field Day (amateur radio) — https://en.wikipedia.org/w/index.php?title=Field_Day_(amateur_radio)&oldid=1375010019
+  - `radio/wp2-field-telephone` — Field telephone — https://en.wikipedia.org/w/index.php?title=Field_telephone&oldid=1382503892
+  - `radio/wp2-fldigi` — Fldigi — https://en.wikipedia.org/w/index.php?title=Fldigi&oldid=1384519434
+  - `radio/wp2-free-space-path-loss` — Free-space path loss — https://en.wikipedia.org/w/index.php?title=Free-space_path_loss&oldid=1365112863
+  - `radio/wp2-frequency-shift-keying` — Frequency-shift keying — https://en.wikipedia.org/w/index.php?title=Frequency-shift_keying&oldid=1385601255
+  - `radio/wp2-g5rv-antenna` — G5RV antenna — https://en.wikipedia.org/w/index.php?title=G5RV_antenna&oldid=1342464324
+  - `radio/wp2-gain-antenna` — Gain (antenna) — https://en.wikipedia.org/w/index.php?title=Gain_(antenna)&oldid=1385588929
+  - `radio/wp2-global-maritime-distress-and-safety-system` — Global Maritime Distress and Safety System — https://en.wikipedia.org/w/index.php?title=Global_Maritime_Distress_and_Safety_System&oldid=1362625517
+  - `radio/wp2-ground-wave` — Ground wave — https://en.wikipedia.org/w/index.php?title=Ground_wave&oldid=1384172288
+  - `radio/wp2-helical-antenna` — Helical antenna — https://en.wikipedia.org/w/index.php?title=Helical_antenna&oldid=1365456654
+  - `radio/wp2-hellschreiber` — Hellschreiber — https://en.wikipedia.org/w/index.php?title=Hellschreiber&oldid=1334931965
+  - `radio/wp2-high-frequency` — High frequency — https://en.wikipedia.org/w/index.php?title=High_frequency&oldid=1381989402
+  - `radio/wp2-impedance-matching` — Impedance matching — https://en.wikipedia.org/w/index.php?title=Impedance_matching&oldid=1383210113
+  - `radio/wp2-intermodulation` — Intermodulation — https://en.wikipedia.org/w/index.php?title=Intermodulation&oldid=1350162449
+  - `radio/wp2-inverted-vee-antenna` — Inverted vee antenna — https://en.wikipedia.org/w/index.php?title=Inverted_vee_antenna&oldid=1334050139
+  - `radio/wp2-ionospheric-storm` — Ionospheric storm — https://en.wikipedia.org/w/index.php?title=Ionospheric_storm&oldid=1383383219
+  - `radio/wp2-itu-region` — ITU Region — https://en.wikipedia.org/w/index.php?title=ITU_Region&oldid=1328340325
+  - `radio/wp2-k-index` — K-index — https://en.wikipedia.org/w/index.php?title=K-index&oldid=1376683587
+  - `radio/wp2-lightning-arrester` — Lightning arrester — https://en.wikipedia.org/w/index.php?title=Lightning_arrester&oldid=1336527851
+  - `radio/wp2-link-budget` — Link budget — https://en.wikipedia.org/w/index.php?title=Link_budget&oldid=1379736720
+  - `radio/wp2-log-periodic-antenna` — Log-periodic antenna — https://en.wikipedia.org/w/index.php?title=Log-periodic_antenna&oldid=1320710464
+  - `radio/wp2-meteor-burst-communications` — Meteor burst communications — https://en.wikipedia.org/w/index.php?title=Meteor_burst_communications&oldid=1382060576
+  - `radio/wp2-military-auxiliary-radio-system` — Military Auxiliary Radio System — https://en.wikipedia.org/w/index.php?title=Military_Auxiliary_Radio_System&oldid=1383402173
+  - `radio/wp2-monopole-antenna` — Monopole antenna — https://en.wikipedia.org/w/index.php?title=Monopole_antenna&oldid=1378299971
+  - `radio/wp2-multiple-frequency-shift-keying` — Multiple frequency-shift keying — https://en.wikipedia.org/w/index.php?title=Multiple_frequency-shift_keying&oldid=1377161964
+  - `radio/wp2-navtex` — NAVTEX — https://en.wikipedia.org/w/index.php?title=NAVTEX&oldid=1328233689
+  - `radio/wp2-noise-electronics` — Noise (electronics) — https://en.wikipedia.org/w/index.php?title=Noise_(electronics)&oldid=1303001217
+  - `radio/wp2-olivia-mfsk` — Olivia MFSK — https://en.wikipedia.org/w/index.php?title=Olivia_MFSK&oldid=1324522392
+  - `radio/wp2-path-loss` — Path loss — https://en.wikipedia.org/w/index.php?title=Path_loss&oldid=1360716530
+  - `radio/wp2-phase-shift-keying` — Phase-shift keying — https://en.wikipedia.org/w/index.php?title=Phase-shift_keying&oldid=1383935022
+  - `radio/wp2-psk31` — PSK31 — https://en.wikipedia.org/w/index.php?title=PSK31&oldid=1332451580
+  - `radio/wp2-push-to-talk` — Push-to-talk — https://en.wikipedia.org/w/index.php?title=Push-to-talk&oldid=1324755965
+  - `radio/wp2-quad-antenna` — Quad antenna — https://en.wikipedia.org/w/index.php?title=Quad_antenna&oldid=1350763023
+  - `radio/wp2-radiation-pattern` — Radiation pattern — https://en.wikipedia.org/w/index.php?title=Radiation_pattern&oldid=1343410001
+  - `radio/wp2-radio-clock` — Radio clock — https://en.wikipedia.org/w/index.php?title=Radio_clock&oldid=1374239198
+  - `radio/wp2-radio-jamming` — Radio jamming — https://en.wikipedia.org/w/index.php?title=Radio_jamming&oldid=1368365006
+  - `radio/wp2-radio-noise` — Radio noise — https://en.wikipedia.org/w/index.php?title=Radio_noise&oldid=1299378687
+  - `radio/wp2-radio-receiver` — Radio receiver — https://en.wikipedia.org/w/index.php?title=Radio_receiver&oldid=1381742115
+  - `radio/wp2-radio-repeater` — Radio repeater — https://en.wikipedia.org/w/index.php?title=Radio_repeater&oldid=1317590737
+  - `radio/wp2-radioteletype` — Radioteletype — https://en.wikipedia.org/w/index.php?title=Radioteletype&oldid=1383993009
+  - `radio/wp2-regenerative-circuit` — Regenerative circuit — https://en.wikipedia.org/w/index.php?title=Regenerative_circuit&oldid=1374383676
+  - `radio/wp2-rubber-ducky-antenna` — Rubber ducky antenna — https://en.wikipedia.org/w/index.php?title=Rubber_ducky_antenna&oldid=1276369332
+  - `radio/wp2-satellite-phone` — Satellite phone — https://en.wikipedia.org/w/index.php?title=Satellite_phone&oldid=1384966099
+  - `radio/wp2-shortwave-radio` — Shortwave radio — https://en.wikipedia.org/w/index.php?title=Shortwave_radio&oldid=1383209789
+  - `radio/wp2-signal-modulation` — Signal modulation — https://en.wikipedia.org/w/index.php?title=Signal_modulation&oldid=1381143769
+  - `radio/wp2-signal-to-noise-ratio` — Signal-to-noise ratio — https://en.wikipedia.org/w/index.php?title=Signal-to-noise_ratio&oldid=1383589748
+  - `radio/wp2-slow-scan-television` — Slow-scan television — https://en.wikipedia.org/w/index.php?title=Slow-scan_television&oldid=1383150106
+  - `radio/wp2-sneakernet` — Sneakernet — https://en.wikipedia.org/w/index.php?title=Sneakernet&oldid=1383614070
+  - `radio/wp2-solar-cycle` — Solar cycle — https://en.wikipedia.org/w/index.php?title=Solar_cycle&oldid=1384200607
+  - `radio/wp2-sound-powered-telephone` — Sound-powered telephone — https://en.wikipedia.org/w/index.php?title=Sound-powered_telephone&oldid=1382937050
+  - `radio/wp2-sporadic-e-propagation` — Sporadic E propagation — https://en.wikipedia.org/w/index.php?title=Sporadic_E_propagation&oldid=1371339346
+  - `radio/wp2-store-and-forward` — Store and forward — https://en.wikipedia.org/w/index.php?title=Store_and_forward&oldid=1379738444
+  - `radio/wp2-sudden-ionospheric-disturbance` — Sudden ionospheric disturbance — https://en.wikipedia.org/w/index.php?title=Sudden_ionospheric_disturbance&oldid=1346826379
+  - `radio/wp2-sunspot` — Sunspot — https://en.wikipedia.org/w/index.php?title=Sunspot&oldid=1384817720
+  - `radio/wp2-superheterodyne-receiver` — Superheterodyne receiver — https://en.wikipedia.org/w/index.php?title=Superheterodyne_receiver&oldid=1376674453
+  - `radio/wp2-ten-code` — Ten-code — https://en.wikipedia.org/w/index.php?title=Ten-code&oldid=1383975754
+  - `radio/wp2-time-signal` — Time signal — https://en.wikipedia.org/w/index.php?title=Time_signal&oldid=1384977774
+  - `radio/wp2-transceiver` — Transceiver — https://en.wikipedia.org/w/index.php?title=Transceiver&oldid=1380817664
+  - `radio/wp2-transmitter` — Transmitter — https://en.wikipedia.org/w/index.php?title=Transmitter&oldid=1379870831
+  - `radio/wp2-tropospheric-propagation` — Tropospheric propagation — https://en.wikipedia.org/w/index.php?title=Tropospheric_propagation&oldid=1383899231
+  - `radio/wp2-twin-lead` — Twin-lead — https://en.wikipedia.org/w/index.php?title=Twin-lead&oldid=1374799441
+  - `radio/wp2-ultra-high-frequency` — Ultra high frequency — https://en.wikipedia.org/w/index.php?title=Ultra_high_frequency&oldid=1382158005
+  - `radio/wp2-very-high-frequency` — Very high frequency — https://en.wikipedia.org/w/index.php?title=Very_high_frequency&oldid=1381973161
+  - `radio/wp2-walkie-talkie` — Walkie-talkie — https://en.wikipedia.org/w/index.php?title=Walkie-talkie&oldid=1384821448
+  - `radio/wp2-whip-antenna` — Whip antenna — https://en.wikipedia.org/w/index.php?title=Whip_antenna&oldid=1376010031
+  - `radio/wp2-wireless-mesh-network` — Wireless mesh network — https://en.wikipedia.org/w/index.php?title=Wireless_mesh_network&oldid=1384737048
+  - `radio/wp2-wspr-amateur-radio-software` — WSPR (amateur radio software) — https://en.wikipedia.org/w/index.php?title=WSPR_(amateur_radio_software)&oldid=1373359324

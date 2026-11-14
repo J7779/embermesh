@@ -1,0 +1,250 @@
+# Sources added by the wiki2 sweep for the `survival` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `survival/wb2-knots-individual` — Knots (Wikibooks): How to Tie Individual Knots — https://en.wikibooks.org/w/index.php?title=Knots/Hitch_knots/Round_turn&oldid=1810622 — pages: Knots/Hitch knots/Round turn (rev 1810622); Knots/Binding knots/Constrictor (rev 3329930); Knots/Binding knots/Reef knot (rev 4089859); Knots/Loop knots/Bowline (rev 4615294); Knots/Loop knots/Alpine butterfly (rev 2981187); Knots/Seizing knots/Sheepshank (rev 4329033); Knots/Bend knots/Sheet bend (rev 3329934); Knots/Decorative knots/Turk's head knot (rev 3577354); Knots/Loop knots/Figure-eight loop (rev 1844033); Knots/Heaving knots/Monkey fist (rev 1844057); Knots/Sinnet knots/Three-string English sinnet (rev 1844680); Knots/Sinnet knots/Five-string English sinnet (rev 1844679); Knots/Hitch knots/Icicle hitch (rev 3329916); Knots/Bend knots/Water knot (rev 1862175); Knots/Binding knots/Trucker's hitch (rev 3699724); Knots/Bend knots/Zeppelin bend (rev 1921628); Knots/Trick knots/Thief knot (rev 3400121); Knots/Hitch knots/Buntline hitch (rev 1924883)
+  - `survival/wb2-knots-rope-and-care-part1` — Knots (Wikibooks): Rope, Terms and Care (part 1 of 2: Knots, Binding knots, Introduction…) — https://en.wikibooks.org/w/index.php?title=Knots&oldid=3461464 — pages: Knots (rev 3461464); Knots/Binding knots (rev 1937411); Knots/Introduction (rev 4431206); Knots/Properties of knots (rev 3099977); Knots/Components (rev 2505929); Knots/Loop knots (rev 1937421); Knots/Webbing (rev 4368293); Knots/Whipping (rev 1937427); Knots/Rope (rev 2734583); Knots/Rope splicing (rev 2695808); Knots/Synthetic fibre (rev 2554201)
+  - `survival/wb2-knots-rope-and-care-part2` — Knots (Wikibooks): Rope, Terms and Care (part 2 of 2: Caring for cordage, Lashing) — https://en.wikibooks.org/w/index.php?title=Knots/Caring_for_cordage&oldid=4615293 — pages: Knots/Caring for cordage (rev 4615293); Knots/Lashing (rev 1984659)
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13, 2026-11-14
+- Files:
+  - `survival/wp2-abrus-precatorius` — Abrus precatorius (jequirity bean) — https://en.wikipedia.org/w/index.php?title=Abrus_precatorius&oldid=1383409774
+  - `survival/wp2-abseiling` — Abseiling — https://en.wikipedia.org/w/index.php?title=Abseiling&oldid=1384629853
+  - `survival/wp2-acclimatization` — Acclimatization — https://en.wikipedia.org/w/index.php?title=Acclimatization&oldid=1304891763
+  - `survival/wp2-ackee` — Ackee — https://en.wikipedia.org/w/index.php?title=Ackee&oldid=1383147746
+  - `survival/wp2-aconitum-napellus` — Aconitum napellus (monkshood) — https://en.wikipedia.org/w/index.php?title=Aconitum_napellus&oldid=1354831815
+  - `survival/wp2-adjustable-grip-hitch` — Adjustable grip hitch — https://en.wikipedia.org/w/index.php?title=Adjustable_grip_hitch&oldid=1353584434
+  - `survival/wp2-aesculus-hippocastanum` — Aesculus hippocastanum (horse chestnut) — https://en.wikipedia.org/w/index.php?title=Aesculus_hippocastanum&oldid=1384259782
+  - `survival/wp2-aflatoxin` — Aflatoxin — https://en.wikipedia.org/w/index.php?title=Aflatoxin&oldid=1383397025
+  - `survival/wp2-amanita-bisporigera` — Amanita bisporigera (eastern destroying angel amanita) — https://en.wikipedia.org/w/index.php?title=Amanita_bisporigera&oldid=1363018576
+  - `survival/wp2-amanita-muscaria` — Amanita muscaria (fly agaric) — https://en.wikipedia.org/w/index.php?title=Amanita_muscaria&oldid=1385051687
+  - `survival/wp2-amanita-ocreata` — Amanita ocreata (destroying angels) — https://en.wikipedia.org/w/index.php?title=Amanita_ocreata&oldid=1377114016
+  - `survival/wp2-amanita-pantherina` — Amanita pantherina (panther cap) — https://en.wikipedia.org/w/index.php?title=Amanita_pantherina&oldid=1381646129
+  - `survival/wp2-amanita-phalloides` — Amanita phalloides (death cap) — https://en.wikipedia.org/w/index.php?title=Amanita_phalloides&oldid=1380615841
+  - `survival/wp2-amanita-virosa` — Amanita virosa (destroying angel) — https://en.wikipedia.org/w/index.php?title=Amanita_virosa&oldid=1364290158
+  - `survival/wp2-amatoxin` — Amatoxin — https://en.wikipedia.org/w/index.php?title=Amatoxin&oldid=1385475787
+  - `survival/wp2-angling` — Angling — https://en.wikipedia.org/w/index.php?title=Angling&oldid=1371328643
+  - `survival/wp2-arum-maculatum` — Arum maculatum (cuckoopint) — https://en.wikipedia.org/w/index.php?title=Arum_maculatum&oldid=1332625066
+  - `survival/wp2-ashleys-stopper-knot` — Ashley's stopper knot — https://en.wikipedia.org/w/index.php?title=Ashley%27s_stopper_knot&oldid=1354755441
+  - `survival/wp2-atropa-bella-donna` — Atropa bella-donna (deadly nightshade) — https://en.wikipedia.org/w/index.php?title=Atropa_bella-donna&oldid=1382702036
+  - `survival/wp2-bachmann-knot` — Bachmann knot — https://en.wikipedia.org/w/index.php?title=Bachmann_knot&oldid=1306225098
+  - `survival/wp2-backpacking-hiking` — Backpacking (hiking) — https://en.wikipedia.org/w/index.php?title=Backpacking_(hiking)&oldid=1380199455
+  - `survival/wp2-belaying` — Belaying — https://en.wikipedia.org/w/index.php?title=Belaying&oldid=1371641306
+  - `survival/wp2-bend-knot` — Bend (knot) — https://en.wikipedia.org/w/index.php?title=Bend_(knot)&oldid=1348442020
+  - `survival/wp2-billycan` — Billycan — https://en.wikipedia.org/w/index.php?title=Billycan&oldid=1363194028
+  - `survival/wp2-bird-trapping` — Bird trapping — https://en.wikipedia.org/w/index.php?title=Bird_trapping&oldid=1379980311
+  - `survival/wp2-birdlime` — Birdlime — https://en.wikipedia.org/w/index.php?title=Birdlime&oldid=1376734383
+  - `survival/wp2-blakes-hitch` — Blake's hitch — https://en.wikipedia.org/w/index.php?title=Blake%27s_hitch&oldid=1352543838
+  - `survival/wp2-blood-knot` — Blood knot — https://en.wikipedia.org/w/index.php?title=Blood_knot&oldid=1378536173
+  - `survival/wp2-blowgun` — Blowgun — https://en.wikipedia.org/w/index.php?title=Blowgun&oldid=1375254392
+  - `survival/wp2-bottle-trap` — Bottle trap — https://en.wikipedia.org/w/index.php?title=Bottle_trap&oldid=1381063806
+  - `survival/wp2-bow-and-arrow` — Bow and arrow — https://en.wikipedia.org/w/index.php?title=Bow_and_arrow&oldid=1382052090
+  - `survival/wp2-bowhunting` — Bowhunting — https://en.wikipedia.org/w/index.php?title=Bowhunting&oldid=1360395128
+  - `survival/wp2-bowline-on-a-bight` — Bowline on a bight — https://en.wikipedia.org/w/index.php?title=Bowline_on_a_bight&oldid=1370582728
+  - `survival/wp2-bowline` — Bowline — https://en.wikipedia.org/w/index.php?title=Bowline&oldid=1370582588
+  - `survival/wp2-buntline-hitch` — Buntline hitch — https://en.wikipedia.org/w/index.php?title=Buntline_hitch&oldid=1362176902
+  - `survival/wp2-butterfly-loop` — Butterfly loop — https://en.wikipedia.org/w/index.php?title=Butterfly_loop&oldid=1371247916
+  - `survival/wp2-camping` — Camping — https://en.wikipedia.org/w/index.php?title=Camping&oldid=1384054706
+  - `survival/wp2-canteen-bottle` — Canteen (bottle) — https://en.wikipedia.org/w/index.php?title=Canteen_(bottle)&oldid=1336897013
+  - `survival/wp2-carabiner` — Carabiner — https://en.wikipedia.org/w/index.php?title=Carabiner&oldid=1382866245
+  - `survival/wp2-carrick-bend` — Carrick bend — https://en.wikipedia.org/w/index.php?title=Carrick_bend&oldid=1357725242
+  - `survival/wp2-cast-net` — Cast net — https://en.wikipedia.org/w/index.php?title=Cast_net&oldid=1380425901
+  - `survival/wp2-cerbera-odollam` — Cerbera odollam (suicide tree) — https://en.wikipedia.org/w/index.php?title=Cerbera_odollam&oldid=1367429502
+  - `survival/wp2-chlorophyllum-molybdites` — Chlorophyllum molybdites (green-spored parasol) — https://en.wikipedia.org/w/index.php?title=Chlorophyllum_molybdites&oldid=1379524007
+  - `survival/wp2-cicuta-maculata` — Cicuta maculata (spotted water hemlock) — https://en.wikipedia.org/w/index.php?title=Cicuta_maculata&oldid=1314021980
+  - `survival/wp2-cicuta-virosa` — Cicuta virosa (cowbane) — https://en.wikipedia.org/w/index.php?title=Cicuta_virosa&oldid=1314161741
+  - `survival/wp2-cicuta` — Cicuta — https://en.wikipedia.org/w/index.php?title=Cicuta&oldid=1359284305
+  - `survival/wp2-clam-digging` — Clam digging — https://en.wikipedia.org/w/index.php?title=Clam_digging&oldid=1340821452
+  - `survival/wp2-claviceps-purpurea` — Claviceps purpurea — https://en.wikipedia.org/w/index.php?title=Claviceps_purpurea&oldid=1379604404
+  - `survival/wp2-climbing-harness` — Climbing harness — https://en.wikipedia.org/w/index.php?title=Climbing_harness&oldid=1383430503
+  - `survival/wp2-clitocybe-dealbata` — Clitocybe dealbata (ivory funnel) — https://en.wikipedia.org/w/index.php?title=Clitocybe_dealbata&oldid=1301276599
+  - `survival/wp2-clove-hitch` — Clove hitch — https://en.wikipedia.org/w/index.php?title=Clove_hitch&oldid=1365517212
+  - `survival/wp2-colchicum-autumnale` — Colchicum autumnale (autumn crocus) — https://en.wikipedia.org/w/index.php?title=Colchicum_autumnale&oldid=1351522358
+  - `survival/wp2-conium-maculatum` — Conium maculatum (hemlock) — https://en.wikipedia.org/w/index.php?title=Conium_maculatum&oldid=1385521251
+  - `survival/wp2-constrictor-knot` — Constrictor knot — https://en.wikipedia.org/w/index.php?title=Constrictor_knot&oldid=1361110722
+  - `survival/wp2-cortinarius-orellanus` — Cortinarius orellanus (fool's webcap) — https://en.wikipedia.org/w/index.php?title=Cortinarius_orellanus&oldid=1363130469
+  - `survival/wp2-cortinarius-rubellus` — Cortinarius rubellus (deadly webcap) — https://en.wikipedia.org/w/index.php?title=Cortinarius_rubellus&oldid=1354756696
+  - `survival/wp2-cow-hitch` — Cow hitch — https://en.wikipedia.org/w/index.php?title=Cow_hitch&oldid=1384380478
+  - `survival/wp2-crab-trap` — Crab trap — https://en.wikipedia.org/w/index.php?title=Crab_trap&oldid=1363150509
+  - `survival/wp2-crampon` — Crampon — https://en.wikipedia.org/w/index.php?title=Crampon&oldid=1381748526
+  - `survival/wp2-crevasse-rescue` — Crevasse rescue — https://en.wikipedia.org/w/index.php?title=Crevasse_rescue&oldid=1323319107
+  - `survival/wp2-daphne-mezereum` — Daphne mezereum (mezereon) — https://en.wikipedia.org/w/index.php?title=Daphne_mezereum&oldid=1377594012
+  - `survival/wp2-datura-stramonium` — Datura stramonium (thornapple) — https://en.wikipedia.org/w/index.php?title=Datura_stramonium&oldid=1382513170
+  - `survival/wp2-deer-hunting` — Deer hunting — https://en.wikipedia.org/w/index.php?title=Deer_hunting&oldid=1383580455
+  - `survival/wp2-dieffenbachia` — Dieffenbachia — https://en.wikipedia.org/w/index.php?title=Dieffenbachia&oldid=1354818984
+  - `survival/wp2-digitalis-purpurea` — Digitalis purpurea (foxglove) — https://en.wikipedia.org/w/index.php?title=Digitalis_purpurea&oldid=1384734643
+  - `survival/wp2-entoloma-sinuatum` — Entoloma sinuatum (livid entoloma) — https://en.wikipedia.org/w/index.php?title=Entoloma_sinuatum&oldid=1364421386
+  - `survival/wp2-equisetum-arvense` — Equisetum arvense (field horsetail) — https://en.wikipedia.org/w/index.php?title=Equisetum_arvense&oldid=1379571962
+  - `survival/wp2-eskimo-bowline` — Eskimo bowline — https://en.wikipedia.org/w/index.php?title=Eskimo_bowline&oldid=1320076830
+  - `survival/wp2-euonymus-europaeus` — Euonymus europaeus (spindle) — https://en.wikipedia.org/w/index.php?title=Euonymus_europaeus&oldid=1379475838
+  - `survival/wp2-eye-splice` — Eye splice — https://en.wikipedia.org/w/index.php?title=Eye_splice&oldid=1380125214
+  - `survival/wp2-farmers-loop` — Farmer's loop — https://en.wikipedia.org/w/index.php?title=Farmer%27s_loop&oldid=1355069669
+  - `survival/wp2-figure-eight-knot` — Figure-eight knot — https://en.wikipedia.org/w/index.php?title=Figure-eight_knot&oldid=1373704703
+  - `survival/wp2-figure-eight-loop` — Figure-eight loop — https://en.wikipedia.org/w/index.php?title=Figure-eight_loop&oldid=1383479837
+  - `survival/wp2-firemans-carry` — Fireman's carry — https://en.wikipedia.org/w/index.php?title=Fireman%27s_carry&oldid=1304283770
+  - `survival/wp2-fish-hook` — Fish hook — https://en.wikipedia.org/w/index.php?title=Fish_hook&oldid=1362228841
+  - `survival/wp2-fishermans-knot` — Fisherman's knot — https://en.wikipedia.org/w/index.php?title=Fisherman%27s_knot&oldid=1368156677
+  - `survival/wp2-fishing-bait` — Fishing bait — https://en.wikipedia.org/w/index.php?title=Fishing_bait&oldid=1349433921
+  - `survival/wp2-fishing-lure` — Fishing lure — https://en.wikipedia.org/w/index.php?title=Fishing_lure&oldid=1329488457
+  - `survival/wp2-fishing-net` — Fishing net — https://en.wikipedia.org/w/index.php?title=Fishing_net&oldid=1372877589
+  - `survival/wp2-fishing-rod` — Fishing rod — https://en.wikipedia.org/w/index.php?title=Fishing_rod&oldid=1369560330
+  - `survival/wp2-fishing-techniques` — Fishing techniques — https://en.wikipedia.org/w/index.php?title=Fishing_techniques&oldid=1385317846
+  - `survival/wp2-fishing` — Fishing — https://en.wikipedia.org/w/index.php?title=Fishing&oldid=1384434924
+  - `survival/wp2-food-storage` — Food storage — https://en.wikipedia.org/w/index.php?title=Food_storage&oldid=1369809265
+  - `survival/wp2-ford-crossing` — Ford (crossing) — https://en.wikipedia.org/w/index.php?title=Ford_(crossing)&oldid=1372990164
+  - `survival/wp2-galerina-marginata` — Galerina marginata (funeral bell) — https://en.wikipedia.org/w/index.php?title=Galerina_marginata&oldid=1366970605
+  - `survival/wp2-game-hunting` — Game (hunting) — https://en.wikipedia.org/w/index.php?title=Game_(hunting)&oldid=1384158666
+  - `survival/wp2-garda-hitch` — Garda hitch — https://en.wikipedia.org/w/index.php?title=Garda_hitch&oldid=1264135360
+  - `survival/wp2-gelsemium-sempervirens` — Gelsemium sempervirens (yellow jessamine) — https://en.wikipedia.org/w/index.php?title=Gelsemium_sempervirens&oldid=1379274969
+  - `survival/wp2-gillnetting` — Gillnetting — https://en.wikipedia.org/w/index.php?title=Gillnetting&oldid=1342328310
+  - `survival/wp2-glycoside` — Glycoside — https://en.wikipedia.org/w/index.php?title=Glycoside&oldid=1377234927
+  - `survival/wp2-granny-knot` — Granny knot — https://en.wikipedia.org/w/index.php?title=Granny_knot&oldid=1378453258
+  - `survival/wp2-gyromitra-esculenta` — Gyromitra esculenta — https://en.wikipedia.org/w/index.php?title=Gyromitra_esculenta&oldid=1384893660
+  - `survival/wp2-halter-hitch` — Halter hitch — https://en.wikipedia.org/w/index.php?title=Halter_hitch&oldid=1171197510
+  - `survival/wp2-handline-fishing` — Handline fishing — https://en.wikipedia.org/w/index.php?title=Handline_fishing&oldid=1323262581
+  - `survival/wp2-heracleum-mantegazzianum` — Heracleum mantegazzianum (giant hogweed) — https://en.wikipedia.org/w/index.php?title=Heracleum_mantegazzianum&oldid=1381307194
+  - `survival/wp2-highwaymans-hitch` — Highwayman's hitch — https://en.wikipedia.org/w/index.php?title=Highwayman%27s_hitch&oldid=1346623926
+  - `survival/wp2-hiking` — Hiking — https://en.wikipedia.org/w/index.php?title=Hiking&oldid=1385445276
+  - `survival/wp2-hitch-knot` — Hitch (knot) — https://en.wikipedia.org/w/index.php?title=Hitch_(knot)&oldid=1312620411
+  - `survival/wp2-hunting` — Hunting — https://en.wikipedia.org/w/index.php?title=Hunting&oldid=1384571572
+  - `survival/wp2-hydrangea` — Hydrangea — https://en.wikipedia.org/w/index.php?title=Hydrangea&oldid=1372391784
+  - `survival/wp2-hyoscyamus-niger` — Hyoscyamus niger (Henbane) — https://en.wikipedia.org/w/index.php?title=Hyoscyamus_niger&oldid=1382512417
+  - `survival/wp2-ice-axe` — Ice axe — https://en.wikipedia.org/w/index.php?title=Ice_axe&oldid=1383138200
+  - `survival/wp2-ice-fishing` — Ice fishing — https://en.wikipedia.org/w/index.php?title=Ice_fishing&oldid=1360690316
+  - `survival/wp2-icicle-hitch` — Icicle hitch — https://en.wikipedia.org/w/index.php?title=Icicle_hitch&oldid=1345471584
+  - `survival/wp2-ilex-aquifolium` — Ilex aquifolium (holly) — https://en.wikipedia.org/w/index.php?title=Ilex_aquifolium&oldid=1376851178
+  - `survival/wp2-immersion-suit` — Immersion suit — https://en.wikipedia.org/w/index.php?title=Immersion_suit&oldid=1354637572
+  - `survival/wp2-inocybe` — Inocybe — https://en.wikipedia.org/w/index.php?title=Inocybe&oldid=1313826113
+  - `survival/wp2-jacobaea-vulgaris` — Jacobaea vulgaris (ragwort) — https://en.wikipedia.org/w/index.php?title=Jacobaea_vulgaris&oldid=1380336273
+  - `survival/wp2-jug-fishing` — Jug fishing — https://en.wikipedia.org/w/index.php?title=Jug_fishing&oldid=1379440179
+  - `survival/wp2-kalmia-latifolia` — Kalmia latifolia (mountain laurel) — https://en.wikipedia.org/w/index.php?title=Kalmia_latifolia&oldid=1372418116
+  - `survival/wp2-kernmantle-rope` — Kernmantle rope — https://en.wikipedia.org/w/index.php?title=Kernmantle_rope&oldid=1355648041
+  - `survival/wp2-klemheist-knot` — Klemheist knot — https://en.wikipedia.org/w/index.php?title=Klemheist_knot&oldid=1367396686
+  - `survival/wp2-knot` — Knot — https://en.wikipedia.org/w/index.php?title=Knot&oldid=1384631157
+  - `survival/wp2-konzo` — Konzo — https://en.wikipedia.org/w/index.php?title=Konzo&oldid=1365332692
+  - `survival/wp2-laburnum-anagyroides` — Laburnum anagyroides (common laburnum) — https://en.wikipedia.org/w/index.php?title=Laburnum_anagyroides&oldid=1368491677
+  - `survival/wp2-lantana-camara` — Lantana camara (common lantana) — https://en.wikipedia.org/w/index.php?title=Lantana_camara&oldid=1379961250
+  - `survival/wp2-lathyrism` — Lathyrism — https://en.wikipedia.org/w/index.php?title=Lathyrism&oldid=1338089450
+  - `survival/wp2-leave-no-trace` — Leave No Trace — https://en.wikipedia.org/w/index.php?title=Leave_No_Trace&oldid=1383398957
+  - `survival/wp2-lepiota-brunneoincarnata` — Lepiota brunneoincarnata (deadly dapperling) — https://en.wikipedia.org/w/index.php?title=Lepiota_brunneoincarnata&oldid=1253882899
+  - `survival/wp2-lifeboat-shipboard` — Lifeboat (shipboard) — https://en.wikipedia.org/w/index.php?title=Lifeboat_(shipboard)&oldid=1382697568
+  - `survival/wp2-lily-of-the-valley` — Lily of the valley — https://en.wikipedia.org/w/index.php?title=Lily_of_the_valley&oldid=1385012146
+  - `survival/wp2-list-of-poisonous-plants` — List of poisonous plants — https://en.wikipedia.org/w/index.php?title=List_of_poisonous_plants&oldid=1383132551
+  - `survival/wp2-lobster-trap` — Lobster trap — https://en.wikipedia.org/w/index.php?title=Lobster_trap&oldid=1384450792
+  - `survival/wp2-longline-fishing` — Longline fishing — https://en.wikipedia.org/w/index.php?title=Longline_fishing&oldid=1369641148
+  - `survival/wp2-manchineel` — Manchineel — https://en.wikipedia.org/w/index.php?title=Manchineel&oldid=1384831500
+  - `survival/wp2-marlinespike-hitch` — Marlinespike hitch — https://en.wikipedia.org/w/index.php?title=Marlinespike_hitch&oldid=1267037651
+  - `survival/wp2-matthew-walker-knot` — Matthew Walker knot — https://en.wikipedia.org/w/index.php?title=Matthew_Walker_knot&oldid=1319462963
+  - `survival/wp2-mess-kit` — Mess kit — https://en.wikipedia.org/w/index.php?title=Mess_kit&oldid=1370968725
+  - `survival/wp2-millers-knot` — Miller's knot — https://en.wikipedia.org/w/index.php?title=Miller%27s_knot&oldid=1345621463
+  - `survival/wp2-monkeys-fist` — Monkey's fist — https://en.wikipedia.org/w/index.php?title=Monkey%27s_fist&oldid=1364876752
+  - `survival/wp2-mountaineering` — Mountaineering — https://en.wikipedia.org/w/index.php?title=Mountaineering&oldid=1383558089
+  - `survival/wp2-munter-hitch` — Munter hitch — https://en.wikipedia.org/w/index.php?title=Munter_hitch&oldid=1299560948
+  - `survival/wp2-muscarine` — Muscarine — https://en.wikipedia.org/w/index.php?title=Muscarine&oldid=1384723601
+  - `survival/wp2-mussel` — Mussel — https://en.wikipedia.org/w/index.php?title=Mussel&oldid=1384621474
+  - `survival/wp2-mycotoxin` — Mycotoxin — https://en.wikipedia.org/w/index.php?title=Mycotoxin&oldid=1385434899
+  - `survival/wp2-narcissus-plant` — Narcissus (plant) — https://en.wikipedia.org/w/index.php?title=Narcissus_(plant)&oldid=1384898785
+  - `survival/wp2-nerium` — Nerium — https://en.wikipedia.org/w/index.php?title=Nerium&oldid=1383422909
+  - `survival/wp2-noodling` — Noodling — https://en.wikipedia.org/w/index.php?title=Noodling&oldid=1332217232
+  - `survival/wp2-noose` — Noose — https://en.wikipedia.org/w/index.php?title=Noose&oldid=1379563132
+  - `survival/wp2-oenanthe-crocata` — Oenanthe crocata (hemlock water-dropwort) — https://en.wikipedia.org/w/index.php?title=Oenanthe_crocata&oldid=1358873486
+  - `survival/wp2-omphalotus-olearius` — Omphalotus olearius (jack-o'-lantern mushroom) — https://en.wikipedia.org/w/index.php?title=Omphalotus_olearius&oldid=1357314344
+  - `survival/wp2-orellanine` — Orellanine — https://en.wikipedia.org/w/index.php?title=Orellanine&oldid=1380116055
+  - `survival/wp2-overhand-knot` — Overhand knot — https://en.wikipedia.org/w/index.php?title=Overhand_knot&oldid=1362374935
+  - `survival/wp2-oxalic-acid` — Oxalic acid — https://en.wikipedia.org/w/index.php?title=Oxalic_acid&oldid=1379997184
+  - `survival/wp2-oyster` — Oyster — https://en.wikipedia.org/w/index.php?title=Oyster&oldid=1384654536
+  - `survival/wp2-palomar-knot` — Palomar knot — https://en.wikipedia.org/w/index.php?title=Palomar_knot&oldid=1337854395
+  - `survival/wp2-paxillus-involutus` — Paxillus involutus (brown roll-rim) — https://en.wikipedia.org/w/index.php?title=Paxillus_involutus&oldid=1374791446
+  - `survival/wp2-phytolacca-americana` — Phytolacca americana (American pokeweed) — https://en.wikipedia.org/w/index.php?title=Phytolacca_americana&oldid=1381448264
+  - `survival/wp2-phytolacca` — Phytolacca — https://en.wikipedia.org/w/index.php?title=Phytolacca&oldid=1371661174
+  - `survival/wp2-podophyllum-peltatum` — Podophyllum peltatum (mayapple) — https://en.wikipedia.org/w/index.php?title=Podophyllum_peltatum&oldid=1352956831
+  - `survival/wp2-prunus-laurocerasus` — Prunus laurocerasus (cherry laurel) — https://en.wikipedia.org/w/index.php?title=Prunus_laurocerasus&oldid=1360822390
+  - `survival/wp2-prusik` — Prusik — https://en.wikipedia.org/w/index.php?title=Prusik&oldid=1367959243
+  - `survival/wp2-pteridium-aquilinum` — Pteridium aquilinum (bracken) — https://en.wikipedia.org/w/index.php?title=Pteridium_aquilinum&oldid=1376153257
+  - `survival/wp2-pyrrolizidine-alkaloid` — Pyrrolizidine alkaloid — https://en.wikipedia.org/w/index.php?title=Pyrrolizidine_alkaloid&oldid=1371787940
+  - `survival/wp2-ranunculus-acris` — Ranunculus acris (meadow buttercup) — https://en.wikipedia.org/w/index.php?title=Ranunculus_acris&oldid=1377890752
+  - `survival/wp2-reef-knot` — Reef knot — https://en.wikipedia.org/w/index.php?title=Reef_knot&oldid=1343399911
+  - `survival/wp2-rhododendron` — Rhododendron — https://en.wikipedia.org/w/index.php?title=Rhododendron&oldid=1385472479
+  - `survival/wp2-ricinus` — Ricinus — https://en.wikipedia.org/w/index.php?title=Ricinus&oldid=1382941806
+  - `survival/wp2-robinia-pseudoacacia` — Robinia pseudoacacia (black locust) — https://en.wikipedia.org/w/index.php?title=Robinia_pseudoacacia&oldid=1377028869
+  - `survival/wp2-rolling-hitch` — Rolling hitch — https://en.wikipedia.org/w/index.php?title=Rolling_hitch&oldid=1220983917
+  - `survival/wp2-rope-rescue` — Rope rescue — https://en.wikipedia.org/w/index.php?title=Rope_rescue&oldid=1382810959
+  - `survival/wp2-search-and-rescue-dog` — Search and rescue dog — https://en.wikipedia.org/w/index.php?title=Search_and_rescue_dog&oldid=1382122911
+  - `survival/wp2-seine-fishing` — Seine fishing — https://en.wikipedia.org/w/index.php?title=Seine_fishing&oldid=1345747145
+  - `survival/wp2-sheepshank` — Sheepshank — https://en.wikipedia.org/w/index.php?title=Sheepshank&oldid=1271529528
+  - `survival/wp2-sheet-bend` — Sheet bend — https://en.wikipedia.org/w/index.php?title=Sheet_bend&oldid=1361191771
+  - `survival/wp2-shellfish` — Shellfish — https://en.wikipedia.org/w/index.php?title=Shellfish&oldid=1377769701
+  - `survival/wp2-sling-weapon` — Sling (weapon) — https://en.wikipedia.org/w/index.php?title=Sling_(weapon)&oldid=1382043450
+  - `survival/wp2-solanine` — Solanine — https://en.wikipedia.org/w/index.php?title=Solanine&oldid=1385166122
+  - `survival/wp2-solanum-dulcamara` — Solanum dulcamara (bittersweet) — https://en.wikipedia.org/w/index.php?title=Solanum_dulcamara&oldid=1385124586
+  - `survival/wp2-solanum-nigrum` — Solanum nigrum (European black nightshade) — https://en.wikipedia.org/w/index.php?title=Solanum_nigrum&oldid=1383252631
+  - `survival/wp2-spear-thrower` — Spear-thrower — https://en.wikipedia.org/w/index.php?title=Spear-thrower&oldid=1381769439
+  - `survival/wp2-spear` — Spear — https://en.wikipedia.org/w/index.php?title=Spear&oldid=1384348481
+  - `survival/wp2-spearfishing` — Spearfishing — https://en.wikipedia.org/w/index.php?title=Spearfishing&oldid=1383268253
+  - `survival/wp2-stopper-knot` — Stopper knot — https://en.wikipedia.org/w/index.php?title=Stopper_knot&oldid=1278707006
+  - `survival/wp2-survival-knife` — Survival knife — https://en.wikipedia.org/w/index.php?title=Survival_knife&oldid=1376435269
+  - `survival/wp2-survivalism` — Survivalism — https://en.wikipedia.org/w/index.php?title=Survivalism&oldid=1380707692
+  - `survival/wp2-swimming` — Swimming — https://en.wikipedia.org/w/index.php?title=Swimming&oldid=1383253511
+  - `survival/wp2-taut-line-hitch` — Taut-line hitch — https://en.wikipedia.org/w/index.php?title=Taut-line_hitch&oldid=1281913571
+  - `survival/wp2-taxus-baccata` — Taxus baccata (yew) — https://en.wikipedia.org/w/index.php?title=Taxus_baccata&oldid=1385042216
+  - `survival/wp2-thirst` — Thirst — https://en.wikipedia.org/w/index.php?title=Thirst&oldid=1379104447
+  - `survival/wp2-timber-hitch` — Timber hitch — https://en.wikipedia.org/w/index.php?title=Timber_hitch&oldid=1362379098
+  - `survival/wp2-toxicodendron-diversilobum` — Toxicodendron diversilobum (Pacific poison oak) — https://en.wikipedia.org/w/index.php?title=Toxicodendron_diversilobum&oldid=1377192732
+  - `survival/wp2-toxicodendron-radicans` — Toxicodendron radicans (eastern poison ivy) — https://en.wikipedia.org/w/index.php?title=Toxicodendron_radicans&oldid=1380936275
+  - `survival/wp2-toxicodendron-vernix` — Toxicodendron vernix (poison sumac) — https://en.wikipedia.org/w/index.php?title=Toxicodendron_vernix&oldid=1360934822
+  - `survival/wp2-toxicoscordion-venenosum` — Toxicoscordion venenosum (death camas) — https://en.wikipedia.org/w/index.php?title=Toxicoscordion_venenosum&oldid=1360097167
+  - `survival/wp2-tracking-dog` — Tracking (dog) — https://en.wikipedia.org/w/index.php?title=Tracking_(dog)&oldid=1354822676
+  - `survival/wp2-trapline` — Trapline — https://en.wikipedia.org/w/index.php?title=Trapline&oldid=1360364519
+  - `survival/wp2-trapping-pit` — Trapping pit — https://en.wikipedia.org/w/index.php?title=Trapping_pit&oldid=1347939958
+  - `survival/wp2-treading-water` — Treading water — https://en.wikipedia.org/w/index.php?title=Treading_water&oldid=1385511938
+  - `survival/wp2-trichoderma-cornu-damae` — Trichoderma cornu-damae (poison fire coral) — https://en.wikipedia.org/w/index.php?title=Trichoderma_cornu-damae&oldid=1381185170
+  - `survival/wp2-tricholoma-equestre` — Tricholoma equestre (man on horseback) — https://en.wikipedia.org/w/index.php?title=Tricholoma_equestre&oldid=1385083754
+  - `survival/wp2-trotline` — Trotline — https://en.wikipedia.org/w/index.php?title=Trotline&oldid=1278467031
+  - `survival/wp2-truckers-hitch` — Trucker's hitch — https://en.wikipedia.org/w/index.php?title=Trucker%27s_hitch&oldid=1379757868
+  - `survival/wp2-tumble-hitch` — Tumble hitch — https://en.wikipedia.org/w/index.php?title=Tumble_hitch&oldid=1303736964
+  - `survival/wp2-turks-head-knot` — Turk's head knot — https://en.wikipedia.org/w/index.php?title=Turk%27s_head_knot&oldid=1384076916
+  - `survival/wp2-two-half-hitches` — Two half-hitches — https://en.wikipedia.org/w/index.php?title=Two_half-hitches&oldid=1241282454
+  - `survival/wp2-ultralight-backpacking` — Ultralight backpacking — https://en.wikipedia.org/w/index.php?title=Ultralight_backpacking&oldid=1383784852
+  - `survival/wp2-veratrum-album` — Veratrum album (false helleborine) — https://en.wikipedia.org/w/index.php?title=Veratrum_album&oldid=1376538090
+  - `survival/wp2-veratrum-viride` — Veratrum viride (Indian poke) — https://en.wikipedia.org/w/index.php?title=Veratrum_viride&oldid=1376538188
+  - `survival/wp2-wall-and-crown-knot` — Wall and crown knot — https://en.wikipedia.org/w/index.php?title=Wall_and_crown_knot&oldid=1358656761
+  - `survival/wp2-water-knot` — Water knot — https://en.wikipedia.org/w/index.php?title=Water_knot&oldid=1278705931
+  - `survival/wp2-whipping-knot` — Whipping knot — https://en.wikipedia.org/w/index.php?title=Whipping_knot&oldid=1331814282
+  - `survival/wp2-wisteria` — Wisteria — https://en.wikipedia.org/w/index.php?title=Wisteria&oldid=1384356543
+  - `survival/wp2-yosemite-bowline` — Yosemite bowline — https://en.wikipedia.org/w/index.php?title=Yosemite_bowline&oldid=1323187593
+  - `survival/wp2-zeppelin-bend` — Zeppelin bend — https://en.wikipedia.org/w/index.php?title=Zeppelin_bend&oldid=1342128448
+
+## Wikivoyage (en.wikivoyage.org)
+
+- Credit: Wikivoyage contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `survival/wv2-arctic` — Arctic (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Arctic&oldid=5429196
+  - `survival/wv2-canoeing` — Canoeing (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Canoeing&oldid=4654182
+  - `survival/wv2-dangerous-animals` — Dangerous animals (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Dangerous_animals&oldid=5428555
+  - `survival/wv2-fishing` — Fishing (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Fishing&oldid=5383385
+  - `survival/wv2-hiking-and-bushwalking-in-australia` — Hiking and bushwalking in Australia (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Hiking_and_bushwalking_in_Australia&oldid=5322769
+  - `survival/wv2-horse-riding` — Horse riding (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Horse_riding&oldid=5323987
+  - `survival/wv2-hunting` — Hunting (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Hunting&oldid=5381685
+  - `survival/wv2-mountaineering` — Mountaineering (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Mountaineering&oldid=5426037
+  - `survival/wv2-offroad-driving` — Offroad driving (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Offroad_driving&oldid=5187880
+  - `survival/wv2-packing-list` — Packing list (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Packing_list&oldid=5399407
+  - `survival/wv2-right-to-access-in-the-nordic-countries` — Right to access in the Nordic countries (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Right_to_access_in_the_Nordic_countries&oldid=5340394
+  - `survival/wv2-rock-climbing` — Rock climbing (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Rock_climbing&oldid=5380146
+  - `survival/wv2-stay-safe` — Stay safe (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Stay_safe&oldid=5407077
+  - `survival/wv2-tropical-rainforests` — Tropical rainforests (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Tropical_rainforests&oldid=5291858
+  - `survival/wv2-volcanoes` — Volcanoes (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Volcanoes&oldid=5322042
+  - `survival/wv2-wild-camping` — Wild camping (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Wild_camping&oldid=5344964
+  - `survival/wv2-wilderness` — Wilderness (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Wilderness&oldid=5365027
+  - `survival/wv2-winter-driving` — Winter driving (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Winter_driving&oldid=5415738

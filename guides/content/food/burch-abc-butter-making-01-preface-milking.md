@@ -1,0 +1,32 @@
+---
+id: food/burch-abc-butter-making-01-preface-milking
+title: "ABC Butter Making 1: Preface; Milking"
+category: food
+tags: ["butter making", "churning", "cream", "milk", "dairy", "cattle"]
+summary: "Preface; Milking, from ABC Butter Making (Burch, 1888). I do not claim anything new or startling for this little work, nor do I claim to be what is usually termed \"an authority\" on the subject treated."
+source: "F. S. Burch, ABC Butter Making: A Hand-Book for the Beginner (C. S. Burch Publishing Company, Chicago, 1888); public-domain transcription"
+source_title: "ABC Butter Making: A Hand-Book for the Beginner"
+license: Public Domain
+attribution: "F. S. Burch, ABC Butter Making: A Hand-Book for the Beginner (C. S. Burch Publishing Company, Chicago, 1888). Public domain in the United States (published before 1930)."
+retrieved: 2026-11-13
+part_of: food/burch-abc-butter-making
+order: 1
+---
+
+# ABC Butter Making 1: Preface; Milking
+
+*From ABC Butter Making: A Hand-Book for the Beginner by F. S. Burch (C. S. Burch Publishing Company, Chicago, 1888).*
+
+> **Editor's note:** Milk handling in this book predates routine pasteurisation. Raw milk can carry tuberculosis, brucellosis, Listeria, Salmonella and E. coli; heat milk to 72 °C (161 °F) for 15 seconds or 63 °C (145 °F) for 30 minutes before drinking it or feeding it to children.
+
+## Preface
+
+I do not claim anything new or startling for this little work, nor do I claim to be what is usually termed "an authority" on the subject treated. A B C Butter Making is the result of my own experience in the dairy, together with an extended and careful observation of the experiences and practices of some of the most successful butter-makers in the country, and is an answer, in a complete form, to the numberless questions asked me (as Editor of the Dairy World), by beginners in the dairy.
+
+The Author.
+
+## Milking
+
+Before we can make butter we must have milk, and a few suggestions on this important question will not be out of place here. In order that no dirt or hairs may find their way into the milk-pail, a careful dairyman will always brush off the teats and udder of his cow before he begins to milk, yet, I am sorry to say, thousands of men who profess to be careful dairymen do not know this, and are sometimes guilty of that most uncleanly habit of softening up the teats by squeezing out a little milk on their hands. A large number of cows are utterly ruined every year by improper milking; irregular milking spoils a large number; noisy, loud talking and rough milkers help to spoil a good many more. The very slow milker, as well as the quick, jerky milker, who never strips the cow thoroughly, are helping to make a large number of our cows unprofitable. Six o'clock in the morning and six o'clock in the evening are by far the best hours to do the milking. Some of our deep milkers should be milked three times a day for a week or more after calving. I might write a chapter on kicking cows, but after a wide and exceedingly costly experience in this line will simply say I do not believe in them, and would not accept the best one I ever saw as a gift. I am satisfied that it is not a good plan to feed or "slop" a cow during the milking, as a hungry animal will be too deeply absorbed in eating to "give down" all the milk. Better feed just before or immediately after milking. Keep strangers away from the stable during the milking hour; never carry on a conversation in a loud voice with some person in another part of the stable while milking; in short, do nothing that will be likely to draw the attention of your cow, or she will in a greater or less degree "hold up" a part of the milk. When possible a cow should always be milked by the same person, as the milker soon learns any little peculiarity of the animal, and knows exactly how to handle her, as well as readily detecting any unusual occurrence, such as shortage of milk, sore or caked teats, etc. Milk as rapidly as possible, without jerking, and avoid hurting the teats with sharp and long finger nails by keeping them well pared. Never attempt to draw the milk from a very sore or inflamed teat with your hands; it only causes the animal great pain, and in nine cases out of ten you will fail to secure all of the milk. Milking tubes, made of silver, are not only great conveniences, but now that they can be bought so cheaply, are an absolute necessity, and all farmers should keep a few on hand for use in case of an emergency. The silver tubes are the best, and can be purchased for half a dollar each of almost any dealer in dairy goods. I have mailed thousands of them during the past few years to dairymen in all parts of the country, and have received hundreds of letters stating that valuable cows have been saved that would otherwise have been ruined for milking, but for the use of these tubes. It might be well to say right here that in no case would I recommend the use of tubes for regular milking, as their constant use would soon distend the orifice of the teat, so that it would leak. Grease or wet the tubes before inserting, and be careful to push in slowly. If the teat is very sore the tubes may be allowed to remain in the teat for a day or two, but I would advise that they be removed after each milking when possible, and always wiped perfectly dry.
+
+A good milking stool not only adds comfort to the milker, but helps to facilitate the work to a greater degree than one would naturally suppose. I give an illustration of a handy stool, and as a novice can easily make one, I will simply say, make the leg according to the length of your own. Before closing this chapter on milking I want to say a word about the pail. Never use a wooden pail or vessel to milk in. The best pail I ever used was a patent device called the "Michigan Milk Bucket," and were it not for the expense (I believe the price is two dollars), they would soon come into general use. The illustration shows exactly what they are—a combined pail, strainer and stool; and as the strainer prevents any dirt or hairs from getting into the pail, and the close-fitting cover precludes any possibility of the milk absorbing stable odors, I cannot say too much in their praise. When these pails were first placed on the market the strainer was at the bottom of the receiving cup, and all the dirt was washed into the pail, but the manufacturers altered them by placing the strainer an inch above the bottom of the receiver, and I believe that they are now as near perfect a milk-pail as one could ask for.

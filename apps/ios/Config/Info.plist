@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>EmberMesh</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>org.embermesh.card</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>ember</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<!-- Permission prompts: written for a non-technical person. -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>EmberMesh uses Bluetooth to pass messages straight to nearby phones and to connect to radio equipment. This works with no internet and no phone signal.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>EmberMesh uses Bluetooth to pass messages straight to nearby phones and to connect to radio equipment. This works with no internet and no phone signal.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>EmberMesh listens to send and receive messages as sound (a cable to a radio, or the phone held near one) and to read Morse code tones. It listens only while a sound link or the Morse reader is on, and nothing is recorded or saved.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>EmberMesh uses the camera to scan QR codes (a contact card or a group invite) and to read Morse code from a blinking flashlight or lamp. Nothing is recorded or saved.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>EmberMesh uses your location only when you choose to share it, for example in an SOS or a check-in, so people can find you. It works from GPS without internet.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>EmberMesh looks for other EmberMesh phones and computers on the same Wi-Fi or hotspot so you can chat without the internet.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_embermesh._tcp</string>
+		<string>_embermesh._udp</string>
+	</array>
+
+	<!-- Plain ws:// to hubs on the local hotspot (no internet, no TLS certificates off-grid). -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+
+	<!-- Background: Bluetooth links keep running (both roles); audio only while a sound link is
+	     actively listening/transmitting; periodic refresh for store-and-forward. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>audio</string>
+		<string>fetch</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>org.embermesh.app.refresh</string>
+	</array>
+
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>UIRequiresFullScreen</key>
+	<false/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-label="EmberMesh: off-grid mesh chat and an offline survival library">
+  <title>EmberMesh</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#120d0b"/>
+      <stop offset="1" stop-color="#2a1610"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.5" r="0.45">
+      <stop offset="0" stop-color="#ff8a3d" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#e8471c"/>
+      <stop offset="0.6" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#ffc861"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ffd27a"/>
+      <stop offset="1" stop-color="#fff4d6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="320" rx="24" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="24" fill="url(#glow)"/>
+  <!-- background mesh -->
+  <g stroke="#ff8a3d" stroke-opacity="0.18" stroke-width="1.5" fill="none">
+    <path d="M760 40 L860 90 L980 50 L1100 110 L1220 60 M860 90 L900 190 L1020 230 L1100 110 M900 190 L800 260 L700 220 L760 40 M1020 230 L1160 250 L1220 160 L1100 110 M1220 160 L1220 60 M800 260 L960 290 L1020 230 M700 220 L620 290"/>
+  </g>
+  <g fill="#ffb35c" fill-opacity="0.45">
+    <circle cx="760" cy="40" r="4"/><circle cx="860" cy="90" r="5"/><circle cx="980" cy="50" r="4"/>
+    <circle cx="1100" cy="110" r="6"/><circle cx="1220" cy="60" r="4"/><circle cx="900" cy="190" r="5"/>
+    <circle cx="1020" cy="230" r="5"/><circle cx="800" cy="260" r="4"/><circle cx="700" cy="220" r="4"/>
+    <circle cx="1160" cy="250" r="4"/><circle cx="1220" cy="160" r="5"/><circle cx="960" cy="290" r="3"/>
+    <circle cx="620" cy="290" r="3"/>
+  </g>
+  <!-- emblem (same drawing as logo.svg, scaled) -->
+  <g transform="translate(96 64) scale(1.5)">
+    <circle cx="64" cy="64" r="62" fill="#17110f" stroke="#ff8a3d" stroke-opacity="0.25" stroke-width="1"/>
+    <g stroke="#ff8a3d" stroke-opacity="0.55" stroke-width="2.5" stroke-linecap="round" fill="none">
+      <path d="M64 14 L107 39 L107 89 L64 114 L21 89 L21 39 Z"/>
+      <path d="M64 14 L64 34 M107 39 L88 50 M107 89 L88 78 M64 114 L64 98 M21 89 L40 78 M21 39 L40 50"/>
+    </g>
+    <g fill="#ffb35c">
+      <circle cx="64" cy="14" r="5.5"/><circle cx="107" cy="39" r="5.5"/><circle cx="107" cy="89" r="5.5"/>
+      <circle cx="64" cy="114" r="5.5"/><circle cx="21" cy="89" r="5.5"/><circle cx="21" cy="39" r="5.5"/>
+    </g>
+    <path fill="url(#flame)" d="M64 30 C73 44 88 55 88 75 C88 90 77 100 64 100 C51 100 40 90 40 75 C40 63 47 55 52 46 C54 55 58 60 63 62 C60 52 60 40 64 30 Z"/>
+    <path fill="url(#core)" d="M64 62 C70 70 76 76 76 84 C76 92 70 97 64 97 C58 97 52 92 52 84 C52 78 56 74 59 70 C60 75 62 77 64 78 C63 72 62 67 64 62 Z"/>
+  </g>
+  <g font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+    <text x="330" y="160" font-size="84" font-weight="700" fill="#fff4e8" letter-spacing="-1">Ember<tspan fill="#ff8a3d">Mesh</tspan></text>
+    <text x="334" y="210" font-size="27" fill="#e9cdb8">Off-grid mesh chat and an offline survival library</text>
+    <text x="334" y="250" font-size="20" fill="#b89a86">radios · LoRa · Bluetooth · Wi-Fi · USB stick · QR code · Morse</text>
+  </g>
+</svg>

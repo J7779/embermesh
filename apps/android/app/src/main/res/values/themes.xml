@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ember_bg">#FF17110F</color>
+    <color name="ember_accent">#FFFF7A2F</color>
+    <style name="Theme.Ember" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/ember_bg</item>
+        <item name="android:colorBackground">@color/ember_bg</item>
+        <item name="android:colorPrimary">@color/ember_bg</item>
+        <item name="android:colorPrimaryDark">@color/ember_bg</item>
+        <item name="android:colorAccent">@color/ember_accent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/ember_bg</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+    <style name="Theme.Ember.Scanner" parent="Theme.Ember">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+</resources>

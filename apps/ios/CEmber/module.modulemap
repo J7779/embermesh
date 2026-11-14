@@ -1,0 +1,11 @@
+// Clang module exposing the native C APIs to Swift as `CEmber`:
+//   core/include/ember/ember.h     the EmberMesh core
+//   native/ember_ios_hub.h         the host library's hub, wrapped for the `ws_server` endpoint
+// SWIFT_INCLUDE_PATHS points at this directory; the static library (core + host + wrapper, merged)
+// is produced by build-core.sh and linked with -lember_ios -lc++ (see project build settings).
+module CEmber {
+  header "../../../core/include/ember/ember.h"
+  header "../native/ember_ios_hub.h"
+  link "c++"
+  export *
+}

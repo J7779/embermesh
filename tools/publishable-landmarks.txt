@@ -1,0 +1,25 @@
+# Public landmarks accepted as sample coordinates by tools/check-publishable.sh (rule "coord").
+# A coordinate pair with 4+ decimals within about 2 km (0.02 degrees) of an entry is accepted.
+# Format: <lat> <lon>   # name
+51.5007 -0.1246    # Westminster / Big Ben, London
+51.5074 -0.1278    # London (city centre reference)
+51.4769 -0.0005    # Royal Observatory, Greenwich
+48.8566 2.3522     # Paris (city centre reference)
+48.8584 2.2945     # Eiffel Tower, Paris
+48.1467 11.6083    # Munich (Maidenhead locator example, Wikipedia)
+40.7128 -74.0060   # New York City Hall area
+41.7148 -72.7273   # ARRL headquarters / W1AW, Newington CT
+38.8895 -77.0352   # Washington Monument, Washington DC
+38.8977 -77.0365   # White House, Washington DC
+-33.8568 151.2153  # Sydney Opera House
+-33.8688 151.2093  # Sydney (city centre reference)
+64.1466 -21.9426   # Reykjavik
+-34.6037 -58.3816  # Buenos Aires
+-0.1807 -78.4678   # Quito
+61.2181 -149.9003  # Anchorage
+35.6762 139.6503   # Tokyo
+45.5230 -122.6765  # Pioneer Courthouse Square, Portland OR
+49.0583 -72.0292   # APRS specification position example (4903.50N/07201.75W)
+37.8199 -122.4783  # Golden Gate Bridge
+27.9881 86.9250    # Mount Everest summit
+39.8283 -98.5795   # geographic centre of the contiguous United States (Lebanon, Kansas)

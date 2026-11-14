@@ -1,0 +1,42 @@
+---
+id: reference/beard-shelters-19-how-to-split-logs-make-shakes-splits-or
+title: "Shelters, Shacks and Shanties 19: How to Split Logs, Make Shakes, Splits, or Clapboards. How to Chop a Log in Half. How to Flatten a Log. Also Some Don'ts"
+category: reference
+tags: [reference, axe, logs, woodworking, tools]
+summary: "Dan Beard's 1914 guide to building wilderness shelters, chapter 19: how to split logs, make shakes, splits, or clapboards. how to chop a log in half. how to flatten a log. also some don'ts."
+source: "Daniel Carter Beard, Shelters, Shacks and Shanties, 1914 (public-domain transcription)"
+source_title: "Shelters, Shacks and Shanties, by Dan Beard, 1914"
+license: "Public Domain (published 1914, United States)"
+attribution: "Daniel Carter Beard, Shelters, Shacks and Shanties (1914). Public domain in the United States."
+retrieved: 2026-11-13
+part_of: shelter/beard-shelters
+order: 190
+---
+
+# Shelters, Shacks and Shanties 19: How to Split Logs, Make Shakes, Splits, or Clapboards. How to Chop a Log in Half. How to Flatten a Log. Also Some Don'ts
+
+*Chapter 19 of "Shelters, Shacks and Shanties" by Dan Beard (1914).*
+
+Logs are usually split by the use of wedges, but it is possible to split them by the use of two axes. Fig. 119 shows both methods. To split with the axe, strike it smartly into the wood at the small end so as to start a crack, then sink the axe in the crack, *A*. Next take the second axe and strike it in line with the first one at *B*. If this is done properly it should open the crack wide enough to release the first axe without trouble, which may then be struck in the log at *C*. In this manner it is possible to split a straight-grained piece of timber without the use of wedges. The first axe should be struck in at the smaller or top end of the log. To split a log with wedges, take your axe in your left hand and a club in your right hand and, by hammering the head of your axe with the club, drive the blade into the small end of the log far enough to make a crack deep enough to hold the thin edge of your wedges. Make this crack all the way across the end of the log, as in Fig. 119. Put two wedges in the end of the log, as in the diagram, and drive them until the wood begins to split and crack along the sides of the log; then follow up this crack with other wedges, as shown at *D* and *E*, until the log is split in half.
+
+While ordinary wood splits easily enough with the grain, it is very difficult to drive an axe through the wood at right angles to the grain, as shown by diagram to the left (Fig. 120); hence, if the amateur be chopping wood, if he will strike a slanting blow, like the one to the right in Fig. 120, he will discover that the blade of his axe will enter the wood; whereas, in the first position, where he strikes the grain at right angles, it will only make a dent in the wood and bounce the axe back; but in striking a diagonal blow he must use care not to slant his axe too far or the blade of the axe may only scoop out a shallow chip and swing around, seriously injuring the axeman or some one else.
+
+If it is desired to cut off the limb of a tree, do not disfigure the tree by tearing the bark down; trees are becoming too scarce for us to injure them unnecessarily; if you cut part way through the limb on the under-side (see the right-hand diagram, Fig. 121) and then cut partly through from the top side, the limb will fall off without tearing the bark down the trunk; but if you cut only from the top (see left-hand diagram, Fig. 121), sooner or later the weight of the limb will tear it off and make an ugly wound down the front of the tree, which in time decays, makes a hollow, and ultimately destroys the tree. A neatly cut branch, on the other hand, when the stub has been sheared off close to the bark, will heal up, leaving only an eye-mark on the bark to tell where the limb once grew.
+
+If it is desired to chop a log up into shorter pieces, remember to stand on the log to do your chopping, as in Fig. 122. This will do away with the necessity of rolling the log over when you want to chop on the other side. Do not forget to make the kerf, or notch, *C*, *D* the same as *A*, *B*; in other words, the distance across the notch should equal the diameter of the log. If you start with too narrow a kerf, or notch, before you finish you will be compelled to widen it.
+
+Fig. 119. Fig. 120. Fig. 121. Fig. 122. Fig. 123. Fig. 124. Fig. 125.
+
+Fig. 126. Fig. 127. Fig. 128. Fig. 129. Fig. 130. Fig. 131.
+
+*[Illustration: How to split a log, chop a log, flatten a log, and trim a tree.]*
+
+To flatten a log you must *score and hew* it. Scoring consists in making a number of notches, *C*, *D*, *E*, *F*, *G*, *H*, *J*, etc., to the depth of the line *A*, *B* (Figs. 123 and 124); hewing it is the act of chopping off or splitting off the pieces *A*, *C* and *C*, *D* and *D*, *E*, etc., leaving the surface flat, as shown by Fig. 125, which was known among the pioneers as a puncheon and with which they floored their cabins before the advent of the saw-mill and milled lumber.
+
+Perhaps it will be advisable for the amateur to take a chalk-line and snap it from *A* to *B* (Fig. 123), so that he may be certain to have the flat surface level. The expert axeman will do this by what he calls "sensiation." It might be well to say here that if you select for puncheons wood with a straight grain and wood that will split easily you will simplify your task, but even mean, stubborn wood may be flattened by scoring and hewing. Quoting from Horace Kephart's excellent book on woodcraft, an experienced man can tell a straight-grained log "by merely scanning the bark"; if the ridges and furrows of the bark run straight up and down the wood will have a corresponding straight grain, but if they are spiral the wood will split "waney" or not at all. "Waney" is a good word, almost as good as "sensiation"; so when you try to quarter a log with which to chink your cabin or log house don't select a "waney" log. To quarter a log split it as shown in Fig. 119 and split it along the dotted lines shown in the end view of Fig. 126.
+
+In the Maine woods the woodsmen are adepts in making shakes, splits, clapboards, or shingles by the use of only an axe and splitting them out of the billets of wood from four to six feet long. The core of the log (Fig. 130) is first cut out and then the pieces are split out, having wedge-shaped edges, as shown by the lines marked on Fig. 127. They also split out boards after the manner shown by Fig. 128. In making either the boards or the shakes, if it is found that the wood splinters down into the body of the log too far or into the board or shake too far, you must commence at the other end of the billet or log and split it up to meet the first split, or take hold of the split or board with your hands and deftly tear it from the log, an art which only experience can teach. I have seen two-story houses composed of nothing but a framework with sides and roof shingled over with these splits. In the West they call these "shake" cabins.
+
+It may be wise before we close this axeman's talk to caution the reader against chopping firewood by resting one end of the stick to be cut on a log and the other end on the ground, as shown in Fig. 131, and then striking this stick a sharp blow with the axe in the middle. The effect of this often is to send the broken piece or fragment gyrating through the air, as is shown by the dotted lines, and many a woodchopper has lost an eye from a blow inflicted by one of these flying pieces; indeed, I have had some of my friends meet with this serious and painful accident from the same cause, and I have seen men in the lumber fields who have been blinded in a similar manner.
+
+There are two sorts of axes in general use among the lumbermen; but the double-bitted axe (131 *A*) appears to be the most popular among lumberjacks. My readers, however, are not lumberjacks but campers, and a double-bitted axe is a nuisance around camps. It is always dangerous and even when one blade is sunk into the tree the other blade is sticking out, a menace to everybody and everything that comes near it. But the real old-fashioned reliable axe (131 *B*) is the one that is exceedingly useful in a camp, around a country place, or a farm. I even have one now in my studio closet here in the city of New York, but I keep it more for sentiment's sake than for any real use it may be to me here.

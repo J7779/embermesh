@@ -1,0 +1,230 @@
+# Sources added by the wiki2 sweep for the `hazards` category
+
+All guides listed here were taken from Wikimedia projects and are licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); they stay under that licence. Each was converted from the page wikitext to plain Markdown. References, images, infoboxes, navigation templates and link lists were removed; for Wikipedia articles, sections that are not practical (history, etymology, culture, statistics and similar) were also omitted, and long articles were shortened to their leading sections (each such file says which sections were left out). Groups of short Wikibooks pages were combined into one guide, split into parts where long. No text was otherwise changed. Each file's front matter repeats its source URL with revision id, licence and attribution.
+
+## Wikibooks (en.wikibooks.org)
+
+- Credit: Wikibooks contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `hazards/wb2-diy-household-seismic-safety` — Do-It-Yourself: Household seismic safety — https://en.wikibooks.org/w/index.php?title=Do-It-Yourself/Household_seismic_safety&oldid=4646925
+
+## Wikipedia (en.wikipedia.org)
+
+- Credit: Wikipedia contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-13, 2026-11-14
+- Files:
+  - `hazards/wp2-adder` — Adder — https://en.wikipedia.org/w/index.php?title=Adder&oldid=1383144315
+  - `hazards/wp2-aedes-aegypti` — Aedes aegypti (yellow fever mosquito) — https://en.wikipedia.org/w/index.php?title=Aedes_aegypti&oldid=1382567001
+  - `hazards/wp2-african-buffalo` — African buffalo (Cape buffalo) — https://en.wikipedia.org/w/index.php?title=African_buffalo&oldid=1385498993
+  - `hazards/wp2-african-bush-elephant` — African bush elephant — https://en.wikipedia.org/w/index.php?title=African_bush_elephant&oldid=1385351088
+  - `hazards/wp2-africanized-bee` — Africanized bee — https://en.wikipedia.org/w/index.php?title=Africanized_bee&oldid=1384818916
+  - `hazards/wp2-aftershock` — Aftershock — https://en.wikipedia.org/w/index.php?title=Aftershock&oldid=1373602959
+  - `hazards/wp2-agkistrodon-piscivorus` — Agkistrodon piscivorus — https://en.wikipedia.org/w/index.php?title=Agkistrodon_piscivorus&oldid=1384633637
+  - `hazards/wp2-amblyomma-americanum` — Amblyomma americanum (lone star tick) — https://en.wikipedia.org/w/index.php?title=Amblyomma_americanum&oldid=1384473172
+  - `hazards/wp2-american-alligator` — American alligator — https://en.wikipedia.org/w/index.php?title=American_alligator&oldid=1384112348
+  - `hazards/wp2-american-black-bear` — American black bear — https://en.wikipedia.org/w/index.php?title=American_black_bear&oldid=1384632606
+  - `hazards/wp2-androctonus-australis` — Androctonus australis (yellow fat-tailed scorpion) — https://en.wikipedia.org/w/index.php?title=Androctonus_australis&oldid=1355497598
+  - `hazards/wp2-animal-attack` — Animal attack — https://en.wikipedia.org/w/index.php?title=Animal_attack&oldid=1384728033
+  - `hazards/wp2-anopheles` — Anopheles — https://en.wikipedia.org/w/index.php?title=Anopheles&oldid=1350666462
+  - `hazards/wp2-antivenom` — Antivenom — https://en.wikipedia.org/w/index.php?title=Antivenom&oldid=1341271076
+  - `hazards/wp2-arizona-bark-scorpion` — Arizona bark scorpion — https://en.wikipedia.org/w/index.php?title=Arizona_bark_scorpion&oldid=1378961863
+  - `hazards/wp2-asbestos` — Asbestos — https://en.wikipedia.org/w/index.php?title=Asbestos&oldid=1382862741
+  - `hazards/wp2-asian-giant-hornet` — Asian giant hornet — https://en.wikipedia.org/w/index.php?title=Asian_giant_hornet&oldid=1384987352
+  - `hazards/wp2-asphyxia` — Asphyxia — https://en.wikipedia.org/w/index.php?title=Asphyxia&oldid=1381803095
+  - `hazards/wp2-atropine` — Atropine — https://en.wikipedia.org/w/index.php?title=Atropine&oldid=1379708984
+  - `hazards/wp2-avalanche-rescue` — Avalanche rescue — https://en.wikipedia.org/w/index.php?title=Avalanche_rescue&oldid=1352018200
+  - `hazards/wp2-avalanche` — Avalanche — https://en.wikipedia.org/w/index.php?title=Avalanche&oldid=1384572701
+  - `hazards/wp2-background-radiation` — Background radiation — https://en.wikipedia.org/w/index.php?title=Background_radiation&oldid=1384235029
+  - `hazards/wp2-bear-attack` — Bear attack — https://en.wikipedia.org/w/index.php?title=Bear_attack&oldid=1383053534
+  - `hazards/wp2-black-fly` — Black fly — https://en.wikipedia.org/w/index.php?title=Black_fly&oldid=1369738683
+  - `hazards/wp2-black-mamba` — Black mamba — https://en.wikipedia.org/w/index.php?title=Black_mamba&oldid=1383365348
+  - `hazards/wp2-black-necked-spitting-cobra` — Black-necked spitting cobra — https://en.wikipedia.org/w/index.php?title=Black-necked_spitting_cobra&oldid=1380856600
+  - `hazards/wp2-blister-agent` — Blister agent — https://en.wikipedia.org/w/index.php?title=Blister_agent&oldid=1360620181
+  - `hazards/wp2-blister-beetle` — Blister beetle — https://en.wikipedia.org/w/index.php?title=Blister_beetle&oldid=1363121763
+  - `hazards/wp2-blood-agent` — Blood agent — https://en.wikipedia.org/w/index.php?title=Blood_agent&oldid=1350876857
+  - `hazards/wp2-blue-ringed-octopus` — Blue-ringed octopus — https://en.wikipedia.org/w/index.php?title=Blue-ringed_octopus&oldid=1375075931
+  - `hazards/wp2-boiling-liquid-expanding-vapor-explosion` — Boiling liquid expanding vapor explosion — https://en.wikipedia.org/w/index.php?title=Boiling_liquid_expanding_vapor_explosion&oldid=1380184021
+  - `hazards/wp2-booby-trap` — Booby trap — https://en.wikipedia.org/w/index.php?title=Booby_trap&oldid=1382694612
+  - `hazards/wp2-bothrops-asper` — Bothrops asper (terciopelo) — https://en.wikipedia.org/w/index.php?title=Bothrops_asper&oldid=1376157472
+  - `hazards/wp2-bothrops-atrox` — Bothrops atrox (common lancehead) — https://en.wikipedia.org/w/index.php?title=Bothrops_atrox&oldid=1373039770
+  - `hazards/wp2-box-jellyfish` — Box jellyfish — https://en.wikipedia.org/w/index.php?title=Box_jellyfish&oldid=1382442394
+  - `hazards/wp2-brown-bear` — Brown bear — https://en.wikipedia.org/w/index.php?title=Brown_bear&oldid=1385607058
+  - `hazards/wp2-brown-recluse-spider` — Brown recluse spider — https://en.wikipedia.org/w/index.php?title=Brown_recluse_spider&oldid=1381827351
+  - `hazards/wp2-cane-toad` — Cane toad — https://en.wikipedia.org/w/index.php?title=Cane_toad&oldid=1381439525
+  - `hazards/wp2-carbon-monoxide` — Carbon monoxide — https://en.wikipedia.org/w/index.php?title=Carbon_monoxide&oldid=1381039287
+  - `hazards/wp2-caterpillar` — Caterpillar — https://en.wikipedia.org/w/index.php?title=Caterpillar&oldid=1381843020
+  - `hazards/wp2-cbrn-defense` — CBRN defense — https://en.wikipedia.org/w/index.php?title=CBRN_defense&oldid=1373815286
+  - `hazards/wp2-cheiracanthium` — Cheiracanthium — https://en.wikipedia.org/w/index.php?title=Cheiracanthium&oldid=1380182569
+  - `hazards/wp2-chemical-accident` — Chemical accident — https://en.wikipedia.org/w/index.php?title=Chemical_accident&oldid=1367524295
+  - `hazards/wp2-chironex-fleckeri` — Chironex fleckeri (Australian box jelly) — https://en.wikipedia.org/w/index.php?title=Chironex_fleckeri&oldid=1372092044
+  - `hazards/wp2-chlorine-gas-poisoning` — Chlorine gas poisoning — https://en.wikipedia.org/w/index.php?title=Chlorine_gas_poisoning&oldid=1359869798
+  - `hazards/wp2-ciguatera-fish-poisoning` — Ciguatera fish poisoning — https://en.wikipedia.org/w/index.php?title=Ciguatera_fish_poisoning&oldid=1384716604
+  - `hazards/wp2-civil-defense` — Civil defense — https://en.wikipedia.org/w/index.php?title=Civil_defense&oldid=1381166634
+  - `hazards/wp2-coastal-taipan` — Coastal taipan — https://en.wikipedia.org/w/index.php?title=Coastal_taipan&oldid=1379999508
+  - `hazards/wp2-cold-wave` — Cold wave — https://en.wikipedia.org/w/index.php?title=Cold_wave&oldid=1384179841
+  - `hazards/wp2-common-death-adder` — Common death adder — https://en.wikipedia.org/w/index.php?title=Common_death_adder&oldid=1380706203
+  - `hazards/wp2-common-krait` — Common krait — https://en.wikipedia.org/w/index.php?title=Common_krait&oldid=1365324293
+  - `hazards/wp2-cone-snail` — Cone snail — https://en.wikipedia.org/w/index.php?title=Cone_snail&oldid=1384124296
+  - `hazards/wp2-confined-space` — Confined space — https://en.wikipedia.org/w/index.php?title=Confined_space&oldid=1341312310
+  - `hazards/wp2-conus-geographus` — Conus geographus (geography cone) — https://en.wikipedia.org/w/index.php?title=Conus_geographus&oldid=1368359679
+  - `hazards/wp2-cougar` — Cougar — https://en.wikipedia.org/w/index.php?title=Cougar&oldid=1381812438
+  - `hazards/wp2-coyote` — Coyote — https://en.wikipedia.org/w/index.php?title=Coyote&oldid=1384922910
+  - `hazards/wp2-crevasse` — Crevasse — https://en.wikipedia.org/w/index.php?title=Crevasse&oldid=1364926462
+  - `hazards/wp2-crocodile-attack` — Crocodile attack — https://en.wikipedia.org/w/index.php?title=Crocodile_attack&oldid=1384037800
+  - `hazards/wp2-crotalus-durissus` — Crotalus durissus (South American rattlesnake) — https://en.wikipedia.org/w/index.php?title=Crotalus_durissus&oldid=1368126741
+  - `hazards/wp2-crotalus-oreganus` — Crotalus oreganus (Western rattlesnake) — https://en.wikipedia.org/w/index.php?title=Crotalus_oreganus&oldid=1371776660
+  - `hazards/wp2-dam-failure` — Dam failure — https://en.wikipedia.org/w/index.php?title=Dam_failure&oldid=1384636064
+  - `hazards/wp2-dangerous-goods` — Dangerous goods — https://en.wikipedia.org/w/index.php?title=Dangerous_goods&oldid=1385378693
+  - `hazards/wp2-debris-flow` — Debris flow — https://en.wikipedia.org/w/index.php?title=Debris_flow&oldid=1379350038
+  - `hazards/wp2-dermacentor-variabilis` — Dermacentor variabilis (American dog tick) — https://en.wikipedia.org/w/index.php?title=Dermacentor_variabilis&oldid=1376364642
+  - `hazards/wp2-dermatobia-hominis` — Dermatobia hominis (human botfly) — https://en.wikipedia.org/w/index.php?title=Dermatobia_hominis&oldid=1367255701
+  - `hazards/wp2-dingo` — Dingo — https://en.wikipedia.org/w/index.php?title=Dingo&oldid=1384755978
+  - `hazards/wp2-dosimeter` — Dosimeter — https://en.wikipedia.org/w/index.php?title=Dosimeter&oldid=1330347316
+  - `hazards/wp2-drought` — Drought — https://en.wikipedia.org/w/index.php?title=Drought&oldid=1378555067
+  - `hazards/wp2-dust-explosion` — Dust explosion — https://en.wikipedia.org/w/index.php?title=Dust_explosion&oldid=1383739830
+  - `hazards/wp2-earthquake` — Earthquake — https://en.wikipedia.org/w/index.php?title=Earthquake&oldid=1379800890
+  - `hazards/wp2-eastern-brown-snake` — Eastern brown snake — https://en.wikipedia.org/w/index.php?title=Eastern_brown_snake&oldid=1374521220
+  - `hazards/wp2-eastern-copperhead` — Eastern copperhead — https://en.wikipedia.org/w/index.php?title=Eastern_copperhead&oldid=1365325425
+  - `hazards/wp2-eastern-diamondback-rattlesnake` — Eastern diamondback rattlesnake — https://en.wikipedia.org/w/index.php?title=Eastern_diamondback_rattlesnake&oldid=1384901192
+  - `hazards/wp2-eastern-green-mamba` — Eastern green mamba — https://en.wikipedia.org/w/index.php?title=Eastern_green_mamba&oldid=1359111987
+  - `hazards/wp2-echis-carinatus` — Echis carinatus (Sindh saw-scaled viper) — https://en.wikipedia.org/w/index.php?title=Echis_carinatus&oldid=1374066990
+  - `hazards/wp2-egyptian-cobra` — Egyptian cobra — https://en.wikipedia.org/w/index.php?title=Egyptian_cobra&oldid=1380864272
+  - `hazards/wp2-electromagnetic-pulse` — Electromagnetic pulse — https://en.wikipedia.org/w/index.php?title=Electromagnetic_pulse&oldid=1382352650
+  - `hazards/wp2-epidemic` — Epidemic — https://en.wikipedia.org/w/index.php?title=Epidemic&oldid=1365091067
+  - `hazards/wp2-famine` — Famine — https://en.wikipedia.org/w/index.php?title=Famine&oldid=1384634811
+  - `hazards/wp2-fire-coral` — Fire coral — https://en.wikipedia.org/w/index.php?title=Fire_coral&oldid=1378514297
+  - `hazards/wp2-flood` — Flood — https://en.wikipedia.org/w/index.php?title=Flood&oldid=1384628230
+  - `hazards/wp2-free-ranging-dog` — Free-ranging dog — https://en.wikipedia.org/w/index.php?title=Free-ranging_dog&oldid=1383487050
+  - `hazards/wp2-gaboon-viper` — Gaboon viper — https://en.wikipedia.org/w/index.php?title=Gaboon_viper&oldid=1368756866
+  - `hazards/wp2-gas-leak` — Gas leak — https://en.wikipedia.org/w/index.php?title=Gas_leak&oldid=1381963524
+  - `hazards/wp2-gas-mask` — Gas mask — https://en.wikipedia.org/w/index.php?title=Gas_mask&oldid=1382925799
+  - `hazards/wp2-gila-monster` — Gila monster — https://en.wikipedia.org/w/index.php?title=Gila_monster&oldid=1384979165
+  - `hazards/wp2-grain-entrapment` — Grain entrapment — https://en.wikipedia.org/w/index.php?title=Grain_entrapment&oldid=1320775879
+  - `hazards/wp2-grizzly-bear` — Grizzly bear — https://en.wikipedia.org/w/index.php?title=Grizzly_bear&oldid=1385125501
+  - `hazards/wp2-hazmat-suit` — Hazmat suit — https://en.wikipedia.org/w/index.php?title=Hazmat_suit&oldid=1372588232
+  - `hazards/wp2-heat-wave` — Heat wave — https://en.wikipedia.org/w/index.php?title=Heat_wave&oldid=1382512165
+  - `hazards/wp2-hemiscorpius-lepturus` — Hemiscorpius lepturus — https://en.wikipedia.org/w/index.php?title=Hemiscorpius_lepturus&oldid=1380496073
+  - `hazards/wp2-hexophthalma` — Hexophthalma — https://en.wikipedia.org/w/index.php?title=Hexophthalma&oldid=1380506020
+  - `hazards/wp2-hippopotamus` — Hippopotamus — https://en.wikipedia.org/w/index.php?title=Hippopotamus&oldid=1382059641
+  - `hazards/wp2-hobo-spider` — Hobo spider — https://en.wikipedia.org/w/index.php?title=Hobo_spider&oldid=1379655889
+  - `hazards/wp2-hottentotta-tamulus` — Hottentotta tamulus (Indian red scorpion) — https://en.wikipedia.org/w/index.php?title=Hottentotta_tamulus&oldid=1384702364
+  - `hazards/wp2-hydrogen-cyanide` — Hydrogen cyanide — https://en.wikipedia.org/w/index.php?title=Hydrogen_cyanide&oldid=1380006624
+  - `hazards/wp2-hydrogen-sulfide` — Hydrogen sulfide — https://en.wikipedia.org/w/index.php?title=Hydrogen_sulfide&oldid=1384423278
+  - `hazards/wp2-hypercapnia` — Hypercapnia — https://en.wikipedia.org/w/index.php?title=Hypercapnia&oldid=1347464907
+  - `hazards/wp2-hypoxia-medicine` — Hypoxia (medicine) — https://en.wikipedia.org/w/index.php?title=Hypoxia_(medicine)&oldid=1380746867
+  - `hazards/wp2-indian-cobra` — Indian cobra (spectacled cobra) — https://en.wikipedia.org/w/index.php?title=Indian_cobra&oldid=1381313642
+  - `hazards/wp2-indoor-mold` — Indoor mold — https://en.wikipedia.org/w/index.php?title=Indoor_mold&oldid=1375526502
+  - `hazards/wp2-inland-taipan` — Inland taipan — https://en.wikipedia.org/w/index.php?title=Inland_taipan&oldid=1384152601
+  - `hazards/wp2-ionizing-radiation` — Ionizing radiation — https://en.wikipedia.org/w/index.php?title=Ionizing_radiation&oldid=1383527785
+  - `hazards/wp2-irukandji-jellyfish` — Irukandji jellyfish — https://en.wikipedia.org/w/index.php?title=Irukandji_jellyfish&oldid=1376828367
+  - `hazards/wp2-ixodes-ricinus` — Ixodes ricinus (castor bean tick) — https://en.wikipedia.org/w/index.php?title=Ixodes_ricinus&oldid=1378929440
+  - `hazards/wp2-ixodes-scapularis` — Ixodes scapularis (black-legged tick) — https://en.wikipedia.org/w/index.php?title=Ixodes_scapularis&oldid=1374800794
+  - `hazards/wp2-king-cobra` — King cobra — https://en.wikipedia.org/w/index.php?title=King_cobra&oldid=1380854581
+  - `hazards/wp2-komodo-dragon` — Komodo dragon — https://en.wikipedia.org/w/index.php?title=Komodo_dragon&oldid=1383701465
+  - `hazards/wp2-lachesis-muta` — Lachesis muta (Southern American bushmaster) — https://en.wikipedia.org/w/index.php?title=Lachesis_muta&oldid=1380690046
+  - `hazards/wp2-lahar` — Lahar — https://en.wikipedia.org/w/index.php?title=Lahar&oldid=1379099148
+  - `hazards/wp2-land-mine` — Land mine — https://en.wikipedia.org/w/index.php?title=Land_mine&oldid=1384804059
+  - `hazards/wp2-latrodectism` — Latrodectism — https://en.wikipedia.org/w/index.php?title=Latrodectism&oldid=1365703462
+  - `hazards/wp2-latrodectus-geometricus` — Latrodectus geometricus (brown widow) — https://en.wikipedia.org/w/index.php?title=Latrodectus_geometricus&oldid=1380516456
+  - `hazards/wp2-latrodectus-mactans` — Latrodectus mactans (southern black widow) — https://en.wikipedia.org/w/index.php?title=Latrodectus_mactans&oldid=1381453744
+  - `hazards/wp2-latrodectus-tredecimguttatus` — Latrodectus tredecimguttatus (Mediterranean black widow) — https://en.wikipedia.org/w/index.php?title=Latrodectus_tredecimguttatus&oldid=1372950850
+  - `hazards/wp2-leech` — Leech — https://en.wikipedia.org/w/index.php?title=Leech&oldid=1381338671
+  - `hazards/wp2-leopard` — Leopard — https://en.wikipedia.org/w/index.php?title=Leopard&oldid=1385440873
+  - `hazards/wp2-lightning-strike` — Lightning strike — https://en.wikipedia.org/w/index.php?title=Lightning_strike&oldid=1384722075
+  - `hazards/wp2-lion` — Lion — https://en.wikipedia.org/w/index.php?title=Lion&oldid=1383140093
+  - `hazards/wp2-lionfish` — Lionfish — https://en.wikipedia.org/w/index.php?title=Lionfish&oldid=1384691528
+  - `hazards/wp2-lonomia-obliqua` — Lonomia obliqua — https://en.wikipedia.org/w/index.php?title=Lonomia_obliqua&oldid=1376857881
+  - `hazards/wp2-loxoscelism` — Loxoscelism — https://en.wikipedia.org/w/index.php?title=Loxoscelism&oldid=1380928470
+  - `hazards/wp2-megalopyge-opercularis` — Megalopyge opercularis (southern flannel moth) — https://en.wikipedia.org/w/index.php?title=Megalopyge_opercularis&oldid=1379622641
+  - `hazards/wp2-micrurus-fulvius` — Micrurus fulvius (eastern coral snake) — https://en.wikipedia.org/w/index.php?title=Micrurus_fulvius&oldid=1374253055
+  - `hazards/wp2-moose` — Moose — https://en.wikipedia.org/w/index.php?title=Moose&oldid=1381896073
+  - `hazards/wp2-mosquito` — Mosquito — https://en.wikipedia.org/w/index.php?title=Mosquito&oldid=1384961214
+  - `hazards/wp2-mudflow` — Mudflow — https://en.wikipedia.org/w/index.php?title=Mudflow&oldid=1375791780
+  - `hazards/wp2-mustard-gas` — Mustard gas — https://en.wikipedia.org/w/index.php?title=Mustard_gas&oldid=1381343863
+  - `hazards/wp2-myiasis` — Myiasis — https://en.wikipedia.org/w/index.php?title=Myiasis&oldid=1380799782
+  - `hazards/wp2-nerve-agent` — Nerve agent — https://en.wikipedia.org/w/index.php?title=Nerve_agent&oldid=1382716103
+  - `hazards/wp2-nile-crocodile` — Nile crocodile — https://en.wikipedia.org/w/index.php?title=Nile_crocodile&oldid=1382567303
+  - `hazards/wp2-nuclear-explosion` — Nuclear explosion — https://en.wikipedia.org/w/index.php?title=Nuclear_explosion&oldid=1382515542
+  - `hazards/wp2-paralytic-shellfish-poisoning` — Paralytic shellfish poisoning — https://en.wikipedia.org/w/index.php?title=Paralytic_shellfish_poisoning&oldid=1315021992
+  - `hazards/wp2-paraponera-clavata` — Paraponera clavata (bullet ant) — https://en.wikipedia.org/w/index.php?title=Paraponera_clavata&oldid=1381006221
+  - `hazards/wp2-pepper-spray` — Pepper spray — https://en.wikipedia.org/w/index.php?title=Pepper_spray&oldid=1383125407
+  - `hazards/wp2-pesticide-poisoning` — Pesticide poisoning — https://en.wikipedia.org/w/index.php?title=Pesticide_poisoning&oldid=1380455049
+  - `hazards/wp2-phlebotominae` — Phlebotominae — https://en.wikipedia.org/w/index.php?title=Phlebotominae&oldid=1368887333
+  - `hazards/wp2-phoneutria` — Phoneutria — https://en.wikipedia.org/w/index.php?title=Phoneutria&oldid=1378999309
+  - `hazards/wp2-phosgene` — Phosgene — https://en.wikipedia.org/w/index.php?title=Phosgene&oldid=1380098115
+  - `hazards/wp2-poison-dart-frog` — Poison dart frog — https://en.wikipedia.org/w/index.php?title=Poison_dart_frog&oldid=1354641277
+  - `hazards/wp2-polar-bear` — Polar bear — https://en.wikipedia.org/w/index.php?title=Polar_bear&oldid=1381468014
+  - `hazards/wp2-portuguese-man-o-war` — Portuguese man o' war — https://en.wikipedia.org/w/index.php?title=Portuguese_man_o%27_war&oldid=1382855843
+  - `hazards/wp2-pralidoxime` — Pralidoxime — https://en.wikipedia.org/w/index.php?title=Pralidoxime&oldid=1377012930
+  - `hazards/wp2-prussian-blue-medical-use` — Prussian blue (medical use) — https://en.wikipedia.org/w/index.php?title=Prussian_blue_(medical_use)&oldid=1379809852
+  - `hazards/wp2-puff-adder` — Puff adder — https://en.wikipedia.org/w/index.php?title=Puff_adder&oldid=1372517006
+  - `hazards/wp2-pulmonary-agent` — Pulmonary agent — https://en.wikipedia.org/w/index.php?title=Pulmonary_agent&oldid=1362749143
+  - `hazards/wp2-pyroclastic-flow` — Pyroclastic flow — https://en.wikipedia.org/w/index.php?title=Pyroclastic_flow&oldid=1369932956
+  - `hazards/wp2-quicksand` — Quicksand — https://en.wikipedia.org/w/index.php?title=Quicksand&oldid=1380636790
+  - `hazards/wp2-radiological-warfare` — Radiological warfare — https://en.wikipedia.org/w/index.php?title=Radiological_warfare&oldid=1341370472
+  - `hazards/wp2-red-imported-fire-ant` — Red imported fire ant — https://en.wikipedia.org/w/index.php?title=Red_imported_fire_ant&oldid=1383839502
+  - `hazards/wp2-redback-spider` — Redback spider — https://en.wikipedia.org/w/index.php?title=Redback_spider&oldid=1385076073
+  - `hazards/wp2-riot-control` — Riot control — https://en.wikipedia.org/w/index.php?title=Riot_control&oldid=1382322581
+  - `hazards/wp2-rip-current` — Rip current — https://en.wikipedia.org/w/index.php?title=Rip_current&oldid=1384248723
+  - `hazards/wp2-rockfall` — Rockfall — https://en.wikipedia.org/w/index.php?title=Rockfall&oldid=1373919347
+  - `hazards/wp2-russells-viper` — Russell's viper — https://en.wikipedia.org/w/index.php?title=Russell%27s_viper&oldid=1383001683
+  - `hazards/wp2-saltwater-crocodile` — Saltwater crocodile — https://en.wikipedia.org/w/index.php?title=Saltwater_crocodile&oldid=1382108552
+  - `hazards/wp2-sarin` — Sarin — https://en.wikipedia.org/w/index.php?title=Sarin&oldid=1380029107
+  - `hazards/wp2-scolopendra-gigantea` — Scolopendra gigantea (Peruvian giant yellow-leg centipede) — https://en.wikipedia.org/w/index.php?title=Scolopendra_gigantea&oldid=1379747113
+  - `hazards/wp2-scombroid-food-poisoning` — Scombroid food poisoning — https://en.wikipedia.org/w/index.php?title=Scombroid_food_poisoning&oldid=1364138993
+  - `hazards/wp2-sea-urchin` — Sea urchin — https://en.wikipedia.org/w/index.php?title=Sea_urchin&oldid=1380397290
+  - `hazards/wp2-shark-attack` — Shark attack — https://en.wikipedia.org/w/index.php?title=Shark_attack&oldid=1381160609
+  - `hazards/wp2-sinkhole` — Sinkhole — https://en.wikipedia.org/w/index.php?title=Sinkhole&oldid=1385118851
+  - `hazards/wp2-smoke-inhalation` — Smoke inhalation — https://en.wikipedia.org/w/index.php?title=Smoke_inhalation&oldid=1362869491
+  - `hazards/wp2-snake-venom` — Snake venom — https://en.wikipedia.org/w/index.php?title=Snake_venom&oldid=1382700086
+  - `hazards/wp2-sneaker-wave` — Sneaker wave — https://en.wikipedia.org/w/index.php?title=Sneaker_wave&oldid=1360701817
+  - `hazards/wp2-social-distancing` — Social distancing — https://en.wikipedia.org/w/index.php?title=Social_distancing&oldid=1380957600
+  - `hazards/wp2-soil-liquefaction` — Soil liquefaction — https://en.wikipedia.org/w/index.php?title=Soil_liquefaction&oldid=1375861773
+  - `hazards/wp2-southern-cassowary` — Southern cassowary — https://en.wikipedia.org/w/index.php?title=Southern_cassowary&oldid=1382396226
+  - `hazards/wp2-space-weather` — Space weather — https://en.wikipedia.org/w/index.php?title=Space_weather&oldid=1381837184
+  - `hazards/wp2-spotted-hyena` — Spotted hyena — https://en.wikipedia.org/w/index.php?title=Spotted_hyena&oldid=1384684280
+  - `hazards/wp2-stingray-injury` — Stingray injury — https://en.wikipedia.org/w/index.php?title=Stingray_injury&oldid=1374777236
+  - `hazards/wp2-surface-water-rescue` — Surface water rescue — https://en.wikipedia.org/w/index.php?title=Surface_water_rescue&oldid=1341983984
+  - `hazards/wp2-sydney-funnel-web-spider` — Sydney funnel-web spider — https://en.wikipedia.org/w/index.php?title=Sydney_funnel-web_spider&oldid=1385076101
+  - `hazards/wp2-synanceia` — Synanceia — https://en.wikipedia.org/w/index.php?title=Synanceia&oldid=1364352436
+  - `hazards/wp2-tear-gas` — Tear gas — https://en.wikipedia.org/w/index.php?title=Tear_gas&oldid=1384609071
+  - `hazards/wp2-tetrodotoxin` — Tetrodotoxin — https://en.wikipedia.org/w/index.php?title=Tetrodotoxin&oldid=1381444599
+  - `hazards/wp2-tick` — Tick — https://en.wikipedia.org/w/index.php?title=Tick&oldid=1376012002
+  - `hazards/wp2-tiger-attack` — Tiger attack — https://en.wikipedia.org/w/index.php?title=Tiger_attack&oldid=1382079343
+  - `hazards/wp2-tiger-snake` — Tiger snake — https://en.wikipedia.org/w/index.php?title=Tiger_snake&oldid=1382068600
+  - `hazards/wp2-timber-rattlesnake` — Timber rattlesnake — https://en.wikipedia.org/w/index.php?title=Timber_rattlesnake&oldid=1362719932
+  - `hazards/wp2-tityus-serrulatus` — Tityus serrulatus (Brazilian yellow scorpion) — https://en.wikipedia.org/w/index.php?title=Tityus_serrulatus&oldid=1314657539
+  - `hazards/wp2-triatominae` — Triatominae — https://en.wikipedia.org/w/index.php?title=Triatominae&oldid=1378513475
+  - `hazards/wp2-trombiculidae` — Trombiculidae — https://en.wikipedia.org/w/index.php?title=Trombiculidae&oldid=1356358554
+  - `hazards/wp2-tropical-cyclone-preparedness` — Tropical cyclone preparedness — https://en.wikipedia.org/w/index.php?title=Tropical_cyclone_preparedness&oldid=1377076809
+  - `hazards/wp2-tsetse-fly` — Tsetse fly — https://en.wikipedia.org/w/index.php?title=Tsetse_fly&oldid=1373206107
+  - `hazards/wp2-tsunami` — Tsunami — https://en.wikipedia.org/w/index.php?title=Tsunami&oldid=1385335589
+  - `hazards/wp2-tunga-penetrans` — Tunga penetrans (jigger) — https://en.wikipedia.org/w/index.php?title=Tunga_penetrans&oldid=1377264273
+  - `hazards/wp2-unexploded-ordnance` — Unexploded ordnance — https://en.wikipedia.org/w/index.php?title=Unexploded_ordnance&oldid=1383975727
+  - `hazards/wp2-venom` — Venom — https://en.wikipedia.org/w/index.php?title=Venom&oldid=1384527639
+  - `hazards/wp2-venomous-snake` — Venomous snake — https://en.wikipedia.org/w/index.php?title=Venomous_snake&oldid=1384326682
+  - `hazards/wp2-vipera-ammodytes` — Vipera ammodytes (horned viper) — https://en.wikipedia.org/w/index.php?title=Vipera_ammodytes&oldid=1376295109
+  - `hazards/wp2-vipera-aspis` — Vipera aspis (asp) — https://en.wikipedia.org/w/index.php?title=Vipera_aspis&oldid=1376295157
+  - `hazards/wp2-volcanic-gas` — Volcanic gas — https://en.wikipedia.org/w/index.php?title=Volcanic_gas&oldid=1375932457
+  - `hazards/wp2-volcano` — Volcano — https://en.wikipedia.org/w/index.php?title=Volcano&oldid=1383463954
+  - `hazards/wp2-vx-nerve-agent` — VX (nerve agent) — https://en.wikipedia.org/w/index.php?title=VX_(nerve_agent)&oldid=1384877478
+  - `hazards/wp2-wandering-spider` — Wandering spider — https://en.wikipedia.org/w/index.php?title=Wandering_spider&oldid=1384933504
+  - `hazards/wp2-western-diamondback-rattlesnake` — Western diamondback rattlesnake — https://en.wikipedia.org/w/index.php?title=Western_diamondback_rattlesnake&oldid=1385547864
+  - `hazards/wp2-wild-boar` — Wild boar — https://en.wikipedia.org/w/index.php?title=Wild_boar&oldid=1384640042
+  - `hazards/wp2-wolf-attack` — Wolf attack — https://en.wikipedia.org/w/index.php?title=Wolf_attack&oldid=1385407631
+
+## Wikivoyage (en.wikivoyage.org)
+
+- Credit: Wikivoyage contributors
+- Licence: CC BY-SA 4.0
+- Retrieved: 2026-11-14
+- Files:
+  - `hazards/wv2-earthquake-safety` — Earthquake safety (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Earthquake_safety&oldid=5332219
+  - `hazards/wv2-snow-safety` — Snow safety (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Snow_safety&oldid=5316326
+  - `hazards/wv2-thunderstorms` — Thunderstorms (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Thunderstorms&oldid=5340331
+  - `hazards/wv2-tornado-safety` — Tornado safety (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Tornado_safety&oldid=5346112
+  - `hazards/wv2-war-zone-safety` — War zone safety (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=War_zone_safety&oldid=5393247
+  - `hazards/wv2-weather` — Weather (Wikivoyage) — https://en.wikivoyage.org/w/index.php?title=Weather&oldid=5394914

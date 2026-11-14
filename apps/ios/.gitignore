@@ -1,0 +1,22 @@
+# Per-user / per-machine Xcode state, signing material and build output (never publish).
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+DerivedData/
+build/
+.swiftpm/
+.build/
+Pods/
+*.xcresult
+*.ipa
+*.dSYM/
+*.dSYM.zip
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.cer
+*.certSigningRequest
+ExportOptions*.plist
+*.xcconfig.local
+Local.xcconfig
+.DS_Store

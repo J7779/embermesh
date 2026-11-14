@@ -1,0 +1,40 @@
+---
+id: medical/wikibooks-first-aid-marine-first-aid
+title: First Aid: Marine Stings and Bites
+category: medical
+tags: [jellyfish sting, marine sting, stingray, sea urchin, coral cut, vinegar, hot water]
+summary: First aid for jellyfish, stingray, sea urchin and other marine injuries.
+source: https://en.wikibooks.org/w/index.php?title=First_Aid/Marine_First_Aid&oldid=4527194
+source_title: Wikibooks: First Aid (Marine First Aid)
+license: CC BY-SA 4.0
+attribution: "Wikibooks contributors, \"First Aid/Marine First Aid\", Wikibooks, The Free Textbook Project (revision 4527194), https://en.wikibooks.org/w/index.php?title=First_Aid/Marine_First_Aid&oldid=4527194. Adapted for the EmberMesh offline library: converted to Markdown; references, images and navigation removed. Licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)."
+retrieved: 2026-11-13
+part_of: medical/wikibooks-first-aid
+order: 37
+---
+
+# First Aid: Marine Stings and Bites
+
+_From the community-written Wikibooks textbook "First Aid" (CC BY-SA 4.0). Practices change; where it differs from the field-manual guides in this library, prefer the more recent source._
+
+## Decompression sickness
+
+Decompression sickness (DCS), also known as the bends or diver's sickness is a severe medical condition where arterial gas fails to repressurize properly, forming bubbles in the blood vessels. While commonly associated with surfacing too rapidly while diving, it can occur in any rapid change from a high pressure to a low pressure environment. If not treated promptly, decompression sickness is fatal.
+
+### Treatment
+
+Multiple treatments are used for DCS. The moment DCS is suspected, emergency medical assistance should be summoned. The success and survival rates for treatments drop as time goes on. Remove the patient from the water, but do not use the Trendelenberg position (supine, feet above head). Administer antacids to the patient and oxygen if available. Follow any further instructions from medical personnel to the letter. When emergency personnel arrive, it is important that all dive gear are transported with the patient as they may indicate the reason for DCS, and consequently the appropriate treatment.
+
+DCS treatment consists of provision of oxygen and recompression to remedy the gas imbalance. When medical care is not available, use of oxygen may clear up mild to moderate cases of DCS. Even if symptoms disappear, the patient still requires medical attention at the earliest opportunity because lack of symptoms does not indicate that the situation is resolved. In an aquatic environment where the patient will not reach medical care in time, recompression can be achieved as a last resort though reentry into the water. Where there is another option, this treatment is always discouraged due to the extreme risk involved. Suit the patient and another diver up and have them enter the water. Whenever possible, follow a recompression table. If none is available, proceed to the depth where the patient left the dive table and continue to follow the table. There are no second chances, because failure to adhere to the table as written most likely will kill or cause permanent damage to the patient and may cause DCS in the caregiver.
+
+## Fish hooks
+
+### Assessment and Treatment
+
+Many a fisherman has felt the pain associated with stabbing an extremity with a fish hook. Thankfully, these wounds are generally not dangerous when properly treated. In all cases, proper treatment is crucial due to the potential side effects of the unclean metal.
+
+Before attempting to remove the fish hook, assess if removal in the field will cause any side effects. For example, **never** attempt to remove an object in the eye or near a major artery. When in doubt, it is wise to err on the side of caution and transport to an urgent care unit or emergency department. Once satisfied that removal can be done in the field, assess how deep the hook has gone in. It is generally advisable to have another person remove the hook whenever possible. Where the barb has not fully penetrated the skin, gently but firmly pull the hook out. If the barb is buried in the skin, attempting to remove the hook this way will only create a bigger hole, cause more pain to the patient, and potentially lead to unpleasant side effects. In these cases, the barb must be eliminated before the hook can be removed. The most commonly used method is to carefully loop the hook around and push it back through the skin. Once the barb is visible, use wire cutters or another sharp instrument to separate the barb from the hook. (If the hook was barbless to begin with, simply back the hook out through the entry hole.) Then back the barbless hook out through the original hole. Thoroughly clean all wounds and remove any and all remnants. Apply an antibiotic ointment and apply a sterile dressing. Wrap the bandage firmly but do not cut off circulation.
+
+### Post treatment care
+
+The risk of tetanus may necessitate a booster immunization. Due to the fatality rate of tetanus, it is strongly advisable that victims receive the immunization if needed. The wound site should be monitored for signs of infection. If signs appear or the wound does not appear to be healing normally, seek medical attention as soon as possible.

@@ -1,0 +1,154 @@
+name: Core
+
+# The shared C++17 core (core/) and its full doctest suite on every compiler and as WebAssembly.
+# Only the core is built here (EMBER_BUILD_DESKTOP/TOOLS=OFF): the host library and emberd have
+# their own workflow (Desktop), so a portability problem there does not hide a core result.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  native:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Linux GCC, id: linux-gcc, os: ubuntu-24.04, cc: gcc, cxx: g++, type: Release, sanitize: 'OFF' }
+          - { name: Linux Clang ASan+UBSan, id: linux-clang-sanitize, os: ubuntu-24.04, cc: clang, cxx: clang++, type: Debug, sanitize: 'ON' }
+          - { name: macOS Apple Clang, id: macos-clang, os: macos-15, cc: clang, cxx: clang++, type: Release, sanitize: 'OFF' }
+          - { name: Windows MSVC, id: windows-msvc, os: windows-2025, cc: '', cxx: '', type: Release, sanitize: 'OFF' }
+    env:
+      BUILD_DIR: build/ci-core
+      ASAN_OPTIONS: detect_leaks=1:abort_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Compiler
+        id: cc
+        run: |
+          if [ -n "${{ matrix.cxx }}" ]; then
+            echo "CC=${{ matrix.cc }}" >> "$GITHUB_ENV"
+            echo "CXX=${{ matrix.cxx }}" >> "$GITHUB_ENV"
+            "${{ matrix.cxx }}" --version | head -1 | tee "$RUNNER_TEMP/compiler.txt"
+          else
+            echo "MSVC (Visual Studio generator, x64)" | tee "$RUNNER_TEMP/compiler.txt"
+          fi
+          cmake --version | head -1
+
+      - name: Configure
+        run: |
+          gen=()
+          [ "$RUNNER_OS" = Windows ] && gen=(-A x64)
+          cmake -S . -B "$BUILD_DIR" "${gen[@]}" -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DEMBER_SANITIZE=${{ matrix.sanitize }} \
+            -DEMBER_BUILD_TESTS=ON -DEMBER_BUILD_TOOLS=OFF -DEMBER_BUILD_DESKTOP=OFF
+
+      - name: Build
+        run: cmake --build "$BUILD_DIR" --config ${{ matrix.type }} --target ember_tests --parallel 4
+
+      - name: Run the doctest suite
+        run: |
+          mkdir -p build/ci-logs
+          exe="$BUILD_DIR/core/ember_tests"
+          [ "$RUNNER_OS" = Windows ] && exe="$BUILD_DIR/core/${{ matrix.type }}/ember_tests.exe"
+          set -o pipefail
+          "$exe" --no-colors 2>&1 | tee build/ci-logs/core-${{ matrix.id }}.log
+
+      - name: Summary
+        if: always()
+        run: |
+          py() { if python3 -c '' >/dev/null 2>&1; then python3 "$@"; else python "$@"; fi; }   # Windows: python
+          {
+            echo "### Core: ${{ matrix.name }}"
+            echo
+            echo "Compiler: $(cat "$RUNNER_TEMP/compiler.txt" 2>/dev/null || echo unknown); build type ${{ matrix.type }}; sanitizers ${{ matrix.sanitize }}"
+            echo
+            py tools/ci/report.py tests-header
+            py tools/ci/report.py tests doctest "core doctest (${{ matrix.id }})" build/ci-logs/core-${{ matrix.id }}.log
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: core-test-log-${{ matrix.id }}
+          path: build/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn
+
+  wasm:
+    name: WebAssembly (wasm32, Node)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '26'
+
+      - uses: ./.github/actions/setup-emsdk
+
+      - name: Build and run ember_tests as wasm32 under Node
+        run: |
+          mkdir -p build/ci-logs
+          set -o pipefail
+          tools/ci/core-wasm-tests.sh build/core-wasm -- --no-colors 2>&1 | tee build/ci-logs/core-wasm.log
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Core: WebAssembly"
+            echo
+            echo "Emscripten $(sed -n 's/.*"\(.*\)".*/\1/p' .toolchains/emsdk/upstream/emscripten/emscripten-version.txt 2>/dev/null), Node $(node --version), NODERAWFS"
+            echo
+            python3 tools/ci/report.py tests-header
+            python3 tools/ci/report.py tests doctest "core doctest (wasm32)" build/ci-logs/core-wasm.log
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: core-test-log-wasm
+          path: build/ci-logs/
+          retention-days: 14
+          if-no-files-found: warn
+
+  summary:
+    name: Core summary
+    if: always()
+    needs: [native, wasm]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/ci
+      - name: Required jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 tools/ci/needs-summary.py "Core"
