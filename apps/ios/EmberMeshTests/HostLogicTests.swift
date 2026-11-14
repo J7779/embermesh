@@ -275,13 +275,15 @@ final class LinkManagerTests: XCTestCase {
 
 final class ServiceLogicTests: XCTestCase {
   func testSignalPatternParsing() {
+    // RPC_API §10 limits: 1–4096 entries, each 10 ms – 60 s, ≤ 10 min total.
     XCTAssertEqual(try SignalService.parsePattern(["pattern_ms": [100, 200]]).get(), [100, 200])
-    XCTAssertEqual(try SignalService.parsePattern(["pattern_ms": []]).get(), [])
+    XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": []]).get())
     XCTAssertThrowsError(try SignalService.parsePattern([:]).get())
     XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": [-1]]).get())
+    XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": [0]]).get())
     XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": ["x"]]).get())
     XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": [60_001]]).get())
-    XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": Array(repeating: 1, count: 4001)]).get())
+    XCTAssertThrowsError(try SignalService.parsePattern(["pattern_ms": Array(repeating: 10, count: 4097)]).get())
   }
 
   func testToneWav() {

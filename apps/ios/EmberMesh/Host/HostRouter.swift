@@ -34,6 +34,7 @@ final class HostRouter: HostMethodHandler {
     capture.audioEndpoint = { [weak self] in self?.links.endpoints(of: AudioEndpoint.self).first { $0.isConnected } }
     capture.previewHost = { [weak self] in self?.presenter?.webContentView }
     capture.onEvent = { [weak self] n, d in self?.onEvent?(n, d) }
+    signal.cameraBusy = { [weak self] in self?.capture.camera != nil || QRScannerViewController.active > 0 }
     accessibility.onChange = { [weak self] d in self?.onEvent?("host.accessibility", d) }
   }
 
@@ -106,6 +107,7 @@ final class HostRouter: HostMethodHandler {
   var features: [String] {
     var f = ["location", "flash", "tone", "file", "notify", "keep_awake", "background_ble", "hub", "getusermedia"]
     f += CaptureService.features
+    if signal.info.string("torch") == "yes" { f.append("torch") }
     f.append("accessibility")
     if haptics.supported { f.append("haptic") }
     if QRScannerViewController.hasCamera { f.append("qr_scan") }
@@ -125,7 +127,7 @@ final class HostRouter: HostMethodHandler {
       return spec.json(available: ok, reason: reason, linkTypes: linkTypes(for: spec.kind).flatMap { $0.isEmpty ? nil : $0 })
     }
     return ["platform": "ios", "app_version": HostRouter.appVersion, "backend": "native", "endpoint_kinds": kinds,
-            "features": features, "actions": HostRouter.actions, "accessibility": accessibility.state,
+            "features": features, "actions": HostRouter.actions, "accessibility": accessibility.state, "signal": signal.info,
             // Sound links: iOS has no serial/GPIO lines, so PTT is VOX or keyed by hand only.
             "audio": ["ptt": ["vox", "manual"], "serial_ptt": false, "presets_supported": ["handheld_vox", "acoustic", "sound_card", "custom"],
                       "presets_unsupported": ["handheld_ptt": "iPhone cannot key a PTT line (no serial/GPIO). Use the radio's VOX (handheld_vox) or an interface with its own VOX, or press PTT yourself (acoustic)."]], "os_version": UIDevice.current.systemVersion,
@@ -159,7 +161,10 @@ final class HostRouter: HostMethodHandler {
       QRScannerViewController.scan(presenter: presenter, completion: c)
     case "host.file.save": files.save(params: p, presenter: presenter, completion: c)
     case "host.file.pick": files.pick(params: p, presenter: presenter, completion: c)
-    case "host.signal.flash": signal.flash(params: p, hostView: presenter?.hostView, completion: c)
+    case "host.signal.flash":
+      let window = presenter?.hostView.window ?? UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.windows.first { $0.isKeyWindow } }.first
+      signal.flash(params: p, window: window, completion: c)
+    case "host.signal.stop": signal.stopAll(); c(.success([:]))
     case "host.haptic": c(haptics.perform(p))
     case "host.capture.start": capture.start(p, completion: c)
     case "host.capture.update": capture.update(p, completion: c)

@@ -68,8 +68,8 @@ struct TempDir {
   ~TempDir() { rmtree(path); }
   std::string file(const std::string& rel, const std::string& content) const {
     std::string p = ember_host::path_join(path, rel);
-    size_t s = p.find_last_of('/');
-    ember_host::make_dirs(p.substr(0, s));
+    size_t s = p.find_last_of("/\\");  // either separator: path_join uses '\\' on Windows
+    if (s != std::string::npos) ember_host::make_dirs(p.substr(0, s));
     ember_host::write_file_atomic(p, content);
     return p;
   }

@@ -687,7 +687,9 @@ pattern.
 - `"auto"` (default; what older UIs send by omitting it): the torch if the device has one that the
   host can switch, otherwise a full-screen flash.
 - `"torch"`: the torch only; error `unsupported` when there is none, `permission_denied` when the
-  platform needs a permission for it and the user refused.
+  platform needs a permission for it and the user refused, `busy` when the camera that owns the
+  torch is in use (this app's QR scanner or Morse camera reader, or another app). In `"auto"` each
+  of these cases falls back to the screen instead.
 - `"screen"`: the screen only.
 
 `host.signal.flash` resolves when the pattern has finished or was stopped (`stopped:true`), never

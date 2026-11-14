@@ -147,9 +147,9 @@ TEST_SUITE("http") {
     bool isdir = false;
     CHECK(resolve_static_path(root.path, "/", &isdir) == ember_host::path_join(root.path, "index.html"));
     CHECK(isdir);
-    CHECK(resolve_static_path(root.path, "/js/app.js") == ember_host::path_join(root.path, "js/app.js"));
+    CHECK(resolve_static_path(root.path, "/js/app.js") == ember_host::path_join(ember_host::path_join(root.path, "js"), "app.js"));
     CHECK(resolve_static_path(root.path, "/js//./app.js") != "");
-    CHECK(resolve_static_path(root.path, "/../" + outside.path.substr(outside.path.find_last_of('/') + 1) + "/passwd") == "");
+    CHECK(resolve_static_path(root.path, "/../" + outside.path.substr(outside.path.find_last_of("/\\") + 1) + "/passwd") == "");
     CHECK(resolve_static_path(root.path, "/js/../../passwd") == "");
     CHECK(resolve_static_path(root.path, "/..") == "");
     CHECK(resolve_static_path(root.path, "/.secret") == "");

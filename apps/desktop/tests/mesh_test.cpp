@@ -383,7 +383,9 @@ TEST_SUITE("mesh") {
     REQUIRE(a.start({"--link", link_arg("sdr", R"({"kind":"rtl_tcp","config":{"host":"127.0.0.1","port":)" + std::to_string(sdr.port) + "}}",
                                         R"({"type":"rtl_tcp","config":{"sample_rate":"240000","frequency_hz":144390000}})")}));
     REQUIRE(wait_until([&] { return a.link_by_name("sdr").get("state").as_string() == "up"; }, 10000));
-    CHECK(sdr.commands.load() >= 2);  // the driver tuned the dongle itself
+    // The driver tuned the dongle itself. The link is "up" once connected; the fake dongle counts
+    // the tuning commands as it reads them, a moment later.
+    CHECK(wait_until([&] { return sdr.commands.load() >= 2; }, 10000));
     CHECK_MESSAGE(wait_until([&] { return a.link_by_name("sdr").get("stats").get("rx_frames").as_int() > 0; }, 40000),
                   "no frame decoded: " << a.link_by_name("sdr").dump());
     CHECK_MESSAGE(wait_until([&] { return a.has_message("ch:public", t); }, 20000),

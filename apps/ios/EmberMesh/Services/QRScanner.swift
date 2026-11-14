@@ -3,6 +3,8 @@ import UIKit
 
 /// host.qr.scan: full-screen camera with AVCaptureMetadataOutput (QR only). No third-party decoder.
 final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+  /// Number of scanners whose capture session may be running (the torch belongs to it then).
+  private(set) static var active = 0
   static var hasCamera: Bool {
     #if targetEnvironment(simulator)
     return false
@@ -80,6 +82,7 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
       cancel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       cancel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
     ])
+    QRScannerViewController.active += 1
     sessionQueue.async { self.session.startRunning() }
   }
 
@@ -100,6 +103,7 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
   private func finish(_ r: RPCResult) {
     guard let c = completion else { return }
     completion = nil
+    QRScannerViewController.active = max(0, QRScannerViewController.active - 1)
     sessionQueue.async { self.session.stopRunning() }
     if presentingViewController != nil {
       dismiss(animated: true) { c(r) }

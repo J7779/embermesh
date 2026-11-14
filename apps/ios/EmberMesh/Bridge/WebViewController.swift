@@ -181,7 +181,14 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
     decisionHandler(.allow)
   }
 
+  deinit {
+    // The page is gone: the light must go off (RPC_API §10).
+    let host = AppEnvironment.shared?.host
+    DispatchQueue.main.async { host?.signal.stopAll() }
+  }
+
   func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    AppEnvironment.shared?.host.signal.stopAll()  // page reloading / navigating away
     webHost.pageWillLoad()
   }
 
@@ -202,6 +209,7 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
     emberLog("web content process terminated; reloading")
+    AppEnvironment.shared?.host.signal.stopAll()
     loadStart()
   }
 

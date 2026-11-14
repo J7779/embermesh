@@ -336,11 +336,36 @@ and, on devices with a camera, `capture_camera_luma`.
     default is 8000.
   - If the core rejects a feed (session closed after 60 s idle, `morse.rx.stop`), capture stops and
     the shell emits `host.capture.state {kind, running:false, error}`.
-- **Sending:** `host.signal.flash` plays the pattern against absolute deadlines on a dedicated thread
-  (`mach_wait_until`), keeping the torch configuration locked for the whole pattern. Measured edge
-  error in the simulator: p95 1.02 ms, max 1.03 ms at 20 WPM (60 ms dots) and at 5 WPM. Without a
-  torch (simulator, iPads) it uses a white full-screen overlay at full brightness. Its edges appear
-  at the next display refresh, a quantisation of up to 16.7 ms.
+- **Sending by light** (RPC_API §10): `host.signal.flash {pattern_ms, mode?}` resolves only when
+  the pattern has finished or was stopped, with `{used:"torch"|"screen", stopped, timing:{worst_late_ms,
+  mean_late_ms, edges}}`. `host.signal.stop` stops a flash or tone at once, and a second flash/tone
+  stops the running one. Limits: ≤ 4,096 entries of 10 ms – 60 s, ≤ 10 min in total, otherwise
+  `bad_params`; an empty pattern is `bad_params` too. `host.info.signal = {torch:"yes"|"no",
+  screen:true}`, with the `torch` feature when "yes". iOS never reports "ask".
+  - **Torch present:** `auto`/`torch` use it.
+  - **No torch** (simulator, iPads without a flash): `auto` → screen, `torch` → `unsupported`.
+  - **Camera in use by this app** (QR scanner or Morse camera reader): `auto` → screen, `torch` →
+    `busy`, and the torch is never touched.
+  - **Torch refused by the system** (overheated, lock failed): `auto` → screen, `torch` → `busy` /
+    `permission_denied`.
+  - **Torch control:** `AVCaptureDevice.lockForConfiguration` + `torchMode`, held for the whole
+    pattern. No camera authorisation is requested, and no capture session is started or read. Apple
+    documents the authorisation requirement for capture sessions (`AVCaptureDeviceInput`), not for
+    torch control; flashlight apps work without the camera permission. Only a real iPhone can
+    confirm that no prompt appears on current iOS.
+  - **Screen fallback:** a full-window cover, white for on, black for off, at full brightness with
+    the idle timer held off. Brightness and idle-timer state are restored exactly afterwards. A tap on
+    the cover stops the flash, because the UI's Stop button is underneath it.
+  - **The light always goes off:** at pattern end, on stop, on error, on willResignActive,
+    background and screen lock (protected data becoming unavailable), and when the page reloads,
+    navigates away, its web content process dies, or the web view controller goes away.
+  - **Nothing about the pattern or text is logged or stored.**
+  - **Timing:** edge *k* is due at start + Σ previous durations on the monotonic clock, on a
+    dedicated thread. Waits are interruptible until 3 ms before the deadline, then finished with
+    `mach_wait_until`. Measured in the simulator at 20 and 5 WPM: worst 2.1 ms late, mean
+    1.1–1.6 ms. A late edge shortens the next interval, so lateness never accumulates; this is
+    tested with a virtual clock. The torch LED's own switching latency, and screen edges (shown at
+    the next display refresh, ≤ 16.7 ms), are not included.
 
 ## Connecting a radio (sound link)
 

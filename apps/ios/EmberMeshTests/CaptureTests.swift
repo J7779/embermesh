@@ -345,52 +345,224 @@ final class WebMediaTests: XCTestCase {
 }
 
 final class FlashTimingTests: XCTestCase {
-  func stats(_ tr: [SignalService.PatternPlayer.Transition]) -> (mean: Double, p95: Double, max: Double) {
-    let errs = tr.map { abs($0.actualMs - $0.scheduledMs) }.sorted()
-    guard !errs.isEmpty else { return (0, 0, 0) }
-    return (errs.reduce(0, +) / Double(errs.count), errs[min(errs.count - 1, Int(Double(errs.count) * 0.95))], errs.last!)
+  /// Real monotonic clock and dedicated thread at 20 and 5 WPM (scheduling only; the torch LED's
+  /// own switching latency can only be measured on an iPhone).
+  func testRealClockEdgeLateness() {
+    for wpm in [20.0, 5.0] {
+      let pat = MorseGen.pattern(wpm >= 20 ? "PARIS PARIS" : "SOS", wpm: wpm).map { Int($0.rounded()) }
+      let light = FakeLight()
+      let k = Keyer(clock: MonotonicClock())
+      var r: Keyer.Result?
+      let t = Thread { r = k.run(pat, light: light) }
+      t.start()
+      XCTAssertTrue(spin(until: Double(pat.reduce(0, +)) / 1000 + 3) { r != nil })
+      print(String(format: "flash timing %.0f WPM (dot %.0f ms, %d edges): worst %.3f ms late, mean %.3f ms", wpm, 1200 / wpm, r?.edges ?? 0, r?.worstLateMs ?? -1, r?.meanLateMs ?? -1))
+      XCTAssertEqual(r?.stopped, false)
+      XCTAssertEqual(r?.edges, pat.count)
+      XCTAssertLessThan(r?.meanLateMs ?? 99, 5)
+      XCTAssertLessThan(r?.worstLateMs ?? 99, 15)
+      XCTAssertEqual(light.states.last, false, "light off at the end")
+    }
+  }
+}
+
+/// Records what the keyer switched (thread-safe).
+final class FakeLight: SignalLight {
+  private let lock = NSLock()
+  private var _states: [Bool] = []
+  var began = 0, ended = 0
+  var failBegin: RPCError?
+  var states: [Bool] { lock.lock(); defer { lock.unlock() }; return _states }
+  var isOn: Bool { states.last ?? false }
+  func begin() throws { if let e = failBegin { throw e }; began += 1 }
+  func set(_ on: Bool) { lock.lock(); _states.append(on); lock.unlock() }
+  func end() { lock.lock(); _states.append(false); lock.unlock(); ended += 1 }
+}
+
+/// Virtual monotonic clock: waits return instantly with time advanced to the deadline plus an
+/// injected lateness for chosen edges; `stopAfter` cancels at a given wait.
+final class VirtualClock: KeyerClock {
+  var t: UInt64 = 1_000_000_000
+  var lateness: [Int: UInt64] = [:]   // wait index -> extra ns
+  var waits = 0
+  var onWait: ((Int) -> Void)?
+  func nowNs() -> UInt64 { t }
+  func wait(until d: UInt64, cancel: DispatchSemaphore) -> Bool {
+    let i = waits; waits += 1
+    onWait?(i)
+    if cancel.wait(timeout: .now()) == .success { return false }
+    t = max(t, d) + (lateness[i] ?? 0)
+    return true
+  }
+}
+
+final class SignalContractTests: XCTestCase {
+  /// A late edge shortens the next interval: later edges stay on their schedule (no drift).
+  func testDriftFreeScheduling() {
+    let clock = VirtualClock()
+    clock.lateness = [3: 7_000_000]   // edge 3 woke 7 ms late
+    let k = Keyer(clock: clock)
+    let light = FakeLight()
+    let pat = [60, 60, 180, 60, 60, 60, 180, 420]
+    let r = k.run(pat, light: light)
+    XCTAssertFalse(r.stopped)
+    let actualMs = k.edgeTimesNs.map { Double($0) / 1e6 }
+    let schedMs = k.scheduledNs.map { Double($0) / 1e6 }
+    XCTAssertEqual(actualMs[3] - schedMs[3], 7, accuracy: 0.001, "edge 3 late")
+    for i in 4..<pat.count { XCTAssertEqual(actualMs[i], schedMs[i], accuracy: 0.001, "edge \(i) back on schedule") }
+    XCTAssertEqual(r.worstLateMs, 7, accuracy: 0.001)
+    XCTAssertEqual(light.states, [true, false, true, false, true, false, true, false, false])
   }
 
-  /// Edge timing of the flash scheduler at 5 and 20 WPM (the torch path's scheduling; the torch
-  /// LED's own switching latency can only be measured on a device).
-  func testFlashSchedulerJitter() {
-    for wpm in [20.0, 5.0] {
-      let text = wpm >= 20 ? "PARIS PARIS" : "SOS"
-      let pat = MorseGen.pattern(text, wpm: wpm).map { Int($0.rounded()) }
-      let p = SignalService.PatternPlayer()
-      p.recordTransitions = true
-      var finished = false
-      var states: [Bool] = []
-      let lock = NSLock()
-      p.play(pat, apply: { on in lock.lock(); states.append(on); lock.unlock() }, done: { finished = true })
-      XCTAssertTrue(spin(until: Double(pat.reduce(0, +)) / 1000 + 3) { finished })
-      let s = stats(p.recorded)
-      print(String(format: "flash timing %.0f WPM (dot %.0f ms, %d edges): mean %.3f ms, p95 %.3f ms, max %.3f ms", wpm, 1200 / wpm, p.recorded.count, s.mean, s.p95, s.max))
-      XCTAssertEqual(p.recorded.count, pat.count + 1)
-      XCTAssertEqual(states.first, true); XCTAssertEqual(states.last, false)
-      XCTAssertLessThan(s.p95, 5.0, "edges within 5 ms (p95; ~1 ms when idle, ~2 ms under full-suite load)")
-      XCTAssertLessThan(s.max, 15.0)
+  func testStopMidPatternLeavesLightOff() {
+    let clock = VirtualClock()
+    let k = Keyer(clock: clock)
+    clock.onWait = { i in if i == 3 { k.stop() } }
+    let light = FakeLight()
+    let r = k.run([100, 100, 100, 100, 100, 100], light: light)
+    XCTAssertTrue(r.stopped)
+    XCTAssertEqual(light.states.last, false)
+    XCTAssertEqual(r.edges, 3)
+  }
+
+  func testLimits() {
+    func code(_ v: Any) -> String? { if case .failure(let e) = SignalService.parsePattern(["pattern_ms": v]) { return e.code }; return nil }
+    XCTAssertNil(code([10, 60_000]))
+    XCTAssertEqual(code([]), "bad_params")
+    XCTAssertEqual(code([9]), "bad_params")
+    XCTAssertEqual(code([60_001]), "bad_params")
+    XCTAssertEqual(code(["x"]), "bad_params")
+    XCTAssertEqual(code([true]), "bad_params")
+    XCTAssertEqual(code(Array(repeating: 100, count: 4097)), "bad_params")
+    XCTAssertNil(code(Array(repeating: 100, count: 4096)))
+    XCTAssertEqual(code(Array(repeating: 60_000, count: 11)), "bad_params", "over 10 minutes")
+    XCTAssertNil(code(Array(repeating: 60_000, count: 10)))
+    if case .success = SignalService.parsePattern([:]) { XCTFail() }
+  }
+
+  /// A SignalService with fake torch / screen and a virtual clock.
+  func service(torch: Bool, busy: Bool = false, torchFails: RPCError? = nil) -> (SignalService, FakeLight, FakeLight) {
+    let s = SignalService()
+    let t = FakeLight(); t.failBegin = torchFails
+    let sc = FakeLight()
+    s.clock = VirtualClock()
+    s.torchAvailable = { torch }
+    s.cameraBusy = { busy }
+    s.makeTorch = { t }
+    s.makeScreen = { _ in sc }
+    return (s, t, sc)
+  }
+
+  func flash(_ s: SignalService, _ p: JSONObject) -> RPCResult {
+    var out: RPCResult?
+    s.flash(params: p, window: nil) { out = $0 }
+    XCTAssertTrue(spin(until: 5) { out != nil })
+    return out ?? .failure(.internalError("no result"))
+  }
+
+  func testModeSelectionFallbackAndBusy() throws {
+    let pat: JSONObject = ["pattern_ms": [100, 100, 300]]
+    // Torch present.
+    var (s, t, sc) = service(torch: true)
+    var r = try flash(s, pat).get()
+    XCTAssertEqual(r.string("used"), "torch"); XCTAssertEqual(r.bool("stopped"), false)
+    XCTAssertEqual(t.began, 1); XCTAssertEqual(t.ended, 1); XCTAssertFalse(t.isOn); XCTAssertEqual(sc.began, 0)
+    XCTAssertNotNil(r.object("timing")?.number("worst_late_ms"))
+    r = try flash(s, pat.merging(["mode": "screen"]) { $1 }).get()
+    XCTAssertEqual(r.string("used"), "screen"); XCTAssertEqual(sc.ended, 1); XCTAssertFalse(sc.isOn)
+    // No torch: auto → screen, torch → unsupported.
+    (s, t, sc) = service(torch: false)
+    XCTAssertEqual(try flash(s, pat).get().string("used"), "screen")
+    guard case .failure(let e1) = flash(s, pat.merging(["mode": "torch"]) { $1 }) else { return XCTFail() }
+    XCTAssertEqual(e1.code, "unsupported")
+    XCTAssertEqual(t.began, 0)
+    // Torch busy (our own QR scanner / Morse camera): auto → screen, torch → busy.
+    (s, t, sc) = service(torch: true, busy: true)
+    XCTAssertEqual(try flash(s, pat).get().string("used"), "screen")
+    guard case .failure(let e2) = flash(s, pat.merging(["mode": "torch"]) { $1 }) else { return XCTFail() }
+    XCTAssertEqual(e2.code, "busy")
+    XCTAssertEqual(t.began, 0, "busy torch never touched")
+    // Torch refused by the system: auto → screen, torch → that error.
+    (s, t, sc) = service(torch: true, torchFails: RPCError("permission_denied", "x"))
+    XCTAssertEqual(try flash(s, pat).get().string("used"), "screen")
+    guard case .failure(let e3) = flash(s, pat.merging(["mode": "torch"]) { $1 }) else { return XCTFail() }
+    XCTAssertEqual(e3.code, "permission_denied")
+    // Bad mode / bad pattern.
+    guard case .failure(let e4) = flash(s, ["pattern_ms": [100], "mode": "laser"]) else { return XCTFail() }
+    XCTAssertEqual(e4.code, "bad_params")
+  }
+
+  /// Real clock: stop (host.signal.stop), a second flash and resign-active each end the running flash
+  /// at once with stopped:true and the light off.
+  func testStopSecondFlashAndLifecycle() {
+    for trigger in ["stop", "second", "resign", "background", "lock"] {
+      let (s, t, _) = service(torch: true)
+      s.clock = MonotonicClock()
+      var first: RPCResult?
+      s.flash(params: ["pattern_ms": [5000, 100]], window: nil) { first = $0 }
+      XCTAssertTrue(spin(until: 1) { t.isOn }, trigger)
+      let t0 = Date()
+      switch trigger {
+      case "stop": s.stopAll()
+      case "second": s.flash(params: ["pattern_ms": [10]], window: nil) { _ in }
+      case "resign": NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
+      case "background": NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+      default: NotificationCenter.default.post(name: UIApplication.protectedDataWillBecomeUnavailableNotification, object: nil)
+      }
+      XCTAssertTrue(spin(until: 2) { first != nil }, trigger)
+      XCTAssertLessThan(Date().timeIntervalSince(t0), 0.5, "stopped at once (\(trigger))")
+      XCTAssertEqual((try? first?.get())?.bool("stopped"), true, trigger)
+      XCTAssertEqual(t.states.last, false, "torch off (\(trigger))")
+      spin(until: 0.1) { false }
     }
   }
 
-  /// No torch in the simulator → screen flash: the white overlay toggles and ends hidden.
-  func testScreenFlashFallback() throws {
-    let svc = SignalService()
+  /// Through HostRouter: host.info.signal + features, mode contract, host.signal.stop.
+  func testRouterContract() throws {
+    let n = TestNode(name: "signal")
+    n.start()
+    let info = try XCTUnwrap(n.host("host.info")).get()
+    let sig = try XCTUnwrap(info.object("signal"))
+    XCTAssertEqual(sig.bool("screen"), true)
+    let feats = info["features"] as? [String] ?? []
+    XCTAssertTrue(feats.contains("flash"))
+    #if targetEnvironment(simulator)
+    XCTAssertEqual(sig.string("torch"), "no")
+    XCTAssertFalse(feats.contains("torch"))
+    guard case .failure(let e) = n.host("host.signal.flash", ["pattern_ms": [100], "mode": "torch"]) else { return XCTFail() }
+    XCTAssertEqual(e.code, "unsupported")
+    #endif
+    XCTAssertNotEqual(sig.string("torch"), "ask", "iOS never needs a permission for the torch")
+    XCTAssertNotNil(try n.host("host.signal.stop")?.get(), "no-op when idle")
+    // A real screen flash (simulator: no torch) on the key window, stopped early.
+    var res: RPCResult?
+    n.host.handleHost(method: "host.signal.flash", params: ["pattern_ms": [3000, 100]]) { res = $0 }
+    XCTAssertTrue(spin(until: 1) { n.host.signal.isFlashing })
+    XCTAssertEqual(n.host.signal.flashingWith, SystemTorch.available ? "torch" : "screen")
+    XCTAssertNotNil(try n.host("host.signal.stop")?.get())
+    XCTAssertTrue(spin(until: 2) { res != nil })
+    let r = try XCTUnwrap(res).get()
+    XCTAssertEqual(r.bool("stopped"), true)
+    XCTAssertEqual(r.string("used"), SystemTorch.available ? "torch" : "screen")
+    if case .success = n.host("host.signal.flash", ["pattern_ms": [5]]) { XCTFail("limits enforced") }
+    n.stop()
+  }
+
+  /// The screen fallback restores brightness and the idle timer exactly, and removes its cover.
+  func testScreenLightRestoresState() throws {
     let window = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.windows.first }.first)
-    var mode: String?
-    let pat = MorseGen.pattern("E E", wpm: 10).map { Int($0) }   // 120 ms on, 840 ms off, 120 ms on
-    svc.flash(params: ["pattern_ms": pat], hostView: window.rootViewController?.view ?? window) { r in mode = try? r.get().string("mode") }
-    XCTAssertEqual(mode, SignalService.hasTorch ? "torch" : "screen")
-    var sawOn = false
-    let end = Date().addingTimeInterval(Double(pat.reduce(0, +)) / 1000 + 1)
-    while Date() < end { if svc.screenOverlayVisible { sawOn = true }; RunLoop.current.run(until: Date().addingTimeInterval(0.005)) }
-    XCTAssertTrue(sawOn, "white overlay was shown")
-    XCTAssertFalse(svc.screenOverlayVisible, "and hidden at the end")
-    // An empty pattern stops a running one.
-    svc.flash(params: ["pattern_ms": [5000, 100]], hostView: window) { _ in }
-    svc.flash(params: ["pattern_ms": []], hostView: window) { r in XCTAssertEqual(try? r.get().string("mode"), "off") }
-    spin(until: 0.3) { false }
-    XCTAssertFalse(svc.screenOverlayVisible)
+    let idle = UIApplication.shared.isIdleTimerDisabled
+    let light = ScreenLight(window: window)
+    try light.begin()
+    XCTAssertTrue(light.isCovering)
+    XCTAssertTrue(UIApplication.shared.isIdleTimerDisabled)
+    light.set(true)
+    XCTAssertTrue(spin(until: 1) { light.isOn })
+    light.end()
+    XCTAssertFalse(light.isCovering)
+    XCTAssertFalse(light.isOn)
+    XCTAssertEqual(UIApplication.shared.isIdleTimerDisabled, idle)
+    XCTAssertThrowsError(try ScreenLight(window: nil).begin())
   }
 }
 

@@ -148,7 +148,16 @@ class WinVfs : public Vfs {
     HANDLE h = CreateFileW(widen(path).c_str(), access,
                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, disp,
                            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, nullptr);
-    if (h == INVALID_HANDLE_VALUE) return map_error(GetLastError());
+    if (h == INVALID_HANDLE_VALUE) {
+      DWORD e = GetLastError();
+      // Opening a directory as a file fails with "access denied" (it would need backup semantics):
+      // report it as the caller error it is, like the POSIX implementation does.
+      if (e == ERROR_ACCESS_DENIED) {
+        DWORD attrs = GetFileAttributesW(widen(path).c_str());
+        if (attrs != INVALID_FILE_ATTRIBUTES && (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0) return Status::InvalidArgument;
+      }
+      return map_error(e);
+    }
     BY_HANDLE_FILE_INFORMATION info;
     if (!GetFileInformationByHandle(h, &info) ||
         (info.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY)) != 0 ||
