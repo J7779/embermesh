@@ -26,7 +26,7 @@ nothing "all rights reserved".
 
 ## What is in the library
 
-Counted from the `license:` field of all 5,333 guides (5,301 library guides and the 32-chapter operator manual) (files whose names start with `_` are
+Counted from the `license:` field of all 5,334 guides (5,301 library guides and the 33-chapter operator manual) (files whose names start with `_` are
 not guides):
 
 | Licence | Guides | Main sources |
@@ -35,9 +35,9 @@ not guides):
 | **Public domain — US Government works** (17 U.S.C. §105) | 1,191 | US Army field manuals and technical publications approved for public release, FEMA / Ready.gov, CDC, ATSDR, NIOSH, EPA, NWS / NOAA, USDA (Farmers' and home-canning bulletins, a 1954 soil-conservation handbook), US Coast Guard, USGS, FCC rules (47 CFR) |
 | **Public domain — old books** (published in 1930 or earlier) | 1,204 | Books mostly from 1880–1929 on farming, repair, woodcraft, first aid, radio, food preservation and household skills, transcribed from public-domain scans |
 | **CC BY 4.0** | 295 | Open Resources for Nursing (Open RN / WisTech Open) textbooks (282); BCcampus *Clinical Procedures for Safer Patient Care* via LibreTexts (13) |
-| **CC0 1.0** | 33 | The EmberMesh operator manual (`guides/content/embermesh/`, 32 chapters) and one original reference table — written for EmberMesh and dedicated to the public domain |
+| **CC0 1.0** | 34 | The EmberMesh operator manual (`guides/content/embermesh/`, 33 chapters) and one original reference table — written for EmberMesh and dedicated to the public domain |
 | **CC BY-SA 3.0** | 28 | Appropedia |
-| **Total** | **5,333** | |
+| **Total** | **5,334** | |
 
 The `license:` values are written out more precisely in the files themselves (30 distinct
 spellings, for example `Public Domain (US Government work, 17 U.S.C. §105; published 1918, United

@@ -36,7 +36,8 @@ off until you turn it on, reaches contacts far away while a connection exists.
 ---
 
 EmberMesh is a chat app and a reference library that keep working when phone networks, the
-internet and power grids do not. Two phones can talk over Bluetooth with nothing else around. A
+internet and power grids do not. Two phones can talk over Bluetooth with nothing else around, and
+apps on the same Wi-Fi or hotspot find each other and link up by themselves. A
 laptop or phone on its own Wi-Fi hotspot becomes a **hub**: anyone nearby opens a web page and is
 on the mesh. Plug a cheap handheld radio into that hub through a sound card and the whole group can
 reach another camp kilometres away. Messages that cannot be delivered yet are kept and carried —
@@ -44,8 +45,9 @@ by anyone walking between the groups, or on a USB stick, or as a series of QR co
 
 Beside the chat sits a library of **5,301 offline guides** — first aid, water, food, shelter,
 radio, repair, power and more — plus a 33-chapter operator manual, searchable by keywords and by meaning, with 60 field calculators
-and a Morse reader that decodes a flashing light through the camera or a tone through the
-microphone. The same C++17 core runs on Android, iOS, Linux, macOS, Windows and in any modern
+and Morse by light: type a message and the phone flashes it; point another camera roughly at the
+blinking light and it finds the light by itself and reads it (a tone through the microphone works
+too). The same C++17 core runs on Android, iOS, Linux, macOS, Windows and in any modern
 browser as WebAssembly, so every device behaves the same way. In a browser it installs as an
 offline app, and a hosted copy of the web app is one click away under **Open the web app** above.
 
@@ -53,18 +55,21 @@ offline app, and a hosted copy of the web app is one click away under **Open the
   <tr>
     <td align="center"><img src="docs/assets/screenshots/chat.png" width="200" alt="Public channel with a check-in, a shared position and an SOS relayed over LoRa"><br><sub>Chat — SOS, check-ins, positions</sub></td>
     <td align="center"><img src="docs/assets/screenshots/radio-wizard.png" width="200" alt="Connect a radio wizard: the cables and adapters needed for a handheld radio on VOX"><br><sub>Connect a radio — what you need</sub></td>
-    <td align="center"><img src="docs/assets/screenshots/morse-reader.png" width="200" alt="Morse reader decoding VVV CQ TEST from a blinking light seen by the camera"><br><sub>Morse reader — camera or microphone</sub></td>
+    <td align="center"><img src="docs/assets/screenshots/morse-reader.png" width="200" alt="Morse camera reader reading the light: CQ CQ DE N0CALL K decoded at 10 WPM, no box to place"><br><sub>Morse reader — finds the light itself</sub></td>
     <td align="center"><img src="docs/assets/screenshots/sos.png" width="200" alt="SOS screen with the hold-to-send beacon button"><br><sub>SOS beacon — hold to send</sub></td>
   </tr>
 </table>
 <table>
   <tr>
-    <td align="center"><img src="docs/assets/screenshots/links.png" width="420" alt="Links and radios: a Wi-Fi link and an amateur-band audio link with a receive level meter"><br><sub>Links &amp; radios — every connection, with live levels</sub></td>
+    <td align="center"><img src="docs/assets/screenshots/links.png" width="420" alt="Links and radios: an audio link's receive level meter, a LoRa link and an automatic nearby-device link"><br><sub>Links &amp; radios — live levels, automatic links tagged</sub></td>
     <td align="center"><img src="docs/assets/screenshots/library.png" width="420" alt="Survival library search with smart search and Ask the library"><br><sub>Library — keyword and smart search</sub></td>
   </tr>
   <tr>
     <td align="center"><img src="docs/assets/screenshots/instructions.png" width="420" alt="What you need: devices, cables and adapters per connection and platform"><br><sub>Instructions — hardware for every connection</sub></td>
     <td align="center"><img src="docs/assets/screenshots/antenna-tool.png" width="420" alt="Half-wave dipole calculator with cut lengths and a build diagram"><br><sub>Tools — antenna designer with build diagram</sub></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><img src="docs/assets/screenshots/connections.png" width="420" alt="Settings, Connections: Nearby devices on, the internet relay off, and what each relay can see"><br><sub>Connections — nearby devices, and the optional relay with what it can see</sub></td>
   </tr>
 </table>
 <sub>Screenshots from the shared UI with its built-in demo backend (<code>ui/?mock=1</code>); names, places and positions are fictional sample data.</sub>
@@ -108,8 +113,9 @@ binaries are published to the rolling [**latest** pre-release](../../releases/ta
 | iOS 15+ | no download (an `.ipa` needs Apple signing); build it with Xcode and sign it with your own Apple ID — [apps/ios/README.md](apps/ios/README.md) |
 
 The latest pre-release is rebuilt from every commit and is a development build. The Android release
-APK is signed with the project's release key when it is named `…-android-release.apk`, so it
-updates earlier copies signed with that key; an APK named `…-release-ci-debug-signed.apk` (or one
+APK is signed in CI with the publisher's own release key (when the repository's signing secrets
+are set — [docs/CI.md](docs/CI.md#release-signing)) and is then named `…-android-release.apk`, so it
+updates earlier copies signed with that key. An APK named `…-release-ci-debug-signed.apk` (or one
 from another builder) carries a throw-away key and will not install over it as an update
 (uninstall first). The release notes give the signing certificate's SHA-256.
 
@@ -126,12 +132,13 @@ runs from a USB stick — see [Getting the app onto other people's devices](guid
 |---|---|
 | 💬 **Chat** | Direct messages (end-to-end encrypted), channels (random key, passphrase or open), a signed cleartext Public channel, delivery and read receipts, priorities, small files |
 | 🕸️ **Mesh** | Managed flooding with store-carry-forward: undelivered messages are kept for days and handed to every newly met peer. A node with several links bridges them automatically |
-| 🆘 **Emergency** | Repeating SOS beacon relayed first by every node, safety check-ins and roll call, a bulletin board (water, food, medical, shelter, hazards), position sharing, Morse by flashlight or tone |
+| 🆘 **Emergency** | Repeating SOS beacon relayed first by every node, safety check-ins and roll call, a bulletin board (water, food, medical, shelter, hazards), position sharing, typed messages sent as Morse by flashlight, screen or tone |
 | 📻 **Radios** | Sound-card soft modems through any radio's audio, KISS TNCs with APRS messaging, Meshtastic, RNode, AT-command LoRa modules, transparent serial radios, receive-only SDR |
-| 📶 **Device to device** | Bluetooth LE phone-to-phone, Wi-Fi multicast, Apple peer-to-peer, WebRTC paired by QR code, TCP, serial cable, USB-stick and QR-code bundles |
+| 📶 **Device to device** | **Nearby devices:** apps on the same Wi-Fi or hotspot find each other and connect by themselves. Also Bluetooth LE phone-to-phone, Wi-Fi multicast, Apple peer-to-peer, WebRTC paired by QR code, TCP, serial cable, USB-stick and QR-code bundles |
+| 🌐 **Internet relay** (optional) | Off until you turn it on. Then contacts are also reached over any internet connection (LTE, satellite) through relay servers that carry sealed frames: they see addresses, sizes and timing, never content. One free third-party relay is enabled by default; your own hub can be a private relay instead (`emberd --relay-broker`) |
 | 🏕️ **Hub** | A computer or phone serves the app on its own hotspot at `http://<ip>:8437/`; browsers that open it join the mesh. Add a radio and the whole hotspot reaches distant groups |
 | 📚 **Library** | 5,301 guides in 19 categories plus a 33-chapter operator manual, keyword and meaning-based search, every guide with its source and licence |
-| 🧭 **Easy to use** | Simple mode (bigger text and buttons, fewer choices, plain words) and accessibility settings: text size, high contrast, motion, reading spacing, vibration, keyboard shortcuts, screen-reader labels. A short 3D launch animation that can be shortened or turned off and follows the system's reduced-motion setting |
+| 🧭 **Easy to use** | Simple mode (bigger text and buttons, fewer choices, plain words) and accessibility settings: text size, high contrast, motion, reading spacing, vibration, keyboard shortcuts, screen-reader labels. The same short 3D launch animation in every app, which can be shortened or turned off and follows the system's reduced-motion setting |
 | 🧮 **Tools** | 60 calculators, including 19 antenna designers with build diagrams, link budget, radio horizon, coax loss, solar and battery sizing, grid conversion, water disinfection; band plans for 36 radio services |
 | 🔐 **Your data** | Storage encrypted with a passphrase, duress passphrase, panic wipe, identity backup, contact verification by 8 words read over the radio or by QR card |
 
@@ -162,12 +169,18 @@ runs from a USB stick — see [Getting the app onto other people's devices](guid
 <details>
 <summary><b>Morse reader</b></summary>
 
-Point the camera at a flashlight, a lamp or another phone's screen, or let the microphone hear a
-tone, and the text appears as it is decoded. One decoder in the core serves every app: it finds
-the speed by itself (about 3–25 WPM by light, 5–40 WPM by sound), tolerates hand-keyed timing,
-camera exposure drift, flicker and noise, and needs no link. Sending works by torch, screen flash
-or tone. Tested with generated light and tone signals, not yet with a real lamp in real light —
-see [Sending and reading Morse](guides/content/embermesh/morse-reading.md).
+Point the camera roughly at a flashlight, a lamp or another phone's screen, or let the microphone
+hear a tone, and the text appears as it is decoded. The camera reader watches the whole frame and
+finds the keyed light by itself — no box to place — ignoring steady lamps, flicker and hand shake;
+tap a light to choose it when there are two. One decoder in the core serves every app and finds the
+speed by itself. **Sending:** type text and the device flashes it with its flashlight, or with the
+screen when it has none, or plays it as a tone.
+
+Measured **in simulation only** ([core/src/morse/README.md](core/src/morse/README.md)): the camera
+reader locks on in about 1–1.5 s at 12–15 WPM and needs about two camera frames per dot (30 fps:
+up to ~20 WPM); a one-pixel light in a dark room must stand roughly 20–40 brightness levels above
+its background, and daylight scenes are much harder. It has been tested with generated scenes, not
+yet with a real lamp in real light — see [Sending and reading Morse](guides/content/embermesh/morse-reading.md).
 
 </details>
 
@@ -223,7 +236,12 @@ flowchart LR
   end
   P2 -. "carried by a person<br/>(store-carry-forward)" .-> P3
   P1 -. "USB stick / QR codes" .-> P3
+  HubA <-. "optional internet relay<br/>(sealed frames, while a connection exists)" .-> HubB
 ```
+
+Devices on the same Wi-Fi find each other through DNS-SD and connect without setup; browsers cannot
+discover the network, so they join the hub that served them or pair by code. Details:
+[docs/CONNECTIVITY.md](docs/CONNECTIVITY.md).
 
 <details>
 <summary><b>Mesh, security and storage in more detail</b></summary>
@@ -250,12 +268,18 @@ flowchart LR
   working clock never lets the mesh change it. Guide packs from others are validated before use.
 - **On the device:** passphrase-encrypted storage, a duress passphrase, panic wipe; hubs never
   announce the computer's or phone's own name.
+- **Nearby devices and the relay:** Nearby shows your name and EmberMesh identity to every
+  EmberMesh device on the same network. The internet relay sends nothing before you consent; its
+  frames are sealed end to end, but the relay operator sees your IP address, when you are online
+  and which other users you exchange messages with, and on brokers that allow wildcard subscriptions
+  anyone can watch topic names, sizes and timing. A single default relay is a single point of
+  failure. See [SECURITY.md](SECURITY.md) and [docs/CONNECTIVITY.md](docs/CONNECTIVITY.md) §2, §4.5.
 - **Limits, stated plainly:** no forward secrecy for direct messages; who talks to whom and when is
   visible to anyone in radio range; passphrase channels can be guessed offline (prefer random-key
   channels shared by invite); "verified" only means something for contacts you verified yourself,
   so do that before an emergency. The code has not had an independent security audit.
 
-Threat model and mechanisms: [docs/PROTOCOL.md §4, §9–§11](docs/PROTOCOL.md#4-security) and the
+Threat model and mechanisms: [docs/PROTOCOL.md §4, §9–§12](docs/PROTOCOL.md#4-security) and the
 [security chapter](guides/content/embermesh/security.md) of the manual. To report a vulnerability,
 see [SECURITY.md](SECURITY.md).
 
@@ -263,10 +287,10 @@ see [SECURITY.md](SECURITY.md).
 
 | | Runs as | Links it can use |
 |---|---|---|
-| **Android** 5.0+ | native app (Kotlin + C++ core) | Bluetooth LE, Bluetooth SPP, USB serial (FTDI, CP210x, CH34x, PL2303, CDC-ACM), USB / jack audio, Wi-Fi, Wi-Fi Direct, phone hub |
-| **iPhone / iPad**, iOS 15+ | native app (Swift + C++ core) | Bluetooth LE, Apple peer-to-peer, audio (VOX only: iOS cannot key PTT), Wi-Fi, phone hub |
-| **Linux** (incl. Raspberry Pi), **macOS**, **Windows** | `emberd` daemon + web UI | serial, sound cards with VOX / RTS / DTR / CM108 / `rigctld` PTT, TCP/UDP, `rtl_tcp`, Wi-Fi hub |
-| **Browser** (Chrome / Edge tested) | WebAssembly app: installable offline PWA, hosted web app or single HTML file | WebSocket to a hub, WebRTC, Web Serial and Web Bluetooth (Chrome), audio modem |
+| **Android** 5.0+ | native app (Kotlin + C++ core) | Nearby devices, internet relay, Bluetooth LE, Bluetooth SPP, USB serial (FTDI, CP210x, CH34x, PL2303, CDC-ACM), USB / jack audio, Wi-Fi, Wi-Fi Direct, phone hub |
+| **iPhone / iPad**, iOS 15+ | native app (Swift + C++ core) | Nearby devices, internet relay, Bluetooth LE, Apple peer-to-peer, audio (VOX only: iOS cannot key PTT), Wi-Fi, phone hub |
+| **Linux** (incl. Raspberry Pi), **macOS**, **Windows** | `emberd` daemon + web UI | Nearby devices (built-in mDNS), internet relay (TLS through Mbed TLS) and a private relay broker, serial, sound cards with VOX / RTS / DTR / CM108 / `rigctld` PTT, TCP/UDP, `rtl_tcp`, Wi-Fi hub |
+| **Browser** (Chrome / Edge tested) | WebAssembly app: installable offline PWA, hosted web app or single HTML file | internet relay, WebSocket to a hub, WebRTC, Web Serial and Web Bluetooth (Chrome), audio modem; no Nearby discovery (a page cannot search the network: it joins a hub or pairs by code) |
 
 **Radio hardware the software supports** (none of it field-tested yet): handhelds such as the
 Baofeng UV-5R through a K1 audio cable on VOX or through an AIOC / Digirig-class interface;
@@ -277,7 +301,7 @@ is in [What you need](guides/content/embermesh/what-you-need.md).
 
 ## The guide library
 
-5,301 guides in 19 categories plus the 33-chapter operator manual — about 81 MB of Markdown, packed
+5,301 guides in 19 categories plus the 33-chapter operator manual — about 80 MB of Markdown, packed
 into one 58.2 MB `guides.pack` with a prebuilt keyword index, the search model and passage vectors. Every guide records its source, licence and attribution, and the app shows
 them at the bottom of each guide.
 
@@ -317,11 +341,12 @@ The **operator manual** is inside every app (Guides → "How to use EmberMesh") 
 
 **For developers:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (design and layout) ·
 [docs/RPC_API.md](docs/RPC_API.md) (app ↔ core contract) · [docs/PROTOCOL.md](docs/PROTOCOL.md)
-(wire format, security) · platform READMEs: [desktop](apps/desktop/README.md) ·
+(wire format, security) · [docs/CONNECTIVITY.md](docs/CONNECTIVITY.md) (Nearby devices, internet
+relay) · [docs/CI.md](docs/CI.md) (workflows, release signing) · platform READMEs: [desktop](apps/desktop/README.md) ·
 [web](apps/web/README.md) · [Android](apps/android/README.md) · [iOS](apps/ios/README.md) ·
 [shared UI](ui/README.md) · [guide packer](tools/guidepack/README.md).
-Working rules and step-by-step playbooks for contributors and automated coding tools:
-[AGENTS.md](AGENTS.md).
+Working rules for contributors and automated coding tools: [AGENTS.md](AGENTS.md), with
+step-by-step playbooks in [`.claude/skills/`](.claude/skills/).
 
 ## Building and testing
 
@@ -378,8 +403,8 @@ publishing gate; report security problems privately as described in [SECURITY.md
 ## Licences
 
 - **Code:** [MIT License](LICENSE) — Copyright (c) 2026 Joe.
-- **Third-party components** (Monocypher, miniaudio, ZXing core, the potion-base-4M search model, parts of Project Nayuki's QR Code generator,
-  doctest, the Gradle wrapper):
+- **Third-party components** (Monocypher, miniaudio, Mbed TLS, ZXing core, the potion-base-4M
+  search model, parts of Project Nayuki's QR Code generator, doctest, the Gradle wrapper):
   their own permissive licences, listed with full texts in
   [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 - **Guide library:** each guide under its own licence — public domain, CC0, CC BY 4.0 or
