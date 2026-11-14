@@ -16,7 +16,8 @@
 #               user name, $HOME, host name and its labels, macOS ComputerName/LocalHostName,
 #               git user.name / user.email (and the parts of the e-mail local part), GitHub user,
 #               local IPv4 and MAC addresses, Wi-Fi SSID, iOS simulator UDIDs, Android AVD
-#               names, code-signing team ids, emberd admin tokens found in data directories.
+#               names, code-signing team ids, names and ids of paired phones/tablets, emberd
+#               admin tokens found in data directories.
 #               One exception (owner-approved public identity): the git user.name (display name
 #               only) may appear in a copyright statement ("Copyright (c) 2026 <name>", "© 2026
 #               <name>") in files listed as `identity path <glob>` in publishable-allow.txt, if
@@ -72,7 +73,7 @@ while [[ $# -gt 0 ]]; do
     --max-size) shift; MAX_SIZE="${1:?--max-size needs a number}" ;;
     --quiet|-q) QUIET=1 ;;
     --self-test) SELF_TEST=1 ;;
-    -h|--help) sed -n '2,51p' "$SCRIPT" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,52p' "$SCRIPT" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
   esac
   shift
@@ -625,6 +626,21 @@ done
 for d in "${HOME:-/nonexistent}/.android/avd"/*.avd; do [[ -d "$d" ]] && add_id "Android AVD name" "$(basename "$d" .avd)"; done
 if command -v security >/dev/null 2>&1; then
   for v in $(with_timeout 5 security find-identity -v -p codesigning 2>/dev/null | grep -Eo '\([A-Z0-9]{10}\)' | tr -d '()' | sort -u); do add_id "Apple team id" "$v"; done
+  # The team id proper is the certificate's organisational unit (what DEVELOPMENT_TEAM is set to).
+  if command -v openssl >/dev/null 2>&1; then
+    for v in $(with_timeout 8 security find-certificate -a -c "Apple Development" -p 2>/dev/null \
+                 | awk '/BEGIN CERT/{c=""} {c=c $0 "\n"} /END CERT/{print c | "openssl x509 -noout -subject 2>/dev/null"; close("openssl x509 -noout -subject 2>/dev/null")}' \
+                 | grep -Eo 'OU ?= ?[A-Z0-9]{10}' | grep -Eo '[A-Z0-9]{10}$' | sort -u); do add_id "Apple team id" "$v"; done
+  fi
+fi
+# Phones and tablets paired with this computer: their names and device identifiers.
+if command -v xcrun >/dev/null 2>&1; then
+  while IFS= read -r line; do
+    name="$(printf '%s' "$line" | sed -E 's/ {2,}.*//')"
+    udid="$(printf '%s' "$line" | grep -Eo '[0-9A-F]{8}-[0-9A-F]{16}' | head -1)"
+    [[ -n "$udid" ]] && add_id "paired device id" "$udid"
+    [[ -n "$udid" && -n "$name" ]] && add_name "paired device name" "$name"
+  done < <(with_timeout 10 xcrun devicectl list devices 2>/dev/null | grep -E 'physical' || true)
 fi
 fi  # end of the identifiers skipped by --ci
 # emberd admin tokens from default data directories and from builds/test runs inside the checkout.
