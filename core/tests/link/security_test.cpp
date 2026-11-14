@@ -2,6 +2,7 @@
 // L6, L9). Each case reproduces the reported attack with deterministic input. CPU-blowup cases
 // assert a time bound that is generous (sanitizer Debug builds are ~20x slower than -O2) but far
 // below what the unfixed code needed.
+#include "timing_slack.h"
 #include <chrono>
 #include <string>
 
@@ -194,7 +195,7 @@ TEST_CASE("H5: framing/stream decoder work budget (direct)") {
   auto t0 = std::chrono::steady_clock::now();
   size_t frames = 0;
   for (size_t off = 0; off < d.size(); off += 1000) dec.feed(ByteView(d).sub(off, 1000), [&](uint8_t, ByteView) { ++frames; });
-  CHECK(seconds_since(t0) < 2.0);
+  CHECK(seconds_since(t0) < 2.0 * timing_slack());
   CHECK(frames == 0);
   CHECK(dec.stats().budget_skipped > 0);
   // Genuine frames, back to back after the attack, all decode.

@@ -10,6 +10,23 @@
 
 using namespace mesh;
 
+// Memory bounds below are for a normal build. A sanitizer build of the daemon keeps freed memory in
+// quarantine and adds shadow memory, so its resident size says little: allow several times more
+// (still far below what an unbounded queue would reach).
+static long rss_limit_kib(long mib) {
+#if defined(__SANITIZE_ADDRESS__)
+  return mib * 1024L * 4;
+#elif defined(__has_feature)
+#if __has_feature(address_sanitizer)
+  return mib * 1024L * 4;
+#else
+  return mib * 1024L;
+#endif
+#else
+  return mib * 1024L;
+#endif
+}
+
 // Callsigns in these tests use the Q prefix series, which the ITU never allocates to stations, so
 // they cannot belong to a real operator (and pass the core's callsign validation).
 namespace {
@@ -496,7 +513,7 @@ TEST_SUITE("mesh") {
     d.usage(&rss1, &cpu1);
     MESSAGE("garbage run: " << sent_http << " HTTP junk connections; RSS " << rss0 / 1024 << " -> " << rss1 / 1024 << " MiB, CPU "
                             << (cpu1 - cpu0) << " s");
-    CHECK(rss1 < 400 * 1024);
+    CHECK(rss1 < rss_limit_kib(400));
     Json st = d.result("mesh.stats");
     CHECK(st.get("rx_bad").as_int() > 0);
     for (const char* n : {"tcp", "kiss", "udp", "serial", "audio"}) {
@@ -557,7 +574,7 @@ TEST_SUITE("mesh") {
     CHECK(evicted);
     CHECK(honest.upgraded() == 1);
     CHECK(honest.min_frames() > 10);
-    CHECK(rss_max < 300 * 1024);
+    CHECK(rss_max < rss_limit_kib(300));
     ::close(frozen);
     CHECK(d.alive());
   }
@@ -596,7 +613,7 @@ TEST_SUITE("mesh") {
                                     << int(100.0 * (cpu_load - cpu_conn) / wall) << "% of one core) for " << sent
                                     << " messages x 100 guests + " << sent / 5 * 100 << " junk frames");
     CHECK(swarm.upgraded() == 100);
-    CHECK(rss_load < 300 * 1024);
+    CHECK(rss_load < rss_limit_kib(300));
   }
 
   TEST_CASE("clean shutdown and restart keep identity links and messages") {
@@ -1095,7 +1112,7 @@ TEST_SUITE("mesh") {
                                           << int(40.0 * double(big) / (1 << 20) / secs) << " MiB/s total); daemon RSS peak "
                                           << rss_max / 1024 << " MiB, CPU " << (cpu1 - cpu0) << " s");
     CHECK(complete.load() == 40);
-    CHECK(rss_max < 200 * 1024);
+    CHECK(rss_max < rss_limit_kib(200));
     CHECK(a.alive());
   }
 

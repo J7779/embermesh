@@ -539,6 +539,9 @@ Connects: screen ↔ camera. Works on: Android, iPhone/iPad, Browser, Computer (
 
 ### Morse by light (flashlight, lamp or screen)
 
+Nothing extra is needed to **send** a message by light either: phones use their own flashlight,
+other devices their screen (see [Sending and reading Morse](morse-reading.md)).
+
 Connects: light ↔ camera. Works on: Android, iPhone/iPad, Browser, Computer (emberd).
 
 ```

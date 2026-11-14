@@ -157,7 +157,9 @@ Bulletins from unverified senders carry an **unverified sender** tag.
 
 ## Tools
 
-- **Band plans** (choose **Region**, filter), **Morse send & read** (the **Morse** screen: **Send**, **Read by camera**, **Read by sound**; see
+- **Band plans** (choose **Region**, filter), **Morse send & read** (the **Morse** screen: **Send** (**Send a message by light**: type, choose **Slow · 6** / **Normal · 12** /
+  **Fast · 15**, **Flash with flashlight** or **Flash with screen**, **Play as sound**, **Stop**),
+  **Read by camera**, **Read by sound**; see
   [Morse by light and sound](morse-reading.md)), **Station
   profiles** (your radios' power, feedline, antenna and height, used to fill calculators).
 - Calculators by group: **Antennas**, **Radio & propagation**, **Power**, **Navigation**,

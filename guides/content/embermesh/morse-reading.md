@@ -16,8 +16,8 @@ order: 26
 # Sending and Reading Morse by Light and Sound
 
 Morse needs no network, no radio data mode and no app on the other side: a flashlight, a lamp, a
-mirror, a whistle or a voice radio is enough. EmberMesh can **send** Morse with the flashlight, the
-screen or a tone, and **read** Morse in real time through the **camera** (a blinking light) or the
+mirror, a whistle or a voice radio is enough. EmberMesh can **send** a typed message by flashing
+the flashlight or the screen, or as a tone, and **read** Morse in real time through the **camera** (a blinking light) or the
 **microphone** (a tone), turning it into text.
 
 > **What is proven:** the decoder read generated light patterns (with camera jitter, dropped frames,
@@ -30,18 +30,84 @@ screen or a tone, and **read** Morse in real time through the **camera** (a blin
 **Tools → Morse send & read** opens the **Morse** screen with three tabs: **Send**, **Read by
 camera**, **Read by sound**. The **?** button opens this chapter.
 
-## 2. Sending
+## 2. Sending a message by light
 
-On **Send**:
+This is how two people with phones (or any EmberMesh devices) pass a short message with **no network
+at all**: one flashes it, the other's camera reads it.
 
-1. **Text** (default `SOS`), **Speed (words per minute)** (default 10).
-2. Tick **Repeat until stopped** for a beacon.
-3. **Flashlight** (the camera torch; on devices without one this is **Screen flash**), **Screen
-   only** (the whole screen flashes white), or **Tone** (a 700 Hz beep through the speaker).
-4. **Stop** ends it.
+### The sender
 
-SOS is · · · — — — · · · sent as one sign. The app's own advice: signal from high ground at night; a
-phone screen is visible for about 1 km in darkness, a flashlight much further.
+1. **Tools → Morse send & read** (in Simple mode **Radio tools**), tab **Send**. The card is called
+   **Send a message by light**.
+2. Type in **Message** (up to 200 characters; it starts as `SOS`). **In Morse** shows the dots and
+   dashes and how long it will take ("About ... at 12 words per minute").
+3. Choose a **Speed**: **Slow · 6**, **Normal · 12** (the default) or **Fast · 15** (words per
+   minute). **Exact speed** (under the speed choice) takes **Words per minute (3–15)**. Keep
+   **Normal**; it is what a phone camera reads reliably. If the reader misses characters, go to
+   **Slow**.
+4. Tick **Repeat until I stop** to send it again and again (with a pause between rounds), for example
+   for a beacon or a reader who is still aiming.
+5. Agree with the reader: they press **Start reading** first, then you start.
+6. Tap **Flash with flashlight** (phones with a torch), or **Flash with screen** on devices without
+   one. **Use the screen instead** switches a torch phone to the screen; **Play as sound** plays it as
+   a 700 Hz tone through the speaker (for **Read by sound**, or for ears).
+7. While it sends, the screen shows which character is being sent and the time left. **Stop** ends
+   it at once. When the screen is flashing, tap anywhere on it to stop ("Tap to stop").
+
+### The receiver
+
+1. **Tools → Morse send & read → Read by camera** (the sender's card **How the other person reads
+   it** has a button **Open the camera reader**).
+2. Rest the phone on something steady, point the back camera at the sender's light, tap **Start
+   reading** and tell the sender to begin.
+3. Tap the light in the picture (or tick **Find the blinking light automatically**). Text appears in
+   the transcript as it is decoded. Details: section 3.
+
+### Advice that matters
+
+- **Darkness and distance:** in the dark a flashlight carries much further than a screen. Get the
+  light into the reader's view with nothing in between; the reader works best when the light is
+  bright against a dark background. How far it works with real phones has not been measured: try it.
+- **Hold both devices still.** Rest them on a wall, a car roof or a backpack.
+- **Speed:** keep **Normal**; if characters come out wrong or as `□`, send again at **Slow**.
+- **Do not point the light into anyone's eyes.**
+- **What Morse cannot send:** only letters A-Z, digits and common punctuation (`. , ? ' ! / ( ) & : ;
+  = + - _ " @`) exist in Morse; prosigns can be typed as `<AR>`, `<SK>` and so on. Anything else
+  (accented letters, emoji, other scripts) is skipped, and the screen says so ("Morse has no sign for
+  ...").
+- A message that would take more than 10 minutes is refused: shorten it or go faster.
+
+### Flashlight or screen
+
+| Device | What flashes |
+|---|---|
+| Android phone or iPhone with a flashlight | The flashlight, switched on and off by the app. No camera permission is asked for this |
+| iPad, tablet or computer without a flashlight, iOS simulator | The screen, the whole screen flashing white |
+| Browser on an Android phone (Chrome) | The flashlight where the browser can reach it: the first time it asks for the **camera**, which is needed **only to switch the light on**; nothing is recorded or sent. If refused, use the screen |
+| Browser on a computer, the computer hub's operator page | The screen |
+| Flashlight busy (this app's QR scanner or Morse reader is using the camera) | The screen instead |
+
+**The screen is slower:** at most 7 words per minute, so it never flashes more than three times a
+second. Before the first screen flash the app warns **The whole screen will flash** with **Flash the
+screen** / **Cancel**; with reduced motion or Simple mode it asks every time.
+
+### Privacy and safety, plainly
+
+- **Light is not private and not encrypted.** Anyone who can see the light can read the message.
+  Do not send secrets, the positions of vulnerable people or anything you would not shout across a
+  street.
+- **A signal shows where you are.** Anyone watching sees the light, too.
+- **The typed text stays on this page.** It is not stored, not logged and not sent to the mesh.
+- **Flashing screens can trigger seizures** in people with photosensitive epilepsy. That is why the
+  screen is limited to three flashes a second and warns first. Do not watch it if that affects you,
+  and warn people near you.
+- The light always goes off when the message ends, on **Stop**, on an error, or when the app leaves
+  the screen.
+
+> **What is proven for sending:** the flash timing was tested in simulation and in the phone apps'
+> own tests (the Android emulator and the iOS simulator), and the camera reader decodes the
+> generated light patterns. **Not yet tested between real phones outdoors.** Practise once before
+> you need it.
 
 ## 3. Reading with the camera
 
@@ -112,7 +178,7 @@ to its speaker.
 
 - They can **send** with any flashlight, lamp, mirror flash or whistle; you read with the camera or
   microphone.
-- You can **send** to them with **Flashlight**, **Screen only** or **Tone**, and they read by eye or
+- You can **send** to them with **Flash with flashlight**, **Flash with screen** or **Play as sound**, and they read by eye or
   ear, using the table below. Send slowly (5-10 WPM) with clear gaps.
 - A voice radio works too: they key the microphone and whistle or hum Morse; you read the radio's
   speaker by sound. A sound-card link set to the **Morse code (CW)** modem sends text as Morse over a
@@ -156,11 +222,11 @@ letters, seven between words. **Tools → Signalling → Morse code** converts a
 
 ## 9. Practice drills
 
-1. **Self-test:** two devices. One sends `SOS SOS` with **Screen only** at 10 WPM; the other reads
+1. **Self-test:** two devices. One sends `SOS SOS` with **Flash with screen** (or **Use the screen instead**) at **Slow · 6**; the other reads
    with **Read by camera** from 2 m, then 10 m, then across a dark room or yard.
-2. **Speed ladder:** send `PARIS PARIS` at 8, 12, 15 and 20 WPM by flashlight and note where reading
+2. **Speed ladder:** send `PARIS PARIS` at **Slow · 6**, **Normal · 12** and **Fast · 15** with **Flash with flashlight** and note where reading
    fails on your camera.
-3. **Sound:** send with **Tone**, read with **Read by sound**; then through two voice radios (one
+3. **Sound:** send with **Play as sound**, read with **Read by sound**; then through two voice radios (one
    keyed while the phone beeps into it, the other's speaker read by the second phone).
 4. **By eye and ear:** learn the letters of your callsign or name, `SOS`, `OK`, `K`, `R` and the
    digits; copy the app's slow flashes on paper and check against the transcript.

@@ -142,16 +142,14 @@ spelling** for letters.
 
 ## Signalling with light and sound
 
-**Tools → Morse send & read** opens the **Morse** screen; on its **Send** tab:
+**Send a message by light** (no network needed): **Tools → Morse send & read → Send**, type the
+message (it starts as `SOS`), keep the speed **Normal · 12**, tick **Repeat until I stop** for a
+beacon, and tap **Flash with flashlight** (or **Flash with screen**). Another phone reads it with
+**Read by camera**. Light is not private: anyone who sees it can read it, and it shows where you are.
+Step by step, speeds and safety: [Sending and reading Morse](morse-reading.md).
 
-1. **Text** (default `SOS`), **Speed (words per minute)** (default 10).
-2. Tick **Repeat until stopped** for a beacon.
-3. Tap **Flashlight** (the camera light, where available; otherwise **Screen flash**), **Screen
-   only**, or **Tone** (an audible 700 Hz beep).
-4. **Stop** ends it.
-
-SOS is · · · — — — · · · sent as one sign. Signal from high ground at night: a phone screen is
-visible for about 1 km in darkness, a flashlight much further. **Tools → Signalling → Ground-to-air
+SOS is · · · — — — · · · sent as one sign. In the dark a flashlight carries much further than a
+screen. **Tools → Signalling → Ground-to-air
 emergency signals** shows the symbols to lay out on the ground for aircraft; **Morse code** converts
 any text. To **read** someone else's flashes or tones, use the **Read by camera** and **Read by
 sound** tabs: [Morse by light and sound](morse-reading.md).

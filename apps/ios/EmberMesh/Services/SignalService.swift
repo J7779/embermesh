@@ -161,6 +161,9 @@ final class Keyer {
   private var stopped = false
   private(set) var edgeTimesNs: [UInt64] = []   // actual edge times relative to start (tests)
   private(set) var scheduledNs: [UInt64] = []
+  /// When the final "off" happened, relative to start, and when it was due (Σ pattern).
+  private(set) var endNs: UInt64 = 0
+  private(set) var endDueNs: UInt64 = 0
 
   init(clock: KeyerClock) { self.clock = clock }
 
@@ -187,6 +190,8 @@ final class Keyer {
     }
     if !cancelled, isStopped || !clock.wait(until: start + at, cancel: cancel) { cancelled = true }
     light.set(false)
+    endDueNs = at
+    endNs = clock.nowNs() &- start
     let positive = late.map { max(0, $0) }
     return Result(stopped: cancelled, worstLateMs: positive.max() ?? 0,
                   meanLateMs: positive.isEmpty ? 0 : positive.reduce(0, +) / Double(positive.count), edges: late.count)
@@ -250,7 +255,11 @@ final class SignalService {
 
   // MARK: flash
 
-  /// Resolves when the pattern has finished or was stopped. `completion` on the main queue.
+  /// A flash that waits for the running one to finish tearing down (light off, state restored)
+  /// before it may take the light: two flashes never hold a light at the same time.
+  private var pending: (start: () -> Void, cancel: () -> Void)?
+
+  /// Resolves when the pattern has finished or was stopped (exactly once). `completion` on the main queue.
   func flash(params: JSONObject, window: UIWindow?, completion: @escaping RPCCompletion) {
     let pattern: [Int]
     switch SignalService.parsePattern(params) {
@@ -259,19 +268,43 @@ final class SignalService {
     }
     let mode = params.string("mode") ?? "auto"
     guard ["auto", "torch", "screen"].contains(mode) else { completion(.failure(.badParams("mode must be auto, torch or screen"))); return }
-    stopAll()  // a second flash (or a running tone) stops first
+    let preferred = mode != "screen" && torchAvailable() ? "torch" : "screen"
+    let start = { [weak self] in
+      guard let self else { return }
+      self.begin(pattern: pattern, mode: mode, window: window, completion: completion)
+    }
+    // A second flash (or a running tone) stops the running one first; a flash that was still
+    // waiting to start is resolved as stopped without ever touching a light.
+    let cancelPending = pending?.cancel
+    pending = nil
+    cancelPending?()
+    player?.stop()
+    player = nil
+    if let r = running {
+      pending = (start, { completion(.success(["used": preferred, "stopped": true])) })
+      r.keyer.stop()   // its teardown (main queue) starts the pending flash
+    } else {
+      start()
+    }
+  }
 
+  private func begin(pattern: [Int], mode: String, window: UIWindow?, completion: @escaping RPCCompletion) {
     var light: SignalLight?
     var used = "screen"
+    var fallback: String?
     if mode != "screen" {
       if !torchAvailable() {
         if mode == "torch" { completion(.failure(.unsupported("this device has no flashlight"))); return }
+        fallback = "no_torch"
       } else if cameraBusy() {
         if mode == "torch" { completion(.failure(.busy("the camera (and its flashlight) is in use by the QR scanner or the Morse reader"))); return }
+        fallback = "busy"
       } else {
         let t = makeTorch()
         do { try t.begin(); light = t; used = "torch" } catch {
-          if mode == "torch" { completion(.failure((error as? RPCError) ?? .io("the flashlight could not be used"))); return }
+          let e = (error as? RPCError) ?? .io("the flashlight could not be used")
+          if mode == "torch" { completion(.failure(e)); return }
+          fallback = e.code == "permission_denied" ? "permission_denied" : (e.code == "unsupported" ? "no_torch" : "busy")
         }
       }
     }
@@ -281,18 +314,25 @@ final class SignalService {
       light = s
       used = "screen"
     }
+    if mode == "screen" { fallback = nil }
     let keyer = Keyer(clock: clock)
     (light as? ScreenLight)?.onTap = { [weak keyer] in keyer?.stop() }
     running = (keyer, used)
     let lit = light!
     let t = Thread {
       let r = keyer.run(pattern, light: lit)
-      lit.end()
+      lit.end()   // light off and state restored before anything else may take the light
       DispatchQueue.main.async {
         if self.running?.keyer === keyer { self.running = nil }
-        completion(.success(["used": used, "stopped": r.stopped,
-                             "timing": ["max_late_ms": (r.worstLateMs * 100).rounded() / 100,
-                                        "mean_late_ms": (r.meanLateMs * 100).rounded() / 100, "edges": r.edges]]))
+        var res: JSONObject = ["used": used, "stopped": r.stopped,
+                               "timing": ["max_late_ms": (r.worstLateMs * 100).rounded() / 100,
+                                          "mean_late_ms": (r.meanLateMs * 100).rounded() / 100, "edges": r.edges]]
+        if let fallback { res["fallback"] = fallback }
+        completion(.success(res))
+        if self.running == nil, let next = self.pending {
+          self.pending = nil
+          next.start()
+        }
       }
     }
     t.qualityOfService = .userInteractive
@@ -304,8 +344,12 @@ final class SignalService {
   var flashingWith: String? { running?.used }
 
   /// host.signal.stop and every "light must go off" situation: stops a flash (its completion then
-  /// reports stopped:true) and a tone. No-op when nothing runs.
+  /// reports stopped:true), drops a flash still waiting to start (resolved as stopped) and stops a
+  /// tone. No-op when nothing runs.
   func stopAll() {
+    let cancelPending = pending?.cancel
+    pending = nil
+    cancelPending?()
     running?.keyer.stop()
     player?.stop()
     player = nil

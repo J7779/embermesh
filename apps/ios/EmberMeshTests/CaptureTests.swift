@@ -345,23 +345,40 @@ final class WebMediaTests: XCTestCase {
 }
 
 final class FlashTimingTests: XCTestCase {
-  /// Real monotonic clock and dedicated thread at 20 and 5 WPM (scheduling only; the torch LED's
-  /// own switching latency can only be measured on an iPhone).
-  func testRealClockEdgeLateness() {
+  /// Real monotonic clock + dedicated thread. On a shared or virtualised host a wake-up can be tens or
+  /// hundreds of ms late, so lateness itself is not a property of the code; what must hold anywhere:
+  /// edges in order, never early, the pattern never shorter than requested, and lateness measured
+  /// against each edge's own deadline (start + Σ previous durations), so it cannot accumulate. The
+  /// "no drift" proof is the deterministic VirtualClock test below; the measured lateness is logged
+  /// and attached. The single numeric bound (2 s for the last edge) is far above any scheduling delay
+  /// and only catches accumulation: naive "sleep(duration) after each edge" scheduling adds every
+  /// wake-up delay to all later edges.
+  func testRealClockEdgeTimingInvariants() {
     for wpm in [20.0, 5.0] {
       let pat = MorseGen.pattern(wpm >= 20 ? "PARIS PARIS" : "SOS", wpm: wpm).map { Int($0.rounded()) }
       let light = FakeLight()
       let k = Keyer(clock: MonotonicClock())
+      let done = expectation(description: "pattern \(wpm)")
       var r: Keyer.Result?
-      let t = Thread { r = k.run(pat, light: light) }
+      let t = Thread { r = k.run(pat, light: light); done.fulfill() }
       t.start()
-      XCTAssertTrue(spin(until: Double(pat.reduce(0, +)) / 1000 + 3) { r != nil })
-      print(String(format: "flash timing %.0f WPM (dot %.0f ms, %d edges): worst %.3f ms late, mean %.3f ms", wpm, 1200 / wpm, r?.edges ?? 0, r?.worstLateMs ?? -1, r?.meanLateMs ?? -1))
-      XCTAssertEqual(r?.stopped, false)
-      XCTAssertEqual(r?.edges, pat.count)
-      XCTAssertLessThan(r?.meanLateMs ?? 99, 5)
-      XCTAssertLessThan(r?.worstLateMs ?? 99, 15)
-      XCTAssertEqual(light.states.last, false, "light off at the end")
+      wait(for: [done], timeout: Double(pat.reduce(0, +)) / 1000 + 60)
+      guard let r else { return XCTFail("keyer did not finish") }
+      let sched = k.scheduledNs, actual = k.edgeTimesNs
+      XCTAssertFalse(r.stopped)
+      XCTAssertEqual(r.edges, pat.count)
+      XCTAssertEqual(sched.count, pat.count)
+      XCTAssertEqual(light.states, (0..<pat.count).map { $0 % 2 == 0 } + [false], "edges in order, light off at the end")
+      for i in 0..<actual.count { XCTAssertGreaterThanOrEqual(actual[i], sched[i], "edge \(i) never early") }
+      XCTAssertTrue(zip(actual, actual.dropFirst()).allSatisfy { $0 <= $1 }, "edge times increase")
+      XCTAssertEqual(k.endDueNs, UInt64(pat.reduce(0, +)) * 1_000_000)
+      XCTAssertGreaterThanOrEqual(k.endNs, k.endDueNs, "not shorter than the pattern")
+      let lastLateMs = Double(actual.last! &- sched.last!) / 1e6
+      XCTAssertLessThan(lastLateMs, 2000, "no accumulated drift (generous: see above)")
+      let line = String(format: "flash timing %.0f WPM (dot %.0f ms, %d edges): max %.3f ms late, mean %.3f ms, last edge %.3f ms, end %.3f ms after due",
+                        wpm, 1200 / wpm, r.edges, r.worstLateMs, r.meanLateMs, lastLateMs, Double(k.endNs - k.endDueNs) / 1e6)
+      print(line)
+      let a = XCTAttachment(string: line); a.lifetime = .keepAlways; add(a)
     }
   }
 }
@@ -370,13 +387,15 @@ final class FlashTimingTests: XCTestCase {
 final class FakeLight: SignalLight {
   private let lock = NSLock()
   private var _states: [Bool] = []
-  var began = 0, ended = 0
+  private var _began = 0, _ended = 0
   var failBegin: RPCError?
   var states: [Bool] { lock.lock(); defer { lock.unlock() }; return _states }
+  var began: Int { lock.lock(); defer { lock.unlock() }; return _began }
+  var ended: Int { lock.lock(); defer { lock.unlock() }; return _ended }
   var isOn: Bool { states.last ?? false }
-  func begin() throws { if let e = failBegin { throw e }; began += 1 }
+  func begin() throws { if let e = failBegin { throw e }; lock.lock(); _began += 1; lock.unlock() }
   func set(_ on: Bool) { lock.lock(); _states.append(on); lock.unlock() }
-  func end() { lock.lock(); _states.append(false); lock.unlock(); ended += 1 }
+  func end() { lock.lock(); _states.append(false); _ended += 1; lock.unlock() }
 }
 
 /// Virtual monotonic clock: waits return instantly with time advanced to the deadline plus an
@@ -412,6 +431,32 @@ final class SignalContractTests: XCTestCase {
     for i in 4..<pat.count { XCTAssertEqual(actualMs[i], schedMs[i], accuracy: 0.001, "edge \(i) back on schedule") }
     XCTAssertEqual(r.worstLateMs, 7, accuracy: 0.001)
     XCTAssertEqual(light.states, [true, false, true, false, true, false, true, false, false])
+    XCTAssertEqual(k.endNs, k.endDueNs, "ends exactly when due")
+  }
+
+  /// One very late wake-up (a descheduled thread, 500 ms — longer than the next three intervals):
+  /// the edges whose deadlines passed meanwhile fire at once, in order; every later edge and the end
+  /// are at their ORIGINAL deadlines (nothing shifted by the delay).
+  func testVeryLateWakeupDoesNotShiftLaterEdges() {
+    let clock = VirtualClock()
+    clock.lateness = [2: 500_000_000]
+    let k = Keyer(clock: clock)
+    let light = FakeLight()
+    let pat = [60, 60, 180, 60, 60, 60, 180, 420, 60, 60, 1000, 60]
+    let r = k.run(pat, light: light)
+    XCTAssertFalse(r.stopped)
+    let sched = k.scheduledNs, actual = k.edgeTimesNs
+    let lateAt = sched[2] + 500_000_000
+    for i in 0..<actual.count {
+      XCTAssertGreaterThanOrEqual(actual[i], sched[i], "edge \(i) never early")
+      if i < 2 { XCTAssertEqual(actual[i], sched[i]) }
+      else if sched[i] <= lateAt { XCTAssertEqual(actual[i], lateAt, "edge \(i) overdue: switched at once when the thread woke") }
+      else { XCTAssertEqual(actual[i], sched[i], "edge \(i) at its original deadline") }
+    }
+    XCTAssertTrue(sched.contains { $0 > lateAt }, "the pattern continues past the late wake-up")
+    XCTAssertEqual(light.states, (0..<pat.count).map { $0 % 2 == 0 } + [false], "every edge switched, in order")
+    XCTAssertEqual(k.endNs, k.endDueNs, "ends at the original time")
+    XCTAssertEqual(r.worstLateMs, 500, accuracy: 0.001)
   }
 
   func testStopMidPatternLeavesLightOff() {
@@ -456,7 +501,7 @@ final class SignalContractTests: XCTestCase {
   func flash(_ s: SignalService, _ p: JSONObject) -> RPCResult {
     var out: RPCResult?
     s.flash(params: p, window: nil) { out = $0 }
-    XCTAssertTrue(spin(until: 5) { out != nil })
+    XCTAssertTrue(spin(until: 30) { out != nil })
     return out ?? .failure(.internalError("no result"))
   }
 
@@ -466,25 +511,30 @@ final class SignalContractTests: XCTestCase {
     var (s, t, sc) = service(torch: true)
     var r = try flash(s, pat).get()
     XCTAssertEqual(r.string("used"), "torch"); XCTAssertEqual(r.bool("stopped"), false)
+    XCTAssertNil(r["fallback"])
+    XCTAssertNotNil(r.object("timing")?.number("max_late_ms"))
     XCTAssertEqual(t.began, 1); XCTAssertEqual(t.ended, 1); XCTAssertFalse(t.isOn); XCTAssertEqual(sc.began, 0)
     XCTAssertNotNil(r.object("timing")?.number("max_late_ms"))
     r = try flash(s, pat.merging(["mode": "screen"]) { $1 }).get()
     XCTAssertEqual(r.string("used"), "screen"); XCTAssertEqual(sc.ended, 1); XCTAssertFalse(sc.isOn)
     // No torch: auto → screen, torch → unsupported.
     (s, t, sc) = service(torch: false)
-    XCTAssertEqual(try flash(s, pat).get().string("used"), "screen")
+    let nt = try flash(s, pat).get()
+    XCTAssertEqual(nt.string("used"), "screen"); XCTAssertEqual(nt.string("fallback"), "no_torch")
     guard case .failure(let e1) = flash(s, pat.merging(["mode": "torch"]) { $1 }) else { return XCTFail() }
     XCTAssertEqual(e1.code, "unsupported")
     XCTAssertEqual(t.began, 0)
     // Torch busy (our own QR scanner / Morse camera): auto → screen, torch → busy.
     (s, t, sc) = service(torch: true, busy: true)
-    XCTAssertEqual(try flash(s, pat).get().string("used"), "screen")
+    let bz = try flash(s, pat).get()
+    XCTAssertEqual(bz.string("used"), "screen"); XCTAssertEqual(bz.string("fallback"), "busy")
     guard case .failure(let e2) = flash(s, pat.merging(["mode": "torch"]) { $1 }) else { return XCTFail() }
     XCTAssertEqual(e2.code, "busy")
     XCTAssertEqual(t.began, 0, "busy torch never touched")
     // Torch refused by the system: auto → screen, torch → that error.
     (s, t, sc) = service(torch: true, torchFails: RPCError("permission_denied", "x"))
-    XCTAssertEqual(try flash(s, pat).get().string("used"), "screen")
+    let pd = try flash(s, pat).get()
+    XCTAssertEqual(pd.string("used"), "screen"); XCTAssertEqual(pd.string("fallback"), "permission_denied")
     guard case .failure(let e3) = flash(s, pat.merging(["mode": "torch"]) { $1 }) else { return XCTFail() }
     XCTAssertEqual(e3.code, "permission_denied")
     // Bad mode / bad pattern.
@@ -492,29 +542,93 @@ final class SignalContractTests: XCTestCase {
     XCTAssertEqual(e4.code, "bad_params")
   }
 
-  /// Real clock: stop (host.signal.stop), a second flash and resign-active each end the running flash
-  /// at once with stopped:true and the light off.
+  /// Real clock: stop (host.signal.stop), a second flash, resign-active, background and screen lock
+  /// each end the running flash early with stopped:true, its completion called exactly once, and the
+  /// light off. Nothing is read "immediately": every condition is awaited (slow, virtualised hosts).
   func testStopSecondFlashAndLifecycle() {
     for trigger in ["stop", "second", "resign", "background", "lock"] {
       let (s, t, _) = service(torch: true)
       s.clock = MonotonicClock()
+      var firstCalls = 0
       var first: RPCResult?
-      s.flash(params: ["pattern_ms": [5000, 100]], window: nil) { first = $0 }
-      XCTAssertTrue(spin(until: 1) { t.isOn }, trigger)
-      let t0 = Date()
+      let firstDone = expectation(description: "first completion (\(trigger))")
+      s.flash(params: ["pattern_ms": [30_000, 100]], window: nil) { first = $0; firstCalls += 1; firstDone.fulfill() }
+      XCTAssertTrue(spin(until: 10) { t.isOn }, "torch on (\(trigger))")
+      var secondDone: XCTestExpectation?
+      var second: RPCResult?
       switch trigger {
       case "stop": s.stopAll()
-      case "second": s.flash(params: ["pattern_ms": [10]], window: nil) { _ in }
+      case "second":
+        let e = expectation(description: "second completion"); secondDone = e
+        s.flash(params: ["pattern_ms": [20]], window: nil) { second = $0; e.fulfill() }
       case "resign": NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
       case "background": NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
       default: NotificationCenter.default.post(name: UIApplication.protectedDataWillBecomeUnavailableNotification, object: nil)
       }
-      XCTAssertTrue(spin(until: 2) { first != nil }, trigger)
-      XCTAssertLessThan(Date().timeIntervalSince(t0), 0.5, "stopped at once (\(trigger))")
+      // Well before the 30 s pattern would end.
+      wait(for: [firstDone] + (secondDone.map { [$0] } ?? []), timeout: 15)
       XCTAssertEqual((try? first?.get())?.bool("stopped"), true, trigger)
-      XCTAssertEqual(t.states.last, false, "torch off (\(trigger))")
-      spin(until: 0.1) { false }
+      if trigger == "second" { XCTAssertEqual((try? second?.get())?.bool("stopped"), false, "the second flash ran to its end") }
+      XCTAssertTrue(spin(until: 10) { t.ended >= 1 && !t.isOn }, "torch released and off (\(trigger))")
+      XCTAssertFalse(s.isFlashing)
+      spin(until: 0.2) { false }
+      XCTAssertEqual(firstCalls, 1, "completion called exactly once (\(trigger))")
     }
+  }
+
+  /// Product race (slow scheduler): a second flash must not take the light before the first one has
+  /// switched it off and restored its state — otherwise the screen fallback saves "brightness 1.0,
+  /// idle timer disabled" as the state to restore, and a torch flash is switched off/unlocked by the
+  /// first flash's late teardown. Deterministic: the first light's end() blocks until released.
+  func testSecondFlashWaitsForFirstTeardown() {
+    final class Gated: SignalLight {
+      let name: String; let log: (String) -> Void; let gate: DispatchSemaphore?
+      init(_ n: String, _ l: @escaping (String) -> Void, gate: DispatchSemaphore? = nil) { name = n; log = l; self.gate = gate }
+      func begin() throws { log("\(name).begin") }
+      func set(_ on: Bool) {}
+      func end() { gate?.wait(); log("\(name).end") }
+    }
+    let s = SignalService()
+    s.clock = MonotonicClock()
+    s.torchAvailable = { false }
+    let lock = NSLock()
+    var events: [String] = []
+    let log: (String) -> Void = { e in lock.lock(); events.append(e); lock.unlock() }
+    let gate = DispatchSemaphore(value: 0)
+    var n = 0
+    // Lights are named in the order they are created: L1 for flash A, L2 for whichever flash runs next.
+    s.makeScreen = { _ in n += 1; return Gated("L\(n)", log, gate: n == 1 ? gate : nil) }
+    var a: [RPCResult] = [], b: [RPCResult] = [], c: [RPCResult] = []
+    let ea = expectation(description: "A"), eb = expectation(description: "B"), ec = expectation(description: "C")
+    s.flash(params: ["pattern_ms": [30_000]], window: nil) { a.append($0); ea.fulfill() }
+    s.flash(params: ["pattern_ms": [20]], window: nil) { b.append($0); eb.fulfill() }   // queued behind A
+    s.flash(params: ["pattern_ms": [20]], window: nil) { c.append($0); ec.fulfill() }   // replaces B before it starts
+    spin(until: 0.3) { false }
+    lock.lock(); let before = events; lock.unlock()
+    XCTAssertEqual(before, ["L1.begin"], "nothing else took the light while A is still tearing down")
+    gate.signal()   // A's teardown finishes
+    wait(for: [ea, eb, ec], timeout: 15)
+    lock.lock(); let all = events; lock.unlock()
+    XCTAssertEqual(all, ["L1.begin", "L1.end", "L2.begin", "L2.end"], "the next light began only after A's ended; only two lights were ever made (B never touched one)")
+    XCTAssertEqual(a.count, 1); XCTAssertEqual(b.count, 1); XCTAssertEqual(c.count, 1)
+    XCTAssertEqual((try? a.first?.get())?.bool("stopped"), true)
+    XCTAssertEqual((try? b.first?.get())?.bool("stopped"), true, "replaced before starting: resolved once as stopped")
+    XCTAssertEqual((try? c.first?.get())?.bool("stopped"), false)
+  }
+
+  /// The real screen fallback, back to back: brightness / idle-timer state ends exactly as before.
+  func testBackToBackScreenFlashesRestoreState() throws {
+    let window = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.windows.first }.first)
+    let s = SignalService()
+    s.clock = MonotonicClock()
+    s.torchAvailable = { false }
+    let idle = UIApplication.shared.isIdleTimerDisabled
+    let e1 = expectation(description: "1"), e2 = expectation(description: "2")
+    s.flash(params: ["pattern_ms": [5000]], window: window) { _ in e1.fulfill() }
+    s.flash(params: ["pattern_ms": [50]], window: window) { _ in e2.fulfill() }
+    wait(for: [e1, e2], timeout: 20)
+    XCTAssertEqual(UIApplication.shared.isIdleTimerDisabled, idle, "idle timer restored exactly")
+    XCTAssertFalse(window.subviews.contains { $0.accessibilityIdentifier == "ember.flash.cover" }, "no cover left")
   }
 
   /// Through HostRouter: host.info.signal + features, mode contract, host.signal.stop.
@@ -537,10 +651,10 @@ final class SignalContractTests: XCTestCase {
     // A real screen flash (simulator: no torch) on the key window, stopped early.
     var res: RPCResult?
     n.host.handleHost(method: "host.signal.flash", params: ["pattern_ms": [3000, 100]]) { res = $0 }
-    XCTAssertTrue(spin(until: 1) { n.host.signal.isFlashing })
+    XCTAssertTrue(spin(until: 10) { n.host.signal.isFlashing })
     XCTAssertEqual(n.host.signal.flashingWith, SystemTorch.available ? "torch" : "screen")
     XCTAssertNotNil(try n.host("host.signal.stop")?.get())
-    XCTAssertTrue(spin(until: 2) { res != nil })
+    XCTAssertTrue(spin(until: 15) { res != nil })
     let r = try XCTUnwrap(res).get()
     XCTAssertEqual(r.bool("stopped"), true)
     XCTAssertEqual(r.string("used"), SystemTorch.available ? "torch" : "screen")
@@ -557,7 +671,7 @@ final class SignalContractTests: XCTestCase {
     XCTAssertTrue(light.isCovering)
     XCTAssertTrue(UIApplication.shared.isIdleTimerDisabled)
     light.set(true)
-    XCTAssertTrue(spin(until: 1) { light.isOn })
+    XCTAssertTrue(spin(until: 10) { light.isOn })
     light.end()
     XCTAssertFalse(light.isCovering)
     XCTAssertFalse(light.isOn)

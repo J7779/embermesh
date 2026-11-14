@@ -30,6 +30,7 @@ Per-device guides: [Android](app-android.md), [iPhone/iPad](app-ios.md), [browse
 | Add a radio or connection, run the hub, net plan, WebRTC | **More → Links & radios** |
 | Notice board | **More → Bulletins** |
 | Calculators, band plans, Morse send & read, station profiles | **More → Tools** |
+| Send a typed message by flashlight or screen, read it with a camera | **Tools → Morse send & read** (**Send** / **Read by camera**) |
 | This manual, Connect a radio, What you need, Read Morse code | **Instructions** (the **Help** tab on phones) |
 | Notes, checklists, supply inventory | **More → Notes & lists** |
 | Name, callsign, region, low power, relaying, position, clock, identity, passphrase, wipe, bundles | **More → Settings** |

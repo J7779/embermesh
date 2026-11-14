@@ -639,7 +639,10 @@ if command -v xcrun >/dev/null 2>&1; then
     name="$(printf '%s' "$line" | sed -E 's/ {2,}.*//')"
     udid="$(printf '%s' "$line" | grep -Eo '[0-9A-F]{8}-[0-9A-F]{16}' | head -1)"
     [[ -n "$udid" ]] && add_id "paired device id" "$udid"
-    [[ -n "$udid" && -n "$name" ]] && add_name "paired device name" "$name"
+    # A factory-default name ("iPhone", "iPad (2)") identifies nobody and is an ordinary word in the docs.
+    if [[ -n "$udid" && -n "$name" ]] && ! printf '%s' "$name" | grep -Eqi '^(iphone|ipad|ipod( touch)?|apple (watch|tv|vision pro))( ?\([0-9]+\))?$'; then
+      add_name "paired device name" "$name"
+    fi
   done < <(with_timeout 10 xcrun devicectl list devices 2>/dev/null | grep -E 'physical' || true)
 fi
 fi  # end of the identifiers skipped by --ci

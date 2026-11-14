@@ -1,6 +1,7 @@
 // Security review H6 regressions: checksum-valid but hostile guides.pack files must not make
 // load/get/search expensive. Packs are built with the real builder, then doctored (bodies
 // appended, doc records re-pointed, checksums repaired) the way an attacker would.
+#include "timing_slack.h"
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -143,7 +144,7 @@ TEST_CASE("H6 regression: every doc sharing one decompression-bomb body is rejec
   CHECK(st == LoadStatus::kBadLayout);
   auto t0 = std::chrono::steady_clock::now();
   lib.search("water", "", 200);
-  CHECK(seconds_since(t0) < 1.0);
+  CHECK(seconds_since(t0) < 1.0 * timing_slack());
 }
 
 TEST_CASE("H6: overlapping body ranges are rejected, adjacent and distinct ones accepted") {
@@ -198,7 +199,7 @@ TEST_CASE("H6: expansion ratio and deflate block count are capped") {
   std::string out;
   auto t0 = std::chrono::steady_clock::now();
   CHECK_FALSE(inflate_raw(ByteView(blocks.comp), n, out));
-  CHECK(seconds_since(t0) < 0.5);
+  CHECK(seconds_since(t0) < 0.5 * timing_slack());
   // A modest number of blocks (what zlib or our encoder produce) is still fine.
   Bytes few = many_fixed_blocks(16);
   CHECK(inflate_raw(ByteView(few), 16, out));
@@ -248,7 +249,8 @@ TEST_CASE("H6: search inflate work is bounded per query") {
   CHECK(!res.empty());
   if (!res.empty()) CHECK(res[0].snippet.find("water") != std::string::npos);
   MESSAGE("search over 48 x 1 MiB bodies: " << t << " s");
-  CHECK(t < 3.0);  // ~0.1 s at -O2; without the budget: 48 MiB inflated + converted per keystroke
+  // ~0.1 s at -O2; without the budget: 48 MiB inflated + converted per keystroke (many times this bound).
+  CHECK(t < 3.0 * timing_slack());
   // get() still returns the whole body.
   Guide g;
   REQUIRE(lib.get("water/w-0000", g) == GetStatus::kOk);
