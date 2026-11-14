@@ -107,6 +107,7 @@ export class HostRouter {
       case 'host.file.pick': return device.filePick(this.env, p);
       case 'host.signal.flash': return device.flash(this.env, p);
       case 'host.signal.tone': return device.tone(this.env, p);
+      case 'host.signal.stop': return device.signalStop();
       case 'host.notify': return device.notify(this.env, p);
       case 'host.web.download_single_file': return this.downloadSingleFile();
       case 'host.haptic': return device.haptic(this.env, p);
@@ -170,6 +171,7 @@ export class HostRouter {
     if (device.detectQr(env).available) f.push('qr_scan');
     if (device.detectLocation(env).available) f.push('location');
     if (device.detectFlash(env).available) f.push('flash');
+    if (device.detectSignal(env).torch !== 'no') f.push('torch'); // RPC_API §10: "yes" or "ask"
     if (device.detectTone(env).available) f.push('tone');
     if (device.detectFile(env).available) f.push('file');
     if (device.detectNotify(env).available) f.push('notify');
@@ -209,6 +211,7 @@ export class HostRouter {
       accessibility: this.accessibility(),
       actions: [...(this.offline ? await this.offline.actions().catch(() => []) : []), ...this.actions()],
       audio: await this.audioHints(),
+      signal: device.detectSignal(this.env),
       hub: this.hub ? { ...this.hub } : null,
     };
   }

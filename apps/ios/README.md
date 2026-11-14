@@ -337,7 +337,7 @@ and, on devices with a camera, `capture_camera_luma`.
   - If the core rejects a feed (session closed after 60 s idle, `morse.rx.stop`), capture stops and
     the shell emits `host.capture.state {kind, running:false, error}`.
 - **Sending by light** (RPC_API §10): `host.signal.flash {pattern_ms, mode?}` resolves only when
-  the pattern has finished or was stopped, with `{used:"torch"|"screen", stopped, timing:{worst_late_ms,
+  the pattern has finished or was stopped, with `{used:"torch"|"screen", stopped, timing:{max_late_ms,
   mean_late_ms, edges}}`. `host.signal.stop` stops a flash or tone at once, and a second flash/tone
   stops the running one. Limits: ≤ 4,096 entries of 10 ms – 60 s, ≤ 10 min in total, otherwise
   `bad_params`; an empty pattern is `bad_params` too. `host.info.signal = {torch:"yes"|"no",

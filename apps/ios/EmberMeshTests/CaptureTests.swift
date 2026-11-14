@@ -467,7 +467,7 @@ final class SignalContractTests: XCTestCase {
     var r = try flash(s, pat).get()
     XCTAssertEqual(r.string("used"), "torch"); XCTAssertEqual(r.bool("stopped"), false)
     XCTAssertEqual(t.began, 1); XCTAssertEqual(t.ended, 1); XCTAssertFalse(t.isOn); XCTAssertEqual(sc.began, 0)
-    XCTAssertNotNil(r.object("timing")?.number("worst_late_ms"))
+    XCTAssertNotNil(r.object("timing")?.number("max_late_ms"))
     r = try flash(s, pat.merging(["mode": "screen"]) { $1 }).get()
     XCTAssertEqual(r.string("used"), "screen"); XCTAssertEqual(sc.ended, 1); XCTAssertFalse(sc.isOn)
     // No torch: auto → screen, torch → unsupported.

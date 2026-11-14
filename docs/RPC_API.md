@@ -679,7 +679,7 @@ pattern.
 
 | Method | Params | Result |
 |---|---|---|
-| `host.signal.flash` | `{pattern_ms:[on,off,on,…], mode?="auto"}` | `{used:"torch"\|"screen", stopped:bool, timing?:{…}}` |
+| `host.signal.flash` | `{pattern_ms:[on,off,on,…], mode?="auto"}` | `{used:"torch"\|"screen", stopped:bool, timing?:{max_late_ms, mean_late_ms?, edges?}, fallback?}` |
 | `host.signal.stop` | — | `{}` |
 
 `mode`:
@@ -696,8 +696,11 @@ pattern.
 before. A second `host.signal.flash` or `host.signal.tone` while one is running stops the running
 one first. `host.signal.stop` stops a running flash or tone at once and is a no-op otherwise.
 Limits every host enforces: at most 4,096 entries, each 10 ms – 60,000 ms, total at most 10 minutes
-(`bad_params` otherwise). `timing` is optional and platform-specific (for example the largest
-deviation from the requested edges, in ms) — the UI may show it, tests may assert on it.
+(`bad_params` otherwise). `timing` is optional: `max_late_ms` is how late the latest edge was
+against its deadline (the UI warns when it exceeds about a third of a dot), `mean_late_ms` and
+`edges` (number of edges switched) are informational. `fallback` is present only when `"auto"` used
+the screen although a torch was wanted, and says why: `"no_torch"`, `"permission_denied"` or
+`"busy"`.
 
 `host.info` gains `signal: {torch: "yes" | "no" | "ask", screen: true}`. `"ask"` means the host
 cannot know before the user grants a permission (a browser exposes the torch only through the

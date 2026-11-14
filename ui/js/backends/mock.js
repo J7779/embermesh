@@ -99,6 +99,11 @@ export default class MockBackend {
     this.fresh = getParam(params, 'fresh') === '1';
     const unsup = getParam(params, 'unsupported');
     this.unsupported = new Set(unsup ? String(unsup).split(',').map(s => s.trim()).filter(Boolean) : []);
+    // Morse by light (RPC_API §10): ?torch=yes|ask|no|refused — the device has a torch it can switch,
+    // a browser that must ask for the camera first, no torch, or a user who refuses the permission.
+    const torch = String(getParam(params, 'torch') || opts.torch || 'ask');
+    this.torch = ['yes', 'ask', 'no', 'refused'].includes(torch) ? torch : 'ask';
+    this._signal = null;
 
     this._handlers = new Map();
     this._timers = new Set();
@@ -1277,7 +1282,10 @@ const METHODS = {
   // ---- host.*
   'host.info'() {
     const actions = this.unsupported.has('feature:actions') ? [] : HOST_ACTIONS.map(a => (a.id === 'start_on_boot' ? { ...a, checked: this.startOnBoot } : a));
-    return { platform: 'web', app_version: VERSION, backend: 'mock', endpoint_kinds: ENDPOINT_KINDS, features: HOST_FEATURES.filter(f => !this.unsupported.has(`feature:${f}`)), actions };
+    const features = HOST_FEATURES.filter(f => !this.unsupported.has(`feature:${f}`));
+    if (this.torch !== 'no' && features.includes('flash')) features.push('torch');
+    const signal = { torch: this.torch === 'refused' ? 'ask' : this.torch, screen: true };
+    return { platform: 'web', app_version: VERSION, backend: 'mock', endpoint_kinds: ENDPOINT_KINDS, features, actions, signal };
   },
   'host.app.share'() { return { message: 'Share sheet opened (mock)' }; },
   'host.app.start_on_boot'(p) {
@@ -1437,8 +1445,21 @@ const METHODS = {
     }
     return { name: 'field-notes.txt', mime: 'text/plain', data_b64: b64utf8('Field notes\n- Creek level dropping\n- 3 families at the school\n') };
   },
-  async 'host.signal.flash'(p) { return signalWait.call(this, p); },
-  async 'host.signal.tone'(p) { return signalWait.call(this, p); },
+  async 'host.signal.flash'(p) {
+    const mode = p.mode === undefined ? 'auto' : p.mode;
+    if (!['auto', 'torch', 'screen'].includes(mode)) throw rpcError('bad_params', 'mode must be "auto", "torch" or "screen"');
+    checkSignalPattern(p.pattern_ms);
+    let used = 'screen', fallback;
+    if (mode !== 'screen') {
+      if (this.torch === 'yes' || this.torch === 'ask') used = 'torch';
+      else if (mode === 'torch') throw rpcError(this.torch === 'refused' ? 'permission_denied' : 'unsupported', this.torch === 'refused' ? 'Camera permission is needed to use the flashlight' : 'This device has no flashlight');
+      else fallback = this.torch === 'refused' ? 'permission_denied' : 'no_torch';
+    }
+    const r = await signalWait.call(this, p);
+    return { used, ...r, ...(fallback ? { fallback } : {}) };
+  },
+  async 'host.signal.tone'(p) { checkSignalPattern(p.pattern_ms); return signalWait.call(this, p); },
+  'host.signal.stop'() { if (this._signal) this._signal(); return {}; },
   'host.notify'(p) {
     if (typeof console !== 'undefined') console.info('[mock notify]', String(p.title || ''), String(p.body || ''));
     return {};
@@ -1450,11 +1471,26 @@ MockBackend.prototype._sosStatus = function () {
   return { active: this.sos.active, ...(this.sos.since_ts ? { since_ts: this.sos.since_ts } : {}), ...(this.sos.active ? { text: this.sos.text } : {}), sent: this.sos.sent, acked_by: this.sos.acked_by };
 };
 
+/** RPC_API §10 limits: 1–4096 entries of 10–60 000 ms, at most 10 minutes in total. */
+function checkSignalPattern(pattern) {
+  if (!Array.isArray(pattern) || !pattern.length || pattern.length > 4096) throw rpcError('bad_params', 'pattern_ms must be an array of 1–4096 durations');
+  if (pattern.some(v => !(Number(v) >= 10 && Number(v) <= 60000))) throw rpcError('bad_params', 'pattern_ms values must be 10..60000 ms');
+  if (pattern.reduce((a, b) => a + Number(b), 0) > 600000) throw rpcError('bad_params', 'pattern_ms is longer than 10 minutes');
+}
+
+/** Waits for the pattern's duration (scaled by `speed`); a new signal or host.signal.stop ends it early. */
 async function signalWait(p) {
-  if (!Array.isArray(p.pattern_ms) || p.pattern_ms.some(v => !Number.isFinite(Number(v)) || v < 0)) throw rpcError('bad_params', 'pattern_ms must be an array of durations');
-  const total = Math.min(60000, p.pattern_ms.reduce((a, b) => a + Number(b), 0));
-  await new Promise(r => setTimeout(r, total * this.speed));
-  return {};
+  if (this._signal) this._signal();
+  const total = p.pattern_ms.reduce((a, b) => a + Number(b), 0);
+  let stopped = false, mine = null;
+  await new Promise(r => {
+    const t = setTimeout(done, total * this.speed);
+    function done() { clearTimeout(t); r(); }
+    mine = () => { stopped = true; done(); };
+    this._signal = mine;
+  });
+  if (this._signal === mine) this._signal = null;
+  return { stopped, timing: { max_late_ms: 0, edges: p.pattern_ms.length } };
 }
 
 function guideMeta(g) {

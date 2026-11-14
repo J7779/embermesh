@@ -291,7 +291,7 @@ final class SignalService {
       DispatchQueue.main.async {
         if self.running?.keyer === keyer { self.running = nil }
         completion(.success(["used": used, "stopped": r.stopped,
-                             "timing": ["worst_late_ms": (r.worstLateMs * 100).rounded() / 100,
+                             "timing": ["max_late_ms": (r.worstLateMs * 100).rounded() / 100,
                                         "mean_late_ms": (r.meanLateMs * 100).rounded() / 100, "edges": r.edges]]))
       }
     }

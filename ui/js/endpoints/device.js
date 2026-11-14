@@ -173,12 +173,23 @@ export function locationWatch(env, onPos, onErr) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Signalling: screen flash and audible tone
+// Signalling (docs/RPC_API.md §10): Morse by light — the camera torch when this browser can reach
+// one, else a full-screen flash — and audible tones.
+//
+// Host rules this code keeps: the light always goes off (end, stop, error, page hidden/closed);
+// the camera is requested only when a torch flash starts, its frames are never read (the stream is
+// attached to nothing) and every track is stopped as soon as the flash ends; nothing is stored or
+// sent; edges are scheduled against deadlines from the pattern start (no accumulated drift).
 
-function checkPattern(pattern) {
-  if (!Array.isArray(pattern) || !pattern.length || pattern.length > 4096) throw err('bad_params', 'pattern_ms must be a non-empty array');
+export const SIGNAL_LIMITS = Object.freeze({ maxEntries: 4096, minMs: 10, maxMs: 60000, maxTotalMs: 600000 });
+
+/** Validates pattern_ms against the §10 limits; returns numbers. Pure; exported for tests. */
+export function checkPattern(pattern) {
+  if (!Array.isArray(pattern) || !pattern.length) throw err('bad_params', 'pattern_ms must be a non-empty array');
+  if (pattern.length > SIGNAL_LIMITS.maxEntries) throw err('bad_params', `pattern_ms has more than ${SIGNAL_LIMITS.maxEntries} entries`);
   const p = pattern.map(Number);
-  if (p.some((x) => !(x >= 0 && x <= 60000))) throw err('bad_params', 'pattern_ms values must be 0..60000 ms');
+  if (p.some((x) => !(x >= SIGNAL_LIMITS.minMs && x <= SIGNAL_LIMITS.maxMs))) throw err('bad_params', `pattern_ms values must be ${SIGNAL_LIMITS.minMs}..${SIGNAL_LIMITS.maxMs} ms`);
+  if (p.reduce((a, b) => a + b, 0) > SIGNAL_LIMITS.maxTotalMs) throw err('bad_params', 'pattern_ms is longer than 10 minutes');
   return p;
 }
 
@@ -187,53 +198,157 @@ export function detectFlash(env = globalThis) {
   return { available: true };
 }
 
-let flashing = null;
+// Once a torch attempt found no torch on this device, say "no" for the rest of the session.
+const torchMemo = new WeakMap();
+const noTorch = (env) => torchMemo.get(env) === 'no';
 
-/** Full-screen white flashes (on,off,on,…). Tap to stop. Tries the camera torch when asked. */
-export async function flash(env, { pattern_ms, torch } = {}) {
-  const pattern = checkPattern(pattern_ms);
-  if (!detectFlash(env).available) throw err('unsupported', 'No screen to flash');
-  if (flashing) flashing.stop();
-  const doc = env.document;
-  const el = doc.createElement('div');
-  el.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#000;cursor:pointer';
-  el.title = 'Tap to stop';
-  doc.body.appendChild(el);
-  let track = null;
-  if (torch && env.navigator.mediaDevices) {
-    try {
-      const s = await env.navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      track = s.getVideoTracks()[0];
-      const caps = track.getCapabilities ? track.getCapabilities() : {};
-      if (!caps.torch) { track.stop(); track = null; }
-    } catch { track = null; }
-  }
-  const setOn = (on) => {
-    el.style.background = on ? '#fff' : '#000';
-    if (track) track.applyConstraints({ advanced: [{ torch: on }] }).catch(() => {});
-  };
-  let stopped = false;
-  const ctl = { stop() { stopped = true; } };
-  flashing = ctl;
-  el.onclick = () => ctl.stop();
-  try {
-    // Each edge is scheduled against the start time, not after the previous timer: a late timer
-    // (busy page) then shortens the next element instead of stretching the whole message, which
-    // keeps the Morse readable by a camera.
-    const t0 = performance.now();
-    let due = 0;
-    for (let i = 0; i < pattern.length && !stopped; i++) {
-      setOn(i % 2 === 0);
-      due += pattern[i];
-      await new Promise((r) => setTimeout(r, Math.max(0, t0 + due - performance.now())));
-    }
-  } finally {
-    setOn(false);
-    if (track) track.stop();
-    el.remove();
-    if (flashing === ctl) flashing = null;
-  }
+/** Phones and tablets may have a rear camera with a torch; desktops and laptops do not. */
+function mayHaveRearCamera(env) {
+  const nav = env.navigator || {};
+  if (nav.userAgentData && typeof nav.userAgentData.mobile === 'boolean' && nav.userAgentData.mobile) return true;
+  const ua = String(nav.userAgent || '');
+  if (/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(ua)) return true;
+  // iPadOS reports a desktop user agent but has touch points
+  return /Macintosh/.test(ua) && Number(nav.maxTouchPoints) > 1;
+}
+
+/** host.info.signal: {torch:"yes"|"no"|"ask", screen}. Browsers reach a torch only through the camera. */
+export function detectSignal(env = globalThis) {
+  const md = env.navigator && env.navigator.mediaDevices;
+  const canAsk = !!(md && typeof md.getUserMedia === 'function') && isSecure(env) && mayHaveRearCamera(env) && !noTorch(env);
+  return { torch: canAsk ? 'ask' : 'no', screen: detectFlash(env).available };
+}
+
+let current = null; // the running flash or tone: {stop()}
+
+/** host.signal.stop: stops a running flash or tone at once; a no-op otherwise. */
+export function signalStop() {
+  if (current) current.stop();
   return {};
+}
+
+const MODES = new Set(['auto', 'torch', 'screen']);
+
+/** Opens the rear camera only to reach its torch. Returns {stream, track} or throws {code}. */
+async function openTorch(env) {
+  const md = env.navigator && env.navigator.mediaDevices;
+  if (!md || typeof md.getUserMedia !== 'function') throw err('unsupported', 'This browser cannot reach a flashlight');
+  let stream;
+  try {
+    stream = await md.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+  } catch (e) {
+    if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) throw err('permission_denied', 'Camera permission is needed to use the flashlight');
+    torchMemo.set(env, 'no');
+    throw err('unsupported', 'No camera with a flashlight');
+  }
+  const stopAll = () => { for (const t of stream.getTracks()) { try { t.stop(); } catch { /* gone */ } } };
+  const track = stream.getVideoTracks()[0];
+  const caps = track && typeof track.getCapabilities === 'function' ? track.getCapabilities() : {};
+  if (!track || !caps || !caps.torch) {
+    stopAll();
+    torchMemo.set(env, 'no');
+    throw err('unsupported', 'This camera has no flashlight the browser can switch');
+  }
+  return { stream, track, stopAll };
+}
+
+/**
+ * host.signal.flash {pattern_ms, mode?="auto"} → {used, stopped, timing:{max_late_ms, edges}}
+ * (+ `fallback` "no_torch"|"permission_denied" when "auto" fell back to the screen — additive).
+ * Resolves when the pattern has finished or was stopped.
+ */
+export async function flash(env, { pattern_ms, mode = 'auto', torch } = {}) {
+  const pattern = checkPattern(pattern_ms);
+  if (torch === true && (mode === undefined || mode === 'auto')) mode = 'auto'; // old callers
+  if (!MODES.has(mode)) throw err('bad_params', 'mode must be "auto", "torch" or "screen"');
+  if (current) current.stop();
+  const doc = env.document;
+  const perf = env.performance || globalThis.performance;
+  const later = env.setTimeout ? env.setTimeout.bind(env) : setTimeout;
+  const cancel = env.clearTimeout ? env.clearTimeout.bind(env) : clearTimeout;
+
+  let stopped = false;
+  let wake = null;
+  const waiters = new Set();
+  const ctl = { stop() { if (stopped) return; stopped = true; for (const w of [...waiters]) w(); } };
+  current = ctl;
+  const onHide = () => { if (!doc || doc.visibilityState === 'hidden') ctl.stop(); };
+  const listen = (on) => {
+    if (doc && doc.addEventListener) doc[on ? 'addEventListener' : 'removeEventListener']('visibilitychange', onHide);
+    const w = env.window || env;
+    if (w && w.addEventListener && w !== doc) w[on ? 'addEventListener' : 'removeEventListener']('pagehide', ctl.stop);
+  };
+
+  let torchDev = null;
+  let fallback;
+  let el = null;
+  listen(true);
+  try {
+    // Only where a torch may exist (never opens a desktop's webcam): host.info.signal.torch != "no".
+    if (mode !== 'screen' && detectSignal(env).torch !== 'no') {
+      try { torchDev = await openTorch(env); } catch (e) {
+        if (mode === 'torch') throw e;
+        fallback = e.code === 'permission_denied' ? 'permission_denied' : 'no_torch';
+      }
+    } else if (mode === 'torch') throw err('unsupported', 'This device has no flashlight the browser can switch');
+    else if (mode === 'auto') fallback = 'no_torch';
+    if (stopped) return { used: torchDev ? 'torch' : 'screen', stopped: true };
+    if (!torchDev && !detectFlash(env).available) throw err('unsupported', 'No screen to flash');
+    if (!torchDev) {
+      el = doc.createElement('div');
+      // The full-screen light. Night theme: red only. Tap, click or Escape stops it.
+      const lit = doc.documentElement && doc.documentElement.dataset && doc.documentElement.dataset.theme === 'night' ? '#f00' : '#fff';
+      el.style.cssText = 'position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147483647;background:#000;cursor:pointer';
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label', 'Flashing Morse. Tap to stop');
+      el.tabIndex = 0;
+      el.dataset.lit = lit;
+      const hint = doc.createElement('div');
+      hint.textContent = 'Tap to stop';
+      hint.style.cssText = 'position:absolute;left:0;right:0;bottom:24px;text-align:center;font:16px system-ui,sans-serif;color:#777;pointer-events:none';
+      el.appendChild(hint);
+      el.onclick = () => ctl.stop();
+      el.onkeydown = (e) => { if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') ctl.stop(); };
+      doc.body.appendChild(el);
+      try { el.focus({ preventScroll: true }); } catch { /* old */ }
+    }
+    if (env.navigator && env.navigator.wakeLock && typeof env.navigator.wakeLock.request === 'function') {
+      try { wake = await env.navigator.wakeLock.request('screen'); } catch { wake = null; }
+    }
+    const setOn = (on) => {
+      if (torchDev) torchDev.track.applyConstraints({ advanced: [{ torch: on }] }).catch(() => {});
+      else el.style.background = on ? el.dataset.lit : '#000';
+    };
+    // Edges against deadlines from t0: a late timer shortens the next element instead of
+    // stretching the rest of the message (a camera reader keeps its speed lock).
+    const t0 = perf.now();
+    let due = 0, maxLate = 0, edges = 0;
+    for (let i = 0; i < pattern.length && !stopped; i++) {
+      const late = perf.now() - (t0 + due);
+      if (late > maxLate) maxLate = late;
+      setOn(i % 2 === 0);
+      edges++;
+      due += pattern[i];
+      await new Promise((r) => {
+        const t = later(() => { waiters.delete(done); r(); }, Math.max(0, t0 + due - perf.now()));
+        const done = () => { cancel(t); r(); };
+        waiters.add(done);
+      });
+    }
+    const end = perf.now() - (t0 + due);
+    if (!stopped && end > maxLate) maxLate = end;
+    return { used: torchDev ? 'torch' : 'screen', stopped, timing: { max_late_ms: Math.round(maxLate), edges }, ...(fallback && !torchDev ? { fallback } : {}) };
+  } finally {
+    // the light always goes off
+    if (torchDev) {
+      try { torchDev.track.applyConstraints({ advanced: [{ torch: false }] }).catch(() => {}); } catch { /* gone */ }
+      torchDev.stopAll();
+    }
+    if (el) el.remove();
+    if (wake) { try { wake.release(); } catch { /* released */ } }
+    listen(false);
+    if (current === ctl) current = null;
+  }
 }
 
 export function detectTone(env = globalThis) {
@@ -243,13 +358,14 @@ export function detectTone(env = globalThis) {
 
 let toneCtx = null;
 
-/** Plays on/off tone pattern; resolves when done. Uses short ramps so keying is click-free. */
+/** Plays on/off tone pattern; resolves when done or stopped. Uses short ramps so keying is click-free. */
 export async function tone(env, { pattern_ms, freq_hz = 700 } = {}) {
   const pattern = checkPattern(pattern_ms);
   const f = Number(freq_hz);
   if (!(f >= 50 && f <= 8000)) throw err('bad_params', 'freq_hz must be 50..8000');
   const AC = env.AudioContext || env.webkitAudioContext;
   if (!AC) throw err('unsupported', 'This browser has no Web Audio support');
+  if (current) current.stop();
   if (!toneCtx || toneCtx.state === 'closed') toneCtx = new AC();
   const ac = toneCtx;
   if (ac.state === 'suspended') await ac.resume().catch(() => {});
@@ -271,11 +387,21 @@ export async function tone(env, { pattern_ms, freq_hz = 700 } = {}) {
     }
     t += d;
   }
+  let stopped = false;
+  let finish;
+  const ended = new Promise((r) => { finish = r; });
+  const ctl = { stop() { if (stopped) return; stopped = true; try { gain.gain.cancelScheduledValues(ac.currentTime); gain.gain.setValueAtTime(0, ac.currentTime); osc.stop(); } catch { /* not started */ } finish(); } };
+  current = ctl;
   osc.start(t0);
   osc.stop(t + 0.02);
-  await new Promise((r) => { osc.onended = r; setTimeout(r, (t - ac.currentTime) * 1000 + 500); });
-  try { osc.disconnect(); gain.disconnect(); } catch {}
-  return {};
+  osc.onended = () => finish();
+  const timer = setTimeout(() => finish(), (t - ac.currentTime) * 1000 + 500);
+  try { await ended; } finally {
+    clearTimeout(timer);
+    try { osc.disconnect(); gain.disconnect(); } catch {}
+    if (current === ctl) current = null;
+  }
+  return { stopped };
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -1,10 +1,10 @@
-// Morse: Send (flash / screen / tone) | Read by camera | Read by sound. Reading uses the core's
+// Morse: Send (flashlight / screen / tone, ./morse_send.js) | Read by camera | Read by sound. Reading uses the core's
 // decoder (morse.rx.*, docs/RPC_API.md §6); capture is ui/js/lib/capture*.js, or the host's native
 // capture (host.capture.*) when the web view cannot use getUserMedia.
 import { h, clear, append } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { toast, toastError, copyText, segmented, errorText, setFill } from '../lib/ui.js';
-import { toMorse, morsePattern, patternDuration } from '../lib/morse.js';
+import { sendPanel } from './morse_send.js';
 import { lightAdvice, pcmToB64, roiAt, clampRoi, DEFAULT_ROI } from '../lib/capture.js';
 import { CameraReader, MicReader, unavailableReason, mediaErrorText } from '../lib/capture_media.js';
 
@@ -243,102 +243,4 @@ async function sendAsMessage(app, text) {
       try { await app.api.call('messages.send', { conv: c.id, text: t }); s.close(); toast('Sent', { kind: 'ok' }); } catch (e) { toastError(e, 'Not sent'); }
     },
   }, h('span', { class: 'grow' }, String(c.title || c.id)), icon('send', { size: 16 }))))));
-}
-
-// ---------------------------------------------------------------- morse
-function sendPanel(app, page) {
-  const text = h('input', { type: 'text', value: 'SOS', maxlength: 120, 'aria-label': 'Text to signal' });
-  const wpm = h('input', { type: 'number', value: '10', min: 3, max: 30, 'aria-label': 'Words per minute', inputmode: 'numeric' });
-  const repeat = h('input', { type: 'checkbox' });
-  const code = h('pre', { class: 'out', 'aria-live': 'polite' });
-  const upd = () => { code.textContent = toMorse(text.value) || '(nothing to send)'; };
-  text.addEventListener('input', upd);
-  upd();
-  let stop = null;
-  const buttons = [];
-  const go = async how => {
-    if (stop) { stop(); return; }
-    const m = toMorse(text.value);
-    if (!m) return;
-    const pattern = morsePattern(m, Number(wpm.value) || 10);
-    let cancelled = false;
-    for (const b of buttons) b.disabled = true;
-    stopBtn.hidden = false;
-    stop = () => { cancelled = true; };
-    try {
-      do {
-        if (how === 'screen') await screenFlash(pattern, () => cancelled);
-        else if (how === 'flash') {
-          // run host flashlight and mirror on screen; fall back to screen only
-          const hostP = app.api.call('host.signal.flash', { pattern_ms: pattern }).catch(e => { if (e.code !== 'unsupported' && e.code !== 'not_implemented') toastError(e); });
-          await Promise.all([hostP, screenFlash(pattern, () => cancelled, true)]);
-        } else {
-          let ok = true;
-          if (app.has('tone')) { try { await app.api.call('host.signal.tone', { pattern_ms: pattern, freq_hz: 700 }); } catch { ok = false; } }
-          else ok = false;
-          if (!ok) await webAudioTone(pattern, () => cancelled);
-        }
-        if (repeat.checked && !cancelled) await sleep(2000, () => cancelled);
-      } while (repeat.checked && !cancelled);
-    } finally {
-      stop = null;
-      for (const b of buttons) b.disabled = false;
-      stopBtn.hidden = true;
-    }
-  };
-  const stopBtn = h('button', { class: 'btn danger block', hidden: true, onclick: () => stop && stop() }, 'Stop');
-  buttons.push(
-    h('button', { class: 'btn primary', onclick: () => go('flash') }, icon('flash'), app.has('flash') ? 'Flashlight' : 'Screen flash'),
-    h('button', { class: 'btn', onclick: () => go('screen') }, icon('sun'), 'Screen only'),
-    h('button', { class: 'btn', onclick: () => go('tone') }, icon('sound'), 'Tone'));
-  append(page, 
-    h('div', { class: 'card stack' },
-      h('label', { class: 'field-label' }, 'Text', text),
-      h('label', { class: 'field-label' }, 'Speed (words per minute)', wpm),
-      h('label', { class: 'check' }, repeat, h('span', null, 'Repeat until stopped')),
-      code,
-      h('div', { class: 'row' }, buttons), stopBtn,
-      h('p', { class: 'muted small' }, 'SOS is · · · — — — · · · sent as one sign. Signal from high ground at night; a phone screen is visible for about 1 km in darkness, a flashlight much further.')));
-  return () => stop && stop();
-}
-
-function sleep(ms, cancelled) {
-  return new Promise(res => {
-    const t0 = Date.now();
-    const tick = () => (cancelled() || Date.now() - t0 >= ms) ? res() : setTimeout(tick, 50);
-    tick();
-  });
-}
-
-async function screenFlash(pattern, cancelled, small) {
-  const ov = h('div', { class: 'flash-overlay', role: 'presentation' }, h('button', { class: 'btn', onclick: () => { ov.dataset.stop = '1'; } }, 'Stop'));
-  if (small) ov.classList.add('mirror');
-  document.body.appendChild(ov);
-  try {
-    for (let i = 0; i < pattern.length; i++) {
-      if (cancelled() || ov.dataset.stop) break;
-      ov.classList.toggle('on', i % 2 === 0);
-      await sleep(pattern[i], () => cancelled() || !!ov.dataset.stop);
-    }
-  } finally { ov.remove(); }
-}
-
-async function webAudioTone(pattern, cancelled) {
-  const AC = window.AudioContext || window.webkitAudioContext;
-  if (!AC) { toast('No audio output available', { kind: 'bad' }); return; }
-  const ctx = new AC();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.frequency.value = 700;
-  gain.gain.value = 0;
-  osc.connect(gain).connect(ctx.destination);
-  osc.start();
-  let t = ctx.currentTime + 0.05;
-  for (let i = 0; i < pattern.length; i++) {
-    gain.gain.setValueAtTime(i % 2 === 0 ? 0.5 : 0, t);
-    t += pattern[i] / 1000;
-  }
-  gain.gain.setValueAtTime(0, t);
-  await sleep(patternDuration(pattern) + 100, cancelled);
-  try { osc.stop(); ctx.close(); } catch { /* ignore */ }
 }

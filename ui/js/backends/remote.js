@@ -16,7 +16,7 @@ function rpcError(code, message) {
 
 const LOCAL_HOST_METHODS = new Set([
   'host.qr.scan', 'host.file.save', 'host.file.pick', 'host.notify', 'host.keep_awake',
-  'host.signal.flash', 'host.signal.tone',
+  'host.signal.flash', 'host.signal.tone', 'host.signal.stop',
 ]);
 
 /** Builds the /rpc URL from options and the page location. */
@@ -156,7 +156,10 @@ export default class RemoteBackend {
       }
       // capture runs in this browser: the daemon's own capture_* sources are not ours to use here
       f.delete('capture_camera_luma'); f.delete('capture_mic_pcm');
-      return { ...info, backend: 'remote', features: [...f], ...(unavail ? { unavailable_features: unavail } : {}) };
+      // light signalling runs in this browser too (RPC_API §10): this device's torch, not the daemon's
+      const signal = device.detectSignal(this.env);
+      if (signal.torch !== 'no') f.add('torch'); else f.delete('torch');
+      return { ...info, backend: 'remote', features: [...f], signal, ...(unavail ? { unavailable_features: unavail } : {}) };
     }
     return this._remoteCall(method, params);
   }
@@ -190,6 +193,7 @@ export default class RemoteBackend {
       case 'host.notify': return device.notify(env, p);
       case 'host.signal.flash': return device.flash(env, p);
       case 'host.signal.tone': return device.tone(env, p);
+      case 'host.signal.stop': return device.signalStop();
       case 'host.keep_awake': return this._ka().set(p.enabled);
       default: throw rpcError('unsupported', method);
     }

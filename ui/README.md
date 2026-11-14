@@ -12,6 +12,7 @@ cd ui && python3 -m http.server 8000
 #      http://localhost:8000/?mock=1&fresh=1  first-run setup
 #      http://localhost:8000/?mock=1&locked=1 lock screen (passphrase: demo)
 #      http://localhost:8000/?mock=1&unsupported=guides.categories,files.send   graceful degradation
+#      http://localhost:8000/?mock=1&torch=yes|ask|no|refused   Morse by light: flashlight states
 #      http://localhost:8000/                 real WASM core (needs ui/wasm/ from the web build)
 #      http://localhost:8000/?remote=1&token=…  control a desktop daemon over /rpc
 ```
@@ -70,12 +71,15 @@ js/lib/capture_media.js  getUserMedia camera/microphone readers for morse.rx.fee
 js/mock/morse_rx.js, radios.js, hardware.js   mock morse.rx.*, rf.radios, rf.hardware (§6)
 js/mock/link_types.js snapshot of the real core's links.types (the mock offers the real drivers)
 js/lib/store.js       tiny observable store
-js/lib/morse.js       text → Morse → on/off timing
+js/lib/morse.js       text → Morse → on/off timing; sending by light (§10): encodeText (prosigns <AR>,
+                      skipped characters), buildSignal (pattern + per-character spans), speed limits
+                      (torch 12 WPM default / 15 max, screen ≤ 7 WPM = ≤ 3 flashes/s) with the evidence
 js/lib/ui.js          toasts, sheets/dialogs, QR rendering, hold-to-confirm, file pick/save
 js/lib/icons.js       inline SVG icon paths
 js/screens/*.js       chats, people (contacts/peers/radar/stats), sos, bulletins, links,
                       radio (Connect a radio wizard, #/links/radio), morse (send / read by camera /
-                      read by sound, #/tools/morse), help (Instructions, #/help, #/help/hardware),
+                      read by sound, #/tools/morse; Send is morse_send.js: flashlight or screen via
+                      host.signal.flash {mode}, preview, progress, Stop), help (Instructions, #/help, #/help/hardware),
                       hardware ("What you need" cards and matrix),
                       guides, tools, extras (notes/checklists/inventory), settings, setup,
                       lock, more
