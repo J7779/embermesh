@@ -175,17 +175,22 @@ class MorseCaptureTest {
     /** Torch / screen keying accuracy at 5, 12 and 20 WPM ("PARIS PARIS"). */
     @Test fun flashKeyingTiming() {
         assertTrue(EmberRuntime.start(app))
+        // The emulator's only flash unit is on its front camera.
+        val svc = EmberRuntime.services as org.embermesh.app.services.AndroidDeviceServices
+        svc.useAnyFacingTorchForTest(true)
+        try { flashKeyingTimingRun() } finally { svc.useAnyFacingTorchForTest(false) }
+    }
+
+    private fun flashKeyingTimingRun() {
         val results = JSONObject()
         for (wpm in listOf(5, 12, 20)) {
             val dot = MorseKeyer.dotMs(wpm)
             val pattern = units("PARIS PARIS").map { it * dot }.dropLast(1)
-            val p = JSONObject().put("pattern_ms", org.json.JSONArray(pattern))
-            val before = EmberRuntime.router.handle("host.signal.stats", JSONObject()).opt("flash").toString()
-            EmberRuntime.router.handle("host.signal.flash", p)
-            TestNode.waitUntil(pattern.sum() + 5000, "flash pattern done") {
-                EmberRuntime.router.handle("host.signal.stats", JSONObject()).opt("flash").toString() != before
-            }
-            val st = EmberRuntime.router.handle("host.signal.stats", JSONObject()).getJSONObject("flash")
+            val p = JSONObject().put("pattern_ms", org.json.JSONArray(pattern)).put("mode", "torch")
+            // host.signal.flash resolves when the pattern has finished, with its timing.
+            val r = EmberRuntime.router.handle("host.signal.flash", p)
+            assertEquals("torch", r.getString("used"))
+            val st = r.getJSONObject("timing")
             results.put("$wpm", st)
             // A 20 WPM dot is 60 ms: switching must start within a few ms of schedule, without drift.
             assertTrue("$wpm WPM: $st", st.getDouble("abs_p95_ms") < 5.0)

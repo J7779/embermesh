@@ -10,6 +10,7 @@ import { encodeBlob, decodeBlob, buildSdp, BlobError } from './webrtc_blob.js';
 
 const GATHER_TIMEOUT_MS = 4000;
 const GATHER_TIMEOUT_STUN_MS = 9000;
+const GATHER_MAX_MS = 20000;
 
 function schema() {
   return [
@@ -26,18 +27,30 @@ export function iceServers(stun) {
   return s.split(/[\s,]+/).filter(Boolean).map((u) => ({ urls: /^(stun|turn)s?:/.test(u) ? u : `stun:${u}` }));
 }
 
-async function gatherComplete(pc, timeoutMs) {
+/**
+ * Waits until ICE gathering is complete, at most `timeoutMs` — but never hands out a pairing code
+ * without a single candidate while one may still come (a slow machine or a slow mDNS registration
+ * can take longer than usual): then it waits up to `maxMs` for the first one.
+ */
+export async function gatherComplete(pc, timeoutMs, maxMs = GATHER_MAX_MS) {
   if (pc.iceGatheringState === 'complete') return;
+  let have = /\na=candidate:/.test((pc.localDescription && pc.localDescription.sdp) || '');
   await new Promise((resolve) => {
-    const t = setTimeout(done, timeoutMs);
+    const t0 = Date.now();
+    const soft = setTimeout(() => { if (have) done(); }, timeoutMs);
+    const hard = setTimeout(done, Math.max(timeoutMs, maxMs));
     function done() {
-      clearTimeout(t);
+      clearTimeout(soft); clearTimeout(hard);
       pc.removeEventListener('icegatheringstatechange', check);
       pc.removeEventListener('icecandidate', onCand);
-      resolve();
+      resolve(Date.now() - t0);
     }
     function check() { if (pc.iceGatheringState === 'complete') done(); }
-    function onCand(e) { if (!e.candidate) done(); }
+    function onCand(e) {
+      if (!e.candidate) { done(); return; }
+      have = true;
+      if (Date.now() - t0 >= timeoutMs) done(); // past the usual wait: the first one is enough
+    }
     pc.addEventListener('icegatheringstatechange', check);
     pc.addEventListener('icecandidate', onCand);
   });

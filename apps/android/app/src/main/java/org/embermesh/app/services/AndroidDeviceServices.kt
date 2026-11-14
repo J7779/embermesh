@@ -43,7 +43,7 @@ class AndroidDeviceServices(private val ctx: HostContext) : DeviceServices {
         if (lm != null && (lm.allProviders.contains(LocationManager.GPS_PROVIDER) || lm.allProviders.contains(LocationManager.NETWORK_PROVIDER))) f.add("location")
         if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) f.add("qr_scan")
         f.add("flash")
-        if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) f.add("torch")
+        if (light.torchInfo() == "yes") f.add("torch") // RPC_API §10: a back camera with a flash unit
         f.add("tone")
         f.add("file")
         f.add("share_app")
@@ -216,69 +216,104 @@ class AndroidDeviceServices(private val ctx: HostContext) : DeviceServices {
 
     // --- signalling --------------------------------------------------------------------------------
 
-    private val flashGen = AtomicInteger()
     private val toneGen = AtomicInteger()
 
-    override fun flash(patternMs: LongArray) {
-        val gen = flashGen.incrementAndGet()
-        Thread({
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY)
-            runFlash(gen, patternMs)
-        }, "ember-flash").apply { isDaemon = true; priority = Thread.MAX_PRIORITY; start() }
-    }
-
-    @Volatile var lastFlashStats: JSONObject? = null
-        private set
-
-    override fun signalStats(): JSONObject = JSONObject().put("flash", lastFlashStats ?: JSONObject.NULL)
-
-    private fun runFlash(gen: Int, pattern: LongArray) {
-        val torch = openTorch()
-        try {
-            // Absolute-deadline keyer (no drift). Screen fallback: the switch is posted to the UI
-            // thread and becomes visible on the next display frame (up to ~16 ms later at 60 Hz).
-            val act: (Boolean) -> Unit = if (torch != null) torch else { on -> ctx.ui?.let { ui -> ctx.main.post { ui.setScreenFlash(on) } } }
-            val stats = MorseKeyer().run(pattern, { flashGen.get() != gen }, act)
-            lastFlashStats = stats.json().put("light", if (torch != null) "torch" else "screen")
-        } finally {
-            if (torch != null) try { torch(false) } catch (_: Exception) {}
-            ctx.ui?.let { ui -> ctx.main.post { ui.setScreenFlash(false) } }
-            closeTorch?.invoke()
-            closeTorch = null
-        }
-    }
-
-    @Volatile private var closeTorch: (() -> Unit)? = null
-
-    /** Returns a torch switch, or null when there is no usable flash (screen fallback). */
-    @Suppress("DEPRECATION")
-    private fun openTorch(): ((Boolean) -> Unit)? {
-        if (!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) return null
-        if (Build.VERSION.SDK_INT >= 23) {
-            val cm = app.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-            val id = try {
-                cm.cameraIdList.firstOrNull { cm.getCameraCharacteristics(it).get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true }
-            } catch (_: Exception) { null } ?: return null
-            return { on -> try { cm.setTorchMode(id, on) } catch (_: Exception) {} }
-        }
-        return try {
-            val cam = android.hardware.Camera.open()
-            val tex = SurfaceTexture(0)
-            cam.setPreviewTexture(tex)
-            cam.startPreview()
-            closeTorch = { try { cam.stopPreview(); cam.release(); tex.release() } catch (_: Exception) {} }
-            val f: (Boolean) -> Unit = { on ->
-                try {
-                    val p = cam.parameters
-                    p.flashMode = if (on) android.hardware.Camera.Parameters.FLASH_MODE_TORCH else android.hardware.Camera.Parameters.FLASH_MODE_OFF
-                    cam.parameters = p
-                } catch (_: Exception) {}
+    /**
+     * The back camera's torch through CameraManager.setTorchMode only: no CAMERA permission and no
+     * camera session. Availability follows the system torch callback: while a camera is open (the QR
+     * scanner, the Morse camera reader, another app) the torch is reported unavailable and sending
+     * falls back to the screen in "auto" mode instead of fighting for the camera.
+     */
+    private inner class AndroidTorch(private val anyFacing: Boolean = false) : TorchLight {
+        private val cm = if (Build.VERSION.SDK_INT >= 23) app.getSystemService(Context.CAMERA_SERVICE) as CameraManager else null
+        private val id: String? = try {
+            cm?.cameraIdList?.firstOrNull {
+                val ch = cm.getCameraCharacteristics(it)
+                (anyFacing || ch.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) &&
+                    ch.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
             }
-            f
         } catch (_: Exception) { null }
+        @Volatile private var avail = true
+        @Volatile var lit = false
+            private set
+        private val cbThread = if (id != null) HandlerThread("ember-torch-cb").apply { start() } else null
+        private val callback = if (id != null && Build.VERSION.SDK_INT >= 23) object : CameraManager.TorchCallback() {
+            override fun onTorchModeUnavailable(cameraId: String) { if (cameraId == id) avail = false }
+            override fun onTorchModeChanged(cameraId: String, enabled: Boolean) { if (cameraId == id) { avail = true; lit = enabled } }
+        } else null
+
+        init {
+            if (callback != null) try { cm!!.registerTorchCallback(callback, android.os.Handler(cbThread!!.looper)) } catch (_: Exception) {}
+        }
+
+        override val present: Boolean get() = id != null
+        override fun available(): Boolean = id != null && avail && (cameraInUseByApp?.invoke() != true)
+        override fun set(on: Boolean) {
+            val c = cm ?: throw TorchBusyException("no torch")
+            try { c.setTorchMode(id ?: throw TorchBusyException("no torch"), on) }
+            catch (e: android.hardware.camera2.CameraAccessException) { throw TorchBusyException("camera in use") }
+            catch (e: IllegalArgumentException) { throw TorchBusyException("torch unavailable") }
+        }
+
+        fun close() {
+            try { if (callback != null) cm!!.unregisterTorchCallback(callback) } catch (_: Exception) {}
+            cbThread?.quitSafely()
+        }
     }
+
+    /** Set by the runtime: true while this app holds a camera (Morse camera reader). */
+    @Volatile var cameraInUseByApp: (() -> Boolean)? = null
+
+    /** The screen fallback, through the visible activity (restores brightness and flags exactly). */
+    private inner class UiScreen : ScreenLight {
+        override fun available(): Boolean = ctx.ui?.isInFront() == true
+        override fun begin() = onUi { it.screenFlashBegin() }
+        override fun set(on: Boolean) = onUi { it.setScreenFlash(on) }
+        override fun end() = onUi { it.screenFlashEnd() }
+        /** Runs on the main thread and waits (≤ 100 ms) so edge timing reflects when the window changed. */
+        private fun onUi(f: (org.embermesh.app.host.UiHost) -> Unit) {
+            val ui = ctx.ui ?: return
+            val latch = java.util.concurrent.CountDownLatch(1)
+            ctx.main.postAtFrontOfQueue { try { f(ui) } finally { latch.countDown() } }
+            latch.await(100, java.util.concurrent.TimeUnit.MILLISECONDS)
+        }
+    }
+
+    @Volatile private var torchInst: AndroidTorch? = null
+    @Volatile private var lightInst: LightSender? = null
+    private val torch: AndroidTorch get() = torchInst ?: synchronized(this) { torchInst ?: AndroidTorch().also { torchInst = it } }
+    private val light: LightSender get() = lightInst ?: synchronized(this) { lightInst ?: LightSender(torch, UiScreen()).also { lightInst = it } }
+
+    /**
+     * Tests only: also accept a front-facing flash unit (the emulator's only flash is on its front
+     * camera). Production uses the back camera's torch, as RPC_API §10 requires.
+     */
+    fun useAnyFacingTorchForTest(any: Boolean) = synchronized(this) {
+        lightInst?.stop()
+        torchInst?.close()
+        torchInst = AndroidTorch(anyFacing = any)
+        lightInst = LightSender(torchInst, UiScreen())
+    }
+
+    override fun flash(patternMs: LongArray, mode: String): JSONObject {
+        toneGen.incrementAndGet() // a flash stops a running tone
+        return light.flash(patternMs, mode)
+    }
+
+    override fun stopSignals() {
+        toneGen.incrementAndGet()
+        light.stop()
+    }
+
+    override fun signalInfo(): JSONObject = JSONObject().put("torch", light.torchInfo()).put("screen", true)
+
+    /** Test hook: whether the torch is on right now, from the system torch callback. */
+    fun torchLitForTest(): Boolean = torch.lit
+
+    override fun signalStats(): JSONObject = JSONObject().put("flash", light.lastTiming ?: JSONObject.NULL)
 
     override fun tone(patternMs: LongArray, freqHz: Int) {
+        light.stop() // a tone stops a running flash
         val gen = toneGen.incrementAndGet()
         Thread({ runTone(gen, patternMs, freqHz) }, "ember-tone").apply { isDaemon = true; start() }
     }
@@ -317,15 +352,6 @@ class AndroidDeviceServices(private val ctx: HostContext) : DeviceServices {
         }
     }
 
-    private fun sleepCancellable(ms: Long, cancelled: () -> Boolean) {
-        var left = ms
-        while (left > 0 && !cancelled()) {
-            val s = minOf(left, 20L)
-            try { Thread.sleep(s) } catch (_: InterruptedException) { return }
-            left -= s
-        }
-    }
-
     // --- share the app itself ----------------------------------------------------------------------
 
     override fun shareApp(mode: String) {
@@ -350,8 +376,9 @@ class AndroidDeviceServices(private val ctx: HostContext) : DeviceServices {
     }
 
     override fun shutdown() {
-        flashGen.incrementAndGet()
         toneGen.incrementAndGet()
+        try { lightInst?.stop() } catch (_: Throwable) {}
+        try { torchInst?.close() } catch (_: Throwable) {}
         synchronized(locLock) {
             val lm = app.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             watchListener?.let { try { lm.removeUpdates(it) } catch (_: Exception) {} }

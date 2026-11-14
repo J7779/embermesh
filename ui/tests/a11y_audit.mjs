@@ -55,6 +55,7 @@ export const SCREENS = [
   ['tools', '?mock=1', '#/tools', 'screens/tools.js'],
   ['tool-run', '?mock=1', '#/tools/run/link_budget', 'screens/tools.js'],
   ['morse', '?mock=1', '#/tools/morse', 'screens/morse.js'],
+  ['morse-send', '?mock=1&torch=yes', '#/tools/morse?tab=send', 'screens/morse_send.js'],
   ['extras', '?mock=1', '#/extras', 'screens/extras.js'],
   ['checklists', '?mock=1', '#/extras/checklists', 'screens/extras.js'],
   ['settings', '?mock=1', '#/settings', 'screens/settings.js'],

@@ -54,6 +54,25 @@ smoke-tested with `--version`/`--help` and uploaded.
   backend, screenshots uploaded) and `--real auto` (the real WASM core). On Ubuntu 24.04 the job
   lifts the AppArmor restriction on unprivileged user namespaces that Chrome's sandbox needs.
 
+  Browser tests and slow or unusual hosts (hosted macOS VMs stretch short timers several-fold, run
+  with the OS "reduce motion" setting on, and let Chrome's fake camera fall to ~9 of 30 fps):
+  - Tests state the environment they are about instead of inheriting the machine's: the start-up
+    screen tests emulate `prefers-reduced-motion: no-preference` (the reduced-motion test emulates
+    `reduce`); anything paced by the clock sends what is due by the clock, not one item per timer
+    tick; recorded media are timed on their own timeline (the `.y4m` light by frame index), live
+    sources by their frames' timestamps, and Morse speeds are matched to the frame rate actually
+    delivered (at least 3 frames per dot, `ui/tests/capture_hook.mjs`).
+  - Exactly one browser test may **skip** on a capability probe (it is reported as skipped, never as
+    passed, also under `EMBER_REQUIRE_BROWSER=1`): `apps/web/test/e2e_morse.test.mjs` "the UI Morse
+    reader … with the real camera path: fake camera .y4m", when Chrome's fake camera delivers fewer
+    than 24 of the file's 30 frames per second (measured for 2 s), because the recorded light then no
+    longer plays in real time. The live-light variant of the same UI path runs everywhere.
+  - Reproducing a slow host locally (macOS): run Chrome at background QoS with a wrapper,
+    `CHROME=<script that execs taskpolicy -b "<Chrome binary>" "$@">`; `EMBER_E2E_CPU_THROTTLE=<n>`
+    applies DevTools CPU throttling to every test page; `EMBER_E2E_CHROME_FLAGS="--force-prefers-reduced-motion"`
+    (or any flags) is added to every launch of the e2e suite. The WebRTC pairing test prints the
+    candidates of both pairing codes and both peer connections' states when it fails.
+
 ### Pages
 
 Triggered when the Web workflow completes successfully for a push to `main` (and by hand:

@@ -69,6 +69,9 @@ class CaptureManager(private val ctx: HostContext, private val core: CoreApi, pr
         return JSONObject()
     }
 
+    /** This app holds a camera right now (the torch cannot be switched then). */
+    fun cameraActive(): Boolean = camera != null
+
     @Synchronized
     fun stopAll() { camera?.stop(); camera = null; mic?.stop(); mic = null }
 

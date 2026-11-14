@@ -44,7 +44,7 @@ export async function launchChrome(chromePath, { extraArgs = [], muteAudio = tru
     '--headless=new', '--remote-debugging-port=0', `--user-data-dir=${userDir}`,
     '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
     '--disable-component-update', '--disable-sync', '--metrics-recording-only', ...(muteAudio ? ['--mute-audio'] : []),
-    ...extraArgs, 'about:blank',
+    ...extraArgs, ...(process.env.EMBER_E2E_CHROME_FLAGS ? process.env.EMBER_E2E_CHROME_FLAGS.split(/\s+/).filter(Boolean) : []), 'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'], detached: process.platform !== 'win32' }); // own process group
   LIVE.add(proc);
   proc.once('exit', () => {
@@ -146,6 +146,10 @@ export async function openPage(cdp, url, { beforeNavigate, newWindow = false } =
   await s('Page.enable');
   await s('Network.enable');
   if (newWindow) await s('Emulation.setFocusEmulationEnabled', { enabled: true }).catch(() => {});
+  // Reproducing slow CI machines locally: EMBER_E2E_CPU_THROTTLE=<factor> slows every page's CPU
+  // (DevTools CPU throttling), EMBER_E2E_CHROME_FLAGS adds launch flags (see docs/CI.md).
+  const throttle = Number(process.env.EMBER_E2E_CPU_THROTTLE || 0);
+  if (throttle > 1) await s('Emulation.setCPUThrottlingRate', { rate: throttle }).catch(() => {});
   if (beforeNavigate) await beforeNavigate(s);
   await s('Page.navigate', { url });
   return {

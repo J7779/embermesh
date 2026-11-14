@@ -29,8 +29,13 @@ interface DeviceServices {
     fun fileSave(name: String, mime: String, data: ByteArray, mode: String = "save")
     fun filePick(accept: String?): PickedFile
 
-    fun flash(patternMs: LongArray)
+    /** host.signal.flash (RPC_API §10): blocks until the pattern finished or was stopped; {used, stopped, timing}. */
+    fun flash(patternMs: LongArray, mode: String = "auto"): JSONObject
     fun tone(patternMs: LongArray, freqHz: Int)
+    /** host.signal.stop: ends a running flash or tone at once (light off, screen restored). */
+    fun stopSignals() {}
+    /** host.info.signal: {torch:"yes"|"no", screen:true}. */
+    fun signalInfo(): JSONObject = JSONObject().put("torch", "no").put("screen", true)
 
     /** Share (mode "share") or save via SAF (mode "save") the installed APK. */
     fun shareApp(mode: String)
@@ -49,7 +54,7 @@ open class NoDeviceServices : DeviceServices {
     override fun qrScan(): String = throw HostError.unsupported("no QR scanner")
     override fun fileSave(name: String, mime: String, data: ByteArray, mode: String) = throw HostError.unsupported("file save unavailable")
     override fun filePick(accept: String?): PickedFile = throw HostError.unsupported("file pick unavailable")
-    override fun flash(patternMs: LongArray) = throw HostError.unsupported("no flash")
+    override fun flash(patternMs: LongArray, mode: String): JSONObject = throw HostError.unsupported("no flash")
     override fun tone(patternMs: LongArray, freqHz: Int) = throw HostError.unsupported("no tone")
     override fun shareApp(mode: String) = throw HostError.unsupported("app sharing unavailable")
 }

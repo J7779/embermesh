@@ -258,6 +258,21 @@ void MorseTiming::take_text(std::string* out) {
 // hand keying that rushes a character gap), splits at the longest internal space that is clearly
 // longer than an element gap and decodes both halves. Prosign names apply per piece.
 std::string MorseTiming::decode_marks(size_t a, size_t b, int depth) const {
+  // A space inside the character that is a character gap at the speed known *now*: the marks
+  // before it were timed while the speed was still unknown (the first element of an over is taken
+  // as a dot, so after a leading dash "T E" looked like one character "N"). Cut there first, as the
+  // real-time gap check would have done with the right speed.
+  if (depth < 3 && b - a >= 2) {
+    double thr = char_threshold();
+    size_t cut = b;
+    double longest = thr;
+    for (size_t i = a; i + 1 < b; ++i)
+      if (i < char_spaces_.size() && char_spaces_[i] > longest) { longest = char_spaces_[i]; cut = i; }
+    if (cut != b) {
+      std::string l = decode_marks(a, cut + 1, depth + 1), r = decode_marks(cut + 1, b, depth + 1);
+      if (!l.empty() && !r.empty()) return l + r;
+    }
+  }
   double split = std::sqrt(dit_ * dah_);
   std::string pat;
   for (size_t i = a; i < b; ++i) pat += char_marks_[i] >= split ? '-' : '.';

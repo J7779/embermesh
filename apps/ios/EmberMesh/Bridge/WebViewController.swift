@@ -109,6 +109,10 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
     placeholder = nil
     revealReason = reason
     LaunchClock.mark("placeholder removed (\(reason))")
+    // ui/README.md "Launch screen": the page holds the still logo until now, so the start-up
+    // animation begins at its first frame the moment it becomes visible. The flag covers a page
+    // whose boot module has not run yet.
+    webView.evaluateJavaScript(WebHost.launchRemovedScript, completionHandler: nil)
     UIAccessibility.post(notification: .screenChanged, argument: webView)
   }
 

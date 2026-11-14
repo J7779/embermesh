@@ -20,8 +20,8 @@ import org.json.JSONObject
  *  2. At the first app frame the system splash is removed WITHOUT a fade; in the same frame this
  *     overlay shows the identical logo, at the size and place the web boot animation's first frame
  *     uses (30 % of the shorter side of the web view, centred in it).
- *  3. When the WebView has committed its first visible frame (onPageCommitVisible + a visual-state
- *     callback, i.e. the page's static logo is on screen) the overlay is removed in one frame, so the
+ *  3. When the WebView has committed its first visible frame (onPageCommitVisible; onPageFinished
+ *     before API 23) the overlay is removed in the same frame the page's first frame is drawn, so the
  *     animation appears to start from the still image. A 6 s timeout removes it in any case.
  * After step 3 nothing native (views, timers, animators) remains.
  */
@@ -81,9 +81,10 @@ class LaunchHandover(private val activity: Activity, private val root: FrameLayo
     fun webCommitted(wv: WebView) {
         if (overlay == null || timeline.has("web_commit_ms")) return
         mark("web_commit_ms")
-        if (Build.VERSION.SDK_INT >= 23) wv.postVisualStateCallback(1L, object : WebView.VisualStateCallback() {
-            override fun onComplete(requestId: Long) { main.post { remove("web_frame") } }
-        }) else main.post { remove("web_frame") }
+        // onPageCommitVisible: the web view draws the page's first frame in its next draw, which is the
+        // same main-thread frame in which the overlay disappears — remove it now, not a frame later
+        // (the page's boot animation starts right away and must not run under the overlay).
+        main.postAtFrontOfQueue { remove("web_frame") }
     }
 
     fun remove(why: String) {

@@ -82,7 +82,7 @@ export default async function render(app, _params, root) {
       p.motion, v => save('motion', v, 'Animation: ' + v), motionNote),
     choice('Start-up animation', 'boot', [{ value: 'full', label: 'Full' }, { value: 'short', label: 'Short' }, { value: 'off', label: 'Off' }],
       p.boot_animation, v => save('boot_animation', v, 'Start-up animation: ' + v),
-      h('p', { class: 'muted small' }, 'Never delays the app: it ends as soon as the app is ready or when you tap.')));
+      h('p', { class: 'muted small' }, 'Plays each time the app starts, also when your device is set to reduce motion: Full about 2.5 seconds, Short about 1 second. Tap or press any key to skip it. To stop it, choose Off here, set Animation to Reduced or Off, or turn on Simple mode.')));
 
   // ---- reading and touch
   const spacing = switchRow('Extra reading space', 'More space between letters, words and lines. Can help with dyslexia. No extra fonts are downloaded.', p.reading_spacing,
@@ -126,6 +126,8 @@ export default async function render(app, _params, root) {
     contrastNote.classList.toggle('on', q.high_contrast === null);
     const why = { system: 'your system asks for reduced motion', low_power: 'low-power mode limits animation', simple_mode: 'Simple mode limits animation', test: 'motion is switched off for testing', default: '', preference: '' }[e.why.motion] || '';
     motionNote.textContent = (q.motion === 'system' ? 'Following the system: ' : 'Now: ') + ({ full: 'full animation', reduced: 'reduced animation', off: 'no animation' }[e.motion]) + (why ? ' — ' + why + '.' : '.');
+    // the launch animation does not follow the system setting (RPC_API §8): say so where it matters
+    if (q.motion === 'system' && e.motion !== 'full') motionNote.textContent += ' The start-up animation still plays (see below).';
     motionNote.classList.toggle('on', q.motion === 'system');
     const srEl = page.querySelector('#a11y-sr-state');
     if (srEl) srEl.textContent = e.screenReader ? 'A screen reader is running on this device.' : '';

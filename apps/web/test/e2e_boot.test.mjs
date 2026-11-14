@@ -2,7 +2,8 @@
 // the static site, the single file from file://, and the offline PWA with the server gone.
 //   - the first paint is the static logo (never a blank page); the boot screen hands over by
 //     itself, is skipped by a click, and never holds up the node (node.info answers while it runs)
-//   - prefers-reduced-motion: reduce (emulated) -> the calm variant and html[data-motion="reduced"]
+//   - prefers-reduced-motion: reduce (emulated) -> the start-up animation still full (only in-app
+//     settings change it), the rest of the UI html[data-motion="reduced"]
 //   - Simple mode persists across a reload
 //   - first paint / time-to-interactive with and without the boot screen (diagnostics)
 // Under automation the UI skips the boot screen (navigator.webdriver); these tests present
@@ -29,9 +30,13 @@ const PROBE = `
     const el = document.getElementById('ember-boot'); __probe.firstPaintBoot = !!(el && getComputedStyle(el).display !== 'none' && el.querySelector('svg'));
   } }).observe({ type: 'paint', buffered: true });`;
 
+// The machine's own reduce-motion setting decides the start-up variant (the product honours it;
+// hosted macOS runners have it switched on). Every test states the preference it is about, so the
+// result does not depend on the machine: no-preference unless a test passes its own.
 const person = (extra = []) => async (send) => {
   await send('Page.addScriptToEvaluateOnNewDocument', { source: PERSON + PROBE });
-  if (extra.length) await send('Emulation.setEmulatedMedia', { features: extra });
+  const features = [{ name: 'prefers-reduced-motion', value: 'no-preference' }, ...extra.filter((f) => f.name !== 'prefers-reduced-motion'), ...extra.filter((f) => f.name === 'prefers-reduced-motion')];
+  await send('Emulation.setEmulatedMedia', { features: Object.values(Object.fromEntries(features.map((f) => [f.name, f]))) });
 };
 
 // lib/prefs.js reflects the preferences on <html data-simple/-motion> once the app has loaded it.
@@ -70,12 +75,18 @@ async function checkBoot(t, P, label) {
   const s = await bootSample(P);
   assert.ok(s, `${label}: the start-up screen was showing while the node answered`);
   assert.match(s.id, /^[0-9a-f]{16}$/);
-  assert.ok(['full', 'short'].includes(s.variant), `${label}: variant ${s.variant}`);
+  // RPC_API §8: the full animation on every load, whatever the timing; the documented fallback is
+  // the calm variant only where the machine cannot give a 2D canvas (the page detects it itself)
+  const cap = await P.evaluate(`({ canvas2d: (() => { try { return typeof Path2D === 'function' && !!document.createElement('canvas').getContext('2d'); } catch { return false; } })(),
+    reduce: matchMedia('(prefers-reduced-motion: reduce)').matches, webdriver: navigator.webdriver, lowpower: document.documentElement.dataset.lowpower, boot: globalThis.__emberBoot && __emberBoot.canvas })`);
+  assert.equal(s.variant, cap.canvas2d ? 'full' : 'reduced', `${label}: variant ${s.variant} (inputs: ${JSON.stringify(cap)})`);
   assert.equal(tm.firstPaintBoot, true, `${label}: the first paint shows the static logo`);
   const ready = await tti(P);
   await P.waitFor(`globalThis.__emberBoot && !__emberBoot.active`, 8000);
   const reason = await P.evaluate('__emberBoot.reason');
   assert.ok(!/tap|key|skip|click/.test(reason), `${label}: handed over by itself (${reason})`);
+  const at = await P.evaluate('__emberBoot.at');
+  if (s.variant === 'full') assert.ok(at.out - at.frame0 >= 2400 - 20, `${label}: the whole animation played from its first frame (${JSON.stringify(at)})`);
   await P.waitFor(`(() => { const e = document.getElementById('ember-boot'); return !e || getComputedStyle(e).display === 'none' || e.hidden; })()`, 5000);
   t.diagnostic(`${label}: first paint ${tm.fp} ms, first contentful paint ${tm.fcp} ms (the static logo), interactive ${ready} ms, node.info ${s.ms.toFixed(1)} ms during the ${s.variant} animation, handed over: ${reason}`);
   return { ...tm, tti: ready };
@@ -89,6 +100,9 @@ test('static site: static logo first, node answers during the animation, hands o
   const P = await nodePage(b, `${srv.url}index.html?nohub=1&profile=bootsite`, { beforeNavigate: person() });
   t.after(() => P.close());
   const withBoot = await checkBoot(t, P, 'site');
+  // a reload (the app's state now warm, the node ready at once) plays the same full animation
+  await P.reloadNode();
+  await checkBoot(t, P, 'site, reloaded');
   const Q = await nodePage(b, `${srv.url}index.html?nohub=1&noboot=1&profile=bootsite2`, { beforeNavigate: person() });
   t.after(() => Q.close());
   const nb = await timings(Q);
@@ -115,14 +129,17 @@ test('a click skips the start-up screen at once', { skip, timeout: 60000 }, asyn
   assert.deepEqual(realErrors(P.errors), []);
 });
 
-test('prefers-reduced-motion: reduce -> calm start-up variant and html[data-motion="reduced"]', { skip, timeout: 60000 }, async (t) => {
+test('prefers-reduced-motion: reduce -> the start-up animation still plays in full (owner decision), the rest of the UI html[data-motion="reduced"]', { skip, timeout: 60000 }, async (t) => {
   const b = await startBrowser(); if (b.error) { t.skip(b.error); return; }
   cleanups.push(() => b.close());
   const srv = await startServer(DIST_DIR);
   cleanups.push(() => srv.close());
   const P = await nodePage(b, `${srv.url}index.html?nohub=1&profile=bootcalm`, { beforeNavigate: person([{ name: 'prefers-reduced-motion', value: 'reduce' }]) });
   t.after(() => P.close());
-  assert.equal(await P.evaluate('__emberBoot.variant'), 'reduced');
+  // RPC_API §8: only the app's own settings change the launch animation, not the platform's
+  const cap = await P.evaluate(`({ v: __emberBoot.variant, os: __emberBoot.osReduce, canvas2d: (() => { try { return typeof Path2D === 'function' && !!document.createElement('canvas').getContext('2d'); } catch { return false; } })() })`);
+  assert.equal(cap.os, true, 'the page sees the platform asking for reduced motion');
+  assert.equal(cap.v, cap.canvas2d ? 'full' : 'reduced', `variant with the platform setting on: ${JSON.stringify(cap)}`);
   assert.equal((await P.call('host.info')).accessibility.reduce_motion, true, 'host.info.accessibility follows the media query');
   // the platform setting changes while the app runs -> host.accessibility event
   await P.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });

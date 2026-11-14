@@ -65,36 +65,37 @@ export function frameAt(tl, t) {
   return o;
 }
 
-export const KEYS = { prefs: 'ember.ui.', theme: 'embermesh.ui.theme', seen: 'embermesh.ui.boot_seen' };
+export const KEYS = { prefs: 'ember.ui.', theme: 'embermesh.ui.theme' };
 
 /**
- * Preferences mirrored in local storage by lib/prefs.js (RPC_API.md §8) as JSON under
- * `ember.ui.<name>`; `ds` (<html> data-motion/-simple/-theme/-lowpower) wins when present.
+ * The person's own choices, mirrored in local storage by lib/prefs.js (RPC_API.md §8) as JSON under
+ * `ember.ui.<name>`, and html[data-simple]. Not html[data-motion]: that is the effective motion,
+ * which also folds in low-power mode — and low power does not change the start-up animation.
  */
 export function readPrefs(store, ds = {}) {
-  let ok = !!store;
-  const raw = k => { try { return store ? store.getItem(k) : null; } catch { ok = false; return null; } };
-  const val = k => { const r = raw(k); if (r == null) return null; try { return JSON.parse(r); } catch { return r; } };
+  const val = k => { let r = null; try { r = store ? store.getItem(k) : null; } catch { /* blocked */ } if (r == null) return null; try { return JSON.parse(r); } catch { return r; } };
   const prefs = {};
   for (const k of ['boot_animation', 'motion', 'simple_mode']) { const v = val(KEYS.prefs + k); if (v !== null) prefs[k] = v; }
-  if (['system', 'full', 'reduced', 'off'].includes(ds.motion)) prefs.motion = ds.motion;
   if (ds.simple === '1' || ds.simple === 'true') prefs.simple_mode = true;
   const lk = Object(val(KEYS.theme)), th = ['dark', 'light', 'night'];
-  const theme = th.includes(lk.theme) ? lk.theme : th.includes(ds.theme) ? ds.theme : 'dark';
-  const seen = raw(KEYS.seen) !== null;
-  return { prefs, theme, lowPower: !!lk.low_power || ds.lowpower === '1', seen: seen || !ok };
+  return { prefs, theme: th.includes(lk.theme) ? lk.theme : th.includes(ds.theme) ? ds.theme : 'dark' };
 }
 
-/** 'none' | 'off' (one static frame) | 'reduced' | 'short' | 'full'. o = {query, webdriver, prefs, lowPower, osReduce, seen, readyEarly, late} */
+/**
+ * 'none' | 'off' (one static frame) | 'reduced' | 'short' | 'full'. Full on every platform and every
+ * page load unless the person chose otherwise IN THE APP: boot_animation short/off, Motion explicitly
+ * Reduced/Off (not "Follow system"), Simple mode — or a test hook. The OS reduce-motion setting, low
+ * power, being ready early, seen before or a late start do not change it. o = {query, webdriver, prefs}
+ */
 export function chooseVariant(o) {
   const q = k => (o.query && o.query.get ? o.query.get(k) : null), p = o.prefs || {}, forced = q('boot');
   if (q('noboot') === '1') return 'none';
   if (['full', 'short', 'reduced', 'off'].includes(forced)) return forced;
   if (o.webdriver) return 'none';
-  if (p.boot_animation === 'off') return 'off';
-  const motion = q('motion') || p.motion || 'system';
-  if (motion === 'off' || motion === 'reduced' || p.simple_mode === true || o.lowPower || (motion !== 'full' && o.osReduce)) return 'reduced';
-  return p.boot_animation === 'short' || o.seen || o.readyEarly || o.late ? 'short' : 'full';
+  const motion = q('motion') || p.motion;
+  if (p.boot_animation === 'off' || motion === 'off') return 'off';
+  if (motion === 'reduced' || p.simple_mode === true) return 'reduced';
+  return p.boot_animation === 'short' ? 'short' : 'full';
 }
 
 /**

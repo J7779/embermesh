@@ -321,9 +321,12 @@ class FieldsTest {
 
 class HostRouterLogicTest {
     @Test fun patternAndNames() {
-        assertArrayEquals(longArrayOf(100, 0, 10000), HostRouter.pattern(JSONObject().put("pattern_ms", JSONArray(listOf(100, -5, 99999)))))
-        try { HostRouter.pattern(JSONObject()); fail() } catch (e: HostError) { assertEquals("bad_params", e.code) }
-        try { HostRouter.pattern(JSONObject().put("pattern_ms", JSONArray(List(100) { 10000 }))); fail() } catch (e: HostError) { assertEquals("too_large", e.code) }
+        assertArrayEquals(longArrayOf(100, 10, 60000), HostRouter.pattern(JSONObject().put("pattern_ms", JSONArray(listOf(100, 10, 60000)))))
+        for (bad in listOf(JSONObject(), JSONObject().put("pattern_ms", JSONArray(listOf(100, -5))), JSONObject().put("pattern_ms", JSONArray(listOf(99999))),
+                JSONObject().put("pattern_ms", JSONArray(listOf(100.5))), JSONObject().put("pattern_ms", JSONArray(listOf("100"))),
+                JSONObject().put("pattern_ms", JSONArray(List(11) { 60000 })), JSONObject().put("pattern_ms", JSONArray(List(4097) { 10 })))) {
+            try { HostRouter.pattern(bad); fail(bad.toString()) } catch (e: HostError) { assertEquals("bad_params", e.code) }
+        }
         assertEquals("passwd", HostRouter.sanitizeFileName("../../etc/passwd"))
         assertEquals("a b.txt", HostRouter.sanitizeFileName("a<b>\u0001 b.txt".replace("<b>", "")))
         assertEquals("ember-file", HostRouter.sanitizeFileName("..."))

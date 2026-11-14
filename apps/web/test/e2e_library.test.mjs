@@ -126,3 +126,27 @@ test('single file from file:// with the guide pack inlined: node, guide, loopbac
   assert.deepEqual(realErrors(A.errors), []);
   assert.deepEqual(realErrors(B.errors), []);
 });
+
+test('Morse → Send on the real browser host: host.signal.flash (screen) times itself, host.signal.stop ends a flash, host.info.signal', { skip, timeout: 60000 }, async (t) => {
+  if (!needBrowser(t)) return;
+  const srv = await startServer(DIST_DIR);
+  cleanups.push(() => srv.close());
+  const P = await nodePage(browser, `${srv.url}index.html?nohub=1&profile=signal`);
+  cleanups.push(() => P.close());
+  const host = await P.call('host.info');
+  assert.deepEqual(host.signal, { torch: 'no', screen: true }, 'desktop Chrome: screen yes, no flashlight it can switch');
+  assert.ok(!host.features.includes('torch'));
+  const r = await P.call('host.signal.flash', { pattern_ms: [200, 200, 200], mode: 'screen' });
+  assert.equal(r.used, 'screen');
+  assert.equal(r.stopped, false);
+  assert.equal(typeof r.timing.max_late_ms, 'number');
+  t.diagnostic(`screen flash: ${JSON.stringify(r)}`);
+  // a long flash, stopped from outside
+  await P.evaluate(`(globalThis.__long = __emberWasmBackend.call('host.signal.flash', { pattern_ms: [60000], mode: 'screen' }), true)`);
+  await P.waitFor(`[...document.body.children].some((e) => e.style && e.style.position === 'fixed' && e.style.zIndex === '2147483647')`, 5000);
+  await P.call('host.signal.stop');
+  const stopped = await P.evaluate('globalThis.__long', 10000);
+  assert.equal(stopped.stopped, true);
+  assert.equal(await P.evaluate(`[...document.body.children].some((e) => e.style && e.style.position === 'fixed' && e.style.zIndex === '2147483647')`), false, 'overlay removed');
+  assert.deepEqual(realErrors(P.errors), []);
+});

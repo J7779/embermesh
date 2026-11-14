@@ -123,4 +123,37 @@ TEST_CASE("an undecodable element group is reported as a white square, never dro
   CHECK(out.find('S') == 0);
 }
 
+
+// Cold start: the first element of an over is taken as a dot until the speed is known. A message
+// that starts with a dash used to fuse its first letters ("TEST" -> "NST", "TE" -> "N"); the gap
+// that is a character gap at the speed learned since must still separate them.
+TEST_CASE("timing: a message starting with a dash is read right from its first letter") {
+  struct K { const char* text; const char* morse; };
+  // element patterns with explicit letter gaps (' ') at 100 ms dots
+  const K cases[] = {{"TEST", "- . ... -"}, {"TE", "- ."}, {"MOM", "-- --- --"}, {"TEN", "- . -."}};
+  for (const K& k : cases) {
+    CAPTURE(k.text);
+    modem::MorseTiming t;
+    double ms = 0, dot = 100;
+    bool first = true;
+    for (const char* p = k.morse; *p; ++p) {
+      if (*p == ' ') { ms += 2 * dot; t.advance(ms); continue; }  // + the element gap = 3 units
+      if (!first) { /* element gap already added */ }
+      first = false;
+      double len = *p == '-' ? 3 * dot : dot;
+      t.key(true, ms);
+      ms += len;
+      t.key(false, ms);
+      ms += dot;
+      t.advance(ms);
+    }
+    ms += 20 * dot;
+    t.advance(ms);
+    std::string out;
+    t.take_text(&out);
+    while (!out.empty() && out.back() == ' ') out.pop_back();
+    CHECK(out == k.text);
+  }
+}
+
 }  // TEST_SUITE

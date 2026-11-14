@@ -114,8 +114,17 @@ interface UiHost {
     /** Screen-on flag while true (host.keep_awake). */
     fun setKeepScreenOn(on: Boolean)
 
-    /** Brightness / full-screen white flash for host.signal.flash fallback when there is no torch. */
+    /** The activity is visible (started); a screen flash is only possible then. */
+    fun isInFront(): Boolean = true
+
+    /** Screen flash session: save brightness and window flags, keep the screen on. Main thread. */
+    fun screenFlashBegin() {}
+
+    /** Full-screen white (on) or the page (off) at maximum brightness, for host.signal.flash. Main thread. */
     fun setScreenFlash(on: Boolean) {}
+
+    /** End of a screen flash: light off, previous brightness and window flags restored exactly. Main thread. */
+    fun screenFlashEnd() {}
 
     /**
      * Shows [view] (a native camera preview) over the page at [rectCss] {x,y,w,h} in CSS pixels of

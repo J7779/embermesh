@@ -188,23 +188,32 @@ first frame of the start-up animation (`index.html` `#ember-boot`, `css/boot.css
   from a document-start script. The page then draws its first frame exactly over the native logo;
   after a rotation it falls back to the centred rule. iOS does this; Android should use the same
   names.
-* **Hand-over:** remove the native placeholder instantly (no fade) once the page has painted. When
-  `launchLogo` is present the page holds the still image ~140 ms before animating; a host that knows
-  the moment its placeholder is gone may dispatch `window.dispatchEvent(new Event('ember:launch-removed'))`
-  to start at once.
+* **Hand-over:** remove the native placeholder instantly (no fade) once the page has painted, and
+  in the same moment tell the page: `window.__emberHost.launchRemoved = true` and
+  `window.dispatchEvent(new Event('ember:launch-removed'))` (iOS and Android do both). The page
+  holds the still logo until then (at most 1.5 s without the signal), so the animation's frame 0 is
+  the first frame anyone sees — never drawn behind the native screen, never "late".
 
-The start-up animation itself: `js/boot/timeline.js` (timelines, variant choice, hand-over state
-machine — pure), `js/boot/scene.js` (3D renderer on a 2D canvas), `js/boot/boot.js` (DOM glue).
-Variants: `full` (~2.4 s, first launch), `short` (~1.25 s, later launches, `boot_animation:"short"`,
-or when the app is already ready), `reduced` (static logo, wordmark fades; reduce motion, `motion`
-`reduced`/`off`, Simple mode, low-power mode), `off` (one static frame). It ends when its minimum
-time has passed and the app has rendered its first screen, at once on any tap/click/key or when a
-dialog or toast appears, and at a 2.9 s hard cap. Test hooks: `?noboot=1` and `navigator.webdriver`
-skip it, `?boot=full|short|reduced|off` forces a variant (also under automation),
-`?bootpause=<ms>` freezes at that time (past the end: into the hand-over) with
-`window.__emberBoot.seek(ms)` for stills. It reads the mirrored preferences from local storage
-(`ember.ui.<name>` JSON keys written by `js/lib/prefs.js`, `embermesh.ui.theme`) and records
-`embermesh.ui.boot_seen`.
+**The animation is the same on every platform** (docs/RPC_API.md §8): every page load — a cold start
+of a native app, a browser visit, a reload — plays the **full** animation (2.4 s + ~0.6 s hand-over).
+Returning from the background does not replay it (the page is not reloaded). Being ready early,
+having seen it before, a late start, low-power mode and the platform's reduce-motion setting do not
+change it (owner decision; the rest of the UI follows the platform setting; the animation has no
+flashing). The app loads underneath and the hand-over waits for the animation. Only choices made in
+the app do: `boot_animation` `short` (1.25 s) / `off` (one still frame); Motion explicitly `reduced`
+→ `reduced` (still logo, the name fades in), explicitly `off` → `off`; Simple mode → `reduced`. Any
+tap/click/key skips it at once, so does a dialog or toast; a 2.9 s cap counts from its first frame.
+The Accessibility screen states this next to the setting.
+Where no 2D canvas exists (very old or locked-down web views) the `reduced` variant is shown.
+
+Code: `js/boot/timeline.js` (timelines, variant choice, hand-over state machine — pure),
+`js/boot/scene.js` (3D renderer on a 2D canvas), `js/boot/boot.js` (DOM glue). Test hooks:
+`?noboot=1` and `navigator.webdriver` skip it, `?boot=full|short|reduced|off` forces a variant (also
+under automation), `?bootpause=<ms>` freezes at that time (past the end: into the hand-over) with
+`window.__emberBoot.seek(ms)` for stills. Read-only diagnostics: `window.__emberBoot = {variant,
+active, reason, canvas, osReduce, at:{module, frame0, removed?, ready?, out?, done?}}`. It reads the person's
+choices from local storage (`ember.ui.<name>` JSON keys written by `js/lib/prefs.js`, theme from
+`embermesh.ui.theme`) and stores nothing (an old `embermesh.ui.boot_seen` marker is removed).
 
 ## Accessibility and Simple mode
 

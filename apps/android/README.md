@@ -86,7 +86,7 @@ Note: `connectedDebugAndroidTest` uninstalls the app afterwards (its data is gon
 | Native capture sources `capture_camera_luma` (Camera2, 640×480 YUV, ≈30 fps, exposure + white balance locked after 1.5 s, torch off, ROI luma from the Y plane, sensor timestamps) and `capture_mic_pcm` (AudioRecord, UNPROCESSED where available, resampled to the session rate) run on the emulator and call `morse.rx.feed` | `MorseCaptureTest.realCameraDeliversLumaFrames`, `realMicDeliversPcm` |
 | The core decodes a generated blinking light (SOS SOS, 10 WPM, 30 fps, ±2 ms frame jitter, exposure noise → "SOS SOS", 9.7 WPM estimated) and a keyed 700 Hz tone at 48 kHz (CQ CQ, 15 WPM → "CQ CQ", resampled to 8 kHz) fed through those sources' own frame/PCM paths | `MorseCaptureTest.syntheticBlinkingLightDecodes`, `syntheticToneDecodes` |
 | Morse microphone capture while an audio-modem link holds the microphone: both keep receiving audio | `MorseCaptureTest.micCaptureCoexistsWithAudioLink` |
-| Morse sending: torch keyed by an absolute-deadline keyer on an URGENT_DISPLAY thread; on the emulator's virtual torch the switch-call midpoint is within ±1.0–3.8 ms (p95) of schedule at 20/12/5 WPM, < 1 ms mean, < 1 ms drift over "PARIS PARIS" (`host.signal.stats`). Tone sending is sample-accurate (element lengths are sample counts on the audio clock) | `MorseCaptureTest.flashKeyingTiming`, `keyerHasNoDrift` |
+| Morse sending by light (RPC_API §10): `host.signal.flash` resolves with `{used, stopped, timing}`; modes auto/torch/screen; `host.signal.stop` ends a flash in 1–3 ms with the torch off; a second flash stops the first; limits → `bad_params`; the screen flash restores brightness, keep-screen-on and the window foreground exactly, also when the app goes to the background mid-flash; with this app's camera reader holding the camera, `auto` uses the screen and `torch` returns `busy`. On the emulator's virtual torch (its only flash unit is on the front camera, so the tests opt in to it; production requires a back camera): mean edge lateness 0.2–0.5 ms, worst 2–10 ms, drift ≤ 1.3 ms over "PARIS PARIS" at 5/12/20 WPM, `setTorchMode` ≈ 1 ms per call. Tone sending is sample-accurate | `LightSendingTest`, `MorseCaptureTest.flashKeyingTiming`, `LightSenderTest` (JVM: drift, stop, limits, modes, camera busy) |
 | Handheld on VOX through the virtual cable (VOX model: envelope detector, the first 250 ms of every transmission clipped, 400 ms hang) with the core's `handheld_vox` preset (400 ms VOX tone, 600 ms lead-in): frames decode | `AudioModemTest.handheldVoxPresetSurvivesVoxClipping` |
 | Big guide packs mapped from the APK, never copied: the real 41 MB pack (4999 guides) — release APK 47.1 MB, cold start 0.50–0.66 s, native heap 2.4 MB, `guides.categories` 0.5 ms, search 38 ms; a synthetic 49.9 MB pack (5316 guides) — release APK 54 MB, cold start 0.80–0.95 s, search 48 ms. The hub copies the pack once into its web root for guests (as much extra storage as the pack). Passing a 47 MB APK over Bluetooth takes minutes; the hub's `/download/EmberMesh.apk` over Wi-Fi is the fast way | manual check + `RealCoreTest.guidesMemoryMappedFromApk` with `-PemberGuidesPack=<50 MB pack>` |
 
@@ -151,8 +151,9 @@ These are additive; the shared UI may ignore them.
   `capture_camera_luma`, `capture_mic_pcm`); extras: `sample_rate` for `mic_pcm` (the session's rate,
   default 8000) and `host.capture.status` (frames, fps, exposure lock, level, samples, feeds, last
   error). The camera preview is a native view over the page at the CSS-pixel `rect`.
-- `host.signal.stats` → `{flash:{edges, late_mean_ms, abs_p95_ms, abs_max_ms, call_mean_ms,
-  total_error_ms, light:"torch"|"screen"}}` for the last `host.signal.flash`.
+- `host.signal.stats` → `{flash: timing}` of the last `host.signal.flash` (the same object as its
+  result's `timing`: the standard `max_late_ms, mean_late_ms, edges` plus `abs_p95_ms, abs_max_ms,
+  call_mean_ms, call_max_ms, total_error_ms, light`).
 - `host.endpoints.scan {kind:"audio"}` ("Connect a radio"): the phone's likely radio interfaces with
   complete configs — `{id, name, detail, config:{input_device, output_device, ptt, ptt_line?},
   link:{type:"audio", config:{preset}}}`: AIOC (one composite USB device: sound card + CDC serial,
@@ -198,7 +199,27 @@ Device services:
 - `host.location.*`: GPS through LocationManager; works with no network.
 - `host.qr.scan`: camera plus ZXing.
 - `host.file.save/pick`: Storage Access Framework or the share sheet; picks are limited to 32 MB.
-- `host.signal.flash`: camera torch, falling back to a white screen.
+- `host.signal.flash` / `host.signal.stop` (RPC_API §10, Morse sending by light):
+  - **Torch** through `CameraManager.setTorchMode` only — no CAMERA permission, no camera session —
+    on the back camera's flash unit (`host.info.signal.torch` is `"yes"` only then, else `"no"`;
+    Android never needs `"ask"`). While any camera is open (this app's QR scanner or Morse camera
+    reader, or another app; seen through the torch callback) the torch is busy: `auto` uses the
+    screen, `torch` returns `busy`. The app never competes for the camera.
+  - **Screen**: a white full-window overlay at maximum brightness, only while the app is in front;
+    brightness, keep-screen-on and the window foreground are saved and restored exactly. The light
+    hides the page's own Stop button, so a tap anywhere stops a screen flash (the tap is not passed
+    to the page).
+  - **Result**: `{used, stopped, timing:{max_late_ms, mean_late_ms, edges, …}, fallback?}` — `fallback`
+    is `"no_torch"` or `"busy"` when `auto` used the screen although a torch was wanted.
+  - **Timing**: edges are deadlines on `SystemClock.elapsedRealtimeNanos()` from the pattern start, on
+    a dedicated URGENT_DISPLAY thread (a late edge shortens the next interval, no drift); each switch
+    call starts early by half its measured duration. `timing` reports mean and worst lateness.
+  - **The light always goes off**: at the end, on `host.signal.stop`, a new flash or tone, an error,
+    `onStop` (background, screen off, lock), the page reloading or its renderer dying, and runtime
+    shutdown. Nothing about the pattern is logged or stored; page console output reaches logcat only
+    in debuggable builds.
+  - Real-phone torch latency (`setTorchMode` takes about 1 ms on the emulator) and the lamp's own
+    rise time are not measured.
 - `host.signal.tone`: sine tone with ramps.
 - `host.notify`, `host.keep_awake`.
 
@@ -274,7 +295,7 @@ No keystore is part of this repository and none must ever be committed (`.gitign
 | `BLUETOOTH_SCAN` (`neverForLocation`), `BLUETOOTH_CONNECT`, `BLUETOOTH_ADVERTISE` (runtime, 12+) | BLE phone-to-phone mesh, BLE TNCs / Meshtastic, Bluetooth SPP |
 | `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` (runtime) | GPS position for SOS and check-ins (only when the user shares it); also needed for Bluetooth / Wi-Fi scans on Android 11 and older |
 | `RECORD_AUDIO` (runtime), `MODIFY_AUDIO_SETTINGS` | Audio soft modem, Morse audio receive, Bluetooth SCO routing |
-| `CAMERA` (runtime) | QR scanning, Morse light receive, torch for sending Morse (`setTorchMode` needs no permission) |
+| `CAMERA` (runtime) | QR scanning and Morse light receive only. Sending Morse with the torch uses `setTorchMode`, which needs no permission, and never asks for this one |
 | `VIBRATE` | Notification vibration for messages and SOS |
 | `POST_NOTIFICATIONS` (runtime, 13+) | New messages, SOS alerts, the "relaying" notification |
 | `WAKE_LOCK` | Keep relaying with the screen off while a link needs the CPU |
@@ -320,8 +341,8 @@ place of the web boot animation's first frame (ui/README.md "Launch screen"; `LO
    colour only on 5.x); from 12 the system splash shows `drawable-v31/splash_icon` (no icon animation).
 2. In the activity's first frame a native overlay (`ui/LaunchHandover.kt`) shows the same logo; the
    system splash is removed at that moment without a fade.
-3. When the web view has committed its first visible frame (`onPageCommitVisible` + a visual-state
-   callback) the overlay is removed in one frame and the page gets `ember:launch-removed` (so the
+3. When the web view has committed its first visible frame (`onPageCommitVisible`) the overlay is
+   removed in the same frame the page's first frame is drawn and the page gets `ember:launch-removed` (so the
    animation starts at once). A 6 s timeout removes it in any case. Nothing native
    (views, timers, animators) remains after the hand-over.
 

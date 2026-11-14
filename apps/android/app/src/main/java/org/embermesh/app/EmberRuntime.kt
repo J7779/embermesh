@@ -140,6 +140,7 @@ object EmberRuntime : OutboxSink, AppControls {
         File(appContext.filesDir, "links.json").delete()
         services = DeviceServicesFactory.create(hostContext)
         capture = org.embermesh.app.capture.CaptureManager(hostContext, r) { org.embermesh.app.util.Perms.ensure(hostContext, it) }
+        (services as? org.embermesh.app.services.AndroidDeviceServices)?.cameraInUseByApp = { capture?.cameraActive() == true }
         router = HostRouter(hostContext, r, registry, links, services, this, capture)
         r.start()
         started = true

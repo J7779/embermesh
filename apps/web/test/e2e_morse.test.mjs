@@ -94,6 +94,36 @@ const PAGE_HELPERS = `(() => {
   if (globalThis.__morseCap) return true;
   const B = () => globalThis.__emberWasmBackend;
   globalThis.__morseCap = {
+    /**
+     * A recorded light (Chrome's fake camera playing a .y4m file): every frame through
+     * MediaStreamTrackProcessor, timed on the file's own timeline (frame n = n / fps). The fake
+     * device advances one file frame per frame it manages to produce, so on a starved machine the
+     * file plays slower than real time and wall-clock frame timestamps no longer match the light;
+     * the frame index always does. (A real lamp needs no such thing: see light() below.)
+     */
+    fileLight(stream, session, fps) {
+      if (typeof MediaStreamTrackProcessor !== 'function') return this.light(stream, session);
+      const reader = new MediaStreamTrackProcessor({ track: stream.getVideoTracks()[0] }).readable.getReader();
+      const c = new OffscreenCanvas(16, 12);
+      const g = c.getContext('2d', { willReadFrequently: true });
+      let times = [], levels = [], frames = 0, stop = false;
+      (async () => {
+        while (!stop) {
+          const { value: f, done } = await reader.read();
+          if (done || stop) { if (f) f.close(); break; }
+          g.drawImage(f, 0, 0, 16, 12); f.close();
+          const d = g.getImageData(4, 3, 8, 6).data;
+          let sum = 0; for (let i = 0; i < d.length; i += 4) sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          times.push(Math.round((frames * 1000) / fps)); levels.push(sum / (d.length / 4) / 255); frames++;
+        }
+      })();
+      const pump = setInterval(() => {
+        if (!levels.length) return;
+        const p = { session, times_ms: times, levels }; times = []; levels = [];
+        B().call('morse.rx.feed', p).catch((e) => { globalThis.__morseErr = e.message; });
+      }, 100);
+      return { frames: () => frames, stop() { stop = true; clearInterval(pump); reader.cancel().catch(() => {}); stream.getTracks().forEach((t) => t.stop()); } };
+    },
     /** Brightness of the centre of every video frame -> morse.rx.feed {times_ms, levels} every 100 ms. */
     light(stream, session, { clock = 'media' } = {}) {
       const v = document.createElement('video');
@@ -208,7 +238,7 @@ const needMedia = (t) => {
   return true;
 };
 
-test('(a) camera Morse: fake camera plays a blinking light (.y4m) -> brightness samples -> morse.rx transcript', { skip, timeout: 150000 }, async (t) => {
+test('(a) camera Morse: fake camera plays a blinking light (.y4m) -> brightness samples -> morse.rx transcript', { skip, timeout: 200000 }, async (t) => {
   if (!needMedia(t)) return;
   const P = await nodePage(media.browser, `${media.srv.url}index.html?nohub=1&profile=morsecam`);
   t.after(() => P.close());
@@ -216,11 +246,11 @@ test('(a) camera Morse: fake camera plays a blinking light (.y4m) -> brightness 
   assert.ok(host.features.includes('camera'), `camera feature: ${JSON.stringify(host.unavailable_features)}`);
   const pending = await morseSupported(P);
   if (pending) { t.todo(pending); return; }
-  t.diagnostic(`timer drift before capture: ${await waitQuiet([P], 60000)} ms`); // real-time capture: not while the machine is saturated
   const { session } = await P.call('morse.rx.start', { source: 'light' });
   await P.evaluate(PAGE_HELPERS);
-  await P.evaluate(`navigator.mediaDevices.getUserMedia({ video: { width: 64, height: 48, frameRate: 30 } }).then((s) => { globalThis.__cap = __morseCap.light(s, ${JSON.stringify(session)}); return true; })`);
-  const st = await waitTranscript(P, session, LIGHT_TEXT, 45000);
+  await P.evaluate(`navigator.mediaDevices.getUserMedia({ video: { width: 64, height: 48, frameRate: 30 } }).then((s) => { globalThis.__cap = __morseCap.fileLight(s, ${JSON.stringify(session)}, 30); return true; })`);
+  // the file loops; a starved fake device plays it up to ~3x slower, so allow a few loops
+  const st = await waitTranscript(P, session, LIGHT_TEXT, 120000);
   t.diagnostic(`camera: transcript "${st.transcript}", wpm ${st.wpm}, quality ${st.quality}, frames ${await P.evaluate('__cap.frames()')}`);
   const ev = await P.events('morse.text');
   assert.ok(ev.some((e) => e.session === session && e.source === 'light'), 'morse.text events');
@@ -553,13 +583,8 @@ test('rf.radios: the offline radio database answers in the browser (Baofeng UV-5
   assert.deepEqual(realErrors(P.errors), []);
 });
 
-test('the UI Morse reader (#/tools/morse) with the real camera path: fake camera .y4m -> UI capture library -> core -> on-screen transcript', { skip, timeout: 150000 }, async (t) => {
-  if (!needMedia(t)) return;
-  const P = await nodePage(media.browser, `${media.srv.url}index.html?nohub=1&profile=morseui`);
-  t.after(() => P.close());
-  const pending = await morseSupported(P);
-  if (pending) { t.todo(pending); return; }
-  // past the first-run screen (a fresh identity has no name), then open the reader
+/** Opens the UI's Morse reader on a fresh profile (past the first-run screen). */
+async function openReader(P) {
   if ((await P.call('node.info')).name === '') await P.call('node.set_profile', { name: 'Reader' });
   await P.evaluate('__emberWasmBackend._flush().then(() => true)'); // on disk before the reload
   await P.reloadNode();
@@ -567,11 +592,72 @@ test('the UI Morse reader (#/tools/morse) with the real camera path: fake camera
   try { await P.waitFor(`!!document.querySelector('.morse-page')`, 15000); } catch {
     throw new Error(`Morse reader did not open: ${await P.evaluate(`location.hash + ' | ' + document.body.innerText.slice(0, 300)`)}`);
   }
-  t.diagnostic(`timer drift before capture: ${await waitQuiet([P], 60000)} ms`);
   // the UI's own "find the blinking light" option (as the UI smoke test does), then start
   await P.evaluate(`(() => { const c = document.querySelector('.morse-page input[type=checkbox]'); if (c && !c.checked) c.click(); return true; })()`);
   await P.evaluate(`(() => { const b = [...document.querySelectorAll('button')].find((x) => /Start reading/.test(x.textContent)); if (!b) throw new Error('no Start reading button'); b.click(); return true; })()`);
-  const tr = await P.waitFor(`(() => { const e = document.querySelector('.morse-transcript'); const s = e ? e.textContent.replace(/\\s+/g, ' ').trim().toUpperCase() : ''; return s.includes(${JSON.stringify(LIGHT_TEXT)}) ? s : null; })()`, 45000);
+}
+const transcriptHas = (text) => `(() => { const e = document.querySelector('.morse-transcript'); const s = e ? e.textContent.replace(/\\s+/g, ' ').trim().toUpperCase() : ''; return s.includes(${JSON.stringify(text)}) ? s : null; })()`;
+
+/**
+ * Capability probe for the .y4m variant: Chrome's fake camera advances one file frame per frame it
+ * produces, so the recorded light only plays at its real speed when the fake device keeps up (it
+ * does on an idle machine; a starved VM manages ~9 of 30 fps). Measures the delivered frame rate.
+ */
+async function fakeCameraFps(P) {
+  return P.evaluate(`(async () => {
+    const s = await navigator.mediaDevices.getUserMedia({ video: { width: 64, height: 48, frameRate: 30 } });
+    const track = s.getVideoTracks()[0];
+    let n = 0;
+    if (typeof MediaStreamTrackProcessor === 'function') {
+      const r = new MediaStreamTrackProcessor({ track }).readable.getReader();
+      const end = performance.now() + 2000;
+      while (performance.now() < end) { const { value, done } = await r.read(); if (done) break; value.close(); n++; }
+      await r.cancel().catch(() => {});
+    }
+    track.stop();
+    return n / 2;
+  })()`, 30000);
+}
+
+test('the UI Morse reader (#/tools/morse) with the real camera path: fake camera .y4m -> UI capture library -> core -> on-screen transcript', { skip, timeout: 150000 }, async (t) => {
+  if (!needMedia(t)) return;
+  const P = await nodePage(media.browser, `${media.srv.url}index.html?nohub=1&profile=morseui`);
+  t.after(() => P.close());
+  const pending = await morseSupported(P);
+  if (pending) { t.todo(pending); return; }
+  const fps = await fakeCameraFps(P);
+  t.diagnostic(`fake camera delivers ${fps} fps`);
+  if (fps < 24) {
+    // documented in docs/CI.md: the camera-light variant below covers the same UI path at any speed
+    t.skip(`probe: Chrome's fake camera plays its .y4m file at ${fps} of 30 fps here, so the recorded light is not real time`);
+    return;
+  }
+  await openReader(P);
+  const tr = await P.waitFor(transcriptHas(LIGHT_TEXT), 45000);
   t.diagnostic(`UI transcript: "${tr}"`);
+  assert.deepEqual(realErrors(P.errors), []);
+});
+
+test('the UI Morse reader with a live light (clock-driven canvas camera, speed matched to the frame rate): UI capture library -> core -> transcript', { skip, timeout: 180000 }, async (t) => {
+  if (!needMedia(t)) return;
+  const P = await nodePage(media.browser, `${media.srv.url}index.html?nohub=1&profile=morseui2`);
+  t.after(() => P.close());
+  const pending = await morseSupported(P);
+  if (pending) { t.todo(pending); return; }
+  const { CAPTURE_HOOK, MORSE_SENT, MORSE_OK, cameraWpm } = await import('../../../ui/tests/capture_hook.mjs');
+  if ((await P.call('node.info')).name === '') await P.call('node.set_profile', { name: 'Reader' });
+  await P.evaluate('__emberWasmBackend._flush().then(() => true)');
+  await P.reloadNode();
+  await P.evaluate(CAPTURE_HOOK(MORSE_SENT, 12));
+  await P.evaluate(`(location.hash = '#/tools/morse?tab=camera', true)`);
+  await P.waitFor(`!!document.querySelector('.morse-page')`, 15000);
+  await P.evaluate(`(() => { const c = document.querySelector('.morse-page input[type=checkbox]'); if (c && !c.checked) c.click(); [...document.querySelectorAll('button')].find((x) => /Start reading/.test(x.textContent)).click(); return true; })()`);
+  await P.waitFor(`!!document.querySelector('.morse-transcript[data-live]')`, 15000);
+  await new Promise((r) => setTimeout(r, 2000));
+  const fps = await P.evaluate('window.__emberCaptureHook.fps()');
+  const wpm = cameraWpm(fps);
+  const keyMs = await P.evaluate(`window.__emberCaptureHook.go(${wpm})`);
+  const tr = await P.waitFor(`(() => { const s = ((document.querySelector('.morse-transcript') || {}).textContent || '').trim(); return new RegExp(${JSON.stringify(MORSE_OK.source)}).test(s) ? s : null; })()`, keyMs + 20000);
+  t.diagnostic(`light painted at ${fps} fps -> keyed at ${wpm} WPM; UI transcript "${tr}"`);
   assert.deepEqual(realErrors(P.errors), []);
 });

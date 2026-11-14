@@ -124,6 +124,68 @@ class LaunchAndAccessibilityTest {
         } finally { scenario.close(); shots.forEach { it.bmp.recycle() } }
     }
 
+    /**
+     * RPC_API §8 / ui/README.md "Launch screen": every cold start plays the FULL start-up animation,
+     * the same as the web, although the native core makes the app ready long before it ends. Frame 0
+     * comes only after the native overlay is gone, and the whole minimum plays from there. Two launches:
+     * the second (storage and preferences already written) runs with the system's "Remove animations"
+     * on (all three animation scales 0; the host then reports reduce_motion, which the rest of the UI
+     * follows) and is still full — owner decision: only the app's own settings change the launch
+     * animation. (The page's own prefers-reduced-motion reading is logged; this WebView does not
+     * derive it from the animation scales.)
+     */
+    @Test fun everyColdStartPlaysTheFullAnimationFromFrameZero() {
+        if (Build.VERSION.SDK_INT >= 33) inst.uiAutomation.grantRuntimePermission(app.packageName, android.Manifest.permission.POST_NOTIFICATIONS)
+        val scales = listOf("animator_duration_scale", "transition_animation_scale", "window_animation_scale")
+        val old = scales.associateWith { shell("settings get global $it").trim() }
+        try {
+            for (launch in 1..2) {
+                val osReduce = launch == 2
+                for (k in scales) shell("settings put global $k ${if (osReduce) "0" else "1"}")
+                assertTrue(EmberRuntime.start(app))
+                TestNode.waitUntil(5000, "host reports reduce_motion=$osReduce") {
+                    EmberRuntime.router.handle("host.info", JSONObject()).getJSONObject("accessibility").getBoolean("reduce_motion") == osReduce
+                }
+                LaunchHandover.resetForTest()
+                app.startActivity(Intent(app, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                TestNode.waitUntil(10000, "launch $launch: overlay removed") { LaunchHandover.last != null }
+                assertEquals("web_frame", LaunchHandover.last!!.getString("reason"))
+                var boot: JSONObject? = null
+                TestNode.waitUntil(10000, "launch $launch: animation finished") {
+                    inst.runOnMainSync {
+                        val a = androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry.getInstance()
+                            .getActivitiesInStage(androidx.test.runner.lifecycle.Stage.RESUMED).filterIsInstance<MainActivity>().firstOrNull()
+                        a?.webViewForTest()?.evaluateJavascript(
+                            "(() => window.__emberBoot ? {variant: __emberBoot.variant, active: __emberBoot.active, reason: __emberBoot.reason, canvas: __emberBoot.canvas, osReduce: __emberBoot.osReduce, at: __emberBoot.at} : null)()",
+                        ) { v -> try { boot = JSONObject(v) } catch (_: Exception) {} }
+                    }
+                    SystemClock.sleep(100)
+                    boot?.optBoolean("active", true) == false
+                }
+                val b = boot!!
+                val at = b.getJSONObject("at")
+                Log.i("LaunchTest", "launch $launch start-up animation (system reduce motion ${if (osReduce) "ON" else "off"}): $b")
+                assertEquals("launch $launch: full animation by default (system reduce motion ${if (osReduce) "on" else "off"})", "full", b.getString("variant"))
+                assertEquals("the WebView has a 2D canvas", true, b.optBoolean("canvas"))
+                assertEquals("launch $launch: handed over by itself", "ready", b.getString("reason"))
+                val frame0 = at.getLong("frame0"); val removed = at.optLong("removed", -1); val out = at.getLong("out"); val ready = at.optLong("ready", Long.MAX_VALUE)
+                // frame0 is a requestAnimationFrame timestamp (the frame's start), removed is performance.now()
+                // when the page handled 'ember:launch-removed'. The page holds its still until that event,
+                // so frame 0 is produced in the frame after it — whose start time may precede the event's
+                // handling by up to one frame interval. Anything earlier would mean frames ran under the overlay.
+                assertTrue("frame 0 not drawn behind the native overlay: $at", removed >= 0 && frame0 >= removed - FRAME_MS)
+                assertTrue("frame 0 follows the overlay's removal at once: $at", frame0 - removed < 120)
+                assertTrue("launch $launch: the whole 2.4 s animation played: $at", out - frame0 >= 2400 - 20)
+                assertTrue("the app was ready before the animation ended: $at", ready < out)
+                inst.runOnMainSync { MainActivityTracker.finishAll() }
+                SystemClock.sleep(800)
+            }
+        } finally {
+            for (k in scales) shell("settings put global $k ${old[k].let { if (it == null || it == "null" || it.isEmpty()) "1" else it }}")
+            inst.runOnMainSync { MainActivityTracker.finishAll() }
+        }
+    }
+
     /** A failing frame is kept where it survives the test APK being uninstalled (additional test output). */
     private fun saveFailure(bmp: Bitmap) {
         val dirs = listOfNotNull(
@@ -136,6 +198,8 @@ class LaunchAndAccessibilityTest {
     private companion object {
         /** A window change shows up on screen with the next composition (one 60 Hz frame, plus slack). */
         const val COMPOSE_MS = 34L
+        /** One display frame at 60 Hz (+1 ms rounding of the page's millisecond stamps). */
+        const val FRAME_MS = 17L
     }
 
     @Test fun accessibilityHintsAndChangeEvents() {
@@ -157,7 +221,18 @@ class LaunchAndAccessibilityTest {
             assertEquals(1.3, EmberRuntime.router.handle("host.info", JSONObject()).getJSONObject("accessibility").getDouble("font_scale"), 0.001)
         } finally {
             shell("settings put global animator_duration_scale ${if (oldAnim == "null" || oldAnim.isEmpty()) "1" else oldAnim}")
-            shell("settings put system font_scale ${if (oldFont == "null" || oldFont.isEmpty()) "1.0" else oldFont}")
+            // Restore, and make sure it took: a settings write can race the configuration change the
+            // previous one caused, so check and re-apply until the system and the app report it.
+            val font = if (oldFont == "null" || oldFont.isEmpty()) "1.0" else oldFont
+            val fontVal = font.toDouble()
+            val end = System.currentTimeMillis() + 10_000
+            while (System.currentTimeMillis() < end) {
+                shell("settings put system font_scale $font")
+                Thread.sleep(300)
+                val now = shell("settings get system font_scale").trim().toDoubleOrNull()
+                val app = try { EmberRuntime.router.handle("host.info", JSONObject()).getJSONObject("accessibility").getDouble("font_scale") } catch (_: Throwable) { -1.0 }
+                if (now == fontVal && kotlin.math.abs(app - fontVal) < 0.001) break
+            }
             EmberRuntime.eventListeners.remove(l)
         }
         Log.i("LaunchTest", "accessibility events: $events")

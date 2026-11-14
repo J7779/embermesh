@@ -80,8 +80,9 @@ class MainActivity : Activity(), UiHost {
 
         createWebView()
         if (handover == null) handover = LaunchHandover(this, root, main, BG) {
-            // ui/README.md "Launch screen": the native placeholder is gone, start the animation now.
-            evalJs("window.dispatchEvent(new Event('ember:launch-removed'));")
+            // ui/README.md "Launch screen": the native placeholder is gone, the animation starts at its
+            // first frame now. The flag covers a page whose boot module has not run yet.
+            evalJs("(window.__emberHost=window.__emberHost||{}).launchRemoved=true;window.dispatchEvent(new Event('ember:launch-removed'));")
         }.also { it.install() }
         registerBack()
         askNotificationPermission()
@@ -205,7 +206,12 @@ class MainActivity : Activity(), UiHost {
                 if (Build.VERSION.SDK_INT < 23) handover?.webCommitted(view)
             }
 
+            override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
+                stopLight() // the page that started a flash is gone (reload / navigation)
+            }
+
             override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail?): Boolean {
+                stopLight()
                 Log.w(TAG, "WebView renderer gone (crash=${detail?.didCrash()}); recreating")
                 root.removeView(view)
                 view.destroy()
@@ -216,6 +222,9 @@ class MainActivity : Activity(), UiHost {
         }
         wv.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(m: ConsoleMessage): Boolean {
+                // Page console output goes to logcat only in debuggable builds: release builds never log
+                // what a page might print (e.g. text typed for Morse sending).
+                if ((applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) == 0) return true
                 Log.println(if (m.messageLevel() == ConsoleMessage.MessageLevel.ERROR) Log.ERROR else Log.INFO, "EmberWeb",
                     "${m.message()} (${m.sourceId()?.substringAfterLast('/')}:${m.lineNumber()})")
                 return true
@@ -514,11 +523,56 @@ class MainActivity : Activity(), UiHost {
         } else view.layoutParams = lp
     }
 
-    override fun setScreenFlash(on: Boolean) {
-        window.attributes = window.attributes.apply {
-            screenBrightness = if (on) 1f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+    // --- screen flash (host.signal.flash mode "screen") ------------------------------------------------
+
+    @Volatile private var inFront = false
+    override fun isInFront(): Boolean = inFront
+
+    private class SavedScreen(val brightness: Float, val keepOn: Boolean, val foreground: android.graphics.drawable.Drawable?)
+    private var savedScreen: SavedScreen? = null
+
+    override fun screenFlashBegin() {
+        if (savedScreen == null) {
+            savedScreen = SavedScreen(window.attributes.screenBrightness,
+                (window.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0, root.foreground)
         }
-        root.foreground = if (on) android.graphics.drawable.ColorDrawable(Color.WHITE) else null
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.attributes = window.attributes.apply { screenBrightness = 1f }
+    }
+
+    override fun setScreenFlash(on: Boolean) {
+        if (on && savedScreen == null) screenFlashBegin()
+        root.foreground = if (on) android.graphics.drawable.ColorDrawable(Color.WHITE) else savedScreen?.foreground
+    }
+
+    /** Idempotent: restores exactly what screenFlashBegin saved. */
+    override fun screenFlashEnd() {
+        val s = savedScreen ?: run { if (root.foreground is android.graphics.drawable.ColorDrawable) root.foreground = null; return }
+        savedScreen = null
+        root.foreground = s.foreground
+        window.attributes = window.attributes.apply { screenBrightness = s.brightness }
+        if (!s.keepOn) window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    /**
+     * While a screen flash runs, the white overlay hides the page (including its Stop button): a tap
+     * anywhere stops the flash (and is not passed on, so it cannot trigger something under the light).
+     */
+    override fun dispatchTouchEvent(ev: android.view.MotionEvent): Boolean {
+        if (savedScreen != null) {
+            if (ev.actionMasked == android.view.MotionEvent.ACTION_DOWN) stopLight()
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    /** The light always goes off: backgrounding, screen lock, page closed or reloaded. */
+    private fun stopLight() {
+        screenFlashEnd() // restore the window now, on the main thread
+        if (EmberRuntime.isStarted) {
+            val services = EmberRuntime.services
+            try { EmberRuntime.hostContext.io.execute { try { services.stopSignals() } catch (_: Throwable) {} } } catch (_: Exception) {}
+        }
     }
 
     // --- lifecycle ---------------------------------------------------------------------------------
@@ -544,15 +598,19 @@ class MainActivity : Activity(), UiHost {
     // dialog or another app in split screen pauses the activity while the page must keep loading.
     override fun onStart() {
         super.onStart()
+        inFront = true
         webView?.resumeTimers()
     }
 
     override fun onStop() {
+        inFront = false
+        stopLight() // background / screen off / lock: torch off, screen restored
         webView?.pauseTimers() // no UI polling while hidden (battery); events still reach the page
         super.onStop()
     }
 
     override fun onDestroy() {
+        stopLight()
         EmberRuntime.eventListeners.remove(eventListener)
         if (EmberRuntime.isStarted && EmberRuntime.hostContext.ui === this) EmberRuntime.hostContext.ui = null
         if (Build.VERSION.SDK_INT >= 33) {

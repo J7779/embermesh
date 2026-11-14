@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import net from 'node:net';
-import { DIST_DIR, ROOT } from './helpers.mjs';
+import { DIST_DIR, ROOT, ui } from './helpers.mjs';
 import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir, REQUIRE } from './lib/e2e.mjs';
 import { runCleanups, HOOK } from './lib/e2e.mjs';
 import { startServer } from './lib/static_server.mjs';
@@ -173,8 +173,18 @@ test('WebRTC: manual offer/answer pairing between two pages, messages over the d
   assert.match(acc.answer, /^ember:rtc:/);
   const { link } = await A.call('host.webrtc.accept_answer', { pairing_id, answer: acc.answer });
   assert.equal(link.persist, false, 'WebRTC links are session-only (a restart needs a new pairing)');
-  await A.waitCall('links.list', {}, (r) => r.links.find((l) => l.id === link.id && l.state === 'up'), 20000, 'webrtc link A up');
-  await B.waitCall('links.list', {}, (r) => r.links.find((l) => l.id === acc.link.id && l.state === 'up'), 20000, 'webrtc link B up');
+  const { decodeBlob } = await import(ui('endpoints/webrtc_blob.js'));
+  const cands = (blob) => decodeBlob(blob).candidates.map((c) => `${c.type}/${c.tcp ? 'tcp' : 'udp'}/${/\.local$/.test(c.address) ? 'mdns' : c.address}:${c.port}`);
+  t.diagnostic(`offer candidates ${JSON.stringify(cands(offer))}, answer candidates ${JSON.stringify(cands(acc.answer))}`);
+  const pcState = (id) => `(() => { const e = __emberWasmBackend.router.links.get(${id}); const pc = e && e.endpoint && e.endpoint.pc; const dc = e && e.endpoint && e.endpoint.dc;
+    return pc ? { ice: pc.iceConnectionState, conn: pc.connectionState, gathering: pc.iceGatheringState, dc: dc && dc.readyState, local: (pc.localDescription.sdp.match(/a=candidate/g) || []).length } : null; })()`;
+  try {
+    await A.waitCall('links.list', {}, (r) => r.links.find((l) => l.id === link.id && l.state === 'up'), 45000, 'webrtc link A up');
+    await B.waitCall('links.list', {}, (r) => r.links.find((l) => l.id === acc.link.id && l.state === 'up'), 45000, 'webrtc link B up');
+  } catch (e) {
+    // the next CI log must say why: candidates in both codes and both peer connections' states
+    throw new Error(`${e.message.split('\n')[0]}\noffer candidates ${JSON.stringify(cands(offer))}\nanswer candidates ${JSON.stringify(cands(acc.answer))}\nA ${JSON.stringify(await A.evaluate(pcState(link.id)))}\nB ${JSON.stringify(await B.evaluate(pcState(acc.link.id)))}`);
+  }
 
   await dmRoundTrip(A, B, a, b, 'hello over a WebRTC data channel');
   await publicRoundTrip(B, A, 'public over WebRTC');

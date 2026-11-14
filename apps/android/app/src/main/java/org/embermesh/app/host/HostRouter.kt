@@ -89,8 +89,13 @@ class HostRouter(
             val f = services.filePick(params.strOrNull("accept"))
             JSONObject().put("name", f.name).put("mime", f.mime).put("data_b64", Base64.encodeToString(f.data, Base64.NO_WRAP))
         }
-        "host.signal.flash" -> { services.flash(pattern(params)); JSONObject() }
+        "host.signal.flash" -> {
+            val mode = params.str("mode", "auto")
+            if (mode !in setOf("auto", "torch", "screen")) throw HostError.badParams("mode must be auto, torch or screen")
+            services.flash(pattern(params), mode)
+        }
         "host.signal.tone" -> { services.tone(pattern(params), params.int("freq_hz", 700).coerceIn(100, 4000)); JSONObject() }
+        "host.signal.stop" -> { services.stopSignals(); JSONObject() }
         "host.notify" -> {
             app.notifyUser(params.str("title", "EmberMesh"), params.str("body"))
             JSONObject()
@@ -205,6 +210,7 @@ class HostRouter(
         .put("endpoint_kinds", registry.describe(ctx))
         .put("features", JSONArray(features()))
         .put("actions", actions())
+        .put("signal", try { services.signalInfo() } catch (_: Throwable) { JSONObject().put("torch", "no").put("screen", true) })
         .apply { app.accessibility()?.let { put("accessibility", it) } }
         .put("os_version", android.os.Build.VERSION.RELEASE ?: "")
         .put("sdk_int", android.os.Build.VERSION.SDK_INT)
@@ -223,13 +229,17 @@ class HostRouter(
     companion object {
         fun requireId(p: JSONObject): Int = p.int("id", 0).also { if (it <= 0) throw HostError.badParams("id required") }
 
+        /** pattern_ms with the RPC_API §10 limits (≤ 4,096 entries, each 10–60,000 ms, ≤ 10 min): bad_params otherwise. */
         fun pattern(p: JSONObject): LongArray {
             val a = p.optJSONArray("pattern_ms") ?: throw HostError.badParams("pattern_ms required")
-            if (a.length() > 2000) throw HostError(HostError.TOO_LARGE, "pattern too long")
-            var total = 0L
-            return LongArray(a.length()) { i ->
-                a.optLong(i, 0).coerceIn(0, 10_000).also { total += it; if (total > 600_000) throw HostError(HostError.TOO_LARGE, "pattern longer than 10 minutes") }
+            if (a.length() > org.embermesh.app.services.LightSender.MAX_ENTRIES) throw HostError.badParams("pattern_ms: at most ${org.embermesh.app.services.LightSender.MAX_ENTRIES} entries")
+            val out = LongArray(a.length()) { i ->
+                val v = a.opt(i)
+                if (v !is Number || v.toDouble() != Math.floor(v.toDouble())) throw HostError.badParams("pattern_ms: whole milliseconds")
+                v.toLong()
             }
+            org.embermesh.app.services.LightSender.validate(out)
+            return out
         }
 
         fun decodeB64(s: String): ByteArray {

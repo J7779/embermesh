@@ -68,6 +68,10 @@ final class WebHost: NSObject, WKScriptMessageHandler {
   })();
   """
 
+  /// The native placeholder is gone: the boot animation starts at its first frame now.
+  static let launchRemovedScript =
+    "(window.__emberHost=window.__emberHost||{}).launchRemoved=true;window.dispatchEvent(new Event('ember:launch-removed'));"
+
   /// Where the native launch logo is, in CSS px of this page's viewport, so the boot animation can
   /// start from exactly the still image: window.__emberHost.launchLogo = {x, y, size} and the CSS
   /// variables --launch-logo-x / -y / -size on <html>.

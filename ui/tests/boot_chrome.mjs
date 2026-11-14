@@ -121,10 +121,13 @@ async function main() {
   const at = await ev('window.__navAt');
   if (at) { await c.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: at[0], y: at[1], button: 'left', clickCount: 1 }); await c.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: at[0], y: at[1], button: 'left', clickCount: 1 }); await sleep(500); }
   check('never blocks the app after hand-over (hit-test and a real tap)', hit && (!at || /people/.test(await ev('location.hash'))), await ev('location.hash'));
-  const seen = await ev(`localStorage.getItem('embermesh.ui.boot_seen')`);
-  await setInit([NOT_AUTOMATED, PROBE]);
+  await setInit([NOT_AUTOMATED, PROBE, `try { localStorage.setItem('embermesh.ui.theme', JSON.stringify({ theme: 'dark', low_power: true })); } catch {}`]);
   s = await load('?mock=1', 200);
-  check('first run recorded: next launch is the short version', seen === '1' && s.boot && s.boot.variant === 'short', `seen=${seen} variant=${s.boot && s.boot.variant}`);
+check('second launch with the app ready early and low-power mode on: still the full animation', s.boot && s.boot.variant === 'full', `variant=${s.boot && s.boot.variant}`);
+  await sleep(3200);
+  const run = await ev(`JSON.stringify({ at: __emberBoot.at, reason: __emberBoot.reason, seen: localStorage.getItem('embermesh.ui.boot_seen') })`).then(JSON.parse);
+  check('it played its whole minimum from frame 0 although the app was ready early', run.reason === 'ready' && run.at.out - run.at.frame0 >= 2400 - 20 && run.seen === null, JSON.stringify(run));
+  await setInit([NOT_AUTOMATED, PROBE, `try { localStorage.setItem('embermesh.ui.theme', JSON.stringify({ theme: 'dark' })); } catch {}`]);
   await sleep(2600);
 
   // 2. a click skips at once
@@ -146,17 +149,19 @@ async function main() {
   s = await state();
   check('nothing left running after a skip', s.probe.rafAfter === 0 && s.probe.timers === 0, JSON.stringify(s.probe));
 
-  // 4. reduced motion: calm version without canvas
+  // 4. the OS asks for reduced motion: the launch animation still plays in full (owner decision);
+  //    only the app's own Motion setting, Simple mode or the launch-animation setting change it
   await c.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   s = await load('?mock=1', 200);
-  check('reduced motion → calm version (no canvas)', s.boot && s.boot.variant === 'reduced' && s.canvas === 0 && s.overlay, JSON.stringify(s.boot));
-  await sleep(1800);
+  const os = await ev('!!(window.__emberBoot && __emberBoot.osReduce)');
+  check('OS reduce motion on, default app settings → full animation', os && s.boot && s.boot.variant === 'full' && s.canvas === 1, JSON.stringify(s.boot));
+  await sleep(3400);
   s = await state();
-  check('calm version leaves by itself', !s.overlay && s.boot.reason === 'ready');
+  check('… and it leaves by itself', !s.overlay && s.boot.reason === 'ready');
   await c.send('Emulation.setEmulatedMedia', { features: [] });
 
   // 4b. settings mirrored by lib/prefs.js (ember.ui.* JSON keys) take effect
-  for (const [k, v, want] of [['boot_animation', '"off"', 'off'], ['boot_animation', '"short"', 'short'], ['motion', '"reduced"', 'reduced'], ['simple_mode', 'true', 'reduced']]) {
+  for (const [k, v, want] of [['boot_animation', '"off"', 'off'], ['boot_animation', '"short"', 'short'], ['motion', '"reduced"', 'reduced'], ['motion', '"off"', 'off'], ['simple_mode', 'true', 'reduced']]) {
     await setInit([NOT_AUTOMATED, PROBE, `try { localStorage.removeItem('embermesh.ui.boot_seen'); for (const k of ['boot_animation','motion','simple_mode']) localStorage.removeItem('ember.ui.' + k); localStorage.setItem('ember.ui.${k}', '${v}'); } catch {}`]);
     s = await load('?mock=1', 60);
     check(`ember.ui.${k} = ${v} → ${want}`, s.boot && s.boot.variant === want, JSON.stringify(s.boot));

@@ -3,62 +3,88 @@ package org.embermesh.app.services
 import org.json.JSONObject
 
 /**
- * Keys a light (torch or screen) through an on/off pattern with absolute deadlines (no drift: element
- * n starts at t0 + sum of the previous durations), sleeping until ~2 ms before each edge and then
- * spinning, on a thread the caller gives high priority. Each switch call is started early by half its
- * running-average duration (a torch switch is a binder call of several ms). Records the error of each
- * call's midpoint against the schedule ([Stats.lateMs], can be negative) and the call duration
- * ([Stats.callMs]) — the scheduling error the receiver sees, not counting the lamp's own rise time.
+ * Keys a light (torch or screen) through an on/off pattern (RPC_API §10). Edge n is due at
+ * t0 + the sum of the previous durations on a monotonic clock (`SystemClock.elapsedRealtimeNanos`
+ * in the app): no accumulated drift, a late edge shortens the next interval. The thread sleeps until
+ * ~5 ms before each edge, then yields until it is due; each switch call is started early by half its
+ * running-average duration (a torch switch is a binder call of several ms).
+ *
+ * Stopping ([cancelled] true, or the thread interrupted) ends the run at once with the light off.
+ * Statistics: the error of each switch call's midpoint against its deadline ([Stats.lateMs], may be
+ * negative) and the call durations — the scheduling error a receiver sees, not counting the lamp's
+ * own rise time.
  */
 class MorseKeyer(
     private val nanos: () -> Long = System::nanoTime,
     private val sleepMs: (Long) -> Unit = { Thread.sleep(it) },
     private val spin: () -> Unit = { Thread.yield() },
 ) {
-    class Stats(val edges: Int, val lateMs: DoubleArray, val callMs: DoubleArray, val totalErrorMs: Double) {
+    class Stats(val edges: Int, val lateMs: DoubleArray, val callMs: DoubleArray, val totalErrorMs: Double, val stopped: Boolean) {
         private fun pct(a: DoubleArray, p: Double) = if (a.isEmpty()) 0.0 else a.sorted()[((a.size - 1) * p).toInt()]
-        fun json(): JSONObject = JSONObject().put("edges", edges)
-            .put("late_mean_ms", r(lateMs.average().takeIf { !it.isNaN() } ?: 0.0))
+        private fun r(v: Double) = Math.round(v * 100) / 100.0
+        /** Worst lateness of an edge (ms; 0 when every edge was on time or early). */
+        val worstLateMs: Double get() = (lateMs.maxOrNull() ?: 0.0).coerceAtLeast(0.0)
+        val meanLateMs: Double get() = if (lateMs.isEmpty()) 0.0 else lateMs.average()
+
+        /** RPC_API §10 `timing`: max_late_ms (the UI warns on it), mean_late_ms, edges; plus Android extras. */
+        fun json(): JSONObject = JSONObject().put("max_late_ms", r(worstLateMs)).put("mean_late_ms", r(meanLateMs)).put("edges", edges)
             .put("abs_p95_ms", r(pct(lateMs.map { kotlin.math.abs(it) }.toDoubleArray(), 0.95)))
             .put("abs_max_ms", r(lateMs.maxOfOrNull { kotlin.math.abs(it) } ?: 0.0))
-            .put("call_mean_ms", r(callMs.average().takeIf { !it.isNaN() } ?: 0.0)).put("call_max_ms", r(callMs.maxOrNull() ?: 0.0))
+            .put("call_mean_ms", r(if (callMs.isEmpty()) 0.0 else callMs.average())).put("call_max_ms", r(callMs.maxOrNull() ?: 0.0))
             .put("total_error_ms", r(totalErrorMs))
-        private fun r(v: Double) = Math.round(v * 100) / 100.0
     }
+
+    private class Stopped : RuntimeException()
 
     /** pattern_ms = [on, off, on, …]; [act] switches the light. Returns timing statistics. */
     fun run(pattern: LongArray, cancelled: () -> Boolean, act: (Boolean) -> Unit): Stats {
         val late = ArrayList<Double>(pattern.size + 1)
         val call = ArrayList<Double>(pattern.size + 1)
-        // Warm-up: the first torch call is slow (camera service spin-up, ~100+ ms); measure a real call time.
-        var w0 = nanos(); act(false); var callNs = (nanos() - w0).toDouble()
-        w0 = nanos(); act(false); callNs = (nanos() - w0).toDouble()
-        val t0 = nanos() + 20_000_000L // lead so the first edge is scheduled like the others
-        var deadline = t0
-        fun edge(on: Boolean) {
-            // The lamp changes somewhere inside the switch call: start half a call early.
-            val target = deadline - (callNs / 2).toLong()
-            while (true) {
-                val left = target - nanos()
-                if (left <= 0) break
-                if (left > 6_000_000L) sleepMs((left - 5_000_000L) / 1_000_000L) else spin()
+        var callNs: Double
+        var stopped = false
+        var lightOn = false
+        var t0 = 0L
+        try {
+            // Warm-up: the first torch call can be slow; measure a real call time with the light off.
+            var w0 = nanos(); act(false); callNs = (nanos() - w0).toDouble()
+            w0 = nanos(); act(false); callNs = (nanos() - w0).toDouble()
+            t0 = nanos() + 20_000_000L // lead so the first edge is scheduled like the others
+            var deadline = t0
+            fun waitUntil(target: Long) {
+                while (true) {
+                    if (cancelled()) throw Stopped()
+                    val left = target - nanos()
+                    if (left <= 0) break
+                    if (left > 6_000_000L) {
+                        try { sleepMs((left - 5_000_000L) / 1_000_000L) } catch (_: InterruptedException) { throw Stopped() }
+                    } else spin()
+                }
             }
-            val a = nanos()
-            act(on)
-            val b = nanos()
-            late.add((a + (b - a) / 2 - deadline) / 1e6) // error of the call's midpoint vs the schedule
-            call.add((b - a) / 1e6)
-            callNs = callNs * 0.8 + (b - a) * 0.2
+            fun edge(on: Boolean) {
+                waitUntil(deadline - (callNs / 2).toLong())
+                val a = nanos()
+                act(on)
+                lightOn = on
+                val b = nanos()
+                late.add((a + (b - a) / 2 - deadline) / 1e6)
+                call.add((b - a) / 1e6)
+                callNs = callNs * 0.8 + (b - a) * 0.2
+            }
+            for ((i, ms) in pattern.withIndex()) {
+                edge(i % 2 == 0)
+                deadline += ms.coerceAtLeast(0) * 1_000_000L
+            }
+            // The pattern is over at its last deadline: switch off then (a pattern ending on "on"), or
+            // wait out the final dark element, so the caller resolves when the whole pattern has passed.
+            if (lightOn) edge(false) else waitUntil(deadline)
+        } catch (_: Stopped) {
+            stopped = true
+        } finally {
+            // The light always goes off (also on stop and on an error from act()).
+            if (lightOn || stopped) try { act(false) } catch (_: Throwable) {}
         }
-        for ((i, ms) in pattern.withIndex()) {
-            if (cancelled()) break
-            edge(i % 2 == 0)
-            deadline += ms.coerceAtLeast(0) * 1_000_000L
-        }
-        if (pattern.size % 2 == 1 || pattern.isEmpty()) edge(false) // end dark
-        else act(false)
-        val totalError = (nanos() - t0) / 1e6 - pattern.sum()
-        return Stats(late.size, late.toDoubleArray(), call.toDoubleArray(), totalError)
+        val totalError = if (stopped || t0 == 0L) 0.0 else (nanos() - t0) / 1e6 - pattern.sum()
+        return Stats(late.size, late.toDoubleArray(), call.toDoubleArray(), totalError, stopped)
     }
 
     companion object {

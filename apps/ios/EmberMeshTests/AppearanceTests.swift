@@ -162,6 +162,41 @@ final class LaunchPlaceholderTests: XCTestCase {
     XCTAssertEqual((logo?["y"] as? Double) ?? 0, Double(r.minY), accuracy: 0.5)
   }
 
+  /// RPC_API §8 / ui/README.md "Launch screen": every cold start plays the FULL start-up animation,
+  /// the same as the web, although the native core makes the app ready long before it ends. Frame 0
+  /// comes only after the native placeholder is gone, and the whole minimum plays from there. Run
+  /// twice: the second start (preferences and storage already written) is still full. Also full when
+  /// the system's Reduce Motion is on (owner decision; only the app's own settings change it) — the
+  /// page reports what it saw (`osReduce`), checked against UIAccessibility; run it both ways.
+  func testEveryColdStartPlaysTheFullAnimationFromFrameZero() throws {
+    for launch in 1...2 {
+      let vc = try present()
+      XCTAssertTrue(spin(until: 10) { vc.placeholder == nil }, "launch \(launch): placeholder removed")
+      XCTAssertEqual(vc.revealReason, "painted")
+      var boot: [String: Any]?
+      let js = "JSON.stringify(window.__emberBoot ? {variant: __emberBoot.variant, active: __emberBoot.active, reason: __emberBoot.reason, canvas: __emberBoot.canvas, osReduce: __emberBoot.osReduce, at: __emberBoot.at} : null)"
+      XCTAssertTrue(spin(until: 10) {
+        vc.webViewForTesting?.evaluateJavaScript(js) { v, _ in
+          if let s = v as? String, let d = s.data(using: .utf8) { boot = try? JSONSerialization.jsonObject(with: d) as? [String: Any] }
+        }
+        return (boot?["active"] as? Bool) == false
+      }, "launch \(launch): the animation finished by itself")
+      let at = (boot?["at"] as? [String: Double]) ?? [:]
+      let reduce = UIAccessibility.isReduceMotionEnabled
+      print("launch \(launch) start-up animation (system Reduce Motion \(reduce ? "ON" : "off")): \(boot ?? [:])")
+      XCTAssertEqual(boot?["osReduce"] as? Bool, reduce, "the page sees the system Reduce Motion setting")
+      XCTAssertEqual(boot?["variant"] as? String, "full", "launch \(launch): full animation by default, Reduce Motion \(reduce ? "on" : "off")")
+      XCTAssertEqual(boot?["canvas"] as? Bool, true, "WKWebView has a 2D canvas")
+      XCTAssertEqual(boot?["reason"] as? String, "ready", "launch \(launch): handed over by itself")
+      let frame0 = at["frame0"] ?? 0, removed = at["removed"] ?? -1, out = at["out"] ?? 0, ready = at["ready"] ?? .infinity
+      XCTAssertGreaterThanOrEqual(frame0, removed, "frame 0 is not drawn behind the native placeholder")
+      XCTAssertLessThan(frame0 - removed, 120, "frame 0 follows the placeholder's removal at once")
+      XCTAssertGreaterThanOrEqual(out - frame0, 2400 - 20, "launch \(launch): the whole 2.4 s animation played")
+      XCTAssertLessThan(ready, out, "the app was ready before the animation ended (it did not wait for the app)")
+      window.rootViewController = nil
+    }
+  }
+
   func testFailedStartPageRevealsDiagnostics() throws {
     let vc = try present(startURL: URL(string: "embermesh://app/no-such-page.html")!)
     XCTAssertTrue(spin(until: 10) { vc.placeholder == nil })

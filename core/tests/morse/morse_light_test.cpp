@@ -168,6 +168,32 @@ TEST_CASE("light: no signal, steady light, noise only and a dark scene decode no
   }
 }
 
+// A message typed on the Send tab, flashed and filmed from its very first element (no tune-up):
+// 30 fps with frame-time jitter, a full-frame exposure (one frame of lag at every edge), noise. The
+// first letters used to fuse while the speed was still unknown ("TEST" -> "NST").
+TEST_CASE("light: cold start, a short message reads exactly from its first letter (30 fps, jitter, exposure lag)") {
+  for (const char* text : {"TEST", "HELLO WORLD 73", "SOS", "CQ CQ TEST", "TEN"}) {
+    for (double wpm : {7.0, 12.0, 15.0}) {
+      for (uint64_t seed = 1; seed <= 6; ++seed) {
+        CAPTURE(text);
+        CAPTURE(wpm);
+        CAPTURE(seed);
+        HandOptions h;
+        h.wpm = wpm;
+        h.lead_ms = 1000;
+        CameraOptions c;
+        c.fps = 30;
+        c.jitter_ms = 3;
+        c.exposure = 1.0;
+        c.noise = 0.02;
+        Run r = run_light(text, h, c, seed, 3);
+        CAPTURE(r.text);
+        CHECK(r.cer == 0);
+      }
+    }
+  }
+}
+
 TEST_CASE("light long: usable range table (fps x wpm, phone camera)" * doctest::skip()) {
   std::printf("light CER (phone camera model, 3 seeds, 60-char message)\n   fps:");
   const double fpss[] = {10, 15, 24, 30, 60};

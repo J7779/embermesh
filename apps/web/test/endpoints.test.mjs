@@ -187,3 +187,30 @@ test('applyDefaults coerces numbers/bools and fills defaults', () => {
   assert.deepEqual(applyDefaults(schema, { baud: '1200', dtr: 'false', other: 1 }), { baud: 1200, dtr: false, s: 'x', other: 1 });
   assert.deepEqual(applyDefaults(schema, { baud: 'abc', s: '' }), { baud: 9600, dtr: true, s: 'x' });
 });
+
+test('webrtc gatherComplete: usual timeout with candidates, waits longer (capped) for the first one, ends on completion', async () => {
+  const { gatherComplete } = await import(ui('endpoints/webrtc.js'));
+  class PC extends EventTarget {
+    constructor(sdp = '') { super(); this.iceGatheringState = 'gathering'; this.localDescription = { sdp }; }
+    cand(c) { const e = new Event('icecandidate'); e.candidate = c; this.dispatchEvent(e); }
+  }
+  const time = async (fn) => { const t0 = Date.now(); await fn(); return Date.now() - t0; };
+  // a candidate is there: the usual (soft) timeout applies
+  let pc = new PC('v=0\r\na=candidate:1 1 udp 1 x.local 1 typ host\r\n');
+  let ms = await time(() => gatherComplete(pc, 40, 400));
+  assert.ok(ms >= 35 && ms < 200, `soft timeout ${ms}`);
+  // none yet: keeps waiting past the soft timeout; the first late candidate ends it
+  pc = new PC();
+  setTimeout(() => pc.cand({ candidate: 'late' }), 120);
+  ms = await time(() => gatherComplete(pc, 40, 1000));
+  assert.ok(ms >= 110 && ms < 400, `waited for the first candidate (${ms} ms)`);
+  // never any: the hard cap
+  pc = new PC();
+  ms = await time(() => gatherComplete(pc, 20, 150));
+  assert.ok(ms >= 140 && ms < 400, `hard cap ${ms}`);
+  // completion (end-of-candidates) ends it at once
+  pc = new PC();
+  setTimeout(() => pc.cand(null), 10);
+  ms = await time(() => gatherComplete(pc, 500, 1000));
+  assert.ok(ms < 200, `completed ${ms}`);
+});

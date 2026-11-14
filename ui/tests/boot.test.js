@@ -60,21 +60,28 @@ test('no strobing: the glow rises at most once and never flickers', () => {
   }
 });
 
-test('variant choice from preferences, platform and test hooks', () => {
-  const base = { query: q(''), prefs: {}, seen: false };
+test('variant: full by default on every platform; OS reduce motion, early/seen/late/low power never change it', () => {
+  const base = { query: q(''), prefs: {} };
   assert.equal(chooseVariant(base), 'full');
-  assert.equal(chooseVariant({ ...base, seen: true }), 'short');
-  assert.equal(chooseVariant({ ...base, readyEarly: true }), 'short');
-  assert.equal(chooseVariant({ ...base, late: true }), 'short');
+  // inputs that used to shorten it are no longer part of the decision
+  for (const extra of [{ seen: true }, { readyEarly: true }, { late: true }, { lowPower: true }, { seen: true, readyEarly: true, late: true, lowPower: true }]) {
+    assert.equal(chooseVariant({ ...base, ...extra }), 'full', JSON.stringify(extra));
+  }
+  // only the person's choices change it
+  assert.equal(chooseVariant({ ...base, prefs: { boot_animation: 'full' } }), 'full');
   assert.equal(chooseVariant({ ...base, prefs: { boot_animation: 'short' } }), 'short');
   assert.equal(chooseVariant({ ...base, prefs: { boot_animation: 'off' } }), 'off');
-  assert.equal(chooseVariant({ ...base, osReduce: true }), 'reduced');
+  // the OS reduce-motion setting does not change it (owner decision; the rest of the app follows it)
+  assert.equal(chooseVariant({ ...base, osReduce: true }), 'full');
+  assert.equal(chooseVariant({ ...base, osReduce: true, lowPower: true, prefs: { motion: 'system' } }), 'full');
   assert.equal(chooseVariant({ ...base, osReduce: true, prefs: { motion: 'full' } }), 'full');
+  assert.equal(chooseVariant({ ...base, osReduce: true, prefs: { boot_animation: 'short' } }), 'short');
   assert.equal(chooseVariant({ ...base, prefs: { motion: 'reduced' } }), 'reduced');
-  assert.equal(chooseVariant({ ...base, prefs: { motion: 'off' } }), 'reduced');
+  assert.equal(chooseVariant({ ...base, prefs: { motion: 'off' } }), 'off');
+  assert.equal(chooseVariant({ ...base, prefs: { simple_mode: true } }), 'reduced');
   assert.equal(chooseVariant({ ...base, prefs: { simple_mode: true, motion: 'full' } }), 'reduced');
-  assert.equal(chooseVariant({ ...base, lowPower: true, prefs: { motion: 'full' } }), 'reduced');
-  assert.equal(chooseVariant({ ...base, query: q('?motion=off') }), 'reduced');
+  assert.equal(chooseVariant({ ...base, prefs: { boot_animation: 'off', motion: 'reduced' } }), 'off');
+  assert.equal(chooseVariant({ ...base, query: q('?motion=off') }), 'off');
   // automation and ?noboot skip it; ?boot= forces a variant even under automation
   assert.equal(chooseVariant({ ...base, webdriver: true }), 'none');
   assert.equal(chooseVariant({ ...base, query: q('?noboot=1&boot=full') }), 'none');
@@ -84,37 +91,48 @@ test('variant choice from preferences, platform and test hooks', () => {
 
 test('preferences read from mirrored local storage with safe defaults', () => {
   const mem = o => ({ getItem: k => (k in o ? o[k] : null) });
-  assert.deepEqual(readPrefs(mem({})), { prefs: {}, theme: 'dark', lowPower: false, seen: false });
-  // storage blocked or missing → defaults, and treat as seen (short) rather than full every time
+  assert.deepEqual(readPrefs(mem({})), { prefs: {}, theme: 'dark' });
   const blocked = { getItem() { throw new Error('SecurityError'); } };
-  assert.deepEqual(readPrefs(blocked), { prefs: {}, theme: 'dark', lowPower: false, seen: true });
-  assert.equal(readPrefs(null).seen, true);
+  assert.deepEqual(readPrefs(blocked), { prefs: {}, theme: 'dark' });
+  assert.deepEqual(readPrefs(null), { prefs: {}, theme: 'dark' });
   const r = readPrefs(mem({
     'ember.ui.boot_animation': '"short"', 'ember.ui.motion': '"reduced"', 'ember.ui.simple_mode': 'true', 'ember.ui.text_scale': '1.2',
-    [KEYS.theme]: JSON.stringify({ theme: 'night', low_power: true }), [KEYS.seen]: '1',
+    [KEYS.theme]: JSON.stringify({ theme: 'night', low_power: true }), 'embermesh.ui.boot_seen': '1',
   }));
-  assert.deepEqual(r, { prefs: { boot_animation: 'short', motion: 'reduced', simple_mode: true }, theme: 'night', lowPower: true, seen: true });
+  assert.deepEqual(r, { prefs: { boot_animation: 'short', motion: 'reduced', simple_mode: true }, theme: 'night' });
   assert.equal(readPrefs(mem({ 'ember.ui.motion': '{broken' })).prefs.motion, '{broken', 'non-JSON value kept as text, then ignored');
   assert.equal(readPrefs(mem({ [KEYS.theme]: '{"theme":"neon"}' })).theme, 'dark');
-  // attributes set by the preference module win
-  const d = readPrefs(mem({ 'ember.ui.motion': '"full"' }), { motion: 'off', simple: '1', theme: 'light', lowpower: '1' });
-  assert.deepEqual(d, { prefs: { motion: 'off', simple_mode: true }, theme: 'light', lowPower: true, seen: false });
+  // html[data-simple] counts; html[data-motion] is the EFFECTIVE motion (folds in low power): ignored
+  const d = readPrefs(mem({ 'ember.ui.motion': '"full"' }), { motion: 'reduced', simple: '1', theme: 'light', lowpower: '1' });
+  assert.deepEqual(d, { prefs: { motion: 'full', simple_mode: true }, theme: 'light' });
+  assert.equal(chooseVariant({ query: q(''), prefs: readPrefs(mem({}), { motion: 'reduced', lowpower: '1' }).prefs }), 'full', 'low power alone keeps the full animation');
 });
 
 test('settings written by lib/prefs.js (ember.ui.* JSON keys) pick the variant', () => {
   const mem = o => ({ getItem: k => (k in o ? o[k] : null) });
-  const pick = (o, extra = {}) => { const r = readPrefs(mem(o)); return chooseVariant({ query: q(''), prefs: r.prefs, lowPower: r.lowPower, seen: r.seen, ...extra }); };
+  const pick = (o, extra = {}) => chooseVariant({ query: q(''), prefs: readPrefs(mem(o)).prefs, ...extra });
   assert.equal(pick({}), 'full');
   assert.equal(pick({ 'ember.ui.boot_animation': '"short"' }), 'short');
   assert.equal(pick({ 'ember.ui.boot_animation': '"off"' }), 'off');
-  assert.equal(pick({ 'ember.ui.boot_animation': '"full"', 'embermesh.ui.boot_seen': '1' }), 'short');
+  assert.equal(pick({ 'ember.ui.boot_animation': '"full"', 'embermesh.ui.boot_seen': '1' }), 'full', 'the old "seen" marker is ignored');
   assert.equal(pick({ 'ember.ui.motion': '"reduced"' }), 'reduced');
-  assert.equal(pick({ 'ember.ui.motion': '"off"' }), 'reduced');
-  assert.equal(pick({ 'ember.ui.motion': '"system"' }, { osReduce: true }), 'reduced');
+  assert.equal(pick({ 'ember.ui.motion': '"off"' }), 'off');
+  assert.equal(pick({ 'ember.ui.motion': '"system"' }, { osReduce: true }), 'full', 'Follow system + OS reduce motion: still full');
   assert.equal(pick({ 'ember.ui.motion': '"full"' }, { osReduce: true }), 'full');
   assert.equal(pick({ 'ember.ui.simple_mode': 'true', 'ember.ui.motion': '"full"' }), 'reduced');
   assert.equal(pick({ 'ember.ui.simple_mode': 'false' }), 'full');
-  assert.equal(pick({ 'embermesh.ui.theme': '{"theme":"dark","low_power":true}' }), 'reduced');
+  assert.equal(pick({ 'embermesh.ui.theme': '{"theme":"dark","low_power":true}' }), 'full', 'low-power mode does not change it');
+});
+
+test('hand-over with the app ready long before the animation ends: plays the full minimum', () => {
+  const T = TIMELINES.full.T;
+  const m = createMachine({ min: T, cap: 2900, out: TIMELINES.full.out, skipOut: TIMELINES.full.skipOut });
+  m.ready(); // native core ready before frame 0
+  m.start(1000); // frame 0 = first visibility, however late after navigation
+  for (let t = 1000; t < 1000 + T; t += 16) assert.notEqual(m.tick(t).phase, 'out', `still playing at ${t - 1000} ms`);
+  const s = m.tick(1000 + T);
+  assert.equal(s.phase, 'out'); assert.equal(s.reason, 'ready'); assert.equal(s.t, T);
+  assert.equal(m.tick(1000 + T + TIMELINES.full.out).phase, 'done');
 });
 
 test('hand-over: waits for both the minimum time and the app', () => {

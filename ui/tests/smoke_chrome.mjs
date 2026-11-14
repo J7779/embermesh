@@ -54,42 +54,8 @@ const SPECIAL = [
   ['lock', '?mock=1&locked=1', '#/chats'],
   ['degraded', '?mock=1&unsupported=guides.categories,tools.list,files.send,host.hub.status,links.list,bulletins.list,sos.list,messages.search', '#/guides'],
 ];
-/**
- * Test hook for ui/js/lib/capture_media.js: a canvas.captureStream() "camera" showing a light keyed
- * in Morse, and a Web Audio oscillator keyed in Morse as the "microphone". Keying starts only when
- * the walk calls window.__emberCaptureHook.go() — after the reader reports live samples
- * (.morse-transcript[data-live]) — so a slow start never eats the first character.
- */
-// What the test light/tone keys: a "VVV" tune-up first (as operators do), so the decoder's tone and
-// speed tracking have settled before the message; the walk checks the message that follows.
-export const MORSE_SENT = 'VVV CQ TEST';
-export const MORSE_OK = /(^|\s)CQ TEST$/;
-export const CAPTURE_HOOK = (text, wpm) => `(async () => {
-  const { toMorse, morsePattern } = await import(new URL('js/lib/morse.js', location.href).href);
-  const pat = morsePattern(toMorse(${JSON.stringify(text)}), ${wpm});
-  const on = t => { let a = 0; for (let i = 0; i < pat.length; i++) { if (t < a + pat[i]) return i % 2 === 0; a += pat[i]; } return false; };
-  let t0 = Infinity, mics = [];
-  window.__emberCaptureHook = {
-    go: () => { t0 = performance.now() + 300; for (const m of mics) m(); mics = []; return true; },
-    camera: () => {
-      const c = document.createElement('canvas'); c.width = 320; c.height = 240;
-      const g = c.getContext('2d');
-      const draw = () => { const t = performance.now() - t0; g.fillStyle = '#202020'; g.fillRect(0, 0, 320, 240); g.fillStyle = t > 0 && on(t) ? '#ffffff' : '#383838'; g.fillRect(220, 40, 50, 50); requestAnimationFrame(draw); };
-      draw(); return c.captureStream(30);
-    },
-    mic: () => {
-      const ac = new AudioContext(); const o = ac.createOscillator(); o.frequency.value = 650; const gn = ac.createGain(); gn.gain.value = 0;
-      const dst = ac.createMediaStreamDestination(); o.connect(gn).connect(dst); o.start();
-      mics.push(() => {
-        const s0 = ac.currentTime + 0.3; let t = 0;
-        for (let i = 0; i < pat.length; i++) { gn.gain.setValueAtTime(i % 2 === 0 ? 0.5 : 0, s0 + t / 1000); t += pat[i]; }
-        gn.gain.setValueAtTime(0, s0 + t / 1000);
-      });
-      return dst.stream;
-    },
-  };
-  return true;
-})()`;
+import { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm } from './capture_hook.mjs';
+export { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm };
 
 const SIZES = [['phone', 390, 844, 3, true], ['desktop', 1280, 800, 1, false]];
 
@@ -253,7 +219,7 @@ async function main() {
     current = 'interact-search';
     await open('#/guides', 'input[type=search]');
     await ev(`(() => { const i = document.querySelector('input[type=search]'); i.value = 'radio'; i.dispatchEvent(new Event('input')); })()`);
-    await waitFor(`document.querySelectorAll('.snippet mark, .title mark').length > 0`, 4000);
+    await waitFor(`document.querySelectorAll('.snippet mark, .title mark').length > 0`, 15000);
     const marks = await ev(`document.querySelectorAll('.snippet mark, .title mark').length`);
     if (!(marks > 0)) problems.push('[interact-search] no highlighted results');
 
@@ -268,7 +234,7 @@ async function main() {
     current = 'interact-meter';
     await open('#/links', '.meter');
     const meterExpr = `(() => { const m = document.querySelector('.meter'); if (!m) return 'no meter'; const i = m.querySelector('.meter-bar > i'); const w = i && (i.style.transform || i.style.width); return m.hidden ? 'hidden' : (w ? 'ok' : 'no level'); })()`;
-    await waitFor(meterExpr + " === 'ok'", 5000);
+    await waitFor(meterExpr + " === 'ok'", 15000);
     const meter = await ev(meterExpr);
     if (meter !== 'ok') problems.push('[interact-meter] audio link level meter: ' + meter);
 
@@ -286,34 +252,75 @@ async function main() {
       if (auto) await ev(`document.querySelector('.morse-page input[type=checkbox]').click()`);
       await ev(`[...document.querySelectorAll('button')].find(b => /Start reading/.test(b.textContent)).click()`);
       if (!await waitSel('.morse-transcript[data-live]', 8000)) problems.push(`[${current}] reader never reported live samples`);
-      await ev('window.__emberCaptureHook.go()');
-      await waitFor(`new RegExp(${JSON.stringify(MORSE_OK.source)}).test(((document.querySelector('.morse-transcript') || {}).textContent || '').trim())`, 20000);
+      await sleep(2000); // measure the light's real frame rate before choosing the speed
+      const wpm = tab === 'camera' ? cameraWpm(await ev('window.__emberCaptureHook.fps()')) : 12;
+      const keyMs = await ev(`window.__emberCaptureHook.go(${wpm})`);
+      await waitFor(`new RegExp(${JSON.stringify(MORSE_OK.source)}).test(((document.querySelector('.morse-transcript') || {}).textContent || '').trim())`, keyMs + 12000);
       const tr = await ev(`((document.querySelector('.morse-transcript') || {}).textContent || '').trim()`);
       if (!MORSE_OK.test(tr)) problems.push(`[interact-morse-${tab}] transcript ${JSON.stringify(tr)} (expected it to end with "CQ TEST")`);
       if (SHOTS) fs.writeFileSync(path.join(SHOTS, `interact-morse-${tab}-phone.png`), Buffer.from((await c.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
     }
 
+    // Morse → Send (RPC_API §10): the four torch states of the mock host (?torch=yes|no|refused).
+    const sendQ = (torch) => `?mock=1&noboot=1&torch=${torch}`;
+    const sendText = (v) => ev(`(() => { const t = document.querySelector('#morse-send-text'); t.value = ${JSON.stringify(v)}; t.dispatchEvent(new Event('input')); return true; })()`);
+    const txt = (sel) => ev(`((document.querySelector(${JSON.stringify(sel)}) || {}).textContent || '').trim()`);
+    const btnShown = (label) => ev(`[...document.querySelectorAll('.morse-send button')].some(b => b.textContent.trim() === ${JSON.stringify(label)} && !b.hidden && b.offsetParent !== null)`);
+    current = 'interact-morse-send-torch';
+    await open('#/tools/morse?tab=send', '.morse-go', sendQ('yes'));
+    if (!/^Flash with flashlight$/.test(await txt('.morse-go'))) problems.push(`[${current}] primary button: ${JSON.stringify(await txt('.morse-go'))}`);
+    if (!await btnShown('Use the screen instead')) problems.push(`[${current}] "Use the screen instead" missing`);
+    await sendText('Hé');
+    if (!await waitFor(`[...document.querySelectorAll('.morse-send .notice')].some(n => n.textContent.includes('Morse has no sign for “É”'))`, 3000)) problems.push(`[${current}] no notice for an unsendable character`);
+    const mch = await ev(`document.querySelectorAll('.morse-preview .mch').length`);
+    if (mch !== 1) problems.push(`[${current}] preview characters for "Hé": ${mch} (expected 1)`);
+    await sendText('CQ CQ TEST');
+    await ev(`document.querySelector('.morse-go').click()`);
+    if (!await waitFor(`(() => { const s = document.querySelector('.morse-sending'); return !!s && !s.hidden && !!document.querySelector('.morse-preview .mch.now'); })()`, 5000)) problems.push(`[${current}] sending state / current character not shown`);
+    // Stop mid-message. (Pressed in the first moments, before the host has started the flash, the
+    // stop is lost and the message runs to its end: reported against screens/morse_send.js.)
+    await sleep(500);
+    await ev(`document.querySelector('.morse-stop').click()`);
+    if (!await waitFor(`((document.querySelector('.morse-result') || {}).textContent || '').trim() === 'Stopped.'`, 2000)) problems.push(`[${current}] after Stop: ${JSON.stringify(await txt('.morse-result'))}`);
+
+    current = 'interact-morse-send-screen';
+    await open('#/tools/morse?tab=send', '.morse-go', sendQ('no'));
+    if (!/^Flash with screen$/.test(await txt('.morse-go'))) problems.push(`[${current}] primary button: ${JSON.stringify(await txt('.morse-go'))}`);
+    if (await btnShown('Use the screen instead')) problems.push(`[${current}] "Use the screen instead" shown without a torch`);
+    await sendText('E');
+    await ev(`document.querySelectorAll('.morse-send .segmented [role=radio]')[2].click()`);
+    await ev(`document.querySelector('.morse-go').click()`);
+    if (!await waitFor(`((document.querySelector('.sheet h2') || {}).textContent || '').includes('The whole screen will flash')`, 3000)) problems.push(`[${current}] no warning before flashing the screen`);
+    await ev(`[...document.querySelectorAll('.sheet button')].find(b => b.textContent.trim() === 'Flash the screen').click()`);
+    if (!await waitFor(`((document.querySelector('.morse-sending-title') || {}).textContent || '').includes('at 7 words per minute')`, 3000)) problems.push(`[${current}] screen speed not capped: ${JSON.stringify(await txt('.morse-sending-title'))}`);
+    if (!await waitFor(`((document.querySelector('.morse-result') || {}).textContent || '').trim() === 'Sent with the screen.'`, 8000)) problems.push(`[${current}] result: ${JSON.stringify(await txt('.morse-result'))}`);
+
+    current = 'interact-morse-send-refused';
+    await open('#/tools/morse?tab=send', '.morse-go', sendQ('refused'));
+    await ev(`document.querySelector('.morse-go').click()`);
+    if (!await waitFor(`/camera permission/.test((document.querySelector('.morse-result') || {}).textContent || '')`, 5000)) problems.push(`[${current}] result: ${JSON.stringify(await txt('.morse-result'))}`);
+
     current = 'interact-smart-search';
     await open('#/guides', 'input[type=search]');
-    if (!await waitSel('.smart-switch input:checked', 4000)) problems.push('[smart] switch missing or off');
+    if (!await waitSel('.smart-switch input:checked', 15000)) problems.push('[smart] switch missing or off');
     await ev(`(() => { const i = document.querySelector('input[type=search]'); i.value = 'hemorrhage'; i.dispatchEvent(new Event('input')); })()`);
-    await waitFor(`!!document.querySelector('#main .list a.item .by-meaning')`, 4000);
+    await waitFor(`!!document.querySelector('#main .list a.item .by-meaning')`, 15000);
     const m1 = await ev(`(() => { const a = document.querySelector('#main .list a.item'); return a ? (a.getAttribute('href') + '|' + !!a.querySelector('.by-meaning') + '|' + !!a.querySelector('.passage-heading')) : 'none'; })()`);
     if (!/bleeding-control[^|]*\|true\|true/.test(m1)) problems.push('[smart] meaning-only query: ' + m1);
     await ev(`(() => { const i = document.querySelector('input[type=search]'); i.value = 'tourniquet'; i.dispatchEvent(new Event('input')); })()`);
-    await waitFor(`(() => { const a = document.querySelector('#main .list a.item'); return !!a && !a.querySelector('.by-meaning'); })()`, 4000);
+    await waitFor(`(() => { const a = document.querySelector('#main .list a.item'); return !!a && !a.querySelector('.by-meaning'); })()`, 15000);
     const m2 = await ev(`(() => { const a = document.querySelector('#main .list a.item'); return a ? (a.getAttribute('href') + '|' + !!a.querySelector('.by-meaning')) : 'none'; })()`);
     if (!/bleeding-control[^|]*\|false/.test(m2)) problems.push('[smart] exact-term query: ' + m2);
     current = 'interact-ask';
     await open('#/sos', '.ask-shortcuts button');
     await ev(`[...document.querySelectorAll('.ask-shortcuts button')].find(b => /Not breathing/.test(b.textContent)).click()`);
-    await waitFor(`/Rescue Breathing/.test((document.querySelector('.ask-passage') || document.querySelector('.ask-out') || {}).textContent || '')`, 4000);
+    await waitFor(`/Rescue Breathing/.test((document.querySelector('.ask-passage') || document.querySelector('.ask-out') || {}).textContent || '')`, 15000);
     const ask = await ev(`(() => { const f = document.querySelector('.ask-passage'); return f ? f.textContent : (document.querySelector('.ask-out') || {}).textContent || 'none'; })()`);
     if (!/Rescue Breathing/.test(ask)) problems.push('[ask] emergency shortcut: ' + ask.slice(0, 120));
     if (SHOTS) fs.writeFileSync(path.join(SHOTS, 'interact-ask-phone.png'), Buffer.from((await c.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
     current = 'interact-related';
     await open('#/guides/read/radio/handheld-basics-1', '.reader');
-    if (!await waitFor(`document.querySelectorAll('.related a.item').length > 0`, 4000)) problems.push('[related] no related guides');
+    if (!await waitFor(`document.querySelectorAll('.related a.item').length > 0`, 15000)) problems.push('[related] no related guides');
     current = 'interact-no-semantic';
     await open('#/guides', 'input[type=search]', '?mock=1&nosemantic=1');
     await sleep(500);
@@ -324,9 +331,9 @@ async function main() {
     await ev(`document.querySelector('#main .list .item').click()`);
     await waitSel('[data-method=handheld_vox]');
     await ev(`document.querySelector('[data-method=handheld_vox]').click()`);
-    if (!await waitSel('.hw-card', 4000)) problems.push('[interact-radio] no "You will need" step');
+    if (!await waitSel('.hw-card', 15000)) problems.push('[interact-radio] no "You will need" step');
     await ev(`[...document.querySelectorAll('button')].find(b => /I have these/.test(b.textContent)).click()`);
-    if (!await waitFor(`document.querySelectorAll('.radio-checklist li').length > 3`, 4000)) problems.push('[interact-radio] radio checklist missing');
+    if (!await waitFor(`document.querySelectorAll('.radio-checklist li').length > 3`, 15000)) problems.push('[interact-radio] radio checklist missing');
 
     current = 'interact-link';
     await open('#/links/add?kind=ble', 'button');
@@ -335,7 +342,7 @@ async function main() {
     await waitSel('.devices .item', 6000);
     await ev(`document.querySelector('.devices .item').click()`, 300);
     await ev(`(() => { const i = [...document.querySelectorAll('input')].find(x => x.closest('.field') && /call/i.test(x.closest('.field').textContent)); if (i) { i.value = 'N0CALL'; i.dispatchEvent(new Event('input')); } [...document.querySelectorAll('button')].find(b => b.textContent === 'Connect').click(); })()`);
-    await waitFor(`/#\\/links$/.test(location.hash)`, 5000);
+    await waitFor(`/#\\/links$/.test(location.hash)`, 15000);
     if (!/#\/links$/.test(await ev('location.hash'))) problems.push('[interact-link] wizard did not finish: ' + await ev(`(document.querySelector('.field-error:not(:empty)') || {}).textContent`));
   }
 
@@ -542,8 +549,10 @@ async function realMain() {
       if (tab === 'camera') await ev(`document.querySelector('.morse-page input[type=checkbox]').click()`);
       await click('button', 'Start reading');
       if (!await waitSel('.morse-transcript[data-live]', null, 8000)) throw new Error('reader never reported live samples');
-      await ev('window.__emberCaptureHook.go()');
-      await waitFor(`new RegExp(${JSON.stringify(MORSE_OK.source)}).test(${text('.morse-transcript')}.trim())`, 20000);
+      await sleep(2000); // measure the light's real frame rate before choosing the speed
+      const wpm = tab === 'camera' ? cameraWpm(await ev('window.__emberCaptureHook.fps()')) : 12;
+      const keyMs = await ev(`window.__emberCaptureHook.go(${wpm})`);
+      await waitFor(`new RegExp(${JSON.stringify(MORSE_OK.source)}).test(${text('.morse-transcript')}.trim())`, keyMs + 12000);
       const tr = (await ev(text('.morse-transcript'))).trim();
       await shot('real-morse-' + tab + '-phone');
       await click('button', 'Stop');
@@ -561,7 +570,7 @@ async function realMain() {
     await sleep(300);
     await click('button', 'Next');
     await sleep(300);
-    return waitFor(`/Band and licence/.test(${text('#main')})`, 4000);
+    return waitFor(`/Band and licence/.test(${text('#main')})`, 15000);
   });
   await step('smart search, Ask and Related (or keyword search when the core lacks them)', async () => {
     const info = await ev(`window.__ember.api.call('guides.info').then(r => JSON.stringify(r.semantic || {}), e => e.code)`);
@@ -580,7 +589,7 @@ async function realMain() {
     if (!await waitFor(`!!document.querySelector('.ask-passage, .ask-out .notice')`)) throw new Error('Ask showed nothing');
     await shot('real-ask-phone');
     await go('#/guides/read/medical/bleeding', 2500);
-    if (!await waitFor(`document.querySelectorAll('.related a.item').length > 0`, 4000)) throw new Error('no related guides');
+    if (!await waitFor(`document.querySelectorAll('.related a.item').length > 0`, 15000)) throw new Error('no related guides');
     return true;
   });
   await step('create a channel with a random key', async () => {

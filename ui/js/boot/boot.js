@@ -1,10 +1,8 @@
-// Start-up animation. index.html paints the static logo (#ember-boot) before any script; this picks
-// up from exactly that image, plays the 3D scene while the app loads underneath, and hands over when
-// the minimum time has passed AND the app has rendered a screen — at once on a tap/key or when a
-// dialog/toast appears — and at the hard cap. Self-contained (reads mirrored preferences itself).
-// Hooks: ?noboot=1 / navigator.webdriver skip it; ?boot=full|short|reduced|off forces a variant;
-// ?bootpause=<ms> freezes there (past the end: in the hand-over), window.__emberBoot.seek(ms).
-import { chooseVariant, readPrefs, createMachine, frameAt, TIMELINES, KEYS, ease, clamp01 } from './timeline.js';
+// Start-up animation: picks up from the static logo in index.html, plays the 3D scene while the app
+// loads, hands over once its minimum has played AND the app has rendered — at once on a tap/key or a
+// dialog/toast — and at the cap. Hooks: ?noboot=1 / webdriver skip it, ?boot=full|short|reduced|off,
+// ?bootpause=<ms> + window.__emberBoot.seek(ms) for stills. Rules: ui/README.md "Launch screen".
+import { chooseVariant, readPrefs, createMachine, frameAt, TIMELINES, ease, clamp01 } from './timeline.js';
 import { createRenderer } from './scene.js';
 
 const CAP = 2900; // hand over by now even if the app is still loading (it has its own loading state)
@@ -23,8 +21,7 @@ function start() {
   const appReady = () => !!(main && main.firstElementChild && !doc.getElementById('boot'));
   let osReduce = false;
   try { osReduce = win.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* old */ }
-  let variant = chooseVariant({ query, webdriver: navigator.webdriver === true, prefs: info.prefs, lowPower: info.lowPower, osReduce, seen: info.seen, readyEarly: appReady(), late: t0 > 1200 });
-  if (t0 > 3200 && !query.get('boot')) variant = 'none';
+  let variant = chooseVariant({ query, webdriver: navigator.webdriver === true, prefs: info.prefs });
   const pq = query.get('bootpause'), pause = pq ? { t: +pq || 0 } : null;
   root.classList.add('eb-js'); // cancels the CSS fail-safe
   root.dataset.theme = info.theme;
@@ -33,16 +30,23 @@ function start() {
   if (ll && +ll.size > 0 && !getComputedStyle(root).getPropertyValue('--launch-logo-size').trim()) {
     for (const k of ['x', 'y', 'size']) root.style.setProperty('--launch-logo-' + k, (+ll[k] || 0) + 'px');
   }
-  let canvas = null, ctx = null;
+  // no 2D canvas (very old or locked-down web views): the calm version, i.e. the still logo
+  let canvas = null, ctx = null, cv = null;
   if (variant === 'full' || variant === 'short') {
     try { canvas = doc.createElement('canvas'); ctx = typeof Path2D === 'function' && canvas.getContext('2d'); } catch { ctx = null; }
+    cv = !!ctx;
     if (!ctx) { canvas = null; variant = 'reduced'; }
   }
   const tl = TIMELINES[variant] || TIMELINES.off, mach = createMachine({ min: tl.T, cap: CAP, out: tl.out, skipOut: tl.skipOut });
   const logo = root.querySelector('.eb-logo'), word = root.querySelector('.eb-word');
-  const stats = { frames: 0, dt: [], draw: [], q: 0, dpr: 0 }, api = win.__emberBoot = { variant, active: true, reason: '', stats };
+  // read-only diagnostics (tests, native launch checks): times are performance.now() ms; frame0 =
+  // first frame shown, ready = app rendered, removed = native launch screen gone, out = hand-over
+  // start, done = overlay removed; canvas = 2D context available (null: not needed); osReduce = the OS asks for reduced motion (shown anyway)
+  const stats = { frames: 0, dt: [], draw: [], q: 0, dpr: 0 }, at = { module: Math.round(t0) };
+  const api = win.__emberBoot = { variant, active: true, reason: '', canvas: cv, osReduce, at, stats };
   const off = [], listen = (el, type, fn, o) => { el.addEventListener(type, fn, o); off.push(() => el.removeEventListener(type, fn, o)); };
   let raf = 0, safety = 0, mo = null, renderer = null, last = 0, target, L = null;
+  const ready = () => { if (!at.ready) at.ready = Math.round(performance.now()); mach.ready(); };
 
   function finish(reason) {
     if (!api.active) return;
@@ -55,7 +59,8 @@ function start() {
     if (canvas) canvas.width = canvas.height = 0;
     root.remove();
     if (status) status.remove();
-    if (variant !== 'none') try { store.setItem(KEYS.seen, '1'); } catch { /* ignore */ }
+    at.done = Math.round(performance.now());
+    try { store.removeItem('embermesh.ui.boot_seen'); } catch { /* old marker, no longer used */ }
     try { doc.dispatchEvent(new CustomEvent('ember:bootdone', { detail: { variant, reason: api.reason } })); } catch { /* old */ }
   }
   if (variant === 'none') return finish('none');
@@ -85,7 +90,7 @@ function start() {
     raf = 0;
     if (!api.active) return;
     if (!L) layout();
-    if (appReady()) mach.ready();
+    if (appReady()) ready();
     let t, p = null, clock;
     if (pause) {
       t = Math.min(pause.t, tl.T); clock = pause.t;
@@ -96,7 +101,7 @@ function start() {
       t = m.t; clock = m.el;
       if (m.phase === 'out') {
         p = m.p;
-        if (!root.classList.contains('eb-out')) { root.classList.add('eb-out'); target = canvas && findTarget(); }
+        if (!root.classList.contains('eb-out')) { root.classList.add('eb-out'); target = canvas && findTarget(); at.out = Math.round(now); }
       }
     }
     const d0 = performance.now();
@@ -136,33 +141,39 @@ function start() {
   if (!pe) listen(root, 'touchstart', sk, { passive: true });
   listen(win, 'keydown', sk, true);
   listen(win, 'resize', () => { root.classList.add('eb-free'); layout(); });
-  listen(doc, 'ember:ready', () => mach.ready());
+  listen(doc, 'ember:ready', ready);
   listen(doc, 'visibilitychange', () => {
     const n = performance.now();
     if (doc.visibilityState === 'hidden') { mach.pause(n); cancelAnimationFrame(raf); raf = 0; }
-    else { mach.resume(n); if (mach.m.ready) mach.skip(n, 'resume'); if (!raf) raf = requestAnimationFrame(frame); }
+    // back from the background mid-animation: hand over (never replay); not yet shown: start at frame 0
+    else { mach.resume(n); if (at.frame0 && mach.m.ready) mach.skip(n, 'resume'); if (!raf) raf = requestAnimationFrame(at.frame0 ? frame : begin); }
   });
   if (typeof MutationObserver === 'function') {
     mo = new MutationObserver(recs => {
-      if (appReady()) mach.ready();
+      if (appReady()) ready();
       for (const r of recs) for (const el of r.addedNodes) if (el.nodeType === 1 && (r.target.id === 'toasts' || /\b(flash-)?overlay\b/.test(el.className))) skip('interrupt');
     });
     for (const el of [main, doc.body, doc.getElementById('toasts')]) if (el) mo.observe(el, { childList: true });
   }
   if (pause) api.seek = ms => { pause.t = +ms || 0; target = undefined; };
-  else safety = setTimeout(() => finish('safety'), CAP + 1800);
   api.skip = sk;
-  // a native launch screen covers the page for a few frames after first paint: hold the still
-  // image until the host says it is gone ('ember:launch-removed') or ~140 ms
-  let hold = ll && !pause ? 140 : 0;
-  listen(win, 'ember:launch-removed', () => { hold = 0; });
+  // Frame 0 = the first frame anyone sees: frames run only while visible, and a native shell covers
+  // the page until it signals (__emberHost.launchRemoved / 'ember:launch-removed'; ≤ 1.5 s without
+  // one) — the still is held until then. Minimum and cap count from frame 0.
+  const host = win.__emberHost || {};
+  let hold = !pause && (ll || /^(ios|android)$/.test(host.platform)) && !host.launchRemoved, h0 = 0;
+  listen(win, 'ember:launch-removed', () => { hold = false; at.removed = at.removed || Math.round(performance.now()); });
   mach.start(t0);
-  const begin = now => {
+  function begin(now) {
     raf = 0;
     if (!api.active) return;
-    if (hold && now - t0 < hold) { raf = requestAnimationFrame(begin); return; }
+    h0 = h0 || now;
+    if (hold && !host.launchRemoved && now - h0 < 1500) { raf = requestAnimationFrame(begin); return; }
+    if (host.launchRemoved && !at.removed) at.removed = Math.round(performance.now());
+    at.frame0 = Math.round(now);
     if (mach.m.phase === 'play') mach.start(now);
+    if (!pause) safety = setTimeout(() => finish('safety'), CAP + 1800);
     frame(now);
-  };
+  }
   raf = requestAnimationFrame(begin);
 }
