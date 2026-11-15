@@ -1,7 +1,9 @@
 name: Release
 
 # Builds every distributable and publishes it:
-#   - every push to main: a rolling pre-release named "latest" (tag `latest`, replaced each time)
+#   - every push to main: the rolling development release "latest" (tag `latest`, replaced each time).
+#     Until a versioned release exists it is the repository's latest release, so the repository page
+#     and /releases/latest show it; after that it is marked pre-release and vX.Y.Z stays the latest.
 #   - a version tag vX.Y.Z: a normal release for that tag (the tag must match project() VERSION)
 # All files are also attached to the workflow run as artifacts. No iOS artifacts (Apple signing).
 # The release is created with the run's own GITHUB_TOKEN. The only optional secrets are the Android
@@ -275,7 +277,7 @@ jobs:
           compression-level: 0
 
   publish:
-    name: Publish ${{ needs.version.outputs.kind == 'tag' && 'release' || 'rolling pre-release "latest"' }}
+    name: Publish ${{ needs.version.outputs.kind == 'tag' && 'release' || 'rolling release "latest"' }}
     needs: [version, guides, web, desktop, android]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -326,7 +328,7 @@ jobs:
           retention-days: 30
           compression-level: 0
 
-      - name: Publish the rolling pre-release "latest"
+      - name: Publish the rolling release "latest"
         if: needs.version.outputs.kind == 'rolling' && github.ref == 'refs/heads/main'
         run: |
           # Only the newest commit on main may replace "latest" (an older run that finishes late does not).
@@ -335,8 +337,12 @@ jobs:
             echo "main has moved on to $head; not replacing \"latest\" with $GITHUB_SHA (artifacts are attached to this run)" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          # A development build is the repository's latest release only while no versioned release exists.
+          versioned="$(gh api "repos/$GH_REPO/releases" --paginate \
+            --jq '.[] | select((.draft | not) and (.prerelease | not) and (.tag_name | startswith("v"))) | .tag_name')"
+          if [ -n "$versioned" ]; then mark=(--prerelease --latest=false); else mark=(--latest); fi
           gh release delete latest --cleanup-tag --yes 2>/dev/null || true
-          gh release create latest build/out/* --target "$GITHUB_SHA" --prerelease --latest=false \
+          gh release create latest build/out/* --target "$GITHUB_SHA" "${mark[@]}" \
             --title "latest (main, ${GITHUB_SHA:0:8})" --notes-file build/notes.md
           echo "Published: $GITHUB_SERVER_URL/$GH_REPO/releases/tag/latest" >> "$GITHUB_STEP_SUMMARY"
 
@@ -352,6 +358,10 @@ jobs:
             gh release edit "$TAG" --notes-file build/notes.md
           else
             gh release create "$TAG" build/out/* --verify-tag --title "EmberMesh $VERSION" --notes-file build/notes.md "${prerelease[@]}"
+          fi
+          # From the first versioned release on, the rolling development build is a pre-release.
+          if [ "${#prerelease[@]}" -eq 0 ]; then
+            gh release edit latest --prerelease 2>/dev/null || true
           fi
           echo "Published: $GITHUB_SERVER_URL/$GH_REPO/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"
 

@@ -1,6 +1,6 @@
 ---
 name: release
-description: Cut an EmberMesh version (CMake version, vX.Y.Z tag), understand the rolling "latest" pre-release, how the Android APK signing key is selected and how to verify its certificate digest and the download checksums, and what iOS needs. Use when releasing, tagging, changing release signing, or checking which key signed an APK.
+description: Cut an EmberMesh version (CMake version, vX.Y.Z tag), understand the rolling "latest" release, how the Android APK signing key is selected and how to verify its certificate digest and the download checksums, and what iOS needs. Use when releasing, tagging, changing release signing, or checking which key signed an APK.
 ---
 
 # Releases and signing
@@ -10,8 +10,9 @@ Reference: `docs/CI.md` ("Release", "Cutting a versioned release", "Release sign
 
 ## 1. What is published automatically
 
-- **Every push to `main`** builds everything and replaces the rolling pre-release **`latest`**
-  (tag `latest`). Only the newest `main` commit may replace it; an older run that finishes late
+- **Every push to `main`** builds everything and replaces the rolling development release **`latest`**
+  (tag `latest`). It is the repository's latest release until a versioned release exists; from then
+  on it is marked pre-release. Only the newest `main` commit may replace it; an older run that finishes late
   leaves it alone. Version: `project(EmberMesh VERSION …)` + `-dev.<commit>`.
 - Assets: `guides.pack`, the web zip and single-file HTML (with and without the library), five
   `emberd` packages, the Android debug and release APKs, `SHA256SUMS.txt`, release notes.

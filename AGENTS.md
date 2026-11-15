@@ -175,7 +175,7 @@ hooks. Everything else under `.claude/` is personal and stays git-ignored and re
 | [build-and-test](.claude/skills/build-and-test/SKILL.md) | building any target, choosing and running test suites, toolchain problems |
 | [privacy-check](.claude/skills/privacy-check/SKILL.md) | before every commit, push, release or fork; fixing gate findings |
 | [fork-setup](.claude/skills/fork-setup/SKILL.md) | forking or rehosting: Pages, your own signing key, keeping your identifiers out |
-| [release](.claude/skills/release/SKILL.md) | cutting a version, the rolling `latest` pre-release, APK signing and its certificate |
+| [release](.claude/skills/release/SKILL.md) | cutting a version, the rolling `latest` release, APK signing and its certificate |
 | [add-guide](.claude/skills/add-guide/SKILL.md) | adding or importing library guides and their licence evidence |
 | [write-manual-chapter](.claude/skills/write-manual-chapter/SKILL.md) | adding or changing a chapter of the operator manual |
 | [change-rpc-or-protocol](.claude/skills/change-rpc-or-protocol/SKILL.md) | changing an RPC method, event or the wire protocol |

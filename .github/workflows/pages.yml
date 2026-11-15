@@ -1,5 +1,12 @@
 name: Pages
 
+# The run list shows whether a run deployed: a run started by a Web run that did not pass deploys nothing.
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch' && 'Deploy the newest tested site'
+  || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+  && format('Deploy the site tested at {0}', github.event.workflow_run.head_sha)
+  || format('Not deployed: Web did not pass at {0}', github.event.workflow_run.head_sha)) }}
+
 # Hosts the web app on GitHub Pages (https://<owner>.github.io/<repository>/) from every main
 # commit whose Web workflow succeeded. The site deployed is exactly the dist/web the Web workflow
 # built and tested (artifact web-dist-linux of that run: UI + WASM core + data/guides.pack + PWA

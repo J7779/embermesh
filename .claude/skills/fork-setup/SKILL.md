@@ -33,7 +33,7 @@ comment above them in `README.md`.
 ## 3. What works without any secret
 
 All nine workflows: builds, tests, the publishing gate, Pages and the rolling `latest`
-pre-release in your fork. The release APK is then signed with a throw-away CI key and named
+release in your fork. The release APK is then signed with a throw-away CI key and named
 `…-android-release-ci-debug-signed.apk`; it cannot be installed over a later build as an update
 (uninstall first). iOS is never signed on CI (no `.ipa`).
 

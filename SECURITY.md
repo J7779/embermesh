@@ -13,7 +13,7 @@ the version or commit, how to reproduce it (a crafted packet, frame, file or gui
 and what an attacker gains. Reports are acknowledged as soon as possible, and fixes are released
 through the normal builds; you will be credited in the fix unless you prefer not to be.
 
-Only the latest commit on `main` (and the rolling `latest` pre-release built from it) is
+Only the latest commit on `main` (and the rolling `latest` release built from it) is
 supported.
 
 ## What EmberMesh protects, in brief

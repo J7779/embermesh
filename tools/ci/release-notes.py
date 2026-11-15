@@ -84,7 +84,7 @@ def main(argv):
 
     n = []
     if a.kind == "rolling":
-        n += [f"Rolling pre-release built from `main` at [`{sha[:12]}`]({repo_url}/commit/{sha}) "
+        n += [f"Rolling development build of `main` at [`{sha[:12]}`]({repo_url}/commit/{sha}) "
               f"(commit date {date}). It is replaced by every new commit on `main`; for a fixed version use "
               f"a tagged release.", ""]
     else:

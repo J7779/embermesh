@@ -102,7 +102,7 @@ exactly what has and has not been exercised, and how to test a link yourself.
 ## Get it
 
 **Download a build.** Every commit to `main` is built and tested by GitHub Actions, and its
-binaries are published to the rolling [**latest** pre-release](../../releases/tag/latest):
+binaries are published to the rolling [**latest** release](../../releases/tag/latest):
 
 | Platform | What you get |
 |---|---|
@@ -112,7 +112,7 @@ binaries are published to the rolling [**latest** pre-release](../../releases/ta
 | All apps | `guides.pack`, the guide library with its search index |
 | iOS 15+ | no download (an `.ipa` needs Apple signing); build it with Xcode and sign it with your own Apple ID — [apps/ios/README.md](apps/ios/README.md) |
 
-The latest pre-release is rebuilt from every commit and is a development build. The Android release
+The latest release is rebuilt from every commit and is a development build. The Android release
 APK is signed in CI with the publisher's own release key (when the repository's signing secrets
 are set — [docs/CI.md](docs/CI.md#release-signing)) and is then named `…-android-release.apk`, so it
 updates earlier copies signed with that key. An APK named `…-release-ci-debug-signed.apk` (or one
@@ -388,7 +388,7 @@ summary says which step.
 | [iOS](../../actions/workflows/ios.yml) | the app for the simulator and an unsigned device build; XCTest on the simulator | [![iOS](../../actions/workflows/ios.yml/badge.svg?branch=main)](../../actions/workflows/ios.yml) | run artifacts only (no `.ipa`: needs Apple signing) |
 | [Guides](../../actions/workflows/guides.yml) | validates all guides and their licences, builds `guides.pack`, checks search | [![Guides](../../actions/workflows/guides.yml/badge.svg?branch=main)](../../actions/workflows/guides.yml) | run artifacts; `guides.pack` in [latest](../../releases/tag/latest) |
 | [Publish checks](../../actions/workflows/checks.yml) | the publishing gate (`tools/check-publishable.sh` and its self-test), licence and required-file checks | [![Publish checks](../../actions/workflows/checks.yml/badge.svg?branch=main)](../../actions/workflows/checks.yml) | report in the run summary |
-| [Release](../../actions/workflows/release.yml) | collects the binaries of a `main` commit and updates the rolling `latest` pre-release | [![Release](../../actions/workflows/release.yml/badge.svg?branch=main)](../../actions/workflows/release.yml) | [releases/tag/latest](../../releases/tag/latest) |
+| [Release](../../actions/workflows/release.yml) | collects the binaries of a `main` commit and updates the rolling `latest` release | [![Release](../../actions/workflows/release.yml/badge.svg?branch=main)](../../actions/workflows/release.yml) | [releases/tag/latest](../../releases/tag/latest) |
 | [Pages](../../actions/workflows/pages.yml) | publishes the tested web app (with the guide library) as a static site; installable as an offline app | [![Pages](../../actions/workflows/pages.yml/badge.svg?branch=main)](../../actions/workflows/pages.yml) | [the live site](../../deployments/github-pages) |
 
 All runs: [Actions](../../actions).

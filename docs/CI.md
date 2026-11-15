@@ -251,7 +251,8 @@ builds, or the tag without its `v`.
 
 **Where to download:**
 
-- the rolling pre-release: `../../releases/tag/latest` (Releases → "latest"), replaced by every
+- the rolling development release: `../../releases/tag/latest` (Releases → "latest"; the repository's
+  latest release until a versioned release exists, a pre-release after that), replaced by every
   commit on `main`; only the newest commit may replace it (a slower, older run leaves it alone);
 - versioned releases: Releases → `vX.Y.Z`;
 - any run: Actions → Release → the run → Artifacts (`release-*`, and `embermesh-<v>` with
