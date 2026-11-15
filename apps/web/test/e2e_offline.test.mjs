@@ -319,6 +319,16 @@ test('upgrade from the previous release\'s service worker: the new one takes ove
   await P.waitFor(`navigator.serviceWorker.getRegistration().then((r) => !!(r && r.active && r.active.state === 'activated'))`, 60000);
   await P.waitFor(`caches.keys().then((k) => k.some((n) => /^embermesh-\\d/.test(n)))`, 30000);
   const id = (await P.call('node.info')).node_id;
+  // the browser's own record of each worker version (DevTools ServiceWorker domain), for the report
+  // when the takeover does not happen: which version was installed/activated, running or stopped
+  const tl = [];
+  const t0 = Date.now();
+  const offSw = prof.browser.cdp.onEvent((m) => {
+    if (m.method === 'ServiceWorker.workerVersionUpdated') for (const v of m.params.versions) tl.push(`+${Date.now() - t0}ms v${v.versionId} ${v.status}/${v.runningStatus} clients=${(v.controlledClients || []).length}`);
+    else if (m.method === 'ServiceWorker.workerErrorReported') tl.push(`+${Date.now() - t0}ms error ${m.params.errorMessage.errorMessage}`);
+  });
+  t.after(() => offSw());
+  await P.send('ServiceWorker.enable').catch(() => {});
   srv.setRoot(NEW.dir);
   // the browser checks sw.js on navigation; the new worker installs, skips waiting and claims
   await P.reloadNode();
@@ -328,7 +338,7 @@ test('upgrade from the previous release\'s service worker: the new one takes ove
     await P.waitFor(`new Promise((res) => { const sw = navigator.serviceWorker.controller; if (!sw) return res(false); navigator.serviceWorker.addEventListener('message', (e) => res(e.data && e.data.logic), { once: true }); sw.postMessage({ type: 'embermesh-sw-logic' }); setTimeout(() => res(false), 2000); })`, 240000);
   } catch (e) {
     const reg = await P.evaluate(`navigator.serviceWorker.getRegistration().then((r) => JSON.stringify(r && { active: r.active && r.active.state, waiting: r.waiting && r.waiting.state, installing: r.installing && r.installing.state, controller: !!navigator.serviceWorker.controller }))`).catch((x) => x.message);
-    throw new Error(`the new service worker did not take over within 240 s: registration ${reg}`);
+    throw new Error(`the new service worker did not take over within 240 s: registration ${reg}\nworker versions as the browser saw them:\n${tl.slice(-60).join('\n')}`);
   }
   await P.reloadNode();
   const st = await waitReady(P, 120000);
