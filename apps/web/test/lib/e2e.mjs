@@ -72,6 +72,11 @@ const IGNORABLE = [
 ];
 export const realErrors = (errs) => errs.filter((e) => !IGNORABLE.some((r) => r.test(e)));
 
+// A page that ran with the network cut off: the browser logs each failed network request (the
+// app's update check, which is expected to fail then) as a console error. That is the browser's
+// network log, not an error of the app.
+export const offlineNoise = (errs) => realErrors(errs).filter((e) => !/net::ERR_(CONNECTION_REFUSED|FAILED|INTERNET_DISCONNECTED|EMPTY_RESPONSE|CONNECTION_RESET)/.test(e));
+
 const READY = `(() => { const b = globalThis.__emberWasmBackend; return !!(b && b.ready && b.node); })()`;
 
 /**

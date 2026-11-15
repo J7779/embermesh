@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { WASM_DIR, WEB_DIR, ROOT, haveWasm } from './helpers.mjs';
-import { e2eSkip, nodePage, tmpDir, runCleanups, HOOK, REQUIRE, realErrors } from './lib/e2e.mjs';
+import { e2eSkip, nodePage, tmpDir, runCleanups, HOOK, REQUIRE, offlineNoise } from './lib/e2e.mjs';
 import { findChrome, launchChrome } from './lib/cdp.mjs';
 import { startServer } from './lib/static_server.mjs';
 
@@ -28,10 +28,6 @@ const skip = e2eSkip([!haveWasm() && 'WASM build missing', !fs.existsSync(BIG_PA
 const cleanups = [];
 after(async () => { await runCleanups(cleanups); }, HOOK);
 const BASE = '/embermesh/';
-
-// The browser logs a failed network request (an update check while offline) as a console error.
-// That is the browser's network log, not an error of the app.
-const offlineNoise = (errs) => realErrors(errs).filter((e) => !/net::ERR_(CONNECTION_REFUSED|FAILED|INTERNET_DISCONNECTED|EMPTY_RESPONSE|CONNECTION_RESET)/.test(e));
 
 // ---- building site variants -----------------------------------------------------------------
 

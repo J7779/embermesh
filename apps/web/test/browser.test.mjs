@@ -24,6 +24,9 @@ const NODE_READY = `(async () => {
 // Errors that come from the browser environment, not from our code.
 const IGNORABLE = [/favicon\.ico/];
 const realErrors = (errs) => errs.filter((e) => !IGNORABLE.some((r) => r.test(e)));
+// After a stretch with the network cut off: the browser logs each failed network request (the app's
+// update check, expected to fail then) as a console error; that is its network log, not the app's.
+const offlineNoise = (errs) => realErrors(errs).filter((e) => !/net::ERR_(CONNECTION_REFUSED|FAILED|INTERNET_DISCONNECTED|EMPTY_RESPONSE|CONNECTION_RESET)/.test(e));
 
 let browser;
 let launchError = null;
@@ -87,7 +90,7 @@ test('static site over HTTP: WASM node answers, no console errors, service worke
     assert.ok(g > 0, 'guide library loads offline from the cache');
   }
   await page.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
-  assert.deepEqual(realErrors(page.errors), []);
+  assert.deepEqual(offlineNoise(page.errors), []);
   await page.close();
 });
 
