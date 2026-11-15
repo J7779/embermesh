@@ -54,8 +54,19 @@ const SPECIAL = [
   ['lock', '?mock=1&locked=1', '#/chats'],
   ['degraded', '?mock=1&unsupported=guides.categories,tools.list,files.send,host.hub.status,links.list,bulletins.list,sos.list,messages.search', '#/guides'],
 ];
-import { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm } from './capture_hook.mjs';
+import { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm, SOUND_TWIN, CAMERA_TWIN, cameraTwinProblems } from './capture_hook.mjs';
+// Steps that need real-time media (live camera light, live tone) run only when the host passes the
+// real-time probe (docs/CI.md); otherwise they are reported as SKIPPED with the measured numbers.
+// Their deterministic twins (sample / frame time) always run.
+import { REALTIME_PROBE, verdict, probeLine, LIMITS } from './realtime_probe.mjs';
 export { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm };
+
+/** Runs the real-time probe in the page (ev = the walk's evaluate) and prints its line. */
+async function probe(ev, where, parts) {
+  const p = await ev(REALTIME_PROBE(parts));
+  console.log(probeLine(where, p));
+  return p;
+}
 
 const SIZES = [['phone', 390, 844, 3, true], ['desktop', 1280, 800, 1, false]];
 
@@ -145,6 +156,7 @@ async function main() {
   const { proc, dir, wsUrl } = await launch();
   const c = await cdp(wsUrl);
   const problems = [];
+  const skipped = [];
   let current = '';
   c.on((method, p) => {
     if (method === 'Runtime.exceptionThrown') problems.push(`[${current}] exception: ${p.exceptionDetails.exception?.description || p.exceptionDetails.text}`);
@@ -155,6 +167,10 @@ async function main() {
   await c.send('Log.enable');
   await c.send('Page.enable');
   if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
+  // what this host can do in real time, measured once at the start (re-checked before each step)
+  await c.send('Page.navigate', { url: base + '?mock=1#/tools' });
+  await sleep(1500);
+  await probe(async (expr) => (await c.send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true })).result.value, 'mock walk start');
 
   const visit = async (name, query, hash, size) => {
     const [sname, w, hgt, scale, mobile] = size;
@@ -217,7 +233,8 @@ async function main() {
     if (SHOTS) fs.writeFileSync(path.join(SHOTS, 'interact-tool-phone.png'), Buffer.from((await c.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
 
     current = 'interact-search';
-    await open('#/guides', 'input[type=search]');
+    // the box is on screen before the library has loaded; it searches once the categories show
+    await open('#/guides', '.cat-grid a');
     await ev(`(() => { const i = document.querySelector('input[type=search]'); i.value = 'radio'; i.dispatchEvent(new Event('input')); })()`);
     await waitFor(`document.querySelectorAll('.snippet mark, .title mark').length > 0`, 15000);
     const marks = await ev(`document.querySelectorAll('.snippet mark, .title mark').length`);
@@ -245,19 +262,54 @@ async function main() {
     await ev(`document.querySelector('input[data-action="start_on_boot"]').click()`);
     if (!await waitFor(`(async () => (await window.__ember.api.call('host.info')).actions.find(a => a.id === 'start_on_boot').checked)()`)) problems.push('[interact-actions] switch did not call its method');
 
-    for (const [tab, auto] of [['camera', true], ['sound', false]]) {
+    // deterministic twins of the live reader steps below: always run, any host speed. The camera
+    // twin: a 4 px keyed light and a steady lamp in a 1280×720 picture, found without a tap and
+    // read; with only the lamp, nothing is locked or read.
+    for (const [name, expr, keyed] of [['interact-morse-camera-frametime', CAMERA_TWIN(MORSE_SENT, 12), true], ['interact-morse-camera-nolight-frametime', CAMERA_TWIN(MORSE_SENT, 12, { keyed: false }), false]]) {
+      current = name;
+      await open('#/tools', '#main');
+      for (const p of cameraTwinProblems(await ev(expr), { keyed })) problems.push(`[${current}] ${p}`);
+    }
+    current = 'interact-morse-sound-sampletime';
+    await open('#/tools', '#main');
+    const snd = await ev(SOUND_TWIN(MORSE_SENT, 12));
+    if (!snd || !MORSE_OK.test(snd.transcript)) problems.push(`[${current}] transcript ${JSON.stringify(snd && snd.transcript)} (expected it to end with "CQ TEST")`);
+    // the screen with only a steady lamp in the picture: keeps looking, reads nothing (no real time needed)
+    current = 'interact-morse-camera-nolight';
+    await open('#/tools/morse?tab=camera', '.morse-start');
+    await ev(CAPTURE_HOOK(MORSE_SENT, 12, { keyed: false }));
+    await ev(`document.querySelector('.morse-start').click()`);
+    if (!await waitSel('.morse-transcript[data-live]', 8000)) problems.push(`[${current}] reader never reported live frames`);
+    await sleep(6000);
+    const idle = await ev(`({ state: (document.querySelector('.reader-state-text') || {}).textContent, text: (document.querySelector('.morse-transcript') || {}).textContent, ring: !(document.querySelector('.reader-ring') || {}).hidden })`);
+    if (idle.state !== 'Looking for a blinking light…' || idle.text || idle.ring) problems.push(`[${current}] with no keyed light: ${JSON.stringify(idle)}`);
+    await ev(`document.querySelector('.morse-start').click()`);
+    for (const tab of ['camera', 'sound']) {
       current = 'interact-morse-' + tab;
       await open('#/tools/morse?tab=' + tab, '.morse-transcript');
+      const why = verdict(await probe(ev, current, [tab === 'camera' ? 'camera' : 'audio']))[tab === 'camera' ? 'camera' : 'audio'];
+      if (why) { skipped.push(`[${current}] ${why}`); continue; }
       await ev(CAPTURE_HOOK(MORSE_SENT, 12));
-      if (auto) await ev(`document.querySelector('.morse-page input[type=checkbox]').click()`);
-      await ev(`[...document.querySelectorAll('button')].find(b => /Start reading/.test(b.textContent)).click()`);
+      await ev(`document.querySelector('.morse-start').click()`);
       if (!await waitSel('.morse-transcript[data-live]', 8000)) problems.push(`[${current}] reader never reported live samples`);
       await sleep(2000); // measure the light's real frame rate before choosing the speed
-      const wpm = tab === 'camera' ? cameraWpm(await ev('window.__emberCaptureHook.fps()')) : 12;
+      const fps = tab === 'camera' ? await ev('window.__emberCaptureHook.fps()') : 0;
+      if (tab === 'camera' && fps < LIMITS.camera_fps) {
+        // the reader's own page paints the light slower than the probe saw: same probe, same skip
+        skipped.push(`[${current}] the test camera painted ${fps} fps while reading, a camera reader needs ${LIMITS.camera_fps}`);
+        await ev(`[...document.querySelectorAll('button')].find(b => /Stop/.test(b.textContent))?.click()`);
+        continue;
+      }
+      const wpm = tab === 'camera' ? cameraWpm(fps) : 12;
       const keyMs = await ev(`window.__emberCaptureHook.go(${wpm})`);
       await waitFor(`new RegExp(${JSON.stringify(MORSE_OK.source)}).test(((document.querySelector('.morse-transcript') || {}).textContent || '').trim())`, keyMs + 12000);
       const tr = await ev(`((document.querySelector('.morse-transcript') || {}).textContent || '').trim()`);
       if (!MORSE_OK.test(tr)) problems.push(`[interact-morse-${tab}] transcript ${JSON.stringify(tr)} (expected it to end with "CQ TEST")`);
+      if (tab === 'camera') {
+        // found by itself (no tap): the state line and the ring on the light
+        const st = await ev(`({ state: (document.querySelector('.reader-state-text') || {}).textContent, ring: !(document.querySelector('.reader-ring') || {}).hidden })`);
+        if (!/Reading the light|Lost the light/.test(st.state || '')) problems.push(`[${current}] state line ${JSON.stringify(st.state)} after reading`);
+      }
       if (SHOTS) fs.writeFileSync(path.join(SHOTS, `interact-morse-${tab}-phone.png`), Buffer.from((await c.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
     }
 
@@ -360,11 +412,12 @@ async function main() {
   proc.kill();
   srv.close();
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* ignore */ }
+  for (const sk of skipped) console.log('SKIP ' + sk);
   if (problems.length) {
     console.error('SMOKE FAILED:\n' + problems.join('\n'));
     process.exit(1);
   }
-  console.log('smoke ok: ' + (ROUTES.length + SPECIAL.length) * SIZES.length + ' screen loads, no console errors' + (SHOTS ? ', screenshots in ' + SHOTS : ''));
+  console.log('smoke ok: ' + (ROUTES.length + SPECIAL.length) * SIZES.length + ' screen loads, no console errors; ' + `${skipped.length} step(s) SKIPPED (not passed)` + (skipped.length ? ': ' + skipped.map(x => x.split(']')[0].slice(1)).join(', ') : '') + (SHOTS ? ', screenshots in ' + SHOTS : ''));
   // ---- accessibility audit (owned by tests/a11y_audit.mjs; --quick subset, baseline compared)
   if (!ONLY && !process.env.EMBER_SKIP_A11Y) {
     const { spawnSync } = await import('node:child_process');
@@ -412,13 +465,17 @@ async function realMain() {
   const waitFor = async (expr, ms = 8000) => { const end = Date.now() + ms; while (Date.now() < end) { if (await ev(expr)) return true; await sleep(150); } return false; };
   const size = async ([, w, hgt, scale, mobile]) => c.send('Emulation.setDeviceMetricsOverride', { width: w, height: hgt, deviceScaleFactor: SHOTS ? Math.min(scale, 2) : 1, mobile });
   const shot = async name => { if (SHOTS) fs.writeFileSync(path.join(SHOTS, name + '.png'), Buffer.from((await c.send('Page.captureScreenshot', { format: 'png' })).data, 'base64')); };
+  // fn returns false (failed), { skip: reason } (SKIPPED, never counted as ok) or anything else (ok)
+  const skips = [];
   const step = async (name, fn) => {
     current = name;
     const before = problems.length;
-    try { const ok = await fn(); if (ok === false) problems.push(`[${name}] failed`); } catch (e) { problems.push(`[${name}] ${e.message}`); }
+    let skip = null;
+    try { const ok = await fn(); if (ok === false) problems.push(`[${name}] failed`); else if (ok && ok.skip) skip = ok.skip; } catch (e) { problems.push(`[${name}] ${e.message}`); }
     const bad = await ev(`[...document.querySelectorAll('.toast.bad')].map(t => t.textContent).join(' | ')`).catch(() => '');
     if (bad) problems.push(`[${name}] error toast: ${bad}`);
     await ev(`document.querySelectorAll('.toast').forEach(t => t.remove())`).catch(() => {});
+    if (problems.length === before && skip) { skips.push(name); steps.push(`SKIP ${name}: ${skip}`); return; }
     steps.push(`${problems.length === before ? 'ok  ' : 'FAIL'} ${name}`);
   };
   const go = async (hash, wait = 1500) => { await ev(`location.hash = ${JSON.stringify(hash)}`); await sleep(wait); };
@@ -448,6 +505,8 @@ async function realMain() {
     await click('.setup .btn.primary');
     return waitFor(`!!document.querySelector('.chat-list') && !document.getElementById('setup-name')`);
   });
+  // what this host can do in real time, measured once at the start (re-checked before each step)
+  await probe(ev, 'real walk start').catch(e => console.log('realtime probe (real walk start): failed: ' + e.message));
 
   for (const sz of SIZES) {
     await size(sz);
@@ -503,6 +562,7 @@ async function realMain() {
   });
   await step('open a guide found by search', async () => {
     await go('#/guides');
+    if (!await waitSel('.cat-grid a', null, 20000)) throw new Error('library did not load'); // searches once loaded
     await type('input[type=search]', 'purify water');
     if (!await waitFor(`document.querySelectorAll('#main .list a.item').length > 0`)) throw new Error('no search results');
     await click('#main .list a.item');
@@ -540,17 +600,52 @@ async function realMain() {
     await click('.sheet .btn.danger', 'Remove');
     return waitFor(`[...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'Set passphrase')`);
   });
+  const morseRx = () => ev(`window.__ember.api.call('morse.rx.start', { source: 'light' }).then(r => window.__ember.api.call('morse.rx.stop', { session: r.session }).then(() => 'yes'), e => e.code)`);
+  // deterministic twins of the live reader steps: always run, any host speed
+  const frames = () => ev(`((window.__ember.store.get('info') || {}).features || []).includes('morse_frames')`);
+  for (const [name, keyed] of [['read Morse by camera in frame time (4 px light + steady lamp, no tap)', true], ['camera in frame time, steady lamp only: nothing locked or read', false]]) {
+    await step(name, async () => {
+      if (await morseRx() === 'not_implemented') return { skip: 'this core has no morse.rx yet' };
+      if (!await frames()) return { skip: 'this core has no light tracker (node.info.features lacks morse_frames)' };
+      await go('#/tools', 800);
+      const p = cameraTwinProblems(await ev(CAMERA_TWIN(MORSE_SENT, 12, { keyed })), { keyed });
+      if (p.length) throw new Error(p.join('; '));
+      return true;
+    });
+  }
+  await step('read Morse by sound in sample time', async () => {
+    if (await morseRx() === 'not_implemented') return { skip: 'this core has no morse.rx yet' };
+    await go('#/tools', 800);
+    const r = await ev(SOUND_TWIN(MORSE_SENT, 12));
+    if (!MORSE_OK.test(r.transcript)) throw new Error('transcript ' + JSON.stringify(r.transcript));
+    return true;
+  });
+  await step('Morse camera screen, steady lamp only: keeps looking, reads nothing', async () => {
+    if (await morseRx() === 'not_implemented') return { skip: 'this core has no morse.rx yet' };
+    await go('#/tools/morse?tab=camera', 1500);
+    await ev(CAPTURE_HOOK(MORSE_SENT, 12, { keyed: false }));
+    await click('button', 'Start reading');
+    if (!await waitSel('.morse-transcript[data-live]', null, 8000)) throw new Error('reader never reported live frames');
+    await sleep(6000);
+    const idle = await ev(`({ state: ${text('.reader-state-text')}, text: ${text('.morse-transcript')}, ring: !(document.querySelector('.reader-ring') || {}).hidden })`);
+    await click('button', 'Stop');
+    if (idle.state !== 'Looking for a blinking light…' || idle.text || idle.ring) throw new Error('with no keyed light: ' + JSON.stringify(idle));
+    return true;
+  });
   for (const tab of ['camera', 'sound']) {
     await step('read Morse by ' + tab, async () => {
-      const has = await ev(`window.__ember.api.call('morse.rx.start', { source: 'light' }).then(r => window.__ember.api.call('morse.rx.stop', { session: r.session }).then(() => 'yes'), e => e.code)`);
-      if (has === 'not_implemented') { steps.push('skip read Morse by ' + tab + ': this core has no morse.rx yet'); return true; }
+      if (await morseRx() === 'not_implemented') return { skip: 'this core has no morse.rx yet' };
       await go('#/tools/morse?tab=' + tab, 1500);
+      const part = tab === 'camera' ? 'camera' : 'audio';
+      const why = verdict(await probe(ev, 'real walk, read Morse by ' + tab, [part]))[part];
+      if (why) return { skip: why };
       await ev(CAPTURE_HOOK(MORSE_SENT, 12));
-      if (tab === 'camera') await ev(`document.querySelector('.morse-page input[type=checkbox]').click()`);
       await click('button', 'Start reading');
       if (!await waitSel('.morse-transcript[data-live]', null, 8000)) throw new Error('reader never reported live samples');
       await sleep(2000); // measure the light's real frame rate before choosing the speed
-      const wpm = tab === 'camera' ? cameraWpm(await ev('window.__emberCaptureHook.fps()')) : 12;
+      const fps = tab === 'camera' ? await ev('window.__emberCaptureHook.fps()') : 0;
+      if (tab === 'camera' && fps < LIMITS.camera_fps) { await click('button', 'Stop'); return { skip: `the test camera painted ${fps} fps while reading, a camera reader needs ${LIMITS.camera_fps}` }; }
+      const wpm = tab === 'camera' ? cameraWpm(fps) : 12;
       const keyMs = await ev(`window.__emberCaptureHook.go(${wpm})`);
       await waitFor(`new RegExp(${JSON.stringify(MORSE_OK.source)}).test(${text('.morse-transcript')}.trim())`, keyMs + 12000);
       const tr = (await ev(text('.morse-transcript'))).trim();
@@ -575,6 +670,7 @@ async function realMain() {
   await step('smart search, Ask and Related (or keyword search when the core lacks them)', async () => {
     const info = await ev(`window.__ember.api.call('guides.info').then(r => JSON.stringify(r.semantic || {}), e => e.code)`);
     await go('#/guides', 2000);
+    if (!await waitSel('.cat-grid a', null, 20000)) throw new Error('library did not load');
     await type('#main input[type=search]', 'tourniquet');
     if (!await waitFor(`[...document.querySelectorAll('#main .list a.item')].length > 0`)) throw new Error('exact-term query found nothing');
     if (info === 'not_implemented' || !/"available":true/.test(info)) {
@@ -648,7 +744,7 @@ async function realMain() {
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* ignore */ }
   console.log(steps.join('\n'));
   if (problems.length) { console.error('REAL SMOKE FAILED:\n' + problems.join('\n')); process.exit(1); }
-  console.log('real-core smoke ok: ' + steps.length + ' steps, no console errors' + (SHOTS ? ', screenshots in ' + SHOTS : ''));
+  console.log('real-core smoke ok: ' + steps.filter(s => s.startsWith('ok')).length + ' steps passed, no console errors; ' + `${skips.length} step(s) SKIPPED (not passed)` + (skips.length ? ': ' + skips.join(', ') : '') + (SHOTS ? ', screenshots in ' + SHOTS : ''));
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

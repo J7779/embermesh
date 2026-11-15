@@ -5,7 +5,8 @@
 //     output is routed through a MediaStreamAudioDestinationNode into node B's audio endpoint as if
 //     it were B's microphone (getUserMedia -> AudioWorklet capture -> ember_audio_rx -> demodulator).
 //     B must decode A's Public message. Also checks: worklet playout had no underruns while the
-//     core was mid-transmission, link.ptt on/off fired, and serial-RTS PTT (a fake Web Serial port)
+//     core was mid-transmission (the whole test needs a host that passes the real-time probe; its
+//     sample-time twin is audio_playout.test.mjs), link.ptt on/off fired, and serial-RTS PTT (a fake Web Serial port)
 //     was keyed for the whole transmission and released only after the audio had played out.
 //  2. Fake microphone: a WAV produced by the core's own modulator (in Node) is fed to Chrome with
 //     --use-file-for-fake-audio-capture; the page's audio link (real getUserMedia path) must decode it.
@@ -16,7 +17,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { DIST_DIR, wasmModuleUrl, ui, haveWasm } from './helpers.mjs';
 import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir } from './lib/e2e.mjs';
-import { runCleanups, HOOK } from './lib/e2e.mjs';
+import { runCleanups, HOOK, realtimeSkip } from './lib/e2e.mjs';
 import { startServer } from './lib/static_server.mjs';
 
 const skip = e2eSkip([!haveWasm() && 'WASM build missing']);
@@ -114,8 +115,21 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
   assert.equal(setup.stateA, 'running');
   await A.waitCall('links.list', {}, (r) => (r.links.find((l) => l.id === setup.la) || {}).state === 'up', 10000, 'audio link A up');
 
+  // Live audio through the devices (decode, gapless playout, PTT timing) needs a host that runs audio
+  // in real time; probed just before. Below the probe's limits the transmission still runs once and
+  // its numbers are reported, then the test is SKIPPED (the sample-time twin is audio_playout.test.mjs).
+  const rt = await realtimeSkip(t, A, ['audio', 'timers'], 'audio cross-wire');
   const text = `over the air ${Date.now()}`;
   await A.call('messages.send', { conv: 'ch:public', text });
+  if (rt) {
+    const dec = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 30000).then(() => 'yes', () => 'no');
+    await A.waitFor('!__epA.ptt && !__epA._burst && !__epA._pttCancel', 20000).catch(() => {});
+    const st = await A.evaluate('globalThis.__epA.stats()');
+    t.diagnostic(`not real time here: decoded ${dec}, device playout ${JSON.stringify(st)}`);
+    await A.evaluate('globalThis.__B.destroy().then(() => true)');
+    t.skip(rt);
+    return;
+  }
   const got = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.find(m => m.text === ${JSON.stringify(text)}) || null)`, 40000);
   assert.equal(got.from, a.node_id, 'B decoded A\'s frame from audio');
 
@@ -134,7 +148,6 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
   })()`);
   t.diagnostic(`playout: ${JSON.stringify(r.st)}, tx samples ${r.txSamples} @ ${r.rate} Hz, B link stats ${JSON.stringify(r.bLink.stats)}`);
   assert.ok(r.txSamples > r.rate * 0.2, 'core produced audio');
-  assert.equal(r.st.underruns, 0, `no gaps while transmitting (${JSON.stringify(r.st)})`);
   assert.ok(r.st.played >= r.txSamples, 'every transmitted sample was played');
   assert.ok(r.bLink.stats.rx_frames >= 1, 'B link counted the decoded frame');
 
@@ -148,12 +161,15 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
   assert.ok(r.bursts.length >= 1, 'at least one transmission recorded');
   assert.equal(ons.length, r.bursts.length, `one RTS key-up per transmission: ${JSON.stringify(rts)}`);
   assert.equal(r.bursts.reduce((n, b) => n + b.samples, 0), r.txSamples, 'every transmitted sample belongs to a keyed burst');
+  for (const b of r.bursts) assert.ok(b.off_audio >= b.play_end - 0.003, `PTT released ${((b.play_end - b.off_audio) * 1000).toFixed(0)} ms before the last sample played`);
+  assert.equal(rts.at(-1).requestToSend, false, 'RTS low at the end');
+  // measured at the device in wall-clock time (this host passed the real-time probe)
+  t.diagnostic(`device underruns while transmitting: ${r.st.underruns} (${r.st.underrun_samples} samples)`);
+  assert.equal(r.st.underruns, 0, `no gaps while transmitting (${JSON.stringify(r.st)})`);
   for (const b of r.bursts) {
-    assert.ok(b.off_audio >= b.play_end - 0.003, `PTT released ${((b.play_end - b.off_audio) * 1000).toFixed(0)} ms before the last sample played`);
     const audioMs = (b.samples / r.rate) * 1000;
     assert.ok(b.off_ms - b.on_ms >= audioMs - 30, `PTT held ${b.off_ms - b.on_ms} ms for ${audioMs.toFixed(0)} ms of audio`);
   }
-  assert.equal(rts.at(-1).requestToSend, false, 'RTS low at the end');
   await A.evaluate('globalThis.__B.destroy().then(() => true)');
   assert.deepEqual(realErrors(A.errors), []);
 });
@@ -228,6 +244,9 @@ test('audio: a WAV from the core modulator as the microphone decodes in the page
       return buf.duration;
     })()`);
   }
+  // the fake capture device (or the looped Web Audio substitute) must play the WAV in real time
+  const why = await realtimeSkip(t, P, mic === 'real' ? ['audio', 'mic'] : ['audio'], 'WAV microphone');
+  if (why) { t.skip(why); return; }
   const { link } = await P.call('host.link.create', { name: 'Mic', endpoint: { kind: 'audio', config: { ptt: 'vox' } }, link: { type: 'audio', config: cfg('TEST4') } });
   await P.waitCall('links.list', {}, (r) => (r.links.find((l) => l.id === link.id) || {}).state === 'up', 10000, 'audio link up');
   // Fail with a clear reason if the "microphone" is silent instead of timing out on the decode.
@@ -249,14 +268,13 @@ test('audio in the single file (file://): ScriptProcessor path, real modem decod
   const a = await A.call('node.info');
   const setup = await A.evaluate(CROSS_WIRE(a.card, MIC === 'real'), 60000);
   assert.equal(await A.evaluate('__epA.mode'), 'scriptprocessor');
-  // ScriptProcessor runs on the page's main thread: when the machine is saturated (other test files)
-  // a block can be late and the frame lost, as on a busy phone. Like an operator, send again (max 3).
-  let got = false;
-  for (let i = 1; i <= 3 && !got; i++) {
-    const text = `single file over the air ${Date.now()}`;
-    await A.call('messages.send', { conv: 'ch:public', text });
-    try { await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 20000); got = true; t.diagnostic(`decoded on send ${i}`); } catch (e) { if (i === 3) throw e; }
-  }
+  // ScriptProcessor runs on the page's main thread: a late block loses audio, so this needs a host
+  // that runs audio in real time (probed just before; the sample-time twin is audio_playout.test.mjs).
+  const why = await realtimeSkip(t, A, ['audio'], 'single-file audio');
+  if (why) { await A.evaluate('globalThis.__B.destroy().then(() => true)'); t.skip(why); return; }
+  const text = `single file over the air ${Date.now()}`;
+  await A.call('messages.send', { conv: 'ch:public', text });
+  await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 30000);
   await A.waitFor('!__epA.ptt && !__epA._burst && !__epA._pttCancel', 20000);
   const bursts = await A.evaluate('__epA.bursts');
   assert.ok(bursts.length >= 1);

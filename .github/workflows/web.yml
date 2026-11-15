@@ -132,6 +132,16 @@ jobs:
             echo
             echo "UI smoke walk, mock backend: **${SMOKE_MOCK:-not run}**; real WASM core: **${SMOKE_REAL:-not run}**"
             echo
+            # docs/CI.md: steps that need real-time media run only when the host passes the probe;
+            # below its limits they are SKIPPED with the numbers (never passed), their twins always run
+            logs="build/ci-logs/web-tests.log build/ci-logs/smoke-mock.log build/ci-logs/smoke-real.log"
+            echo "Real-time probe and the real-time steps it skipped:"
+            echo
+            echo '```'
+            grep -h -o 'realtime probe (.*' $logs 2>/dev/null | head -40 || true
+            grep -h -E '^SKIP |# realtime probe:' $logs 2>/dev/null | head -40 || true
+            echo '```'
+            echo
             echo "Built (artifact \`web-dist-${{ matrix.id }}\`):"
             echo
             python3 tools/ci/report.py files dist/web/embermesh.html dist/web/index.html dist/web/sw.js dist/web/wasm dist/web/data/guides.pack

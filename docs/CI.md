@@ -62,12 +62,53 @@ smoke-tested with `--version`/`--help` and uploaded.
     tick; recorded media are timed on their own timeline (the `.y4m` light by frame index), live
     sources by their frames' timestamps, and Morse speeds are matched to the frame rate actually
     delivered (4 frames per dot, `ui/tests/capture_hook.mjs`).
-  - Two browser tests may **skip** on a capability probe (reported as skipped, never as passed, also
-    under `EMBER_REQUIRE_BROWSER=1`); each probe tests the capability itself, not the platform:
+  - **Real-time probe** (`ui/tests/realtime_probe.mjs`): "can this host run media in real time?",
+    measured in the page over about a second — the frame rate a canvas camera actually delivers to
+    a `<video>`, a ScriptProcessor on a silent AudioContext (late callbacks, missing callbacks,
+    audio clock against the wall clock), the lateness of a 10 ms timer chain and, in browsers
+    started with Chrome's fake capture devices, the seconds of audio the fake microphone delivers
+    per second (MediaStreamTrackProcessor; a starved host plays the device's file chopped). It runs at the
+    start of every run (`e2e_realtime.test.mjs`, both smoke walks) and again just before each step
+    that needs it; every measurement is printed as `realtime probe (<where>): …` and collected in
+    the job summary. Limits: camera ≥ 24 fps; audio: no callback later than two buffers, at most
+    one missing, audio clock within 5 %; timers: p95 ≤ 25 ms and max ≤ 250 ms late; microphone
+    ≥ 0.95 s of audio per second.
+  - A step whose result depends on wall-clock media delivery runs only when its part of the probe
+    passes, and then must pass; otherwise it is reported as **SKIPPED with the measured numbers**
+    (never as passed; also under `EMBER_REQUIRE_BROWSER=1`; counted separately in the walks'
+    summary lines and in the job summary). Nothing is retried until green. Each such step has a
+    deterministic twin that runs on every runner and proves the same logic in sample / frame time:
+
+    | Step that can skip | Skipped when | Always-on twin |
+    |---|---|---|
+    | mock walk `interact-morse-camera`; real walk "read Morse by camera" (`ui/tests/smoke_chrome.mjs`) | camera probe < 24 fps, or the reader's own page paints the light at < 24 fps | walks: `interact-morse-camera-frametime` / "read Morse by camera in frame time"; suite: `e2e_morse` (a0), and (a) (`.y4m` light timed by frame index) |
+    | mock walk `interact-morse-sound`; real walk "read Morse by sound" | audio probe fails | walks: `interact-morse-sound-sampletime` / "read Morse by sound in sample time" (OfflineAudioContext → UI `Resampler` → `morse.rx`); suite: `e2e_morse` (b0) |
+    | `e2e_morse` (b) sound Morse through the fake microphone | audio or microphone probe fails | `e2e_morse` (b0) |
+    | `e2e_morse` "capture under each build", subtest "the fake microphone delivers audio" (camera readback, CSP and the audio endpoint are always asserted) | microphone probe fails | `e2e_morse` (b0) |
+    | `e2e_audio` "a WAV from the core modulator as the microphone" | audio probe fails, or (real fake device) microphone probe fails | `audio_playout.test.mjs` (B decodes A's modem audio in sample time) |
+    | `e2e_morse` "the UI Morse reader with a live light" | camera probe < 24 fps (or the light painted < 24 fps while reading) | `e2e_morse` (a0), (a) |
+    | `e2e_morse` "the UI Morse reader … fake camera .y4m (small keyed light + steady lamp)" | Chrome's fake camera delivers < 24 of 30 fps (its own probe, below) | `e2e_morse` (a0) |
+    | `e2e_morse` (a2) screen flash → WebRTC video → reader (one send) | camera or timers probe fails in the sender or receiver page | `e2e_morse` (a0), (a) |
+    | `e2e_audio` cross-wired test (live decode, device underrun counter, PTT held for all of the audio in wall-clock ms); below the limits it still transmits once and prints whether B decoded and the device counters, then skips | audio or timers probe fails | `audio_playout.test.mjs` (worklet): virtual sound card in sample time — real core, endpoint and worklet code; chunks contiguous, RTS high from the first to the last sample, B decodes |
+    | `e2e_audio` single file (ScriptProcessor on the main thread, one send) | audio probe fails | `audio_playout.test.mjs` (ScriptProcessor) |
+    | `e2e_remote` subtest "round trip keeps up with 30 feeds/s" (p95 < 3 s) | timers probe fails | the same test's feeds are due by the clock (count, batching, bounded backlog always asserted) |
+
+  - The camera twins (`CAMERA_TWIN`, `ui/tests/capture_hook.mjs`) render the test scene — a dark
+    1280×720 picture with a steady bright lamp and a 4 px keyed light elsewhere — frame by frame
+    and run exactly what the reader does with a camera frame (scale to ≤ 960 px, the UI's
+    `gridSizeFor` / `maxPoolLuma` / `FrameBatcher`, `morse.rx.feed` frames, RPC_API §12). They
+    assert that the tracker locks on the keyed light without any tap and reads it, and that with
+    only the steady lamp nothing locks and the transcript stays empty. The screen-level "steady
+    lamp only" checks (mock walk `interact-morse-camera-nolight`, real walk "Morse camera screen,
+    steady lamp only", `e2e_morse` "only a steady lamp") always run: they need no real time.
+  - Where a check only needs to observe something brief, it records it in the page instead of
+    sampling over DevTools round trips (a busy host stretches those past the moment): `e2e_boot`
+    "node answers during the animation" watches on every frame and timer tick in the page.
+  - Two more browser checks skip on probes of their own capability:
     - `apps/web/test/e2e_morse.test.mjs` "the UI Morse reader … with the real camera path: fake
       camera .y4m" skips when Chrome's fake camera delivers fewer than 24 of the file's 30 frames per
       second (measured for 2 s): the recorded light then no longer plays in real time. The live-light
-      variant of the same UI path runs everywhere.
+      variant and the twins cover the same path.
     - `apps/web/test/e2e_mesh.test.mjs` "WebRTC: manual offer/answer pairing between two pages"
       skips when two peer connections in the same browser cannot connect with host candidates only
       (no trickle, no STUN — exactly what a pairing code carries) within 15 s. Seen on hosted macOS

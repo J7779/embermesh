@@ -9,7 +9,7 @@ import net from 'node:net';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { DIST_DIR, ROOT } from './helpers.mjs';
-import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir, runCleanups, HOOK, REQUIRE } from './lib/e2e.mjs';
+import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir, runCleanups, HOOK, REQUIRE, realtimeSkip } from './lib/e2e.mjs';
 
 const BIN = process.env.EMBER_EMBERD || path.join(ROOT, 'dist/desktop/emberd');
 const skip = e2eSkip([!fs.existsSync(BIN) && `emberd not built (${BIN}): ./build.sh desktop`]);
@@ -80,14 +80,18 @@ test('remote backend: morse.rx.feed at 30 feeds/s over /rpc — batched, bounded
   })()`);
   const core = start.ok ? 'morse.rx implemented' : `morse.rx.start -> ${start.code} (core not there yet: measuring the transport round trip with the error reply)`;
   if (start.ok) session = start.r.session;
+  // feeds are due by the clock (deterministic count); how fast they come back is wall-clock time
+  const rt = await realtimeSkip(t, P, ['timers'], 'remote feeds');
   const r = await P.evaluate(FEED_LOOP(session, 5), 30000);
   t.diagnostic(`${core}; ${r.n} feeds in 5 s -> ${r.stats.sent} RPCs (${r.stats.merged} merged), RTT p50 ${r.p50.toFixed(1)} ms, p95 ${r.p95.toFixed(1)} ms, max ${r.max.toFixed(1)} ms, errors ${JSON.stringify(r.errors)}, max backlog ${r.stats.max_backlog}, dropped ${r.stats.dropped_samples}`);
   console.log(`# remote morse.rx.feed @30/s: p50 ${r.p50.toFixed(1)} ms, p95 ${r.p95.toFixed(1)} ms, ${r.stats.sent} RPCs for ${r.n} feeds (${core})`);
   assert.equal(r.done, r.n, 'every feed settled');
   assert.ok(r.n >= 120, `about 150 feeds sent (${r.n})`);
-  // the round trip is reported above; asserted is only that feeds never stall (host speed varies)
-  assert.ok(r.p95 < 3000, `p95 round trip ${r.p95.toFixed(0)} ms`);
   if (start.ok) assert.deepEqual(r.errors, {});
+  // the round trip is reported above; on a real-time host feeds must also never stall
+  await t.test('round trip keeps up with 30 feeds/s (wall clock)', { skip: rt || false }, () => {
+    assert.ok(r.p95 < 3000, `p95 round trip ${r.p95.toFixed(0)} ms`);
+  });
   // A slow link (300 ms latency each way, ~16 kB/s): feeds merge, the RPC rate drops, the backlog stays bounded.
   await P.send('Network.emulateNetworkConditions', { offline: false, latency: 300, downloadThroughput: 16000, uploadThroughput: 16000 });
   const slow = await P.evaluate(FEED_LOOP(session, 5), 40000);

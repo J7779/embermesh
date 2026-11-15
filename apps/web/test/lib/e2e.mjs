@@ -118,6 +118,20 @@ export async function nodePage(browser, url, { timeoutMs = 30000, beforeNavigate
   return Object.assign(page, { call, events, waitCall, waitEvent, reloadNode: reload });
 }
 
+/**
+ * The shared real-time probe (ui/tests/realtime_probe.mjs, docs/CI.md) in page P, just before a
+ * step whose result depends on wall-clock media delivery. Prints "realtime probe (where): ..."
+ * and returns null when the host holds real time for `parts`, else the skip reason with the numbers.
+ */
+export async function realtimeSkip(t, P, parts, where) {
+  const { REALTIME_PROBE, verdict, probeLine } = await import('../../../../ui/tests/realtime_probe.mjs');
+  const p = await P.evaluate(REALTIME_PROBE(parts), 30000);
+  t.diagnostic(probeLine(where, p));
+  const v = verdict(p);
+  const why = parts.map((k) => v[k]).filter(Boolean);
+  return why.length ? `realtime probe: ${why.join('; ')}` : null;
+}
+
 export function tmpDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }

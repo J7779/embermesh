@@ -28,7 +28,19 @@ const PROBE = `
   globalThis.__probe = { firstPaintBoot: null };
   new PerformanceObserver((l) => { for (const e of l.getEntries()) if (e.name === 'first-contentful-paint' && __probe.firstPaintBoot === null) {
     const el = document.getElementById('ember-boot'); __probe.firstPaintBoot = !!(el && getComputedStyle(el).display !== 'none' && el.querySelector('svg'));
-  } }).observe({ type: 'paint', buffered: true });`;
+  } }).observe({ type: 'paint', buffered: true });
+  // In the page, on every frame and timer tick (not over DevTools round trips, which a busy host
+  // stretches past the hand-over): when the node first answers while the start-up screen is up.
+  (function watch() {
+    const b = globalThis.__emberBoot, w = globalThis.__emberWasmBackend, now = Math.round(performance.now());
+    if (w && w.ready && __probe.nodeReady === undefined) __probe.nodeReady = now;
+    if (b && b.active && w && w.ready && !__probe.asked) {
+      __probe.asked = now; const t0 = performance.now();
+      w.call('node.info').then((i) => { const g = globalThis.__emberBoot; __probe.during = { at: now, ms: performance.now() - t0, id: i.node_id, variant: b.variant, stillActive: !!(g && g.active) }; });
+    }
+    if (__probe.during || (b && !b.active && __probe.nodeReady !== undefined)) return;
+    requestAnimationFrame(watch); setTimeout(watch, 10);
+  })();`;
 
 // The machine's own reduce-motion setting decides the start-up variant (the product honours it;
 // hosted macOS runners have it switched on). Every test states the preference it is about, so the
@@ -46,18 +58,10 @@ async function prefsWired(P) {
 }
 
 async function bootSample(P) {
-  // the node answers while the start-up screen is still up
-  for (let i = 0; i < 40; i++) {
-    const r = await P.evaluate(`(async () => {
-      const b = globalThis.__emberBoot, active = !!(b && b.active);
-      const t = performance.now();
-      const info = await globalThis.__emberWasmBackend.call('node.info');
-      return { active, stillActive: !!(globalThis.__emberBoot && __emberBoot.active), ms: performance.now() - t, id: info.node_id, variant: b && b.variant };
-    })()`);
-    if (r.active && r.stillActive) return r;
-    await new Promise((res) => setTimeout(res, 50));
+  // the node answers while the start-up screen is still up (recorded in the page by PROBE)
+  try { return await P.waitFor(`(globalThis.__probe && __probe.during) || null`, 15000); } catch {
+    return null;
   }
-  return null;
 }
 
 async function timings(P) {
@@ -73,7 +77,8 @@ async function checkBoot(t, P, label) {
   await P.waitFor('globalThis.__probe && __probe.firstPaintBoot !== null', 15000);
   const tm = await timings(P);
   const s = await bootSample(P);
-  assert.ok(s, `${label}: the start-up screen was showing while the node answered`);
+  const seen = await P.evaluate(`({ probe: globalThis.__probe, boot: globalThis.__emberBoot && { active: __emberBoot.active, reason: __emberBoot.reason, at: __emberBoot.at } })`);
+  assert.ok(s, `${label}: the start-up screen was showing while the node answered (${JSON.stringify(seen)})`);
   assert.match(s.id, /^[0-9a-f]{16}$/);
   // RPC_API §8: the full animation on every load, whatever the timing; the documented fallback is
   // the calm variant only where the machine cannot give a 2D canvas (the page detects it itself)
