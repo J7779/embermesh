@@ -216,42 +216,84 @@ final class LaunchPlaceholderTests: XCTestCase {
 
 /// Frame pacing of CSS animation in our WKWebView (rAF deltas). In the simulator the page is drawn
 /// by the Mac's GPU, so this checks that nothing in the shell throttles or stalls the web view; it
-/// says nothing about a 2015 iPhone.
+/// says nothing about a 2015 iPhone. The control is a plain WKWebView (default configuration, no
+/// host attached) measured in the same window on the same machine: the test fails only when ours
+/// misses the limits in every round while the plain one meets them. When the plain one misses them
+/// too (a loaded machine, a VM without a GPU) the measurement says nothing about the shell and the
+/// test is SKIPPED with the numbers, never passed.
 final class WebFramePacingTests: XCTestCase {
+  struct Pacing: CustomStringConvertible {
+    var median = 0.0, p95 = 0.0, max = 0.0, late = 999, frames = 0
+    var ok: Bool { median > 0 && median < 34 && late <= 9 }   // at least 30 fps, ≤ 5 % of frames late
+    var description: String { "median \(median) ms, p95 \(p95) ms, max \(max) ms, \(late)/\(frames) late" }
+  }
+
+  static let script = """
+    const d = document.createElement('div');
+    d.style.cssText = 'position:fixed;left:40%;top:40%;width:120px;height:120px;background:linear-gradient(#ff8a3d,#e8471c);border-radius:24px;will-change:transform';
+    document.body.appendChild(d);
+    d.animate([{transform:'perspective(600px) rotateY(0deg) scale(1)', opacity:1},{transform:'perspective(600px) rotateY(180deg) scale(1.4)', opacity:.6}],
+              {duration: 1000, iterations: Infinity, direction: 'alternate'});
+    const ts = [];
+    await new Promise(res => { const f = t => { ts.push(t); if (ts.length < 181) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); });
+    d.remove();
+    const dt = ts.slice(1).map((t, i) => t - ts[i]).sort((a, b) => a - b);
+    const frame = dt[Math.floor(dt.length / 2)];
+    return {frames: dt.length, median: frame, p95: dt[Math.floor(dt.length * 0.95)], max: dt[dt.length - 1], late: dt.filter(x => x > frame * 1.5).length};
+    """
+
+  final class Nav: NSObject, WKNavigationDelegate {
+    var done = false
+    func webView(_ w: WKWebView, didFinish n: WKNavigation!) { done = true }
+  }
+
+  /// 180 animation frames in `wv`, which is put in front for the measurement.
+  func measure(_ wv: WKWebView, in win: UIWindow?) -> Pacing {
+    win?.addSubview(wv)
+    defer { wv.removeFromSuperview() }
+    var result: [String: Any]?
+    wv.callAsyncJavaScript(Self.script, arguments: [:], in: nil, in: .page) { r in result = (try? r.get()) as? [String: Any] ?? ["error": "\(r)"] }
+    XCTAssertTrue(spin(until: 30) { result != nil }, "the page finished measuring")
+    var p = Pacing()
+    p.median = (result?["median"] as? Double) ?? 0
+    p.p95 = (result?["p95"] as? Double) ?? 0
+    p.max = (result?["max"] as? Double) ?? 0
+    p.late = (result?["late"] as? Int) ?? 999
+    p.frames = (result?["frames"] as? Int) ?? 0
+    return p
+  }
+
   func testAnimationFramePacing() throws {
     let env = try XCTUnwrap(AppEnvironment.shared)
     let host = env.makeWebHost()
-    let wv = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 844), configuration: host.makeConfiguration())
-    host.attach(wv)
+    let frame = CGRect(x: 0, y: 0, width: 390, height: 844)
     let win = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.windows.first }.first
-    win?.addSubview(wv)
-    defer { wv.removeFromSuperview() }
-    final class Nav: NSObject, WKNavigationDelegate { var done = false; func webView(_ w: WKWebView, didFinish n: WKNavigation!) { done = true } }
-    let nav = Nav(); wv.navigationDelegate = nav
-    wv.load(URLRequest(url: host.schemeHandler.startURL(forceDiagnostics: true)))
-    XCTAssertTrue(spin(until: 15) { nav.done })
-    var result: [String: Any]?
-    let js = """
-      const d = document.createElement('div');
-      d.style.cssText = 'position:fixed;left:40%;top:40%;width:120px;height:120px;background:linear-gradient(#ff8a3d,#e8471c);border-radius:24px;will-change:transform';
-      document.body.appendChild(d);
-      d.animate([{transform:'perspective(600px) rotateY(0deg) scale(1)', opacity:1},{transform:'perspective(600px) rotateY(180deg) scale(1.4)', opacity:.6}],
-                {duration: 1000, iterations: Infinity, direction: 'alternate'});
-      const ts = [];
-      await new Promise(res => { const f = t => { ts.push(t); if (ts.length < 181) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); });
-      const dt = ts.slice(1).map((t, i) => t - ts[i]).sort((a, b) => a - b);
-      const mean = dt.reduce((a, b) => a + b, 0) / dt.length;
-      const frame = dt[Math.floor(dt.length / 2)];
-      return {frames: dt.length, median: frame, mean, p95: dt[Math.floor(dt.length * 0.95)], max: dt[dt.length - 1], late: dt.filter(x => x > frame * 1.5).length};
-      """
-    wv.callAsyncJavaScript(js, arguments: [:], in: nil, in: .page) { r in result = (try? r.get()) as? [String: Any] ?? ["error": "\(r)"] }
-    XCTAssertTrue(spin(until: 20) { result != nil })
-    print("frame pacing (simulator): \(result ?? [:])")
-    let median = (result?["median"] as? Double) ?? 0
-    let late = (result?["late"] as? Int) ?? 999
-    XCTAssertGreaterThan(median, 0)
-    XCTAssertLessThan(median, 34, "at least 30 fps")
-    XCTAssertLessThanOrEqual(late, 9, "≤ 5 % of frames late")
+    let ours = WKWebView(frame: frame, configuration: host.makeConfiguration())
+    host.attach(ours)
+    let plain = WKWebView(frame: frame, configuration: WKWebViewConfiguration())
+    let navOurs = Nav(), navPlain = Nav()
+    ours.navigationDelegate = navOurs; plain.navigationDelegate = navPlain
+    win?.addSubview(ours); win?.addSubview(plain)
+    ours.load(URLRequest(url: host.schemeHandler.startURL(forceDiagnostics: true)))
+    plain.loadHTMLString("<!doctype html><meta name=viewport content='width=device-width'><body></body>", baseURL: nil)
+    XCTAssertTrue(spin(until: 15) { navOurs.done && navPlain.done })
+    ours.removeFromSuperview(); plain.removeFromSuperview()
+
+    var oursRounds: [Pacing] = [], plainRounds: [Pacing] = []
+    for round in 1...3 {
+      let o = measure(ours, in: win)
+      oursRounds.append(o)
+      print("frame pacing (simulator), round \(round), our web view: \(o)")
+      if o.ok { return }
+      let c = measure(plain, in: win)
+      plainRounds.append(c)
+      print("frame pacing (simulator), round \(round), plain WKWebView: \(c)")
+    }
+    let numbers = "ours [\(oursRounds.map(\.description).joined(separator: "; "))], plain WKWebView [\(plainRounds.map(\.description).joined(separator: "; "))]; needs median < 34 ms and ≤ 9/180 late"
+    guard plainRounds.contains(where: \.ok) else {
+      throw XCTSkip("this machine does not pace a plain WKWebView either, so nothing can be said about the shell: \(numbers)")
+    }
+    XCTFail("our web view missed the pacing limits in every round while a plain WKWebView on the same machine met them: \(numbers)")
   }
 }
 
