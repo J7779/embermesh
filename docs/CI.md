@@ -174,6 +174,12 @@ versioned service-worker caches keep the long-lived offline copy.
 at "Configure Pages" and its summary says so. After the first deployment, also put the URL in the
 repository's About box (gear icon → Website → "Use your GitHub Pages website").
 
+**Where readers find the site.** GitHub shows a repository's deployments pages
+(`/deployments/...`) to signed-in users only; everyone else gets a 404, so nothing links there.
+The Release workflow asks GitHub for the site's address (`pages: read`) and opens the release
+notes with it, and the README links to that release. The address is never written into a file
+of the repository, so a fork shows its own site, or no line while Pages is not set up.
+
 ### Android
 
 `./build.sh guides android` (debug APK), `./build.sh test --only android --strict`

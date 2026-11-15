@@ -28,7 +28,7 @@ off until you turn it on, reaches contacts far away while a connection exists.
 [![Guides: per-guide licences](https://img.shields.io/badge/guides-PD%20%C2%B7%20CC0%20%C2%B7%20CC%20BY%20%C2%B7%20CC%20BY--SA-ff8a3d)](guides/LICENSES.md)
 [![Platforms](https://img.shields.io/badge/runs%20on-Android%20%C2%B7%20iOS%20%C2%B7%20Linux%20%C2%B7%20macOS%20%C2%B7%20Windows%20%C2%B7%20browser-555)](#supported-platforms-and-hardware)
 
-[**Open the web app**](../../deployments/github-pages) · [**Download**](../../releases/tag/latest) · [Quick start](guides/content/embermesh/quick-start.md) ·
+[**Open the web app or download**](../../releases/tag/latest) · [Quick start](guides/content/embermesh/quick-start.md) ·
 [Operator manual](#documentation) · [How it works](#how-it-works) · [Build from source](#building-and-testing)
 
 </div>
@@ -389,7 +389,7 @@ summary says which step.
 | [Guides](../../actions/workflows/guides.yml) | validates all guides and their licences, builds `guides.pack`, checks search | [![Guides](../../actions/workflows/guides.yml/badge.svg?branch=main)](../../actions/workflows/guides.yml) | run artifacts; `guides.pack` in [latest](../../releases/tag/latest) |
 | [Publish checks](../../actions/workflows/checks.yml) | the publishing gate (`tools/check-publishable.sh` and its self-test), licence and required-file checks | [![Publish checks](../../actions/workflows/checks.yml/badge.svg?branch=main)](../../actions/workflows/checks.yml) | report in the run summary |
 | [Release](../../actions/workflows/release.yml) | collects the binaries of a `main` commit and updates the rolling `latest` release | [![Release](../../actions/workflows/release.yml/badge.svg?branch=main)](../../actions/workflows/release.yml) | [releases/tag/latest](../../releases/tag/latest) |
-| [Pages](../../actions/workflows/pages.yml) | publishes the tested web app (with the guide library) as a static site; installable as an offline app | [![Pages](../../actions/workflows/pages.yml/badge.svg?branch=main)](../../actions/workflows/pages.yml) | [the live site](../../deployments/github-pages) |
+| [Pages](../../actions/workflows/pages.yml) | publishes the tested web app (with the guide library) as a static site; installable as an offline app | [![Pages](../../actions/workflows/pages.yml/badge.svg?branch=main)](../../actions/workflows/pages.yml) | the live site: its address opens the notes of [latest](../../releases/tag/latest) and is in this repository's About box |
 
 All runs: [Actions](../../actions).
 

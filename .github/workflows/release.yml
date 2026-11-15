@@ -283,6 +283,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
+      pages: read   # the site's address, for the release notes
     concurrency:
       group: release-publish
       cancel-in-progress: false
@@ -315,9 +316,13 @@ jobs:
             echo "Android: JDK 21, NDK 27.1.12297006, SDK platform 37, SDK CMake 3.22.1"
             echo "Runners: ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel, windows-2025 (MSVC)"
           } > build/toolchains.txt
+          # The deployments pages of a repository are shown to signed-in users only, so the notes
+          # carry the site's address. Empty when Pages is not set up (a fork): no line then.
+          site="$(gh api "repos/$GH_REPO/pages" --jq '.html_url // empty' 2>/dev/null || true)"
+          echo "site: ${site:-(GitHub Pages is not set up)}"
           python3 tools/ci/release-notes.py --dir build/out --version "$VERSION" --kind "$KIND" \
             --toolchains build/toolchains.txt --android-signer "$ANDROID_SIGNER" --android-cert "$ANDROID_CERT" \
-            --out-notes build/notes.md
+            --site "$site" --out-notes build/notes.md
           cat build/notes.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload everything as one artifact

@@ -261,6 +261,16 @@ class ReleaseNotesSigner(unittest.TestCase):
         self.assertIn("throw-away debug key", t)
         self.assertNotIn("project's release key", t)
 
+    def test_site_address_opens_the_notes(self):
+        t = self.notes(["guides.pack"], "--site", "https://owner.example/repo/")
+        self.assertTrue(t.startswith("**Web app, nothing to install:** <https://owner.example/repo/>"), t[:120])
+
+    def test_no_site_line_without_a_usable_address(self):
+        for site in ("", "null", "http://owner.example/repo/", "https://owner.example/) [x](https://evil.example"):
+            t = self.notes(["guides.pack"], "--site", site)
+            self.assertNotIn("Web app, nothing to install", t, site)
+            self.assertNotIn("evil.example", t, site)
+
 
 if __name__ == "__main__":
     unittest.main()

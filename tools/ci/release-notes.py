@@ -2,12 +2,13 @@
 """Checksums and the notes body of a GitHub release.
 
   release-notes.py --dir DIR --version V --kind rolling|tag [--toolchains FILE] [--out-notes FILE]
-                   [--android-signer release|ci-debug] [--android-cert SHA256]
+                   [--android-signer release|ci-debug] [--android-cert SHA256] [--site URL]
 
 Writes DIR/SHA256SUMS.txt (sha256sum format, sorted, over every other file in DIR) and the
 Markdown notes (stdout, or --out-notes). Commit, ref, run URL and date come from the GITHUB_*
 environment and SOURCE_DATE_EPOCH. --toolchains is a "name: version" list (one per line) that is
-copied into the notes.
+copied into the notes. --site is the address of the hosted web app; the notes open with it, so a
+reader who is not signed in to GitHub can reach the site from the release page.
 """
 import argparse
 import hashlib
@@ -63,6 +64,7 @@ def main(argv):
     p.add_argument("--out-notes")
     p.add_argument("--android-signer", choices=("release", "ci-debug", ""), default="")
     p.add_argument("--android-cert", default="")
+    p.add_argument("--site", default="")
     a = p.parse_args(argv)
 
     files = sorted(f for f in os.listdir(a.dir)
@@ -83,6 +85,10 @@ def main(argv):
     date = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(epoch))
 
     n = []
+    site = a.site.strip()
+    if site.startswith("https://") and not any(c in site for c in " \t\r\n<>()[]\"'`"):
+        n += [f"**Web app, nothing to install:** <{site}> (the newest tested build of `main`; it also works offline "
+              f"once opened).", ""]
     if a.kind == "rolling":
         n += [f"Rolling development build of `main` at [`{sha[:12]}`]({repo_url}/commit/{sha}) "
               f"(commit date {date}). It is replaced by every new commit on `main`; for a fixed version use "

@@ -23,6 +23,8 @@ variables into forks, and you must never ask for or reuse anyone else's signing 
    this; until it is set, the Pages run fails at "Configure Pages" and its summary says so.
 3. Push to `main` (or run Actions -> Web -> Run workflow). Pages deploys after a green Web run
    (`pages.yml`); then set the repository's About -> Website to the Pages URL if you like.
+   The next Release run reads the address from GitHub and opens the release notes with it; the
+   README links there, because `/deployments/...` pages are a 404 for anyone not signed in.
 
 Everything is repository-relative, so nothing needs editing for your account or a new repository
 name: README badges and links use `../../actions/…` and `../../releases/…`, and every URL in the
