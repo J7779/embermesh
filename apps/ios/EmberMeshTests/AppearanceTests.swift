@@ -116,11 +116,17 @@ final class LaunchPlaceholderTests: XCTestCase {
     let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first!
     window = UIWindow(windowScene: scene)
     window.frame = scene.coordinateSpace.bounds
+    // How long the system takes to launch the web content process is the machine's business (a
+    // shared CI runner has needed 6.6 s). These tests are about what happens at the page's first
+    // paint, so both safety timeouts are moved out of the way; they have their own tests below.
+    WebViewController.revealTimeout = 120
+    WebViewController.stallTimeout = 240
   }
   override func tearDown() {
     window.isHidden = true
     window = nil
     WebViewController.revealTimeout = 6
+    WebViewController.stallTimeout = 45
   }
 
   func present(startURL: URL? = nil) throws -> WebViewController {
@@ -147,7 +153,7 @@ final class LaunchPlaceholderTests: XCTestCase {
     XCTAssertEqual(vc.webViewForTesting?.isOpaque, false)
     XCTAssertEqual(vc.webViewForTesting?.backgroundColor, Brand.background)
     XCTAssertEqual(vc.webViewForTesting?.scrollView.backgroundColor, Brand.background)
-    XCTAssertTrue(spin(until: 10) { vc.placeholder == nil })
+    XCTAssertTrue(spin(until: 120) { vc.placeholder == nil })
     let ms = Int(Date().timeIntervalSince(t0) * 1000)
     print("placeholder removed after \(ms) ms (\(vc.revealReason ?? "?"))")
     XCTAssertEqual(vc.revealReason, "painted")
@@ -171,11 +177,11 @@ final class LaunchPlaceholderTests: XCTestCase {
   func testEveryColdStartPlaysTheFullAnimationFromFrameZero() throws {
     for launch in 1...2 {
       let vc = try present()
-      XCTAssertTrue(spin(until: 10) { vc.placeholder == nil }, "launch \(launch): placeholder removed")
+      XCTAssertTrue(spin(until: 120) { vc.placeholder == nil }, "launch \(launch): placeholder removed")
       XCTAssertEqual(vc.revealReason, "painted")
       var boot: [String: Any]?
       let js = "JSON.stringify(window.__emberBoot ? {variant: __emberBoot.variant, active: __emberBoot.active, reason: __emberBoot.reason, canvas: __emberBoot.canvas, osReduce: __emberBoot.osReduce, at: __emberBoot.at} : null)"
-      XCTAssertTrue(spin(until: 10) {
+      XCTAssertTrue(spin(until: 60) {
         vc.webViewForTesting?.evaluateJavaScript(js) { v, _ in
           if let s = v as? String, let d = s.data(using: .utf8) { boot = try? JSONSerialization.jsonObject(with: d) as? [String: Any] }
         }
@@ -199,18 +205,38 @@ final class LaunchPlaceholderTests: XCTestCase {
 
   func testFailedStartPageRevealsDiagnostics() throws {
     let vc = try present(startURL: URL(string: "embermesh://app/no-such-page.html")!)
-    XCTAssertTrue(spin(until: 10) { vc.placeholder == nil })
+    XCTAssertTrue(spin(until: 120) { vc.placeholder == nil })
     XCTAssertTrue(vc.showingDiagnostics)
-    XCTAssertTrue(spin(until: 5) { vc.webViewForTesting?.url?.path.hasPrefix("/__diag/") == true })
+    XCTAssertTrue(spin(until: 30) { vc.webViewForTesting?.url?.path.hasPrefix("/__diag/") == true })
     print("failed start page → \(vc.webViewForTesting?.url?.absoluteString ?? "?"), placeholder removed (\(vc.revealReason ?? "?"))")
   }
 
   func testTimeoutNeverLeavesTheAppCovered() throws {
-    WebViewController.revealTimeout = 0.01  // fires before any page can paint
+    WebViewController.revealTimeout = 0.01  // both fire before any page can paint
+    WebViewController.stallTimeout = 0.01
     let vc = try present()
     XCTAssertTrue(spin(until: 3) { vc.placeholder == nil })
     XCTAssertEqual(vc.revealReason, "timeout")
     XCTAssertFalse(vc.revealPending)
+    XCTAssertTrue(vc.showingDiagnostics, "a start page that never loaded is replaced by the diagnostic page")
+  }
+
+  /// Slow is not broken: a start page that is still loading when the reveal timeout passes keeps
+  /// its logo and keeps loading (it is not replaced by the diagnostic page), and the app starts.
+  func testASlowStartIsNotReplacedByDiagnostics() throws {
+    WebViewController.revealTimeout = 0.01  // passes while the page is still loading
+    WebViewController.stallTimeout = 240
+    let vc = try present()
+    XCTAssertNotNil(vc.placeholder)
+    _ = spin(until: 0.3) { false }   // well past the reveal timeout
+    var app = false
+    XCTAssertTrue(spin(until: 120) {
+      vc.webViewForTesting?.evaluateJavaScript("!!window.__emberBoot") { v, _ in app = (v as? Bool) == true }
+      return app && vc.placeholder == nil
+    }, "the app's own page started and the logo was removed")
+    XCTAssertFalse(vc.showingDiagnostics)
+    XCTAssertFalse(vc.revealPending, "no native timer keeps running")
+    print("slow start: placeholder removed (\(vc.revealReason ?? "?")), diagnostics \(vc.showingDiagnostics)")
   }
 }
 

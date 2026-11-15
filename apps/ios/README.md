@@ -283,11 +283,13 @@ on the air, so they interoperate. Only `stream` is offered for `ble_peer` (never
   view sits inside the safe area, so this rect is not simply "centre of the viewport".
 - **Never covering, never white.** If the start page is missing or fails, the diagnostic page is
   shown. Missing pages are detected through the scheme handler's 404 log, because WebKit gives
-  custom-scheme responses to the delegate without a status. After 6 s the placeholder is removed
-  whatever happened. The web view, its scroll view, the area under the page and the window are all
+  custom-scheme responses to the delegate without a status. A page that has finished loading
+  without reporting a paint is revealed after 6 s. A page that is still loading keeps the logo and
+  keeps loading (on an old or busy device the system can need longer than that just to launch the
+  web content process); only after 45 s is it given up and replaced by the diagnostic page. The web view, its scroll view, the area under the page and the window are all
   #17110f and non-opaque from the first frame (cold start, rotation, return from background). Nothing
-  native keeps animating after the hand-over: the placeholder is static, and its only timer (the 6 s
-  reveal) is cancelled at first paint. There are no display links.
+  native keeps animating after the hand-over: the placeholder is static, and its only timer (the reveal
+  check) is cancelled at first paint. There are no display links.
 - **Status bar** follows the UI's `theme` setting, read from `settings.get` / `settings.set` replies
   on the bridge: `light` → dark text, `dark` / `night` → light text. The launch is always light text
   on #17110f.

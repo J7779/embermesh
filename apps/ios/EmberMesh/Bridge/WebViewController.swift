@@ -5,8 +5,14 @@ import WebKit
 /// friendly. Also the presenter for native sheets (QR scanner, share sheet, document picker).
 final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, Presenter {
   static let background = Brand.background  // #17110f, same as the launch screen
-  /// The placeholder is removed at the page's first paint, or after this long whatever happens.
+  /// The placeholder is removed at the page's first paint. A page that has finished loading without
+  /// reporting a paint is revealed after this long.
   static var revealTimeout: TimeInterval = 6
+  /// A start page that is still loading after this long is given up and the diagnostic page takes
+  /// its place. Slow is not broken: on an old or busy device the system can need longer than
+  /// `revealTimeout` just to launch the web content process, so until this limit the logo stays
+  /// and the page keeps loading.
+  static var stallTimeout: TimeInterval = 45
 
   let webHost: WebHost
   private var webView: WKWebView!
@@ -130,22 +136,33 @@ final class WebViewController: UIViewController, WKNavigationDelegate, WKUIDeleg
     webView.load(URLRequest(url: webHost.schemeHandler.startURL(forceDiagnostics: true)))
   }
 
+  /// Never leave the app covered. A page that finished loading but never reported a paint is
+  /// revealed; a page still loading keeps the logo until `stallTimeout`, then the diagnostic page
+  /// is shown instead.
+  private func armRevealTimer(after delay: TimeInterval, started: TimeInterval) {
+    let item = DispatchWorkItem { [weak self] in
+      guard let self else { return }
+      self.revealTimer = nil
+      let loading = self.webView.isLoading || self.webView.url == nil
+      let left = WebViewController.stallTimeout - (ProcessInfo.processInfo.systemUptime - started)
+      if loading && left > 0 {
+        self.armRevealTimer(after: min(1, left), started: started)
+        return
+      }
+      if loading { self.loadDiagnostics("timeout") }
+      self.removePlaceholder(reason: "timeout")
+    }
+    revealTimer = item
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+  }
+
   private func loadStart() {
     let url = startOverride ?? webHost.schemeHandler.startURL(forceDiagnostics: forceDiagnostics)
     emberLog("loading \(url.absoluteString)")
     webView.configuration.userContentController.addUserScript(
       WKUserScript(source: WebHost.launchLogoScript(launchLogoRectInWebView()), injectionTime: .atDocumentStart, forMainFrameOnly: true))
     if placeholder != nil, revealTimer == nil {
-      // Never leave the app covered: reveal after the timeout whatever happened, and fall back to
-      // the diagnostic page if the start page has not loaded by then.
-      let item = DispatchWorkItem { [weak self] in
-        guard let self else { return }
-        self.revealTimer = nil
-        if self.webView.isLoading || self.webView.url == nil { self.loadDiagnostics("timeout") }
-        self.removePlaceholder(reason: "timeout")
-      }
-      revealTimer = item
-      DispatchQueue.main.asyncAfter(deadline: .now() + WebViewController.revealTimeout, execute: item)
+      armRevealTimer(after: WebViewController.revealTimeout, started: ProcessInfo.processInfo.systemUptime)
     }
     webHost.pageWillLoad()
     webView.load(URLRequest(url: url))
