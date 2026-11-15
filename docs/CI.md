@@ -44,6 +44,14 @@ packs the guide library, stages `dist/desktop/`, then runs every CTest suite (co
 runs `./build.ps1 desktop test` (Visual Studio generator, x64, `ctest -C Release`). The binary is
 smoke-tested with `--version`/`--help` and uploaded.
 
+`emberd_mesh.rpc_carries_30_feeds_per_second_without_blocking_other_calls` measures the daemon in
+real time. A control in the same test measures the machine: a thread that only sleeps records its
+longest oversleep, and every 250 ms it writes one byte next to the daemon's store and flushes it as
+the store does. "No call hangs for 5 s" and "250 feeds in the time" fail unless that control saw the
+machine itself stand still for a second or more in the same run; then those two steps print
+`SKIPPED (not passed)` with the numbers. A daemon that pauses while the machine keeps time fails.
+The percentile checks, which one pause cannot decide, always apply.
+
 ### Web
 
 - **UI unit tests**: `./build.sh test --only js --strict` (`node --test ui/tests/`).
@@ -89,8 +97,8 @@ smoke-tested with `--version`/`--help` and uploaded.
     | `e2e_morse` "the UI Morse reader with a live light" | camera probe < 24 fps (or the light painted < 24 fps while reading) | `e2e_morse` (a0), (a) |
     | `e2e_morse` "the UI Morse reader … fake camera .y4m (small keyed light + steady lamp)" | Chrome's fake camera delivers < 24 of 30 fps (its own probe, below) | `e2e_morse` (a0) |
     | `e2e_morse` (a2) screen flash → WebRTC video → reader (one send) | camera or timers probe fails in the sender or receiver page | `e2e_morse` (a0), (a) |
-    | `e2e_audio` cross-wired test (live decode, device underrun counter, PTT held for all of the audio in wall-clock ms); below the limits it still transmits once and prints whether B decoded and the device counters, then skips | audio or timers probe fails | `audio_playout.test.mjs` (worklet): virtual sound card in sample time — real core, endpoint and worklet code; chunks contiguous, RTS high from the first to the last sample, B decodes |
-    | `e2e_audio` single file (ScriptProcessor on the main thread, one send) | the frame was not decoded and, measured on A's and B's ScriptProcessor callbacks during the send, one ran later than its buffer (the path's own budget, 171 ms at 48 kHz); not decoded while every callback kept time is a failure | `audio_playout.test.mjs` (ScriptProcessor, 3 / 60 / 100 ms) |
+    | `e2e_audio` cross-wired test (live decode, device underrun counter, PTT held for all of the audio in wall-clock ms); below the limits it still transmits once and prints whether B decoded and the device counters, then skips | audio or timers probe fails; or the frame was not decoded and the browser did not hand B's microphone A's whole burst (the samples-played against samples-received control of the single-file row) | `audio_playout.test.mjs` (worklet): virtual sound card in sample time — real core, endpoint and worklet code; chunks contiguous, RTS high from the first to the last sample, B decodes |
+    | `e2e_audio` single file (ScriptProcessor on the main thread, one send) | the frame was not decoded and either (1) a ScriptProcessor callback of A or B ran later than its buffer during the send (the path's own budget, 171 ms at 48 kHz; a callback still overdue when the wait ends counts), or (2) the browser did not hand B's microphone A's whole burst: the test counts the samples A played for the message and the stretch of signal B's microphone received (one stretch, no hole of 8 samples, at most 96 samples shorter; every decoded run measured 25 shorter). Chrome carries the audio between the two AudioContexts on its audio threads and drops a block there on a loaded host although every main-thread callback kept time. Not decoded with the whole burst received and every callback in time is a failure, and so is B transmitting while A's frame is on the air | `audio_playout.test.mjs` (ScriptProcessor, 3 / 60 / 100 ms) |
     | `e2e_remote` subtest "round trip keeps up with 30 feeds/s" (p95 < 3 s) | timers probe fails | the same test's feeds are due by the clock (count, batching, bounded backlog always asserted) |
 
     The `audio_playout.test.mjs` twins run on a virtual sound card whose clock is the sample

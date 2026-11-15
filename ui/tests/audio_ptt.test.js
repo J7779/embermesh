@@ -96,14 +96,16 @@ function endpoint(t, { mode = 'worklet', latency = 0 } = {}) {
   const rts = [];
   const posted = [];
   const ep = audio.create({ ptt: 'serial_rts' }, { env: globalThis, log: { warn() {}, log() {}, error() {} } });
-  ep.ac = { get currentTime() { return Date.now() / 1000; }, outputLatency: latency, baseLatency: 0, close: async () => {} };
+  // the audio clock follows the wall clock unless a test holds it back (clock.lag s) or stops it (clock.frozen s)
+  const clock = { lag: 0, frozen: null };
+  ep.ac = { get currentTime() { return clock.frozen !== null ? clock.frozen : Date.now() / 1000 - clock.lag; }, state: 'running', outputLatency: latency, baseLatency: 0, close: async () => {} };
   ep.sampleRate = RATE;
   ep.mode = mode;
   ep.node = mode === 'worklet' ? { port: { postMessage: m => posted.push(m) }, disconnect() {} } : { disconnect() {} };
   ep.pttPort = { setSignals: async s => { rts.push({ on: s.requestToSend, ms: Date.now() }); }, close: async () => {} };
   const tick = async ms => { for (let i = 0; i < ms; i++) { t.mock.timers.tick(1); await Promise.resolve(); await Promise.resolve(); } };
   const lastRts = () => (rts.length ? rts.at(-1).on : false);
-  return { ep, rts, posted, tick, lastRts };
+  return { ep, rts, posted, tick, lastRts, clock };
 }
 
 test('PTT (worklet): released only after the worklet reports its queue empty, plus the tail', async t => {
@@ -202,6 +204,49 @@ test('PTT (ScriptProcessor): each buffer plays one buffer after its callback, so
   await off;
   assert.equal(lastRts(), false);
   assert.ok(rts.at(-1).ms >= ((2 * 4096) / RATE) * 1000, 'after the last sample of the buffer played');
+});
+
+test('PTT (ScriptProcessor): an audio clock that fell behind the wall clock holds PTT until the last sample has played', async t => {
+  const { ep, tick, lastRts, rts, clock } = endpoint(t, { mode: 'scriptprocessor' });
+  await ep.setPtt(true);
+  ep._notePlayout(4096, 4096);
+  const off = ep.setPtt(false);
+  const end = Math.ceil(((2 * 4096) / RATE + 0.03) * 1000);
+  clock.lag = 0.2; // the device underran for 200 ms after the release was timed
+  await tick(end + 1);
+  assert.equal(lastRts(), true, 'the timer fired, the audio clock is 200 ms short: still keyed');
+  await tick(197);
+  assert.equal(lastRts(), true);
+  await tick(5);
+  await off;
+  assert.equal(lastRts(), false);
+  assert.ok(rts.at(-1).ms >= end + 199, 'released once the audio clock reached the end of the last sample');
+});
+
+test('PTT (ScriptProcessor): an audio clock that stops still releases, at most 6 s after the core dropped PTT', async t => {
+  const { ep, tick, lastRts, rts, clock } = endpoint(t, { mode: 'scriptprocessor' });
+  await ep.setPtt(true);
+  ep._notePlayout(4096, 4096);
+  clock.frozen = 0;
+  const off = ep.setPtt(false);
+  await tick(5990);
+  assert.equal(lastRts(), true);
+  await tick(20);
+  await off;
+  assert.equal(lastRts(), false);
+  assert.ok(rts.at(-1).ms <= 6005, `released at ${rts.at(-1).ms} ms`);
+});
+
+test('PTT (ScriptProcessor): an audio context that is not running releases at the predicted time', async t => {
+  const { ep, tick, lastRts, clock } = endpoint(t, { mode: 'scriptprocessor' });
+  await ep.setPtt(true);
+  ep._notePlayout(4096, 4096);
+  const off = ep.setPtt(false);
+  clock.frozen = 0.05;
+  ep.ac.state = 'suspended';
+  await tick(Math.ceil(((2 * 4096) / RATE + 0.03) * 1000) + 1);
+  await off;
+  assert.equal(lastRts(), false);
 });
 
 // ------------------------------------------------------------------ ScriptProcessor buffer

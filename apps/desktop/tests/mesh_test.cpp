@@ -8,6 +8,8 @@
 #include "host/mdns.h"
 #endif
 #include <algorithm>
+#include <fcntl.h>
+#include <unistd.h>
 #include <sys/wait.h>
 #include <spawn.h>
 #include <cstdlib>
@@ -993,6 +995,36 @@ TEST_SUITE("mesh") {
     a.usage(&rss0, &cpu0);
     std::vector<double> feed_ms, light_ms, info_ms, post_ms;
     std::atomic<bool> stop{false};
+    // Control: what this machine did meanwhile. A thread that only sleeps 10 ms at a time records
+    // its longest oversleep (the scheduler or the virtual machine pausing), and every 250 ms it
+    // writes one byte next to the daemon's store and flushes it the way the store does (the disk
+    // stalling). The daemon answers every call on one thread and flushes its store on it.
+    std::atomic<uint64_t> pause_ms{0}, flush_ms{0};
+    std::thread control([&] {
+      const std::string f = tmp.path + "/control.bin";
+      auto raise = [](std::atomic<uint64_t>& m, uint64_t v) { if (v > m.load()) m.store(v); };
+      uint64_t last = ember_host::steady_ms();
+      for (int i = 1; !stop; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        uint64_t t = ember_host::steady_ms();
+        if (t - last > 10) raise(pause_ms, t - last - 10);
+        if (i % 25 == 0) {
+          int fd = ::open(f.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);
+          if (fd >= 0) {
+            ssize_t w = ::write(fd, "x", 1);
+            (void)w;
+            bool flushed = false;
+#if defined(__APPLE__) && defined(F_FULLFSYNC)
+            flushed = ::fcntl(fd, F_FULLFSYNC) == 0;
+#endif
+            if (!flushed) ::fsync(fd);
+            ::close(fd);
+          }
+          raise(flush_ms, ember_host::steady_ms() - t);
+        }
+        last = ember_host::steady_ms();
+      }
+    });
     // A second client keeps calling node.info while the feeds run (head-of-line check), plus POST.
     std::thread other([&] {
       emberd::RemoteRpc w2;
@@ -1049,6 +1081,7 @@ TEST_SUITE("mesh") {
     }
     stop = true;
     other.join();
+    control.join();
     long rss1 = 0;
     a.usage(&rss1, &cpu1);
     double wall = double(ember_host::steady_ms() - start) / 1000.0;
@@ -1058,15 +1091,26 @@ TEST_SUITE("mesh") {
                           << percentile(feed_ms, 0.99) << " ms, light " << percentile(light_ms, 0.5) << "/" << percentile(light_ms, 0.99)
                           << " ms; concurrent node.info p50/p95/p99/max " << percentile(info_ms, 0.5) << "/" << percentile(info_ms, 0.95) << "/"
                           << percentile(info_ms, 0.99) << "/" << percentile(info_ms, 1.0) << " ms (" << info_ms.size() << " calls), POST p99 " << percentile(post_ms, 0.99) << " ms; daemon CPU " << int(100 * (cpu1 - cpu0) / wall)
-                          << "% of a core, RSS " << rss0 / 1024 << "->" << rss1 / 1024 << " MiB; morse.text events " << morse_events.load());
-    CHECK(n >= 250);
-    CHECK(percentile(feed_ms, 0.99) < 50);
+                          << "% of a core, RSS " << rss0 / 1024 << "->" << rss1 / 1024 << " MiB; morse.text events " << morse_events.load()
+                          << "; this machine meanwhile: longest pause of a sleeping thread " << pause_ms.load() << " ms, slowest 1-byte flush to disk "
+                          << flush_ms.load() << " ms; slowest feed " << percentile(feed_ms, 1.0) << " ms");
     // node.info runs about 190 times here, so its 99th percentile is the second-slowest single call:
-    // one pause of the machine (a shared runner descheduling either process, a slow disk sync)
-    // decides it. Waiting behind the feeds would slow every call, so that is checked where one or
-    // two samples cannot decide it, and no single call may hang.
+    // one pause of the machine decides it. Waiting behind the feeds would slow every call, so that
+    // is checked where one or two samples cannot decide it, and no single call may hang.
+    CHECK(percentile(feed_ms, 0.99) < 50);
     CHECK(percentile(info_ms, 0.95) < 100);
-    CHECK(percentile(info_ms, 1.0) < 5000);
+    // A call that hangs, or too few feeds in the time, fails, unless the control measured this
+    // machine itself standing still for a second or more in the same seconds: then these two
+    // real-time steps are SKIPPED with the numbers, not passed.
+    const uint64_t stood_still = std::max(pause_ms.load(), flush_ms.load());
+    if ((percentile(info_ms, 1.0) >= 5000 || n < 250) && stood_still >= 1000) {
+      MESSAGE("SKIPPED (not passed): no call hangs, 250 feeds in the time. This machine stood still for "
+              << stood_still << " ms during the run (sleeping thread " << pause_ms.load() << " ms, disk flush " << flush_ms.load()
+              << " ms); slowest node.info " << percentile(info_ms, 1.0) << " ms, " << n << " feeds");
+    } else {
+      CHECK(n >= 250);
+      CHECK(percentile(info_ms, 1.0) < 5000);
+    }
     if (morse) CHECK(morse_events.load() > 0);
   }
 

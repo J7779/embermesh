@@ -22,6 +22,11 @@ function frame(v, x = 60, y = 10, w = 10, h = 10, bg = 30) {
   return d;
 }
 const pattern = (text, wpm) => morsePattern(toMorse(text), wpm);
+// Noise for the signal tests comes from a seeded generator, so a run repeats exactly. The mock
+// decoder is a stand-in ("not a reference implementation"): with unseeded noise it read the first
+// dash of the audio test as a dot in about 6 of 400 draws. Noise tolerance is tested on the real
+// decoder in the core's suites.
+const seeded = (seed) => () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const isOn = (pat, t) => { let a = 0; for (let i = 0; i < pat.length; i++) { if (t < a + pat[i]) return i % 2 === 0; a += pat[i]; } return false; };
 
 test('region brightness and clamping', () => {
@@ -92,6 +97,7 @@ const fresh = () => new MockBackend({ persist: false, speed: 0.001, autoplay: fa
 
 test('mock morse.rx decodes light (30 fps, noisy) and audio (resampled 48 kHz tone)', async () => {
   const b = fresh();
+  const rnd = seeded(1);
   const texts = [];
   b.on('morse.text', d => texts.push(d.text));
   const { session } = await b.call('morse.rx.start', { source: 'light' });
@@ -100,7 +106,7 @@ test('mock morse.rx decodes light (30 fps, noisy) and audio (resampled 48 kHz to
   const batch = new SampleBatcher(30, 250);
   let st;
   for (let t = 0; t < total; t += 33.4) {
-    const out = batch.add(t, (isOn(pat, t) ? 0.75 : 0.25) + (Math.random() - 0.5) * 0.06);
+    const out = batch.add(t, (isOn(pat, t) ? 0.75 : 0.25) + (rnd() - 0.5) * 0.06);
     if (out) st = await b.call('morse.rx.feed', { session, ...out });
   }
   st = await b.call('morse.rx.status', { session });
@@ -116,7 +122,7 @@ test('mock morse.rx decodes light (30 fps, noisy) and audio (resampled 48 kHz to
   const ap = pattern('CQ 73', 18);
   const res = new Resampler(48000, 8000);
   const dur = ap.reduce((x, y) => x + y, 0) + 800;
-  const buf = new Float32Array(Math.round(dur * 48)).map((_, i) => (isOn(ap, i / 48) ? 0.4 * Math.sin(2 * Math.PI * 820 * i / 48000) : 0) + (Math.random() - 0.5) * 0.02);
+  const buf = new Float32Array(Math.round(dur * 48)).map((_, i) => (isOn(ap, i / 48) ? 0.4 * Math.sin(2 * Math.PI * 820 * i / 48000) : 0) + (rnd() - 0.5) * 0.02);
   for (let i = 0; i < buf.length; i += 4096) await b.call('morse.rx.feed', { session: a.session, pcm_b64: pcmToB64(res.push(buf.subarray(i, i + 4096))) });
   const sa = await b.call('morse.rx.status', { session: a.session });
   assert.equal(sa.transcript.trim(), 'CQ 73');

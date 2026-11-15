@@ -15,7 +15,10 @@ const GUM_TIMEOUT_MS = 30000;
 // - a worklet that never answers (stalled, crashed) still releases: at the predicted end plus
 //   PTT_STALL_S, and never later than PTT_MAX_HANG_S after the core dropped PTT.
 // - ScriptProcessor: the main thread fills the device buffers itself, so the prediction is exact
-//   (each buffer plays one buffer after its callback; _notePlayout counts that).
+//   (each buffer plays one buffer after its callback; _notePlayout counts that). The wait runs on
+//   the wall clock and the samples on the audio clock: when the timer fires and the audio clock has
+//   not reached the predicted end (the device fell behind), it waits for the rest, never later
+//   than PTT_MAX_HANG_S after the core dropped PTT.
 // - close / page hide / errors release at once, as before.
 const PTT_TAIL_S = 0.03;
 const PTT_STALL_S = 1;
@@ -311,7 +314,17 @@ class AudioEndpoint extends Endpoint {
       this._pttCancel = () => { if (!done) { end(); resolve(); } };
       // ScriptProcessor: the prediction. Worklet: the hard bound, if the drain report never comes.
       const bound = port ? Math.min(hang + PTT_STALL_S, PTT_MAX_HANG_S) : Math.min(hang, PTT_MAX_HANG_S);
-      this._pttTimer = setTimeout(go, Math.ceil(bound * 1000));
+      const asked = Date.now();
+      // ScriptProcessor: release only once the audio clock has reached the end of the last sample.
+      const played = () => {
+        if (done) return;
+        if (!this.ac || this.ac.state !== 'running') { go(); return; } // a stopped clock never arrives
+        const left = (this._playEnd || 0) + this._outLatency() + PTT_TAIL_S - now();
+        const room = PTT_MAX_HANG_S - (Date.now() - asked) / 1000;
+        if (left > 0.001 && room > 0) { this._pttTimer = setTimeout(played, Math.ceil(Math.min(left, room) * 1000)); return; }
+        go();
+      };
+      this._pttTimer = setTimeout(port ? go : played, Math.ceil(bound * 1000));
       if (!port) return;
       const id = ++this._drainSeq;
       this._drainWait = { id, fn: (m) => { this._drainedAt = Number(m.t) || now(); tail = setTimeout(go, Math.ceil((this._outLatency() + PTT_TAIL_S) * 1000)); } };

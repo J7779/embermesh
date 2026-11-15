@@ -66,6 +66,40 @@ async function quiet(A) {
   return '__epB.pttEvents.filter((e) => e.on).length - __bKeys0';
 }
 
+// What B's microphone is handed, sample by sample (both capture paths end in the endpoint's _rx):
+// each stretch of signal â€” first to last sample above the noise floor, closed by 50 ms of silence â€”
+// with the holes inside it. A's modem tone has a constant envelope, so 8 samples in a row near zero
+// inside a stretch is a hole. A's audio reaches B through a MediaStream between two AudioContexts;
+// a browser short of time on its audio threads drops a block there although the page kept time.
+const HEAR = `(() => {
+  const ep = globalThis.__epB, rx = globalThis.__hear = { i: 0, cur: null, bursts: [], end: Math.round(ep.sampleRate * 0.05) };
+  const f = ep._rx.bind(ep);
+  ep._rx = (x) => {
+    for (let j = 0; j < x.length; j++, rx.i++) {
+      if (Math.abs(x[j]) > 0.02) {
+        if (!rx.cur) rx.cur = { first: rx.i, last: rx.i, holes: 0, longest: 0 };
+        else { const run = rx.i - rx.cur.last - 1; if (run >= 8) { rx.cur.holes++; rx.cur.longest = Math.max(rx.cur.longest, run); } rx.cur.last = rx.i; }
+      } else if (rx.cur && rx.i - rx.cur.last > rx.end) { rx.bursts.push(rx.cur); rx.cur = null; }
+    }
+    return f(x);
+  };
+  return true;
+})()`;
+const HEAR_RESET = '(globalThis.__hear.bursts = [], globalThis.__hear.cur = null, true)';
+/**
+ * The frame under test at both ends: the burst A keyed at or after `sentAt` (finished or still
+ * keyed) and what B's microphone was handed since HEAR_RESET. `whole`: one stretch without holes,
+ * as long as A's burst less the modem's ramp (25 to 28 samples at 48 kHz in every decoded run
+ * measured; up to 96 allowed, and one dropped render block is 128).
+ */
+async function sentAndHeard(A, sentAt) {
+  const bursts = (await A.evaluate('__epA.bursts.concat(__epA._burst ? [__epA._burst] : [])').catch(() => null)) || [];
+  const sent = bursts.filter((b) => b.on_ms >= sentAt - 50)[0] || null;
+  const heard = await A.evaluate('(() => { const r = globalThis.__hear; return r.bursts.concat(r.cur ? [r.cur] : []).map((b) => ({ samples: b.last - b.first + 1, holes: b.holes, longest_hole: b.longest })); })()');
+  const short = sent && heard.length === 1 ? sent.samples - heard[0].samples : NaN;
+  return { bursts, sent, heard, whole: heard.length === 1 && heard[0].holes === 0 && short >= 0 && short <= 96 };
+}
+
 const CROSS_WIRE = (cardA, realMic) => `(async () => {
   const A = globalThis.__emberWasmBackend;
   const md = navigator.mediaDevices;
@@ -128,9 +162,12 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
   // Live audio through the devices (decode, gapless playout, PTT timing) needs a host that runs audio
   // in real time; probed just before. Below the probe's limits the transmission still runs once and
   // its numbers are reported, then the test is SKIPPED (the sample-time twin is audio_playout.test.mjs).
+  await A.evaluate(HEAR);
   const bKeys = await quiet(A);
   const rt = await realtimeSkip(t, A, ['audio', 'timers'], 'audio cross-wire');
+  await A.evaluate(HEAR_RESET);
   const text = `over the air ${Date.now()}`;
+  const sentAt = Date.now();
   await A.call('messages.send', { conv: 'ch:public', text });
   if (rt) {
     const dec = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 30000).then(() => 'yes', () => 'no');
@@ -141,7 +178,17 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
     t.skip(rt);
     return;
   }
-  const got = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.find(m => m.text === ${JSON.stringify(text)}) || null)`, 40000);
+  const got = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.find(m => m.text === ${JSON.stringify(text)}) || null)`, 40000).catch(() => null);
+  const air = await sentAndHeard(A, sentAt);
+  t.diagnostic(`A played ${air.sent ? air.sent.samples : 'no'} samples for the message; B's microphone was handed ${JSON.stringify(air.heard)}`);
+  if (!got && air.sent && !air.whole) {
+    // The probe passed a moment ago, yet the browser did not carry this burst to B whole: measured
+    // on the frame itself (see HEAR). Not decoded with the whole burst received fails below.
+    await A.evaluate('globalThis.__B.destroy().then(() => true)');
+    t.skip(`realtime: the browser did not carry A's audio to B whole: A played ${air.sent.samples} samples, B's microphone was handed ${JSON.stringify(air.heard)}`);
+    return;
+  }
+  assert.ok(got, `B decoded A's frame from audio (A's bursts ${JSON.stringify(air.bursts)}; B's microphone was handed ${JSON.stringify(air.heard)})`);
   assert.equal(got.from, a.node_id, 'B decoded A\'s frame from audio');
 
   // let the transmission finish and the PTT hang time pass
@@ -289,33 +336,57 @@ test('audio in the single file (file://): ScriptProcessor path, real modem decod
     const m = globalThis.__spMon = { buf, a: 0, b: 0, n: 0 };
     for (const [k, ep] of [['a', __epA], ['b', __epB]]) {
       const node = ep.node, f = node.onaudioprocess; let last = 0;
-      node.onaudioprocess = (e) => { const t = performance.now(); if (last) m[k] = Math.max(m[k], t - last - buf); last = t; m.n++; return f.call(node, e); };
+      node.onaudioprocess = (e) => { const t = performance.now(); if (last) m[k] = Math.max(m[k], t - last - buf); last = m['last_' + k] = t; m.n++; return f.call(node, e); };
     }
     return Math.round(buf);
   })()`);
+  await A.evaluate(HEAR);
   const bKeys = await quiet(A);
+  // what each node's audio link has done so far, to tell the frame under test from earlier traffic
+  const LINKS = `Promise.all([globalThis.__emberWasmBackend, globalThis.__B].map((b) => b.call('links.list').then((r) => (r.links || []).filter((l) => l.type === 'audio').map((l) => { const st = l.status || l; return { transmissions: st.transmissions, rx_frames: st.rx_frames, tx_frames: st.tx_frames, rx_errors: st.rx_errors }; })))).then((x) => JSON.stringify({ A: x[0], B: x[1] }))`;
+  const linkBefore = await A.evaluate(LINKS).catch((e) => e.message);
+  await A.evaluate(HEAR_RESET);
+  const ev0 = await A.evaluate('__bEvents.length');
   const text = `single file over the air ${Date.now()}`;
+  const sentAt = Date.now();
   await A.call('messages.send', { conv: 'ch:public', text });
   const decoded = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 30000).then(() => true, () => false);
-  const mon = await A.evaluate('globalThis.__spMon');
+  // Lateness includes a callback that is overdue right now: callbacks that stopped coming never
+  // report their own delay.
+  const mon = await A.evaluate('(() => { const m = globalThis.__spMon, now = performance.now(); for (const k of ["a", "b"]) if (m["last_" + k]) m[k] = Math.max(m[k], now - m["last_" + k] - m.buf); return { a: m.a, b: m.b, n: m.n }; })()');
   const late = Math.round(Math.max(mon.a, mon.b));
   const bKeyed = await A.evaluate(bKeys);
-  t.diagnostic(`ScriptProcessor budget ${budget} ms per callback; latest callback ${late} ms behind schedule (A ${Math.round(mon.a)}, B ${Math.round(mon.b)}, ${mon.n} callbacks); B keyed up ${bKeyed}x during the send; decoded: ${decoded}`);
+  const { bursts: aBursts, sent, heard, whole } = await sentAndHeard(A, sentAt);
+  const bPtt = await A.evaluate('__epB.pttEvents.slice(-16).map((e) => ({ on: e.on, t: Math.round(e.t || 0) }))').catch(() => []);
+  // half duplex: B is deaf while it transmits, so B keyed while A's frame was on the air loses it
+  const collided = !!sent && bPtt.some((e, i) => e.on && e.t < (sent.off_ms || Infinity) && ((bPtt[i + 1] && !bPtt[i + 1].on ? bPtt[i + 1].t : Infinity) > sent.on_ms));
+  const linkSeen = `before ${linkBefore} after ${await A.evaluate(LINKS).catch((e) => e.message)}`;
+  t.diagnostic(`ScriptProcessor budget ${budget} ms per callback; latest callback ${late} ms behind schedule (A ${Math.round(mon.a)}, B ${Math.round(mon.b)}, ${mon.n} callbacks); decoded: ${decoded}`);
+  t.diagnostic(`A played ${sent ? sent.samples : 'no'} samples for the message; B's microphone was handed ${JSON.stringify(heard)}; B keyed up ${bKeyed}x since the send${collided ? ', once while A was transmitting' : ', never while A was transmitting'}`);
+  t.diagnostic(`audio links (frames sent and received) ${linkSeen}`);
+  let report = `links ${linkSeen}; A's bursts ${JSON.stringify(aBursts)}; B's PTT ${JSON.stringify(bPtt)}`;
+  if (!decoded) {
+    const bSaw = await A.evaluate(`JSON.stringify(__bEvents.slice(${ev0}).filter((e) => !/^(link\\.(status|updated|ptt)|storage\\.)/.test(e[0])).slice(0, 30).map((e) => e[0] + ' ' + JSON.stringify(e[1] || null).slice(0, 160)))`).catch((e) => e.message);
+    const bMesh = await A.evaluate(`globalThis.__B.call('mesh.stats').then((r) => JSON.stringify({ rx_frames: r.rx_frames, rx_bad: r.rx_bad, delivered: r.delivered, dropped_auth: r.dropped_auth, dropped_rate: r.dropped_rate, dropped_duplicates: r.dropped_duplicates, dropped_expired: r.dropped_expired }))`).catch((e) => e.message);
+    report += `; B's events ${bSaw}; B's mesh counters ${bMesh}`;
+  }
   if (!decoded && late > budget) {
     await A.evaluate('globalThis.__B.destroy().then(() => true)');
     t.skip(`realtime: the main thread ran a ScriptProcessor callback ${late} ms late, more than its ${budget} ms buffer, so audio was lost`);
     return;
   }
-  // what each node's audio link did, for the report when the frame was lost on a host that kept time
-  const linkSeen = await A.evaluate(`Promise.all([globalThis.__emberWasmBackend, globalThis.__B].map((b) => b.call('links.list').then((r) => (r.links || []).filter((l) => l.type === 'audio').map((l) => { const st = l.status || l; return { state: st.state, transmissions: st.transmissions, csma_deferrals: st.csma_deferrals, rx_frames: st.rx_frames, tx_frames: st.tx_frames, rx_errors: st.rx_errors }; })))).then((x) => JSON.stringify({ A: x[0], B: x[1] }))`).catch((e) => e.message);
-  const bTx = await A.evaluate('JSON.stringify(__epB.pttEvents.slice(-12).map((e) => ({ on: e.on, t: Math.round(e.t || 0) })))').catch((e) => e.message);
-  t.diagnostic(`audio links after the send: ${linkSeen}`);
-  assert.equal(bKeyed, 0, `B stayed quiet during the send (links ${linkSeen}; B's PTT ${bTx}; A's bursts ${JSON.stringify(await A.evaluate('__epA.bursts').catch(() => null))})`);
-  assert.ok(decoded, `B decoded the frame (every callback within its ${budget} ms budget: latest ${late} ms behind; links ${linkSeen})`);
+  if (!decoded && sent && !collided && !whole) {
+    await A.evaluate('globalThis.__B.destroy().then(() => true)');
+    t.skip(`realtime: the browser did not carry A's audio to B whole: A played ${sent.samples} samples, B's microphone was handed ${JSON.stringify(heard)} (every callback within its ${budget} ms budget: latest ${late} ms behind)`);
+    return;
+  }
+  assert.ok(sent, `A keyed up for the message (${report})`);
+  assert.equal(collided, false, `B stayed quiet while A's frame was on the air (${report})`);
+  assert.ok(decoded, `B decoded the frame: its microphone was handed A's whole burst and every callback kept its ${budget} ms budget, latest ${late} ms behind (${report})`);
   await A.waitFor('!__epA.ptt && !__epA._burst && !__epA._pttCancel', 20000);
   const bursts = await A.evaluate('__epA.bursts');
   assert.ok(bursts.length >= 1);
-  for (const b of bursts) assert.ok(b.off_audio >= b.play_end - 0.003, 'PTT released after the last sample played');
+  for (const b of bursts) assert.ok(b.off_audio >= b.play_end - 0.003, `PTT released after the last sample played (${JSON.stringify(b)})`);
   t.diagnostic(`single file: decoded via ScriptProcessor; bursts ${JSON.stringify(bursts.map((b) => ({ samples: b.samples, keyed_ms: b.off_ms - b.on_ms })))}`);
   await A.evaluate('globalThis.__B.destroy().then(() => true)');
   assert.deepEqual(realErrors(A.errors), []);
