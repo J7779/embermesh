@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import audio from '../js/endpoints/audio.js';
+import audio, { spBufferSize } from '../js/endpoints/audio.js';
 
 const RATE = 48000;
 
@@ -202,4 +202,64 @@ test('PTT (ScriptProcessor): each buffer plays one buffer after its callback, so
   await off;
   assert.equal(lastRts(), false);
   assert.ok(rts.at(-1).ms >= ((2 * 4096) / RATE) * 1000, 'after the last sample of the buffer played');
+});
+
+// ------------------------------------------------------------------ ScriptProcessor buffer
+test('ScriptProcessor buffer: at least 160 ms (a callback may run that late), power of two', () => {
+  assert.equal(spBufferSize(48000), 8192);
+  assert.equal(spBufferSize(44100), 8192);
+  assert.equal(spBufferSize(16000), 4096);
+  assert.equal(spBufferSize(96000), 16384);
+  for (const r of [16000, 22050, 44100, 48000]) assert.ok(spBufferSize(r) / r >= 0.16, r + ' Hz');
+});
+
+test('ScriptProcessor endpoint: opens with that buffer, receives whole blocks, PTT held one buffer past the callback', async t => {
+  const created = [];
+  const rx = [];
+  let txLeft = 0;
+  const rts = [];
+  const port = { getInfo: () => ({}), async open() {}, async close() {}, async setSignals(s) { rts.push({ on: s.requestToSend, ms: Date.now() }); } };
+  class AC {
+    constructor() { this.sampleRate = RATE; this.state = 'running'; this.outputLatency = 0; this.baseLatency = 0; this.destination = {}; }
+    get currentTime() { return Date.now() / 1000; }
+    async resume() {} async close() {}
+    createMediaStreamSource() { return { connect() {}, disconnect() {} }; }
+    createScriptProcessor(size, i, o) { const sp = { bufferSize: size, i, o, connect() {}, disconnect() {}, onaudioprocess: null }; created.push(sp); return sp; }
+  }
+  const env = Object.create(globalThis);
+  const own = o => { for (const [k, v] of Object.entries(o)) Object.defineProperty(env, k, { value: v, writable: true, configurable: true, enumerable: true }); };
+  own({
+    AudioContext: AC, AudioWorkletNode: undefined, isSecureContext: true, location: { protocol: 'file:' }, document: undefined,
+    navigator: { mediaDevices: { getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }) }, serial: { getPorts: async () => [port], requestPort: async () => port } },
+  });
+  const ep = audio.create({ ptt: 'serial_rts' }, {
+    env, log: { warn() {}, log() {}, error() {} },
+    audioRx: pcm => rx.push(pcm.length),
+    audioTx: n => { const k = Math.min(n, txLeft); txLeft -= k; return new Int16Array(k).fill(1000); },
+  });
+  await ep.open();
+  assert.equal(ep.mode, 'scriptprocessor');
+  assert.equal(created.length, 1);
+  assert.equal(created[0].bufferSize, 8192, '8192 frames at 48 kHz');
+  const sp = created[0];
+  const block = () => { const inp = new Float32Array(8192), out = new Float32Array(8192); sp.onaudioprocess({ inputBuffer: { getChannelData: () => inp }, outputBuffer: { getChannelData: () => out } }); return out; };
+  t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 });
+  const tick = async ms => { for (let i = 0; i < ms; i++) { t.mock.timers.tick(1); await Promise.resolve(); await Promise.resolve(); } };
+  block();
+  assert.deepEqual(rx, [8192], 'microphone capture through the same node: whole blocks');
+  await ep.setPtt(true);
+  txLeft = 6000; // the last 6000 samples of a frame, in one callback at t = 0
+  const out = block();
+  assert.equal(out[0] !== 0 && out[5999] !== 0 && out[6000] === 0, true);
+  const off = ep.setPtt(false);
+  // that buffer plays after the one playing now: from 8192 to 14192 frames; then the 30 ms tail
+  const endMs = (8192 + 6000) / RATE * 1000;
+  await tick(Math.floor(endMs));
+  assert.equal(rts.at(-1).on, true, 'held while the last buffer still plays');
+  await tick(Math.ceil(endMs + 30 - Math.floor(endMs)) + 1);
+  await off;
+  assert.equal(rts.at(-1).on, false);
+  assert.ok(rts.at(-1).ms >= endMs, 'released after the last sample: ' + rts.at(-1).ms + ' ≥ ' + endMs.toFixed(1));
+  assert.ok(rts.at(-1).ms <= endMs + 32);
+  await ep.close();
 });

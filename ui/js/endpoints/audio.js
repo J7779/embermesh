@@ -21,6 +21,25 @@ const PTT_TAIL_S = 0.03;
 const PTT_STALL_S = 1;
 const PTT_MAX_HANG_S = 6;
 
+// ScriptProcessor fallback (the single file on file://, old browsers): the main-thread callback for
+// one buffer must return before the previous buffer has finished playing, or that part of the
+// buffer plays as silence — a gap mid-frame the far end cannot decode. The buffer length is
+// therefore how late a callback may run. 4096 frames (85 ms at 48 kHz) lost 12,648 frames of signal
+// with callbacks 100 ms late. SP_MIN_S = 160 ms gives 8192 frames at 48 and 44.1 kHz (171 / 186 ms)
+// and 4096 at 16 kHz (256 ms): callbacks up to ~170 ms late play whole. The price is one extra
+// buffer before the first sample and before PTT release (≈ 2 × 171 ms keyed in all, which the
+// release already waits for) and staler receive audio, which delays the "channel busy" sense by
+// the same amount; 16384 (341 ms) would double that for stalls a busy page rarely reaches.
+// A deeper queue on the main thread would not help: the late callback itself is the deadline.
+const SP_MIN_S = 0.16;
+/** ScriptProcessor buffer size: the smallest power of two of at least SP_MIN_S (256…16384). Pure. */
+export function spBufferSize(rate) {
+  const want = (Number(rate) || 48000) * SP_MIN_S;
+  let n = 256;
+  while (n < want && n < 16384) n *= 2;
+  return n;
+}
+
 
 // The AudioWorklet processor lives in audio_worklet.js: a real file satisfies a strict CSP
 // (script-src 'self'); in the single-file build the bootstrap maps it to its blob: URL.
@@ -153,7 +172,8 @@ class AudioEndpoint extends Endpoint {
       this.node = node;
     } else {
       // Fallback for old browsers: ScriptProcessorNode on the main thread.
-      const sp = ac.createScriptProcessor(4096, 1, 1); // ~85 ms at 48 kHz: main-thread hiccups stay inaudible
+      const sp = ac.createScriptProcessor(spBufferSize(ac.sampleRate), 1, 1); // capture and playback share it
+      this.spSize = sp.bufferSize || spBufferSize(ac.sampleRate);
       sp.onaudioprocess = (e) => {
         this._rx(e.inputBuffer.getChannelData(0));
         const out = e.outputBuffer.getChannelData(0);
