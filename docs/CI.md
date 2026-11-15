@@ -103,6 +103,14 @@ smoke-tested with `--version`/`--help` and uploaded.
     48 kHz) is the main thread's budget; beyond that blocks are lost. Both nodes run with beacons and relaying off, and A sends only after
     both have been quiet for 1.5 s of audio: a half-duplex modem is deaf while it transmits.
 
+  - The service-worker upgrade test (`e2e_offline`, from the previous release's worker) watches
+    the takeover in the browser's own record of the worker versions (DevTools `ServiceWorker`
+    domain) and never messages the controller while it waits. When the new worker skips waiting,
+    Chrome stops the old one as soon as it is idle; if a request of the loading page restarts it
+    in that instant, the new worker takes over once the old one has been idle for 30 s by itself.
+    Messaging the controller every few seconds keeps the old worker busy and stretches that to
+    Chrome's 5-minute limit. On failure the test prints the version timeline.
+
   - The camera twins (`CAMERA_TWIN`, `ui/tests/capture_hook.mjs`) render the test scene — a dark
     1280×720 picture with a steady bright lamp and a 4 px keyed light elsewhere — frame by frame
     and run exactly what the reader does with a camera frame (scale to ≤ 960 px, the UI's

@@ -319,27 +319,40 @@ test('upgrade from the previous release\'s service worker: the new one takes ove
   await P.waitFor(`navigator.serviceWorker.getRegistration().then((r) => !!(r && r.active && r.active.state === 'activated'))`, 60000);
   await P.waitFor(`caches.keys().then((k) => k.some((n) => /^embermesh-\\d/.test(n)))`, 30000);
   const id = (await P.call('node.info')).node_id;
-  // the browser's own record of each worker version (DevTools ServiceWorker domain), for the report
-  // when the takeover does not happen: which version was installed/activated, running or stopped
+  // The takeover is watched in the browser's own record of the worker versions (DevTools
+  // ServiceWorker domain), never by messaging the controller. When the new worker skips waiting,
+  // Chrome stops the old one as soon as it is idle; if a request of the loading page restarts it
+  // in that instant, the new worker waits until the old one has been idle for 30 s by itself. A
+  // test that keeps asking the controller every 2 s keeps the old worker busy and turns that wait
+  // into Chrome's 5-minute limit.
   const tl = [];
+  const versions = new Map();
   const t0 = Date.now();
   const offSw = prof.browser.cdp.onEvent((m) => {
-    if (m.method === 'ServiceWorker.workerVersionUpdated') for (const v of m.params.versions) tl.push(`+${Date.now() - t0}ms v${v.versionId} ${v.status}/${v.runningStatus} clients=${(v.controlledClients || []).length}`);
-    else if (m.method === 'ServiceWorker.workerErrorReported') tl.push(`+${Date.now() - t0}ms error ${m.params.errorMessage.errorMessage}`);
+    if (m.method === 'ServiceWorker.workerVersionUpdated') {
+      for (const v of m.params.versions) {
+        versions.set(v.versionId, v.status);
+        tl.push(`+${Date.now() - t0}ms v${v.versionId} ${v.status}/${v.runningStatus} clients=${(v.controlledClients || []).length}`);
+      }
+    } else if (m.method === 'ServiceWorker.workerErrorReported') tl.push(`+${Date.now() - t0}ms error ${m.params.errorMessage.errorMessage}`);
   });
   t.after(() => offSw());
-  await P.send('ServiceWorker.enable').catch(() => {});
+  await P.send('ServiceWorker.enable');
+  await new Promise((r) => setTimeout(r, 300)); // the versions that exist now are reported on enable
+  const before = new Set(versions.keys());
   srv.setRoot(NEW.dir);
   // the browser checks sw.js on navigation; the new worker installs, skips waiting and claims
   await P.reloadNode();
-  // the new worker precaches the site before it takes over: on a starved host that takes a while,
-  // so only a safety bound here (the test's own timeout), and its state if it never does
-  try {
-    await P.waitFor(`new Promise((res) => { const sw = navigator.serviceWorker.controller; if (!sw) return res(false); navigator.serviceWorker.addEventListener('message', (e) => res(e.data && e.data.logic), { once: true }); sw.postMessage({ type: 'embermesh-sw-logic' }); setTimeout(() => res(false), 2000); })`, 240000);
-  } catch (e) {
+  const takenOver = () => [...versions].some(([v, status]) => !before.has(v) && status === 'activated');
+  const tWait = Date.now();
+  while (!takenOver() && Date.now() - tWait < 240000) await new Promise((r) => setTimeout(r, 100));
+  if (!takenOver()) {
     const reg = await P.evaluate(`navigator.serviceWorker.getRegistration().then((r) => JSON.stringify(r && { active: r.active && r.active.state, waiting: r.waiting && r.waiting.state, installing: r.installing && r.installing.state, controller: !!navigator.serviceWorker.controller }))`).catch((x) => x.message);
     throw new Error(`the new service worker did not take over within 240 s: registration ${reg}\nworker versions as the browser saw them:\n${tl.slice(-60).join('\n')}`);
   }
+  t.diagnostic(`the new worker took over ${Date.now() - tWait} ms after the reload finished`);
+  // it claims the open page: the page's controller is now the current worker (it answers with its logic version)
+  await P.waitFor(`new Promise((res) => { const sw = navigator.serviceWorker.controller; if (!sw) return res(false); navigator.serviceWorker.addEventListener('message', (e) => res(e.data && e.data.logic), { once: true }); sw.postMessage({ type: 'embermesh-sw-logic' }); setTimeout(() => res(false), 2000); })`, 60000);
   await P.reloadNode();
   const st = await waitReady(P, 120000);
   assert.equal(st.build, NEW.build.build);
