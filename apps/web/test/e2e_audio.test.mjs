@@ -306,8 +306,12 @@ test('audio in the single file (file://): ScriptProcessor path, real modem decod
     t.skip(`realtime: the main thread ran a ScriptProcessor callback ${late} ms late, more than its ${budget} ms buffer, so audio was lost`);
     return;
   }
-  assert.equal(bKeyed, 0, 'B stayed quiet during the send');
-  assert.ok(decoded, `B decoded the frame (every callback within its ${budget} ms budget: latest ${late} ms behind)`);
+  // what each node's audio link did, for the report when the frame was lost on a host that kept time
+  const linkSeen = await A.evaluate(`Promise.all([globalThis.__emberWasmBackend, globalThis.__B].map((b) => b.call('links.list').then((r) => (r.links || []).filter((l) => l.type === 'audio').map((l) => { const st = l.status || l; return { state: st.state, transmissions: st.transmissions, csma_deferrals: st.csma_deferrals, rx_frames: st.rx_frames, tx_frames: st.tx_frames, rx_errors: st.rx_errors }; })))).then((x) => JSON.stringify({ A: x[0], B: x[1] }))`).catch((e) => e.message);
+  const bTx = await A.evaluate('JSON.stringify(__epB.pttEvents.slice(-12).map((e) => ({ on: e.on, t: Math.round(e.t || 0) })))').catch((e) => e.message);
+  t.diagnostic(`audio links after the send: ${linkSeen}`);
+  assert.equal(bKeyed, 0, `B stayed quiet during the send (links ${linkSeen}; B's PTT ${bTx}; A's bursts ${JSON.stringify(await A.evaluate('__epA.bursts').catch(() => null))})`);
+  assert.ok(decoded, `B decoded the frame (every callback within its ${budget} ms budget: latest ${late} ms behind; links ${linkSeen})`);
   await A.waitFor('!__epA.ptt && !__epA._burst && !__epA._pttCancel', 20000);
   const bursts = await A.evaluate('__epA.bursts');
   assert.ok(bursts.length >= 1);
