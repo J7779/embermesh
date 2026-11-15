@@ -34,30 +34,71 @@ async function home(app, root, q0) {
   const askSlot = h('div');
   root.appendChild(h('div', { class: 'page' }, h('div', { class: 'page-head' }, h('h1', null, 'Survival library')), h('div', { class: 'row nowrap' }, h('div', { class: 'grow' }, input), catSel), smartBox, results, askSlot, browse));
 
+  let ready = false, smart = false, semRef = { available: false }, catTitle = {}, bookmarks = [], recent = [];
+  // Search as you type: debounced, at most one query in flight; a query typed while one runs
+  // replaces any queued one, and results of a query that is no longer current are dropped.
+  // The box works from the moment it is on screen: typed while the library still loads, the query
+  // waits ("Loading the library…") and runs as soon as it is ready.
+  let seq = 0;
+  let inFlight = false, queued = false;
+  const runSearch = async () => {
+    if (inFlight) { queued = true; return; }
+    const q = input.value.trim();
+    history.replaceState(null, '', '#/guides' + (q ? '?q=' + encodeURIComponent(q) : ''));
+    const my = ++seq;
+    if (q.length < 2) { clear(results); browse.hidden = false; return; }
+    if (!ready) { clear(results).appendChild(h('p', { class: 'muted search-waiting' }, 'Loading the library…')); return; }
+    let r;
+    inFlight = true;
+    try { r = await app.api.call('guides.search', { query: q, limit: 30, ...(catSel.value ? { category: catSel.value } : {}), ...(semRef.available ? { semantic: smart } : {}) }); } catch (e) { if (my === seq && !queued) clear(results).appendChild(h('p', { class: 'bad-text' }, errorText(e))); return; } finally {
+      inFlight = false;
+      if (queued) { queued = false; runSearch(); }
+    }
+    if (my !== seq || input.value.trim() !== q) return;
+    browse.hidden = true;
+    clear(results);
+    const rs = r.results || [];
+    results.appendChild(h('h2', { class: 'section-title' }, rs.length + ' result' + (rs.length === 1 ? '' : 's') + ' for “' + q + '”'));
+    if (!rs.length) { results.appendChild(h('p', { class: 'muted' }, 'Nothing found. Try fewer or simpler words.')); return; }
+    const terms = (r.results[0] && Array.isArray(rs[0].terms) && rs[0].terms.length) ? rs[0].terms : q.split(/\s+/);
+    results.appendChild(h('ul', { class: 'list' }, rs.map(x => {
+      const sn = resultSnippet(x);
+      return h('li', null, h('a', { class: 'item', href: '#/guides/read/' + enc(String(x.id)) + '?q=' + encodeURIComponent(q) },
+        h('div', { class: 'grow' },
+          h('div', { class: 'title' }, highlight(String(x.title || x.id), x.terms || terms), sn.byMeaning ? h('span', { class: 'tag by-meaning', title: 'Found by meaning, not by the words you typed' }, '≈ by meaning') : null),
+          sn.heading ? h('div', { class: 'sub passage-heading' }, sn.heading) : null,
+          h('div', { class: 'snippet' }, highlight(sn.text, x.terms || terms)),
+          h('div', { class: 'sub' }, catTitle[x.category] || x.category || ''))));
+    })));
+  };
+  const search = debounce(runSearch, 180);
+  input.addEventListener('input', search);
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value = ''; search(); } });
+  if (q0) search();
+  setTimeout(() => { if (!matchMedia('(pointer: coarse)').matches) input.focus(); }, 30);
   let cats = await app.api.try('guides.categories', {}, null, true);
-  if (!cats) { browse.appendChild(empty('The guide library is not available in this build yet.')); input.disabled = true; return; }
+  if (!cats) { browse.appendChild(empty('The guide library is not available in this build yet.')); search.cancel(); clear(results); input.disabled = true; return () => search.cancel(); }
   if (!cats.total) {
     // The pack may still be downloading / loading (browser): show progress and keep the app usable.
     const bar = h('div', { class: 'bar' }, setFill(h('i'), 0));
     const label = h('p', { class: 'muted' }, 'The library is still loading. You can use the rest of the app meanwhile.');
     browse.appendChild(h('div', { class: 'card stack lib-progress' }, h('strong', null, 'Loading the survival library…'), bar, label));
-    input.disabled = true;
     const offProg = app.on('host.guides.progress', d => {
       if (d && d.total > 0) { setFill(bar.firstChild, d.loaded / d.total * 100); label.textContent = formatBytes(d.loaded) + ' of ' + formatBytes(d.total) + ' — you can use the rest of the app meanwhile.'; }
     });
     for (let i = 0; i < 240 && (!cats || !cats.total); i++) {
       await new Promise(r => setTimeout(r, 1000));
-      if (!root.isConnected) return;
+      if (!root.isConnected) { offProg(); return; }
       cats = await app.api.try('guides.categories', {}, null, true);
     }
     offProg();
-    if (!cats || !cats.total) { clear(browse).appendChild(empty('No guide library is included in this build.')); return; }
+    if (!cats || !cats.total) { clear(browse).appendChild(empty('No guide library is included in this build.')); search.cancel(); clear(results); input.disabled = true; return () => search.cancel(); }
     clear(browse);
-    input.disabled = false;
   }
-  const [bookmarks, recent, sem] = await Promise.all([getList(app, 'guide_bookmarks'), getList(app, 'guide_recent'), semanticInfo(app)]);
+  let sem;
+  [bookmarks, recent, sem] = await Promise.all([getList(app, 'guide_bookmarks'), getList(app, 'guide_recent'), semanticInfo(app)]);
   // Smart (meaning-based) search: only offered when the pack has a semantic section.
-  let smart = false;
+  semRef = sem;
   if (sem.available) {
     smart = (await app.kvGet(NS, 'smart_search', true)) !== false;
     const sw = h('input', { type: 'checkbox', checked: smart, 'aria-describedby': 'smart-help' });
@@ -66,7 +107,7 @@ async function home(app, root, q0) {
     const box = await askBox(app, {});
     if (box) askSlot.appendChild(box);
   }
-  const catTitle = Object.fromEntries((cats.categories || []).map(c => [c.id, c.title]));
+  catTitle = Object.fromEntries((cats.categories || []).map(c => [c.id, c.title]));
   for (const c of cats.categories || []) catSel.appendChild(h('option', { value: c.id }, String(c.title || c.id)));
   catSel.addEventListener('change', () => { if (input.value.trim().length >= 2) runSearch(); });
 
@@ -95,44 +136,8 @@ async function home(app, root, q0) {
       h('a', { class: 'item', href: '#/guides/read/' + enc(String(b.id)) }, icon('book'), h('div', { class: 'grow' }, h('div', { class: 'title' }, String(b.title || b.id)), h('div', { class: 'sub' }, (catTitle[b.category] || b.category || '') + (b.ts ? ' · ' + timeAgo(b.ts) : ''))))))));
   }
 
-  // Search as you type: debounced, at most one query in flight; a query typed while one runs
-  // replaces any queued one, and results of a query that is no longer current are dropped.
-  let seq = 0;
-  let inFlight = false, queued = false;
-  const runSearch = async () => {
-    if (inFlight) { queued = true; return; }
-    const q = input.value.trim();
-    history.replaceState(null, '', '#/guides' + (q ? '?q=' + encodeURIComponent(q) : ''));
-    const my = ++seq;
-    if (q.length < 2) { clear(results); browse.hidden = false; return; }
-    let r;
-    inFlight = true;
-    try { r = await app.api.call('guides.search', { query: q, limit: 30, ...(catSel.value ? { category: catSel.value } : {}), ...(sem.available ? { semantic: smart } : {}) }); } catch (e) { if (my === seq && !queued) clear(results).appendChild(h('p', { class: 'bad-text' }, errorText(e))); return; } finally {
-      inFlight = false;
-      if (queued) { queued = false; runSearch(); }
-    }
-    if (my !== seq || input.value.trim() !== q) return;
-    browse.hidden = true;
-    clear(results);
-    const rs = r.results || [];
-    results.appendChild(h('h2', { class: 'section-title' }, rs.length + ' result' + (rs.length === 1 ? '' : 's') + ' for “' + q + '”'));
-    if (!rs.length) { results.appendChild(h('p', { class: 'muted' }, 'Nothing found. Try fewer or simpler words.')); return; }
-    const terms = (r.results[0] && Array.isArray(rs[0].terms) && rs[0].terms.length) ? rs[0].terms : q.split(/\s+/);
-    results.appendChild(h('ul', { class: 'list' }, rs.map(x => {
-      const sn = resultSnippet(x);
-      return h('li', null, h('a', { class: 'item', href: '#/guides/read/' + enc(String(x.id)) + '?q=' + encodeURIComponent(q) },
-        h('div', { class: 'grow' },
-          h('div', { class: 'title' }, highlight(String(x.title || x.id), x.terms || terms), sn.byMeaning ? h('span', { class: 'tag by-meaning', title: 'Found by meaning, not by the words you typed' }, '≈ by meaning') : null),
-          sn.heading ? h('div', { class: 'sub passage-heading' }, sn.heading) : null,
-          h('div', { class: 'snippet' }, highlight(sn.text, x.terms || terms)),
-          h('div', { class: 'sub' }, catTitle[x.category] || x.category || ''))));
-    })));
-  };
-  const search = debounce(runSearch, 180);
-  input.addEventListener('input', search);
-  input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value = ''; search(); } });
-  if (q0) search();
-  setTimeout(() => { if (!matchMedia('(pointer: coarse)').matches) input.focus(); }, 30);
+  ready = true;
+  if (input.value.trim().length >= 2) runSearch(); // what was typed while it loaded
   return () => search.cancel();
 }
 

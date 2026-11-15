@@ -9,6 +9,17 @@ import { floatToInt16, int16ToFloat } from './framing.js';
 import { pttSignals } from './serial.js';
 
 const GUM_TIMEOUT_MS = 30000;
+// PTT release (these key a real transmitter):
+// - worklet: release PTT_TAIL_S plus the device output latency after the worklet reports its queue
+//   empty, never on a main-thread guess (the guess ignores the main thread -> worklet delay).
+// - a worklet that never answers (stalled, crashed) still releases: at the predicted end plus
+//   PTT_STALL_S, and never later than PTT_MAX_HANG_S after the core dropped PTT.
+// - ScriptProcessor: the main thread fills the device buffers itself, so the prediction is exact
+//   (each buffer plays one buffer after its callback; _notePlayout counts that).
+// - close / page hide / errors release at once, as before.
+const PTT_TAIL_S = 0.03;
+const PTT_STALL_S = 1;
+const PTT_MAX_HANG_S = 6;
 
 
 // The AudioWorklet processor lives in audio_worklet.js: a real file satisfies a strict CSP
@@ -56,6 +67,9 @@ class AudioEndpoint extends Endpoint {
     this._burst = null;
     this.bursts = [];
     this._statsWait = null;
+    this._drainWait = null;
+    this._drainSeq = 0;
+    this._drainedAt = 0;
   }
 
   get datagram() { return false; }
@@ -145,7 +159,7 @@ class AudioEndpoint extends Endpoint {
         const out = e.outputBuffer.getChannelData(0);
         const pcm = this.ctx.audioTx ? this.ctx.audioTx(out.length, this.sampleRate) : null;
         out.fill(0);
-        if (pcm && pcm.length) { out.set(int16ToFloat(pcm, this._txGain()).subarray(0, out.length)); this._notePlayout(pcm.length); this.txSamples += pcm.length; if (this._burst) this._burst.samples += pcm.length; }
+        if (pcm && pcm.length) { out.set(int16ToFloat(pcm, this._txGain()).subarray(0, out.length)); this._notePlayout(pcm.length, out.length); this.txSamples += pcm.length; if (this._burst) this._burst.samples += pcm.length; }
       };
       src.connect(sp);
       sp.connect(ac.destination);
@@ -185,6 +199,7 @@ class AudioEndpoint extends Endpoint {
     if (!m || this.closed || !this.node) return;
     if (m.rx) this._rx(m.rx);
     if (m.stats && this._statsWait) { const w = this._statsWait; this._statsWait = null; w(m.stats); }
+    if (m.drained !== undefined && this._drainWait && this._drainWait.id === m.drained) { const w = this._drainWait; this._drainWait = null; w.fn(m); }
     if (m.need !== undefined) {
       const want = Math.max(128, Math.min(48000, m.need | 0));
       const pcm = this.ctx.audioTx ? this.ctx.audioTx(want, this.sampleRate) : null;
@@ -202,17 +217,22 @@ class AudioEndpoint extends Endpoint {
     }
   }
 
-  /** Tracks when the last queued TX sample leaves the speaker (for the PTT hang time). */
-  _notePlayout(samples) {
+  /**
+   * Predicts when the last queued TX sample leaves the speaker. `block`: a ScriptProcessor buffer
+   * size — the buffer filled in a callback plays after the one playing now, one block later.
+   */
+  _notePlayout(samples, block = 0) {
     const now = this.ac ? this.ac.currentTime : 0;
-    this._playEnd = Math.max(this._playEnd || 0, now) + samples / (this.sampleRate || 48000);
+    const rate = this.sampleRate || 48000;
+    this._playEnd = Math.max(this._playEnd || 0, now + block / rate) + samples / rate;
   }
+
+  _outLatency() { return this.ac ? (Number(this.ac.outputLatency) || 0) + (Number(this.ac.baseLatency) || 0) : 0; }
 
   /** Seconds until queued TX audio has been played, plus the device output latency. */
   pttHangSeconds() {
     if (!this.ac) return 0;
-    const lat = (Number(this.ac.outputLatency) || 0) + (Number(this.ac.baseLatency) || 0);
-    return Math.max(0, (this._playEnd || 0) - this.ac.currentTime) + lat + 0.03;
+    return Math.max(0, (this._playEnd || 0) - this.ac.currentTime) + this._outLatency() + PTT_TAIL_S;
   }
 
   /** Playback statistics from the worklet: {played, underruns, underrun_samples, queued, chunks}. */
@@ -227,7 +247,8 @@ class AudioEndpoint extends Endpoint {
 
   /**
    * link.ptt from the core. PTT on keys at once; PTT off is held until the audio already queued
-   * in the worklet (and the device's output latency) has played out, or the tail is cut off.
+   * has played out (worklet: until it reports its queue empty), or the tail is cut off. Bounded:
+   * see PTT_STALL_S / PTT_MAX_HANG_S.
    */
   async setPtt(on) {
     on = !!on;
@@ -236,6 +257,7 @@ class AudioEndpoint extends Endpoint {
     if (this.pttEvents.length > 64) this.pttEvents.shift();
     clearTimeout(this._pttTimer);
     if (this._pttCancel) { const c = this._pttCancel; this._pttCancel = null; c(); } // a new key-up supersedes a pending release
+    this._drainWait = null;
     const now = () => (this.ac ? this.ac.currentTime : 0);
     if (on) {
       if (!this._burst) this._burst = { samples: 0, on_audio: now(), on_ms: Date.now() };
@@ -245,25 +267,37 @@ class AudioEndpoint extends Endpoint {
       const b = this._burst;
       if (b && !this.ptt) {
         this._burst = null;
-        b.off_audio = now(); b.off_ms = Date.now(); b.play_end = this._playEnd || 0;
+        b.off_audio = now(); b.off_ms = Date.now(); b.play_end = Math.max(this._playEnd || 0, this._drainedAt || 0);
+        if (this._drainedAt) b.drained_audio = this._drainedAt;
         this.bursts.push(b);
         if (this.bursts.length > 32) this.bursts.shift();
       }
     };
     const sig = this.pttPort ? pttSignals({ ptt: this.config.ptt === 'serial_rts' ? 'rts' : 'dtr', ptt_invert: this.config.ptt_invert }, on) : null;
     const apply = async () => {
+      if (!on) finish(); // the release is decided now: a key-up arriving during setSignals is a new burst
       if (sig) { try { await this.pttPort.setSignals(sig); } catch (e) { this._log('warn', 'PTT failed', e); } }
-      if (!on) finish();
     };
-    const hang = on ? 0 : this.pttHangSeconds();
-    if (hang > 0 && !this.closed) {
-      await new Promise((resolve) => {
-        this._pttCancel = resolve;
-        this._pttTimer = setTimeout(() => { this._pttCancel = null; apply().then(resolve); }, Math.ceil(hang * 1000));
-      });
-    } else {
-      await apply();
-    }
+    if (on || this.closed) { await apply(); return; }
+    const hang = this.pttHangSeconds();
+    const port = this.mode === 'worklet' && this.node && this.node.port;
+    // nothing was keyed (the line is driven low on open, or a repeated release): nothing to wait for
+    if (!this._burst || (!port && !(hang > 0))) { await apply(); return; }
+    this._drainedAt = 0;
+    await new Promise((resolve) => {
+      let done = false, tail = 0;
+      const end = () => { done = true; clearTimeout(this._pttTimer); clearTimeout(tail); this._pttCancel = null; this._drainWait = null; };
+      const go = () => { if (done) return; end(); apply().then(resolve, resolve); };
+      this._pttCancel = () => { if (!done) { end(); resolve(); } };
+      // ScriptProcessor: the prediction. Worklet: the hard bound, if the drain report never comes.
+      const bound = port ? Math.min(hang + PTT_STALL_S, PTT_MAX_HANG_S) : Math.min(hang, PTT_MAX_HANG_S);
+      this._pttTimer = setTimeout(go, Math.ceil(bound * 1000));
+      if (!port) return;
+      const id = ++this._drainSeq;
+      this._drainWait = { id, fn: (m) => { this._drainedAt = Number(m.t) || now(); tail = setTimeout(go, Math.ceil((this._outLatency() + PTT_TAIL_S) * 1000)); } };
+      // messages to the worklet arrive in order: the drain request follows every chunk already sent
+      try { port.postMessage({ drain: id }); } catch (e) { this._log('warn', 'PTT drain request failed', e); go(); }
+    });
   }
 
   send() { return false; } // audio links move PCM, not bytes
