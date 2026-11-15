@@ -93,6 +93,16 @@ smoke-tested with `--version`/`--help` and uploaded.
     | `e2e_audio` single file (ScriptProcessor on the main thread, one send) | audio probe fails | `audio_playout.test.mjs` (ScriptProcessor) |
     | `e2e_remote` subtest "round trip keeps up with 30 feeds/s" (p95 < 3 s) | timers probe fails | the same test's feeds are due by the clock (count, batching, bounded backlog always asserted) |
 
+    The `audio_playout.test.mjs` twins run on a virtual sound card whose clock is the sample
+    counter (`apps/web/test/lib/virtual_audio.mjs`): the real core, the real endpoint and worklet
+    code, mocked timers that advance with the audio. Every message between the page and the
+    worklet, and every ScriptProcessor callback, arrives a fixed main-thread latency late: the
+    worklet path is asserted at 3, 60 and 100 ms (0 underruns, RTS high from the first to the last
+    sample, B decodes), the ScriptProcessor path at 3 and 60 ms. A ScriptProcessor callback's output
+    plays one buffer after its block, so its 4096-frame buffer gives the main thread 85 ms at 48 kHz;
+    beyond that blocks are lost. Both nodes run with beacons and relaying off, and A sends only after
+    both have been quiet for 1.5 s of audio: a half-duplex modem is deaf while it transmits.
+
   - The camera twins (`CAMERA_TWIN`, `ui/tests/capture_hook.mjs`) render the test scene — a dark
     1280×720 picture with a steady bright lamp and a 4 px keyed light elsewhere — frame by frame
     and run exactly what the reader does with a camera frame (scale to ≤ 960 px, the UI's

@@ -233,12 +233,14 @@ async function main() {
     if (SHOTS) fs.writeFileSync(path.join(SHOTS, 'interact-tool-phone.png'), Buffer.from((await c.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
 
     current = 'interact-search';
-    // the box is on screen before the library has loaded; it searches once the categories show
-    await open('#/guides', '.cat-grid a');
-    await ev(`(() => { const i = document.querySelector('input[type=search]'); i.value = 'radio'; i.dispatchEvent(new Event('input')); })()`);
+    // typed the moment the box appears, while the library may still be loading: still searched
+    await c.send('Page.navigate', { url: base + '?mock=1#/guides' });
+    if (!await waitFor(`(() => { const i = document.querySelector('#main input[aria-label="Search guides"]'); if (!i) return false; i.value = 'radio'; i.dispatchEvent(new Event('input')); return true; })()`, 8000)) problems.push(`[${current}] no search box`);
+    const loadedWhenTyped = await ev(`!!document.querySelector('.cat-grid a')`);
+    console.log(`interact-search: typed ${loadedWhenTyped ? 'after' : 'before'} the library had loaded`);
     await waitFor(`document.querySelectorAll('.snippet mark, .title mark').length > 0`, 15000);
     const marks = await ev(`document.querySelectorAll('.snippet mark, .title mark').length`);
-    if (!(marks > 0)) problems.push('[interact-search] no highlighted results');
+    if (!(marks > 0)) problems.push(`[interact-search] no highlighted results (typed ${loadedWhenTyped ? 'after' : 'before'} the library had loaded)`);
 
     current = 'interact-sos';
     await open('#/sos', '.sos-hold');
@@ -561,9 +563,8 @@ async function realMain() {
     return ev(`[...document.querySelectorAll('.link-card')].some(e => e.textContent.includes('Smoke loopback'))`);
   });
   await step('open a guide found by search', async () => {
-    await go('#/guides');
-    if (!await waitSel('.cat-grid a', null, 20000)) throw new Error('library did not load'); // searches once loaded
-    await type('input[type=search]', 'purify water');
+    await go('#/guides', 0); // typed at once: the box searches even while the library loads
+    await type('#main input[aria-label="Search guides"]', 'purify water');
     if (!await waitFor(`document.querySelectorAll('#main .list a.item').length > 0`)) throw new Error('no search results');
     await click('#main .list a.item');
     const ok = await waitFor(`!!document.querySelector('.reader') && document.querySelector('.reader').textContent.length > 200`);
@@ -670,7 +671,6 @@ async function realMain() {
   await step('smart search, Ask and Related (or keyword search when the core lacks them)', async () => {
     const info = await ev(`window.__ember.api.call('guides.info').then(r => JSON.stringify(r.semantic || {}), e => e.code)`);
     await go('#/guides', 2000);
-    if (!await waitSel('.cat-grid a', null, 20000)) throw new Error('library did not load');
     await type('#main input[type=search]', 'tourniquet');
     if (!await waitFor(`[...document.querySelectorAll('#main .list a.item')].length > 0`)) throw new Error('exact-term query found nothing');
     if (info === 'not_implemented' || !/"available":true/.test(info)) {

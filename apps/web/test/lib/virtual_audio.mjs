@@ -95,21 +95,28 @@ export class VirtualAudio {
       node.lastOut = out;
       return;
     }
-    // ScriptProcessor: collects `size` input frames, then the main-thread callback fills the next
-    // `size` output frames (played while the following block is collected)
+    // ScriptProcessor: collects `size` input frames; the main-thread callback runs `latency` frames
+    // later and its output plays one buffer after the block it was handed (double buffering: the
+    // callback has `size` frames to answer). Whatever
+    // part of that window has passed before the callback returned is lost: played as silence and
+    // counted in node.lost (frames of signal lost).
     node._in.set(input, node._n); node._n += QUANTUM;
     if (node._n === node.size) {
-      const inBuf = node._in, outBuf = new Float32Array(node.size);
+      const inBuf = node._in, outBuf = new Float32Array(node.size), start = this.frames + QUANTUM + node.size; // block k plays during block k+1
       node._in = new Float32Array(node.size); node._n = 0;
-      if (node.onaudioprocess) node.onaudioprocess({ inputBuffer: { getChannelData: () => inBuf }, outputBuffer: { getChannelData: () => outBuf } });
-      node._out.push(outBuf);
+      const slot = { start, buf: null };
+      node._out.push(slot);
+      this._post(() => {
+        if (node.onaudioprocess) node.onaudioprocess({ inputBuffer: { getChannelData: () => inBuf }, outputBuffer: { getChannelData: () => outBuf } });
+        slot.buf = outBuf;
+        const passed = Math.max(0, Math.min(node.size, this.frames - slot.start));
+        for (let i = 0; i < passed; i++) if (outBuf[i] !== 0) { node.lost = (node.lost || 0) + 1; }
+      });
     }
+    node.lastOut = new Float32Array(QUANTUM);
+    while (node._out.length && node._out[0].start + node.size <= this.frames) node._out.shift();
     const cur = node._out[0];
-    if (!cur) { node.lastOut = new Float32Array(QUANTUM); return; }
-    node._pos = node._pos || 0;
-    node.lastOut = cur.slice(node._pos, node._pos + QUANTUM);
-    node._pos += QUANTUM;
-    if (node._pos >= cur.length) { node._out.shift(); node._pos = 0; }
+    if (cur && cur.buf && cur.start <= this.frames) { const off = this.frames - cur.start; node.lastOut = cur.buf.slice(off, off + QUANTUM); }
   }
 
   /** One quantum: messages due, every node in order, then the clock and the mocked timers. */
