@@ -92,9 +92,11 @@ export const SOUND_TWIN = (text, wpm) => `(async () => {
   const { session } = await api.call('morse.rx.start', { source: 'audio', sample_rate: 8000 });
   const res = new Resampler(rate, 8000);
   let fed = 0;
+  window.__soundTwin = { fed: 0, total: x.length };
   for (let i = 0; i < x.length; i += 4096) {
     const pcm = res.push(x.subarray(i, i + 4096));
     if (pcm.length) { fed += pcm.length; await api.call('morse.rx.feed', { session, pcm_b64: pcmToB64(pcm) }); }
+    window.__soundTwin.fed = Math.min(x.length, i + 4096);
   }
   const st = await api.call('morse.rx.status', { session });
   await api.call('morse.rx.stop', { session });
@@ -102,37 +104,51 @@ export const SOUND_TWIN = (text, wpm) => `(async () => {
 })()`;
 
 /**
- * Camera in frame time: the hook's scene (SCENE) rendered frame by frame at `fps`, frame n stamped
- * n / fps s, then exactly what the reader does with a camera frame (ui/js/lib/capture_media.js
- * CameraReader, grid mode): scaled to at most 960 px wide, max-pooled by the UI's own
- * gridSizeFor / maxPoolLuma, batched by its FrameBatcher and fed to morse.rx (§12 frames).
+ * Camera in frame time: the hook's scene (SCENE) as the reader sees each camera frame after its
+ * scaling (ui/js/lib/capture_media.js CameraReader, grid mode: at most 960 px wide, so a 1280×720
+ * frame becomes 960×540 and the 4 px light 3 px). The frames are built as exact RGBA buffers in
+ * JS — no canvas, so no renderer or GPU can change a pixel — then pooled by the UI's own
+ * gridSizeFor / maxPoolLuma, batched by its FrameBatcher (frame n stamped n / fps s) and fed to
+ * morse.rx (§12 frames), awaiting every feed; the status is read after the last one. Nothing
+ * depends on how long the host takes; window.__cameraTwin = {fed, total} shows progress.
  * No tap, no pin: the tracker must find the light itself.
  * -> {transcript, frames, locked_ms (frame time of the first "locked"), target (last), states}
  */
 export const CAMERA_TWIN = (text, wpm, { keyed = true, fps = 30, lead = 1500, tail = 2500 } = {}) => `(async () => {
-  ${PAINT}
+  const S = ${JSON.stringify(SCENE)};
   const { toMorse, morsePattern } = await import(new URL('js/lib/morse.js', location.href).href);
   const { gridSizeFor, maxPoolLuma, FrameBatcher } = await import(new URL('js/lib/capture.js', location.href).href);
   const api = ${API};
   const pat = morsePattern(toMorse(${JSON.stringify(text)}), ${wpm});
   const total = pat.reduce((a, b) => a + b, 0) + ${lead} + ${tail};
   const on = (ms) => { let a = ${lead}; for (let i = 0; i < pat.length; i++) { if (ms >= a && ms < a + pat[i]) return i % 2 === 0; a += pat[i]; } return false; };
-  const big = new OffscreenCanvas(S.w, S.h), bg = big.getContext('2d');
-  const cw = Math.min(960, S.w), ch = Math.max(1, Math.round(cw * S.h / S.w));
-  const small = new OffscreenCanvas(cw, ch), sg = small.getContext('2d', { willReadFrequently: true });
-  const grid = gridSizeFor(cw, ch), fb = new FrameBatcher(8, 100);
+  const cw = Math.min(960, S.w), ch = Math.max(1, Math.round(cw * S.h / S.w)), k = cw / S.w;
+  const frame = (lit) => {
+    const px = new Uint8ClampedArray(cw * ch * 4);
+    const fill = (x, y, w, h, v) => { for (let r = y; r < y + h; r++) for (let c = x; c < x + w; c++) { const i = (r * cw + c) * 4; px[i] = px[i + 1] = px[i + 2] = v; px[i + 3] = 255; } };
+    fill(0, 0, cw, ch, 0x18);
+    const box = (b) => [Math.round(b.x * k), Math.round(b.y * k), Math.max(1, Math.round(b.s * k))];
+    const [lx, ly, ls] = box(S.lamp); fill(lx, ly, ls, ls, 255);
+    if (lit) { const [x, y, s] = box(S.light); fill(x, y, s, s, 255); }
+    return px;
+  };
+  const grid = gridSizeFor(cw, ch);
+  const pool = (lit) => maxPoolLuma(frame(lit), cw, ch, grid.w, grid.h); // the same pixels pool the same way every frame
+  const dark = pool(false), lit = ${keyed} ? pool(true) : dark;
+  const fb = new FrameBatcher(8, 100);
+  const n = Math.ceil(total * ${fps} / 1000);
+  window.__cameraTwin = { fed: 0, total: n };
   const { session } = await api.call('morse.rx.start', { source: 'light' });
-  let out = {}, frames = 0, locked_ms = null, target = null;
+  let frames = 0, locked_ms = null, target = null;
   const states = {};
   const seen = (st) => { const tg = st && st.target; if (!tg) return; target = tg; states[tg.state] = (states[tg.state] || 0) + 1; if (tg.state === 'locked' && locked_ms === null) locked_ms = Math.round(frames * 1000 / ${fps}); };
-  for (let n = 0; n * 1000 / ${fps} < total; n++) {
-    const ms = n * 1000 / ${fps};
-    paint(bg, on(ms), ${keyed});
-    sg.drawImage(big, 0, 0, cw, ch);
-    const { max, mean } = maxPoolLuma(sg.getImageData(0, 0, cw, ch).data, cw, ch, grid.w, grid.h, { out });
-    out = { max, mean }; frames++;
-    const b = fb.add(ms, grid.w, grid.h, max, mean);
+  for (let i = 0; i < n; i++) {
+    const ms = i * 1000 / ${fps};
+    const g = on(ms) ? lit : dark;
+    frames++;
+    const b = fb.add(ms, grid.w, grid.h, g.max, g.mean);
     if (b) seen(await api.call('morse.rx.feed', { session, ...b }));
+    window.__cameraTwin.fed = frames;
   }
   const rest = fb.flush();
   if (rest) seen(await api.call('morse.rx.feed', { session, ...rest }));
@@ -143,7 +159,12 @@ export const CAMERA_TWIN = (text, wpm, { keyed = true, fps = 30, lead = 1500, ta
 })()`;
 
 /** Where the keyed light is, as a fraction of the picture (what a locked target must point at). */
-export const LIGHT_AT = { x: (SCENE.light.x + SCENE.light.s / 2) / SCENE.w, y: (SCENE.light.y + SCENE.light.s / 2) / SCENE.h };
+export const LIGHT_AT = { x: (SCENE.light.x + SCENE.light.s / 2) / SCENE.w, y: (SCENE.light.y + SCENE.light.s / 2) / SCENE.h }; // within a grid cell either way
+
+/** Safety bound for a twin (they finish in seconds; only a host far too slow hits it). */
+export const TWIN_TIMEOUT_MS = 5 * 60 * 1000;
+/** The message when that bound fires: which twin, and how far it got (page expression). */
+export const TWIN_PROGRESS = `JSON.stringify({ camera: window.__cameraTwin || null, sound: window.__soundTwin || null })`;
 
 /** Checks a CAMERA_TWIN result; returns the list of problems (empty = ok). */
 export function cameraTwinProblems(r, { keyed = true } = {}) {

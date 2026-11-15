@@ -56,6 +56,16 @@ before(async () => {
   console.log(`# real getUserMedia(audio) in this headless Chrome: ${MIC}${MIC === 'real' ? '' : ' -> microphone replaced by a Web Audio stream'}`);
 }, HOOK);
 
+// Both nodes quiet before the test frame: no beacons, no relaying, and both endpoints idle for
+// 1.5 s (a half-duplex modem is deaf while it transmits: B keying up during A's frame loses it).
+// Returns a page expression giving how often B keyed up since (0 = B stayed quiet).
+async function quiet(A) {
+  await A.evaluate(`Promise.all([globalThis.__emberWasmBackend, globalThis.__B].map((b) => b.call('settings.set', { settings: { beacon_interval_s: 0, relay_enabled: false } }))).then(() => true)`);
+  await A.waitFor(`(() => { const idle = [__epA, __epB].every((e) => !e.ptt && !e._burst && !e._pttCancel); const now = performance.now(); if (!idle || !globalThis.__quietSince) globalThis.__quietSince = idle ? (globalThis.__quietSince || now) : 0; return idle && now - __quietSince >= 1500; })()`, 30000);
+  await A.evaluate('(globalThis.__bKeys0 = __epB.pttEvents.filter((e) => e.on).length, true)');
+  return '__epB.pttEvents.filter((e) => e.on).length - __bKeys0';
+}
+
 const CROSS_WIRE = (cardA, realMic) => `(async () => {
   const A = globalThis.__emberWasmBackend;
   const md = navigator.mediaDevices;
@@ -118,6 +128,7 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
   // Live audio through the devices (decode, gapless playout, PTT timing) needs a host that runs audio
   // in real time; probed just before. Below the probe's limits the transmission still runs once and
   // its numbers are reported, then the test is SKIPPED (the sample-time twin is audio_playout.test.mjs).
+  const bKeys = await quiet(A);
   const rt = await realtimeSkip(t, A, ['audio', 'timers'], 'audio cross-wire');
   const text = `over the air ${Date.now()}`;
   await A.call('messages.send', { conv: 'ch:public', text });
@@ -146,6 +157,7 @@ test('audio: real modem through the audio endpoint, cross-wired via Web Audio â€
     const links = await globalThis.__B.call('links.list');
     return { st, txSamples: epA.txSamples, rate: epA.sampleRate, sig, pttEvents: epA.pttEvents, bursts: epA.bursts, bLink: links.links[0] };
   })()`);
+  t.diagnostic(`B keyed up ${await A.evaluate(bKeys)}x during the send`);
   t.diagnostic(`playout: ${JSON.stringify(r.st)}, tx samples ${r.txSamples} @ ${r.rate} Hz, B link stats ${JSON.stringify(r.bLink.stats)}`);
   assert.ok(r.txSamples > r.rate * 0.2, 'core produced audio');
   assert.ok(r.st.played >= r.txSamples, 'every transmitted sample was played');
@@ -268,13 +280,34 @@ test('audio in the single file (file://): ScriptProcessor path, real modem decod
   const a = await A.call('node.info');
   const setup = await A.evaluate(CROSS_WIRE(a.card, MIC === 'real'), 60000);
   assert.equal(await A.evaluate('__epA.mode'), 'scriptprocessor');
-  // ScriptProcessor runs on the page's main thread: a late block loses audio, so this needs a host
-  // that runs audio in real time (probed just before; the sample-time twin is audio_playout.test.mjs).
-  const why = await realtimeSkip(t, A, ['audio'], 'single-file audio');
-  if (why) { await A.evaluate('globalThis.__B.destroy().then(() => true)'); t.skip(why); return; }
+  // The ScriptProcessor runs on the page's main thread: a callback later than one buffer (its
+  // budget, spSize / sample rate) loses audio. Measured on the path itself, A's and B's callbacks,
+  // while the frame is sent: a frame lost only on a host that blew that budget is SKIPPED with the
+  // numbers; lost while every callback kept time, it fails. (Twin: audio_playout.test.mjs.)
+  const budget = await A.evaluate(`(() => {
+    const buf = ((__epA.spSize || __epA.node.bufferSize) / __epA.sampleRate) * 1000;
+    const m = globalThis.__spMon = { buf, a: 0, b: 0, n: 0 };
+    for (const [k, ep] of [['a', __epA], ['b', __epB]]) {
+      const node = ep.node, f = node.onaudioprocess; let last = 0;
+      node.onaudioprocess = (e) => { const t = performance.now(); if (last) m[k] = Math.max(m[k], t - last - buf); last = t; m.n++; return f.call(node, e); };
+    }
+    return Math.round(buf);
+  })()`);
+  const bKeys = await quiet(A);
   const text = `single file over the air ${Date.now()}`;
   await A.call('messages.send', { conv: 'ch:public', text });
-  await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 30000);
+  const decoded = await A.waitFor(`globalThis.__B.call('messages.list', { conv: 'ch:public' }).then(r => r.messages.some(m => m.text === ${JSON.stringify(text)}))`, 30000).then(() => true, () => false);
+  const mon = await A.evaluate('globalThis.__spMon');
+  const late = Math.round(Math.max(mon.a, mon.b));
+  const bKeyed = await A.evaluate(bKeys);
+  t.diagnostic(`ScriptProcessor budget ${budget} ms per callback; latest callback ${late} ms behind schedule (A ${Math.round(mon.a)}, B ${Math.round(mon.b)}, ${mon.n} callbacks); B keyed up ${bKeyed}x during the send; decoded: ${decoded}`);
+  if (!decoded && late > budget) {
+    await A.evaluate('globalThis.__B.destroy().then(() => true)');
+    t.skip(`realtime: the main thread ran a ScriptProcessor callback ${late} ms late, more than its ${budget} ms buffer, so audio was lost`);
+    return;
+  }
+  assert.equal(bKeyed, 0, 'B stayed quiet during the send');
+  assert.ok(decoded, `B decoded the frame (every callback within its ${budget} ms budget: latest ${late} ms behind)`);
   await A.waitFor('!__epA.ptt && !__epA._burst && !__epA._pttCancel', 20000);
   const bursts = await A.evaluate('__epA.bursts');
   assert.ok(bursts.length >= 1);

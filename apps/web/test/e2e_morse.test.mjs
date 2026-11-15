@@ -23,7 +23,15 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { DIST_DIR, ui } from './helpers.mjs';
 import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir, runCleanups, HOOK, realtimeSkip } from './lib/e2e.mjs';
-import { SOUND_TWIN, CAMERA_TWIN, cameraTwinProblems, CAPTURE_HOOK, MORSE_SENT, MORSE_OK, cameraWpm } from '../../../ui/tests/capture_hook.mjs';
+import { SOUND_TWIN, CAMERA_TWIN, cameraTwinProblems, CAPTURE_HOOK, MORSE_SENT, MORSE_OK, cameraWpm, TWIN_TIMEOUT_MS, TWIN_PROGRESS } from '../../../ui/tests/capture_hook.mjs';
+
+/** A deterministic twin, run to completion: only a safety bound, reported distinctly. */
+async function runTwin(P, expr) {
+  try { return await P.evaluate(expr, TWIN_TIMEOUT_MS); } catch (e) {
+    if (!/timed? ?out|timeout/i.test(e.message)) throw e;
+    throw new Error(`host too slow to finish the twin within ${TWIN_TIMEOUT_MS / 60000} min (progress ${await P.evaluate(TWIN_PROGRESS).catch(() => '?')})`);
+  }
+}
 import { startServer } from './lib/static_server.mjs';
 
 const skip = e2eSkip();
@@ -285,14 +293,14 @@ test('(b) sound Morse: keyed 700 Hz tone as the fake microphone -> 8 kHz PCM -> 
 
 // Deterministic twins of the live steps (docs/CI.md): the same keying timed by sample / frame
 // index, through the page's real core. They run on every host, whatever the real-time probe says.
-test('(b0) sound Morse in sample time: keyed tone rendered offline -> UI Resampler -> morse.rx transcript (twin of (b) and the walks\' sound step)', { skip, timeout: 90000 }, async (t) => {
+test('(b0) sound Morse in sample time: keyed tone rendered offline -> UI Resampler -> morse.rx transcript (twin of (b) and the walks\' sound step)', { skip, timeout: TWIN_TIMEOUT_MS * 2 + 60000 }, async (t) => {
   if (!needMedia(t)) return;
   const P = await nodePage(media.browser, `${media.srv.url}index.html?nohub=1&profile=morsetwin`);
   t.after(() => P.close());
   const pending = await morseSupported(P);
   if (pending) { t.todo(pending); return; }
   for (const [text, wpm, ok] of [[AUDIO_TEXT, AUDIO_WPM, (s) => s.toUpperCase().includes(AUDIO_TEXT)], [MORSE_SENT, 12, (s) => MORSE_OK.test(s)]]) {
-    const r = await P.evaluate(SOUND_TWIN(text, wpm), 60000);
+    const r = await runTwin(P, SOUND_TWIN(text, wpm));
     t.diagnostic(`sample time, ${wpm} WPM: transcript "${r.transcript}" from ${r.samples_8k} samples at 8 kHz`);
     assert.ok(ok(r.transcript), `transcript "${r.transcript}" for "${text}"`);
   }
@@ -304,14 +312,14 @@ async function framesSupported(P) {
   return f.includes('morse_frames') ? null : 'core has no light tracker yet (node.info.features lacks "morse_frames", RPC_API §12)';
 }
 
-test('(a0) camera Morse in frame time: a 4 px keyed light and a steady lamp in 1280x720 frames -> UI grid pooling -> tracker locks without a tap -> transcript; lamp only -> nothing (twin of the live camera steps)', { skip, timeout: 120000 }, async (t) => {
+test('(a0) camera Morse in frame time: a 4 px keyed light and a steady lamp in 1280x720 frames -> UI grid pooling -> tracker locks without a tap -> transcript; lamp only -> nothing (twin of the live camera steps)', { skip, timeout: TWIN_TIMEOUT_MS * 3 + 60000 }, async (t) => {
   if (!needMedia(t)) return;
   const P = await nodePage(media.browser, `${media.srv.url}index.html?nohub=1&profile=lighttwin`);
   t.after(() => P.close());
   const pending = (await morseSupported(P)) || (await framesSupported(P));
   if (pending) { t.todo(pending); return; }
   for (const [wpm, keyed] of [[12, true], [6, true], [12, false]]) {
-    const r = await P.evaluate(CAMERA_TWIN(MORSE_SENT, wpm, { keyed }), 90000);
+    const r = await runTwin(P, CAMERA_TWIN(MORSE_SENT, wpm, { keyed }));
     t.diagnostic(`frame time, ${keyed ? `keyed at ${wpm} WPM` : 'steady lamp only'}: transcript "${r.transcript}", locked at ${r.locked_ms} ms of ${r.frames} frames, target ${JSON.stringify(r.target)}, states ${JSON.stringify(r.states)}`);
     assert.deepEqual(cameraTwinProblems(r, { keyed }), []);
   }

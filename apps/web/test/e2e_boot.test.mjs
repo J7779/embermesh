@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { DIST_DIR } from './helpers.mjs';
-import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir, runCleanups, HOOK } from './lib/e2e.mjs';
+import { e2eSkip, startBrowser, nodePage, realErrors, tmpDir, runCleanups, HOOK, realtimeSkip } from './lib/e2e.mjs';
 import { findChrome, launchChrome } from './lib/cdp.mjs';
 import { startServer } from './lib/static_server.mjs';
 
@@ -94,7 +94,7 @@ async function checkBoot(t, P, label) {
   if (s.variant === 'full') assert.ok(at.out - at.frame0 >= 2400 - 20, `${label}: the whole animation played from its first frame (${JSON.stringify(at)})`);
   await P.waitFor(`(() => { const e = document.getElementById('ember-boot'); return !e || getComputedStyle(e).display === 'none' || e.hidden; })()`, 5000);
   t.diagnostic(`${label}: first paint ${tm.fp} ms, first contentful paint ${tm.fcp} ms (the static logo), interactive ${ready} ms, node.info ${s.ms.toFixed(1)} ms during the ${s.variant} animation, handed over: ${reason}`);
-  return { ...tm, tti: ready };
+  return { ...tm, tti: ready, reason };
 }
 
 test('static site: static logo first, node answers during the animation, hands over by itself; timings vs ?noboot=1', { skip, timeout: 120000 }, async (t) => {
@@ -114,7 +114,13 @@ test('static site: static logo first, node answers during the animation, hands o
   const nbTti = await tti(Q);
   t.diagnostic(`without the boot screen: first contentful paint ${nb.fcp} ms, interactive ${nbTti} ms (with: ${withBoot.fcp} / ${withBoot.tti} ms)`);
   console.log(`# boot: FCP ${withBoot.fcp} ms (logo) vs ${nb.fcp} ms without; interactive ${withBoot.tti} vs ${nbTti} ms`);
-  assert.ok(withBoot.tti < nbTti + 1500, 'the boot screen does not hold up the app');
+  // A wall-clock comparison of two loads: meaningful only on a host that keeps time, and only when
+  // the cold load's node started within the screen's cap (else the host, not the screen, was slow).
+  const rt = await realtimeSkip(t, Q, ['timers'], 'boot timings');
+  const why = rt || (withBoot.reason === 'cap' ? `the node took longer than the start-up screen's cap to start on this host (handed over: cap), so the timings compare host speed` : null);
+  await t.test('the boot screen does not hold up the app (wall clock, with vs without it)', { skip: why || false }, () => {
+    assert.ok(withBoot.tti < nbTti + 1500, `interactive ${withBoot.tti} ms with the screen vs ${nbTti} ms without`);
+  });
   assert.deepEqual(realErrors(P.errors), []);
 });
 

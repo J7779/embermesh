@@ -90,17 +90,17 @@ smoke-tested with `--version`/`--help` and uploaded.
     | `e2e_morse` "the UI Morse reader … fake camera .y4m (small keyed light + steady lamp)" | Chrome's fake camera delivers < 24 of 30 fps (its own probe, below) | `e2e_morse` (a0) |
     | `e2e_morse` (a2) screen flash → WebRTC video → reader (one send) | camera or timers probe fails in the sender or receiver page | `e2e_morse` (a0), (a) |
     | `e2e_audio` cross-wired test (live decode, device underrun counter, PTT held for all of the audio in wall-clock ms); below the limits it still transmits once and prints whether B decoded and the device counters, then skips | audio or timers probe fails | `audio_playout.test.mjs` (worklet): virtual sound card in sample time — real core, endpoint and worklet code; chunks contiguous, RTS high from the first to the last sample, B decodes |
-    | `e2e_audio` single file (ScriptProcessor on the main thread, one send) | audio probe fails | `audio_playout.test.mjs` (ScriptProcessor) |
+    | `e2e_audio` single file (ScriptProcessor on the main thread, one send) | the frame was not decoded and, measured on A's and B's ScriptProcessor callbacks during the send, one ran later than its buffer (the path's own budget, 171 ms at 48 kHz); not decoded while every callback kept time is a failure | `audio_playout.test.mjs` (ScriptProcessor, 3 / 60 / 100 ms) |
     | `e2e_remote` subtest "round trip keeps up with 30 feeds/s" (p95 < 3 s) | timers probe fails | the same test's feeds are due by the clock (count, batching, bounded backlog always asserted) |
 
     The `audio_playout.test.mjs` twins run on a virtual sound card whose clock is the sample
     counter (`apps/web/test/lib/virtual_audio.mjs`): the real core, the real endpoint and worklet
     code, mocked timers that advance with the audio. Every message between the page and the
     worklet, and every ScriptProcessor callback, arrives a fixed main-thread latency late: the
-    worklet path is asserted at 3, 60 and 100 ms (0 underruns, RTS high from the first to the last
-    sample, B decodes), the ScriptProcessor path at 3 and 60 ms. A ScriptProcessor callback's output
-    plays one buffer after its block, so its 4096-frame buffer gives the main thread 85 ms at 48 kHz;
-    beyond that blocks are lost. Both nodes run with beacons and relaying off, and A sends only after
+    worklet and the ScriptProcessor paths are asserted at 3, 60 and 100 ms (0 underruns / no block
+    lost, RTS high from the first to the last sample, B decodes). A ScriptProcessor callback's
+    output plays one buffer after its block, so its buffer (at least 160 ms: 8192 frames, 171 ms at
+    48 kHz) is the main thread's budget; beyond that blocks are lost. Both nodes run with beacons and relaying off, and A sends only after
     both have been quiet for 1.5 s of audio: a half-duplex modem is deaf while it transmits.
 
   - The camera twins (`CAMERA_TWIN`, `ui/tests/capture_hook.mjs`) render the test scene — a dark
@@ -186,6 +186,10 @@ sure an iPhone simulator exists): `./build.sh guides ios` (simulator build and a
 `./build.sh test --only ios --device-tests --strict` (the XCTest suite on the first available
 iPhone simulator; xcodebuild boots it). Results come from the `.xcresult` bundle, which is
 uploaded. No archive, no `.ipa`, no signing.
+
+The web view frame-pacing test measures a plain `WKWebView` on the same machine as its control: it
+fails only when the app's web view misses the limits in every round while the plain one meets
+them, and is skipped with the measured numbers when the machine cannot pace the plain one either.
 
 ### Guides
 

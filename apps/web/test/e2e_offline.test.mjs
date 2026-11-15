@@ -322,7 +322,14 @@ test('upgrade from the previous release\'s service worker: the new one takes ove
   srv.setRoot(NEW.dir);
   // the browser checks sw.js on navigation; the new worker installs, skips waiting and claims
   await P.reloadNode();
-  await P.waitFor(`new Promise((res) => { const sw = navigator.serviceWorker.controller; if (!sw) return res(false); navigator.serviceWorker.addEventListener('message', (e) => res(e.data && e.data.logic), { once: true }); sw.postMessage({ type: 'embermesh-sw-logic' }); setTimeout(() => res(false), 2000); })`, 60000);
+  // the new worker precaches the site before it takes over: on a starved host that takes a while,
+  // so only a safety bound here (the test's own timeout), and its state if it never does
+  try {
+    await P.waitFor(`new Promise((res) => { const sw = navigator.serviceWorker.controller; if (!sw) return res(false); navigator.serviceWorker.addEventListener('message', (e) => res(e.data && e.data.logic), { once: true }); sw.postMessage({ type: 'embermesh-sw-logic' }); setTimeout(() => res(false), 2000); })`, 240000);
+  } catch (e) {
+    const reg = await P.evaluate(`navigator.serviceWorker.getRegistration().then((r) => JSON.stringify(r && { active: r.active && r.active.state, waiting: r.waiting && r.waiting.state, installing: r.installing && r.installing.state, controller: !!navigator.serviceWorker.controller }))`).catch((x) => x.message);
+    throw new Error(`the new service worker did not take over within 240 s: registration ${reg}`);
+  }
   await P.reloadNode();
   const st = await waitReady(P, 120000);
   assert.equal(st.build, NEW.build.build);

@@ -54,12 +54,28 @@ const SPECIAL = [
   ['lock', '?mock=1&locked=1', '#/chats'],
   ['degraded', '?mock=1&unsupported=guides.categories,tools.list,files.send,host.hub.status,links.list,bulletins.list,sos.list,messages.search', '#/guides'],
 ];
-import { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm, SOUND_TWIN, CAMERA_TWIN, cameraTwinProblems } from './capture_hook.mjs';
+import { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm, SOUND_TWIN, CAMERA_TWIN, cameraTwinProblems, TWIN_TIMEOUT_MS, TWIN_PROGRESS } from './capture_hook.mjs';
 // Steps that need real-time media (live camera light, live tone) run only when the host passes the
 // real-time probe (docs/CI.md); otherwise they are reported as SKIPPED with the measured numbers.
 // Their deterministic twins (sample / frame time) always run.
 import { REALTIME_PROBE, verdict, probeLine, LIMITS } from './realtime_probe.mjs';
 export { MORSE_SENT, MORSE_OK, CAPTURE_HOOK, cameraWpm };
+
+/**
+ * Runs a deterministic twin (capture_hook.mjs) to completion: no step deadline, only a safety
+ * bound that reports "host too slow to finish" with how far the twin got.
+ */
+async function runTwin(c, expr) {
+  try {
+    const r = await c.send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }, TWIN_TIMEOUT_MS);
+    if (r.exceptionDetails) throw new Error('twin failed: ' + (r.exceptionDetails.exception?.description || r.exceptionDetails.text));
+    return r.result.value;
+  } catch (e) {
+    if (!/timed out/.test(e.message)) throw e;
+    const pr = await c.send('Runtime.evaluate', { expression: TWIN_PROGRESS, returnByValue: true }).catch(() => null);
+    throw new Error(`host too slow to finish the twin within ${TWIN_TIMEOUT_MS / 60000} min (progress ${pr && pr.result ? pr.result.value : '?'})`);
+  }
+}
 
 /** Runs the real-time probe in the page (ev = the walk's evaluate) and prints its line. */
 async function probe(ev, where, parts) {
@@ -136,9 +152,9 @@ function cdp(wsUrl) {
   return new Promise(res => {
     ws.onopen = () => res({
       // every DevTools call fails after 60 s instead of hanging the walk (and CI) forever
-      send: (method, params = {}) => new Promise((r, j) => {
+      send: (method, params = {}, ms = 60000) => new Promise((r, j) => {
         const i = ++id;
-        const t = setTimeout(() => { if (pending.delete(i)) j(new Error(method + ' timed out after 60 s')); }, 60000);
+        const t = setTimeout(() => { if (pending.delete(i)) j(new Error(`${method} timed out after ${ms / 1000} s`)); }, ms);
         pending.set(i, { res: v => { clearTimeout(t); r(v); }, rej: e => { clearTimeout(t); j(e); } });
         ws.send(JSON.stringify({ id: i, method, params }));
       }),
@@ -270,12 +286,12 @@ async function main() {
     for (const [name, expr, keyed] of [['interact-morse-camera-frametime', CAMERA_TWIN(MORSE_SENT, 12), true], ['interact-morse-camera-nolight-frametime', CAMERA_TWIN(MORSE_SENT, 12, { keyed: false }), false]]) {
       current = name;
       await open('#/tools', '#main');
-      for (const p of cameraTwinProblems(await ev(expr), { keyed })) problems.push(`[${current}] ${p}`);
+      try { for (const p of cameraTwinProblems(await runTwin(c, expr), { keyed })) problems.push(`[${current}] ${p}`); } catch (e) { problems.push(`[${current}] ${e.message}`); }
     }
     current = 'interact-morse-sound-sampletime';
     await open('#/tools', '#main');
-    const snd = await ev(SOUND_TWIN(MORSE_SENT, 12));
-    if (!snd || !MORSE_OK.test(snd.transcript)) problems.push(`[${current}] transcript ${JSON.stringify(snd && snd.transcript)} (expected it to end with "CQ TEST")`);
+    const snd = await runTwin(c, SOUND_TWIN(MORSE_SENT, 12)).catch(e => { problems.push(`[${current}] ${e.message}`); return null; });
+    if (snd && !MORSE_OK.test(snd.transcript)) problems.push(`[${current}] transcript ${JSON.stringify(snd && snd.transcript)} (expected it to end with "CQ TEST")`);
     // the screen with only a steady lamp in the picture: keeps looking, reads nothing (no real time needed)
     current = 'interact-morse-camera-nolight';
     await open('#/tools/morse?tab=camera', '.morse-start');
@@ -609,7 +625,7 @@ async function realMain() {
       if (await morseRx() === 'not_implemented') return { skip: 'this core has no morse.rx yet' };
       if (!await frames()) return { skip: 'this core has no light tracker (node.info.features lacks morse_frames)' };
       await go('#/tools', 800);
-      const p = cameraTwinProblems(await ev(CAMERA_TWIN(MORSE_SENT, 12, { keyed })), { keyed });
+      const p = cameraTwinProblems(await runTwin(c, CAMERA_TWIN(MORSE_SENT, 12, { keyed })), { keyed });
       if (p.length) throw new Error(p.join('; '));
       return true;
     });
@@ -617,7 +633,7 @@ async function realMain() {
   await step('read Morse by sound in sample time', async () => {
     if (await morseRx() === 'not_implemented') return { skip: 'this core has no morse.rx yet' };
     await go('#/tools', 800);
-    const r = await ev(SOUND_TWIN(MORSE_SENT, 12));
+    const r = await runTwin(c, SOUND_TWIN(MORSE_SENT, 12));
     if (!MORSE_OK.test(r.transcript)) throw new Error('transcript ' + JSON.stringify(r.transcript));
     return true;
   });

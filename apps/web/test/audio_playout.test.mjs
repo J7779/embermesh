@@ -122,8 +122,8 @@ async function transmit(t, opts) {
 for (const latencyMs of [3, 60, 100]) {
   test(`audio playout in sample time (worklet, main-thread answers ${latencyMs} ms late): contiguous chunks, PTT held from first to last sample, B decodes (twin of the cross-wired test)`, { skip, timeout: 120000 }, (t) => transmit(t, { worklet: true, latencyMs }));
 }
-// The ScriptProcessor's 4096-frame buffer gives each callback 85 ms at 48 kHz: 3 and 60 ms are
-// inside that budget (100 ms is not: blocks are lost, see the ScriptProcessor note in docs/CI.md).
-for (const latencyMs of [3, 60]) {
+// The ScriptProcessor's buffer (at least 160 ms: 8192 frames, 171 ms at 48 kHz) is each callback's
+// budget: 3, 60 and 100 ms are inside it.
+for (const latencyMs of [3, 60, 100]) {
   test(`audio playout in sample time (ScriptProcessor, the single file, ${latencyMs} ms): PTT held from first to last sample, B decodes (twin of the single-file test)`, { skip, timeout: 120000 }, (t) => transmit(t, { worklet: false, latencyMs }));
 }
